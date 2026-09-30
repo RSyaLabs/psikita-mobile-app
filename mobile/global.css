@@ -1,0 +1,77 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root:root {
+  --primary: 30 51 34;
+  --primary-foreground: 255 255 255;
+  --secondary: 45 107 63;
+  --secondary-foreground: 255 255 255;
+  --background: 237 242 237;
+  --foreground: 30 51 34;
+  --card: 255 255 255;
+  --popover: 255 255 255;
+  --popover-foreground: 30 51 34;
+  --muted: 228 239 229;
+  --muted-foreground: 96 111 96;
+  --destructive: 207 36 36;
+  --border: 198 214 202;
+  --input: 198 214 202;
+  --ring: 45 107 63;
+  --accent: 228 239 229;
+  --accent-foreground: 30 51 34;
+  --warning: 165 90 5;
+  --warning-foreground: 255 255 255;
+}
+
+*,
+::before,
+::after {
+  --tw-shadow: 0 0 #0000 !important;
+  --tw-shadow-colored: 0 0 #0000 !important;
+  box-shadow: none !important;
+  -webkit-box-shadow: none !important;
+}
+
+/* Universal Frosted Glass Modal & Dialog Backdrop Blur */
+[data-backdrop="true"],
+[data-backdrop],
+.backdrop-blur-md,
+[class*="backdrop-blur"],
+[class*="Backdrop"],
+[class*="backdrop"],
+div[data-overlay-container="true"] > div:first-child,
+div[data-portal="true"] > div:first-child,
+div[data-portal="true"] [data-backdrop="true"],
+div[data-portal] > div:first-child,
+div[style*="z-index:9999"] > div:first-child,
+div[style*="z-index: 9999"] > div:first-child,
+div[style*="z-index:9999"] > div > div:first-child,
+div[style*="z-index: 9999"] > div > div:first-child,
+div[style*="position: fixed"][style*="inset: 0px"],
+div[style*="position: fixed"][style*="inset: 0"],
+div[style*="position: absolute"][style*="left: 0px"][style*="right: 0px"],
+div[style*="position: fixed"][style*="left: 0px"][style*="right: 0px"],
+div[style*="backdrop-filter"],
+div[style*="backdropFilter"],
+[aria-modal="true"] ~ div[style*="position: fixed"],
+[aria-modal="true"] ~ div[style*="position: absolute"] {
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  background-color: rgba(0, 0, 0, 0.45) !important;
+  transition: none !important;
+  animation-duration: 0s !important;
+  animation-delay: 0s !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+

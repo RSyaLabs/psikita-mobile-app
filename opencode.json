@@ -1,0 +1,28 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "formatter": {
+    "prettier": {
+      "command": ["npx", "--yes", "prettier@3", "--write", "$FILE"],
+      "extensions": [
+        ".ts",
+        ".tsx",
+        ".js",
+        ".jsx",
+        ".json",
+        ".md",
+        ".yml",
+        ".yaml"
+      ]
+    }
+  },
+  "commands": {
+    "typecheck": {
+      "description": "Typecheck the mobile app and report errors verbatim",
+      "template": "Run the mobile typecheck with: cd mobile && npx tsc --noEmit --incremental. Report every error verbatim with file and line. Do not edit any file unless I explicitly ask you to fix them."
+    },
+    "verify": {
+      "description": "Typecheck plus the full mobile test suite",
+      "template": "Run both gates in order and report results separately. First: cd mobile && npx tsc --noEmit --incremental. Then: cd mobile && npm run test:ci. Do not edit any file. Report the exact failing test names and the first error line for each."
+    }
+  }
+}

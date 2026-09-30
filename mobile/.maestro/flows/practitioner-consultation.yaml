@@ -1,0 +1,33 @@
+appId: com.psikita.mobile
+---
+- launchApp:
+    clearState: true
+
+# 1. Practitioner Authentication Flow
+- assertVisible: "PsiKita"
+- tapOn:
+    text: "Masuk dengan Akun"
+    optional: true
+
+# Login Modal
+- assertVisible: "Masuk ke Akun"
+- tapOn: "username atau email"
+- inputText: "dr_rina_amelia"
+- tapOn: "••••••••"
+- inputText: "Password123!"
+- tapOn: "Masuk Sekarang"
+
+# 2. Practitioner Dashboard Verification
+- assertVisible:
+    text: "dr. Rina Amelia"
+    optional: true
+- assertVisible:
+    text: "Siaga Menerima Sesi"
+    optional: true
+- assertVisible: "Antrian aktif"
+
+# 3. Quick Navigation & Status Check
+- assertVisible: "Aksi cepat"
+- assertVisible: "Jadwal"
+- assertVisible: "Catatan"
+- assertVisible: "Laporan"

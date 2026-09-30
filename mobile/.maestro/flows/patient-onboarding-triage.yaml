@@ -1,0 +1,42 @@
+appId: com.psikita.mobile
+---
+- launchApp:
+    clearState: true
+
+# 1. Onboarding & Authentication Flow
+- assertVisible: "PsiKita"
+- assertVisible: "Layanan Konsultasi Kesehatan Mental"
+- tapOn:
+    text: "Masuk dengan Akun"
+    optional: true
+
+# Login Modal
+- assertVisible: "Masuk ke Akun"
+- tapOn: "username atau email"
+- inputText: "siti_rahayu"
+- tapOn: "••••••••"
+- inputText: "Password123!"
+- tapOn: "Masuk Sekarang"
+
+# 2. Patient Dashboard Verification
+# The dashboard renders "Halo, {patientName}" (app/(patient)/patient/dashboard.tsx:103).
+# The previous revision asserted "PsiKita" here, which that screen never renders,
+# so the step could only ever fail. The real post-login greeting is asserted instead,
+# and non-optionally, so a failed login fails this flow.
+- assertVisible: "Halo, Siti"
+
+# 3. Triage Consultation Navigation
+- tapOn:
+    text: "Konsultasi langsung"
+    optional: true
+- assertVisible:
+    text: "Triase Konsultasi"
+    optional: true
+- assertVisible:
+    text: "Fitur belum tersedia"
+    optional: true
+
+# 4. Safe Return to Dashboard
+- tapOn:
+    text: "Kembali"
+    optional: true

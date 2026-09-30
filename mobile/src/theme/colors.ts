@@ -1,0 +1,48 @@
+export const colors = {
+  forest: {
+    DEFAULT: "#1E3322",
+    light: "#2A4530",
+    dark: "#142317",
+    muted: "rgba(30, 51, 34, 0.5)",
+  },
+  emerald: {
+    DEFAULT: "#2D6B3F",
+    hover: "#255934",
+    light: "#E8F3EB",
+  },
+  sage: {
+    DEFAULT: "#EDF2ED",
+    50: "#F6F8F6",
+    100: "#EDF2ED",
+    200: "#E4EFE5",
+    300: "#CBD5CB",
+    400: "#A9BFAE",
+    500: "#6B7B6B",
+    600: "#505E50",
+  },
+  status: {
+    warning: "#F59E0B",
+    warningBg: "#FEF3C7",
+    warningText: "#92400E",
+    success: "#10B981",
+    successBg: "#E4EFE5",
+    danger: "#EF4444",
+    dangerBg: "#FEF2F2",
+    dangerText: "#B91C1C",
+  },
+  bpjs: {
+    green: "#2D6B3F",
+    bg: "#E4EFE5",
+  },
+  divider: "#E2E8E2",
+  chip: "#F1F4F1",
+  card: {
+    warm: "#FEF3C7",
+    cool: "#E4EFE5",
+    mint: "#D1FAE5",
+    rose: "#FFE4E6",
+    crisis: "#FEF2F2",
+  },
+  white: "#FFFFFF",
+  border: "#C6D6CA",
+};

@@ -1,0 +1,73 @@
+services:
+  core-api:
+    image: asia-southeast2-docker.pkg.dev/psikita-platform/psikita-shared-repo/core-api:v1.0.2-staging
+    container_name: psikita-core-api
+    restart: unless-stopped
+    ports:
+      - "3100:3000"
+    env_file:
+      - .env
+    environment:
+      - DB_HOST=postgres
+      - REDIS_HOST=redis
+      - PORT=3000
+    volumes:
+      - /home/azureuser/migrations:/app/dist/infrastructures/database/migrations
+      - /home/azureuser/patches/practitioner.dao.js:/app/dist/modules/practitioner/infrastructure/persistence/repositories/practitioner.dao.js
+      - /home/azureuser/patches/psychologist-profile.orm-entity.js:/app/dist/modules/practitioner/infrastructure/persistence/entities/psychologist-profile.orm-entity.js
+      - /home/azureuser/patches/practitioner.module.js:/app/dist/modules/practitioner/practitioner.module.js
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - psikita-network
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: psikita-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: psikita
+      # No default on purpose. A committed default here is a committed password,
+      # and GitHub caches and indexes what it receives, so deleting the value
+      # later does not unpublish it. `:?` makes compose fail loudly rather than
+      # silently starting a database with a placeholder password.
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env or the environment}
+      POSTGRES_DB: psikita_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U psikita -d psikita_dev"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - psikita-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: psikita-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - psikita-network
+
+networks:
+  psikita-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:

@@ -1,0 +1,38 @@
+{
+  "expo": {
+    "name": "PsiKita",
+    "slug": "psikita-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "scheme": "psikita",
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#1E3322"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "id.psikita.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#1E3322"
+      },
+      "package": "id.psikita.app"
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-asset"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

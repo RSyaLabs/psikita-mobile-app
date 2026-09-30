@@ -1,0 +1,14 @@
+{
+  "embeddingProvider": "auto",
+  "scope": "project",
+  "indexing": {
+    "mode": "structural",
+    "autoIndex": false,
+    "watchFiles": true,
+    "requireProjectMarker": true
+  },
+  "search": {
+    "maxResults": 20,
+    "includeContext": true
+  }
+}

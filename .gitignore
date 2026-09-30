@@ -1,0 +1,57 @@
+# Dependencies
+node_modules/
+*/node_modules/
+*/*/node_modules/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Expo / Mobile
+.expo/
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+
+# Build outputs
+dist/
+build/
+web-build/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Local codebase indexes
+.opencode/index/
+graphify-out/
+
+# Local scratch scripts with hardcoded credentials (JWT secret, live login)
+
+# Generated API reference UI (regenerate from staging-openapi.json)
+
+# Local config backups
+*.bak-*
+
+# TypeScript incremental build cache
+*.tsbuildinfo
+
+# uxaudit skill workspace (regenerate: run the skill, do not commit its output)
+.uxaudit/
+
+# Visual-review screenshots. Generated from a running demo; several screens
+# render fixture values that read as real medical identifiers, so these must
+# not travel with the repository.
+docs/screenshots/
