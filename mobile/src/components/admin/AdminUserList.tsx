@@ -15,6 +15,7 @@ import {
 } from "@/components/ui";
 import { getInitials } from "@/utils/format";
 import { haptics } from "@/utils/haptics";
+import { Platform } from "react-native";
 
 export interface AdminUserListItem {
   id: string;
@@ -106,7 +107,8 @@ export function AdminUserList({
                     <Text
                       size="xs"
                       className="text-muted-foreground text-[11px]"
-                      numberOfLines={1}
+                      isTruncated
+                      numberOfLines={Platform.OS === "web" ? undefined : 1}
                     >
                       {user.identifier}
                     </Text>

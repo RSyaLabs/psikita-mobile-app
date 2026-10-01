@@ -30,7 +30,21 @@ interface CustomRenderOptions {
 }
 
 /**
- * Renders UI wrapped in isolated QueryClientProvider and GluestackUIProvider
+ * Renders UI wrapped in isolated QueryClientProvider and GluestackUIProvider.
+ *
+ * The nesting order is deliberately identical to app/_layout.tsx and is not a
+ * cosmetic choice. Gluestack's OverlayProvider sits inside
+ * GluestackUIProvider, and its portal mounts Modal content as siblings of
+ * `props.children`, so anything a provider below GluestackUIProvider supplies is
+ * invisible to Modal children: a Modal child calling useMutation throws
+ * "No QueryClient set" and, in the real app, takes the entire screen down with it.
+ *
+ * This helper used to nest the client BELOW Gluestack, which meant the suite
+ * asserted a tree the app never runs. Every modal test passed while the shipped
+ * forgot-password flow crashed in a browser. QueryClientProvider stays outermost
+ * here, and
+ * __tests__/providers/modal-query-context.test.tsx fails if this order and the
+ * root layout ever diverge again.
  */
 export function renderWithClient(
   ui: React.ReactElement,
@@ -50,11 +64,28 @@ export function renderWithClient(
   };
 }
 
+/**
+ * Same provider order as renderWithClient and as the root layout, plus the auth
+ * provider: query client outermost, then auth, Gluestack innermost.
+ */
 export function renderWithAuth(
   ui: React.ReactElement,
   options?: CustomRenderOptions,
 ) {
-  return renderWithClient(<AuthProvider>{ui}</AuthProvider>, options);
+  const queryClient = options?.queryClient || createTestQueryClient();
+
+  const Wrapper = ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <GluestackUIProvider mode="light">{children}</GluestackUIProvider>
+      </AuthProvider>
+    </QueryClientProvider>
+  );
+
+  return {
+    ...render(ui, { wrapper: Wrapper }),
+    queryClient,
+  };
 }
 
 // Re-export testing library utilities

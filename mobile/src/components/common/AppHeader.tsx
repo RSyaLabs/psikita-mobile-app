@@ -1,5 +1,6 @@
 import React from "react";
 import { useRouter } from "expo-router";
+import { Platform } from "react-native";
 import { ArrowLeft } from "lucide-react-native";
 import { Box, Heading, Text, HStack, Pressable } from "@/components/ui";
 import { safeNavigateBack } from "@/utils/navigation";
@@ -61,10 +62,17 @@ export function AppHeader({
             </Pressable>
           )}
           <Box className="flex-1">
+            {/* Truncation is platform-specific, on both elements below. numberOfLines
+                is a real react-native Text prop, so it is kept on native; on web
+                Heading renders a real <h1> and Text a raw <span>, both of which
+                forward the unknown prop and make React warn, so it is omitted there.
+                See the longer note beside the Heading in AuthLoginModal for why
+                isTruncated does not actually produce an ellipsis here. */}
             <Heading
               size="sm"
               bold
-              numberOfLines={1}
+              isTruncated
+              numberOfLines={Platform.OS === "web" ? undefined : 1}
               className={
                 isPrimary ? "text-primary-foreground" : "text-foreground"
               }
@@ -74,7 +82,8 @@ export function AppHeader({
             {subtitle ? (
               <Text
                 size="xs"
-                numberOfLines={1}
+                isTruncated
+                numberOfLines={Platform.OS === "web" ? undefined : 1}
                 className={
                   isPrimary
                     ? "text-primary-foreground/70"

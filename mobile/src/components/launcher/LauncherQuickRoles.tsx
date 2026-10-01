@@ -3,6 +3,7 @@ import { useRouter } from "expo-router";
 import { Card, HStack, Pressable, Text, VStack } from "@/components/ui";
 import { ROUTES } from "@/constants";
 import { haptics } from "@/utils/haptics";
+import { Platform } from "react-native";
 
 export function LauncherQuickRoles() {
   const router = useRouter();
@@ -27,7 +28,8 @@ export function LauncherQuickRoles() {
             <Text
               size="xs"
               className="font-bold text-primary text-[11px]"
-              numberOfLines={1}
+              isTruncated
+              numberOfLines={Platform.OS === "web" ? undefined : 1}
             >
               🔑 Masuk
             </Text>
@@ -43,7 +45,8 @@ export function LauncherQuickRoles() {
             <Text
               size="xs"
               className="font-bold text-secondary text-[11px]"
-              numberOfLines={1}
+              isTruncated
+              numberOfLines={Platform.OS === "web" ? undefined : 1}
             >
               👤 Pasien
             </Text>
@@ -59,7 +62,8 @@ export function LauncherQuickRoles() {
             <Text
               size="xs"
               className="font-bold text-primary text-[11px]"
-              numberOfLines={1}
+              isTruncated
+              numberOfLines={Platform.OS === "web" ? undefined : 1}
             >
               🩺 Praktisi
             </Text>
@@ -75,7 +79,8 @@ export function LauncherQuickRoles() {
             <Text
               size="xs"
               className="font-bold text-foreground text-[11px]"
-              numberOfLines={1}
+              isTruncated
+              numberOfLines={Platform.OS === "web" ? undefined : 1}
             >
               🛡️ Admin
             </Text>

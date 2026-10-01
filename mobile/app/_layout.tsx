@@ -44,9 +44,33 @@ export default function RootLayout() {
        */}
       <ReducedMotionConfig mode={ReduceMotion.System} />
       <SafeAreaProvider>
-        <GluestackUIProvider mode="light">
-          <QueryProvider>
-            <AuthProvider>
+        {/*
+         * Provider order here is load-bearing, not a style preference.
+         *
+         * Gluestack's OverlayProvider lives INSIDE GluestackUIProvider, and its
+         * portal renders Modal content as siblings of `props.children` rather
+         * than inside them. Every provider nested below GluestackUIProvider is
+         * therefore invisible to whatever a Modal renders, on web and native
+         * alike, because that subtree is mounted beside the app tree rather than
+         * within it.
+         *
+         * With QueryProvider down here, a Modal child calling useMutation or
+         * useQueryClient threw "No QueryClient set, use QueryClientProvider to
+         * set one" and took the whole app down behind it, because
+         * AppErrorBoundary wraps everything. ForgotPasswordView did exactly
+         * that: it is rendered from inside ModalBody and calls useRequestOtp.
+         *
+         * The jest suite never saw it. __tests__/utils/test-utils.tsx nested the
+         * query client ABOVE Gluestack, so the passing LoginForm test that drives
+         * the forgot-password flow was asserting a tree the app never runs.
+         *
+         * So query and auth go ABOVE Gluestack, never below it. The regression
+         * test in __tests__/providers/modal-query-context.test.tsx pins both the
+         * order and the portal behaviour.
+         */}
+        <QueryProvider>
+          <AuthProvider>
+            <GluestackUIProvider mode="light">
               <StatusBar style="dark" backgroundColor={colors.sage.DEFAULT} />
               {/* Box renders a raw <div> on web, and React DOM only accepts a
                   plain object for `style`. An array compiles on native, where
@@ -78,9 +102,9 @@ export default function RootLayout() {
                   </Stack>
                 </Box>
               </Box>
-            </AuthProvider>
-          </QueryProvider>
-        </GluestackUIProvider>
+            </GluestackUIProvider>
+          </AuthProvider>
+        </QueryProvider>
       </SafeAreaProvider>
     </AppErrorBoundary>
   );

@@ -2,6 +2,7 @@ import React from "react";
 import { Badge, BadgeText, Box, Card, HStack, Heading, Text, VStack } from "@/components/ui";
 import { CatalogRoleGroup } from "@/data/catalog";
 import { LauncherScreenItem } from "./LauncherScreenItem";
+import { Platform } from "react-native";
 
 interface LauncherRoleCardProps {
   group: CatalogRoleGroup;
@@ -31,7 +32,8 @@ export function LauncherRoleCard({ group }: LauncherRoleCardProps) {
             <Text
               size="xs"
               className="text-muted-foreground text-[11px]"
-              numberOfLines={1}
+              isTruncated
+              numberOfLines={Platform.OS === "web" ? undefined : 1}
             >
               {group.subtitle}
             </Text>

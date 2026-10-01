@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Platform } from "react-native";
 import { useRouter } from "expo-router";
 import {
   Lock,
@@ -149,12 +150,26 @@ export function AuthLoginModal({
                   <KeyRound size={14} className="text-primary" />
                 )}
               </Box>
+              {/* Truncation is platform-specific, and isTruncated is NOT the mechanism
+                  that does the truncating here. numberOfLines is a real react-native
+                  Text prop and this Heading resolves to RN Text on native, so it is
+                  kept: dropping it would let long titles wrap on the device. On web
+                  the same component renders a real <h1>, where numberOfLines is an
+                  unknown DOM attribute that React warns about, so it is omitted.
+                  isTruncated is kept alongside it for the CSS it adds, but be aware it
+                  cannot produce an ellipsis on either platform: heading/styles.tsx
+                  puts whitespace-pre-wrap in the base class, which overrides the
+                  nowrap that Tailwind's truncate relies on (verified in the browser:
+                  computed white-space stays pre-wrap, text-overflow ellipsis never
+                  engages). Web therefore wraps exactly as it did before this change;
+                  the fix here is only that no invalid prop reaches the DOM. */}
               <Heading
                 level={1}
                 size="md"
                 bold
                 className="text-foreground flex-1"
-                numberOfLines={1}
+                isTruncated
+                numberOfLines={Platform.OS === "web" ? undefined : 1}
               >
                 {tab === "login"
                   ? "Masuk ke Akun"

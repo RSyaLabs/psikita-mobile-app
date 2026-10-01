@@ -4,6 +4,7 @@ import { ChevronRight } from "lucide-react-native";
 import { Box, HStack, Pressable, Text, VStack } from "@/components/ui";
 import { CatalogScreen } from "@/data/catalog";
 import { haptics } from "@/utils/haptics";
+import { Platform } from "react-native";
 
 interface LauncherScreenItemProps {
   screen: CatalogScreen;
@@ -36,7 +37,8 @@ export function LauncherScreenItem({ screen }: LauncherScreenItemProps) {
             <Text
               size="sm"
               className="font-bold text-foreground"
-              numberOfLines={1}
+              isTruncated
+              numberOfLines={Platform.OS === "web" ? undefined : 1}
             >
               {screen.name}
             </Text>
@@ -54,7 +56,8 @@ export function LauncherScreenItem({ screen }: LauncherScreenItemProps) {
           <Text
             size="xs"
             className="text-muted-foreground text-[11px] mt-0.5"
-            numberOfLines={1}
+            isTruncated
+            numberOfLines={Platform.OS === "web" ? undefined : 1}
           >
             {screen.desc}
           </Text>
