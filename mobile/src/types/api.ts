@@ -54,7 +54,11 @@ export interface TokenResponseDto {
   /** staging-openapi.json TokenResponseDto requires refreshToken. */
   refreshToken: string;
   /** Not in the contract. A deployed server may send it; nothing may rely on
-   *  it, because no documented endpoint returns the caller's role. */
+   *  it. Its absence costs nothing: the access token is a JWT whose payload
+   *  carries `role`, see utils/jwt.ts. The contract does expose role on
+   *  RegisteredUserDto and on GET /patient/me and GET /practitioner/me; what it
+   *  lacks is any admin equivalent, which is the part that still has no route
+   *  from the client. */
   user?: {
     id: string;
     username: string;

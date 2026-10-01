@@ -34,10 +34,25 @@ const tokenUserSchema = z
  * as a 502 INVALID_RESPONSE. That is why the integration suite reported a
  * credential problem when the real problem was the contract mismatch.
  *
- * The `user` field stays optional because a deployed server may add it, but
- * nothing may depend on it. See docs/CONTRACT_GAP_ROLE.md: the contract
- * exposes no endpoint that returns the caller's role, so role-based routing
- * currently has no server source of truth.
+ * The `user` field stays optional because a deployed server may add it, and
+ * nothing may depend on it. Its absence costs nothing: the access token is a
+ * JWT whose payload carries `role`, captured from staging and documented in
+ * utils/jwt.ts.
+ *
+ * Two corrections, because the wrong version of both has been asserted here
+ * before and both were believed downstream:
+ *
+ * 1. This comment used to point at docs/CONTRACT_GAP_ROLE.md, which does not
+ *    exist in this repository.
+ * 2. It used to say the contract exposes no endpoint returning the caller's
+ *    role. It does, in three places: RegisteredUserDto on registration,
+ *    UserListItemDto on the user list, and GET /patient/me and
+ *    GET /practitioner/me, the last two of which this client already calls.
+ *
+ * What the contract genuinely lacks is narrower. There is no role-agnostic "who
+ * am I", so the client has to guess which /me to call, and there is no admin
+ * equivalent at all, which means an admin's role cannot be discovered from the
+ * client by any route. Token claims are what make admin routing work today.
  */
 const tokenResponseSchema = z.object({
   accessToken: z.string().refine((token) => token.trim().length > 0),
