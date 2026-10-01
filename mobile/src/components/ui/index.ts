@@ -10,7 +10,6 @@ export * from "./text";
 export * from "./heading";
 export * from "./vstack";
 export * from "./hstack";
-export * from "./icon";
 export * from "./gluestack-ui-provider";
 export * from "./scroll-view";
 export * from "./image";

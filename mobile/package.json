@@ -16,7 +16,6 @@
   },
   "dependencies": {
     "@expo/html-elements": "^57.0.0",
-    "@expo/vector-icons": "~14.0.4",
     "@gluestack-ui/core": "^5.0.15",
     "@gluestack-ui/utils": "^5.0.6",
     "@react-native/js-polyfills": "^0.87.1",
@@ -25,7 +24,6 @@
     "expo-asset": "~11.0.5",
     "expo-blur": "~14.0.3",
     "expo-constants": "~17.0.5",
-    "expo-font": "~13.0.3",
     "expo-haptics": "~14.0.1",
     "expo-linking": "~7.0.4",
     "expo-router": "~4.0.17",
@@ -47,7 +45,6 @@
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
-    "@testing-library/jest-native": "^5.4.3",
     "@testing-library/react-native": "^12.9.0",
     "@types/jest": "^29.5.14",
     "@types/react": "~18.3.12",
