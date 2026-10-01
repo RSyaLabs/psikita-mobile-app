@@ -50,8 +50,3 @@ graphify-out/
 
 # uxaudit skill workspace (regenerate: run the skill, do not commit its output)
 .uxaudit/
-
-# Visual-review screenshots. Generated from a running demo; several screens
-# render fixture values that read as real medical identifiers, so these must
-# not travel with the repository.
-docs/screenshots/
