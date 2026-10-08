@@ -54,7 +54,7 @@ jobs:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('mobile/android/gradle/wrapper/gradle-wrapper.properties', 'mobile/android/**/*.gradle*', 'mobile/android/gradle.properties') }}
+          key: ${{ runner.os }}-gradle-${{ hashFiles('mobile/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
 
@@ -77,7 +77,7 @@ jobs:
           EXPO_PUBLIC_USE_MOCK_FALLBACK: "false"
           CI: "false"
         run: |
-          npx expo prebuild --platform android --clean
+          npx expo prebuild --platform android --clean --no-install
 
       - name: Setup Keystore Signing
         working-directory: mobile/android
