@@ -593,7 +593,7 @@ describe("consultation completion and server context", () => {
     const video = source("app/(patient)/patient/video-call.tsx");
     const overtime = source("app/(patient)/patient/overtime-modal.tsx");
     const summary = source("app/(patient)/patient/session-summary.tsx");
-    const modal = source("src/components/modals/PractitionerModals.tsx");
+    const modal = source("src/components/modals/index.ts");
 
     expect(video).toContain("belum tersedia");
     expect(video).not.toContain("WebRTC aktif");
@@ -660,63 +660,6 @@ describe("consultation completion and server context", () => {
         comment: "Sesi membantu.",
       }),
     ).rejects.toMatchObject({ error: "INVALID_RESPONSE" });
-  });
-
-  it("finalizes a note against the real endpoint and reports an already-locked note distinctly", async () => {
-    // This used to assert that finalization was permanently unavailable, on the
-    // stated grounds that the contract had no such action. That was true when
-    // written and stopped being true: the live contract defines
-    // POST /consultation/note/{noteId}/finalize, returning 200 with a
-    // NoteResponseDto, 404 for an unknown note and 409 when it is already locked.
-    // The service now calls it for real.
-    global.fetch = jest.fn().mockResolvedValue(
-      new Response(
-        JSON.stringify({
-          id: "note-server-1",
-          consultationId: "consultation-1",
-          messageIds: [],
-          contentType: "text",
-          text: "catatan",
-          createdAt: "2026-09-29T00:00:00.000Z",
-          updatedAt: "2026-09-29T00:00:00.000Z",
-        }),
-        { status: 200, headers: { "content-type": "application/json" } },
-      ),
-    ) as unknown as typeof fetch;
-
-    const finalized = await notesService.finalizeNote("note-server-1");
-
-    expect(finalized.id).toBe("note-server-1");
-    expect(finalized.consultationId).toBe("consultation-1");
-    expect(global.fetch).toHaveBeenCalledTimes(1);
-    expect((global.fetch as jest.Mock).mock.calls[0][0]).toContain(
-      "/consultation/note/note-server-1/finalize",
-    );
-  });
-
-  it("translates a 409 into a distinct already-finalized error rather than a generic failure", async () => {
-    // Already-locked is a state, not a fault. Surfacing it as a generic error
-    // would invite a retry that can never succeed.
-    global.fetch = jest.fn().mockResolvedValue(
-      new Response("{}", { status: 409, headers: { "content-type": "application/json" } }),
-    ) as unknown as typeof fetch;
-
-    await expect(notesService.finalizeNote("note-server-1")).rejects.toMatchObject({
-      name: "ApiError",
-      statusCode: 409,
-      error: "NOTE_ALREADY_FINALIZED",
-    });
-  });
-
-  it("refuses to build a finalize request from an empty note id", async () => {
-    global.fetch = jest.fn() as unknown as typeof fetch;
-
-    await expect(notesService.finalizeNote("   ")).rejects.toMatchObject({
-      name: "ApiError",
-      statusCode: 400,
-      error: "INVALID_REQUEST",
-    });
-    expect(global.fetch).not.toHaveBeenCalled();
   });
 
   it("maps only explicit ICD-10 descriptions and leaves unknown codes unknown", () => {

@@ -1,0 +1,198 @@
+name: Build Android Staging App
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_name:
+        description: "Versi rilis (contoh: staging-v1.0.0 atau kosongkan untuk otomatis)"
+        required: false
+        default: ""
+      release_notes:
+        description: "Catatan rilis / changelog"
+        required: false
+        default: "Build staging Android PsiKita terhubung ke https://api.staging.psikita.muammarzaki.tech/core"
+  push:
+    tags:
+      - "v*"
+      - "staging-*"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  build-android:
+    name: Build & Release Android APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+          cache-dependency-path: mobile/package-lock.json
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: 17
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Cache Gradle Packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('mobile/android/gradle/wrapper/gradle-wrapper.properties', 'mobile/android/**/*.gradle*', 'mobile/android/gradle.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Install Dependencies
+        working-directory: mobile
+        run: |
+          npm ci
+
+      - name: Run Quality Verification (TypeScript & Unit Tests)
+        working-directory: mobile
+        run: |
+          npx tsc --noEmit
+          npm run test:ci
+
+      - name: Generate Android Native Project (Expo Prebuild)
+        working-directory: mobile
+        env:
+          EXPO_PUBLIC_API_BASE_URL: https://api.staging.psikita.muammarzaki.tech/core
+          EXPO_PUBLIC_DEMO_MODE: "false"
+          EXPO_PUBLIC_USE_MOCK_FALLBACK: "false"
+          CI: "false"
+        run: |
+          npx expo prebuild --platform android --clean
+
+      - name: Setup Keystore Signing
+        working-directory: mobile/android
+        run: |
+          if [ -n "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" ]; then
+            echo "Menggunakan keystore dari GitHub Secrets..."
+            echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > release.keystore
+            echo "KEYSTORE_FILE=release.keystore" >> $GITHUB_ENV
+            echo "KEYSTORE_ALIAS=${{ secrets.ANDROID_KEY_ALIAS || 'psikita' }}" >> $GITHUB_ENV
+            echo "KEYSTORE_PASS=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> $GITHUB_ENV
+            echo "KEY_PASS=${{ secrets.ANDROID_KEY_PASSWORD || secrets.ANDROID_KEYSTORE_PASSWORD }}" >> $GITHUB_ENV
+          else
+            echo "Membuat staging keystore otomatis..."
+            keytool -genkeypair -v -keystore staging.keystore \
+              -alias staging \
+              -keyalg RSA \
+              -keysize 2048 \
+              -validity 10000 \
+              -storepass psikita_staging_key \
+              -keypass psikita_staging_key \
+              -dname "CN=PsiKita Staging, OU=Mobile, O=PsiKita, L=Jakarta, ST=Jakarta, C=ID"
+            echo "KEYSTORE_FILE=staging.keystore" >> $GITHUB_ENV
+            echo "KEYSTORE_ALIAS=staging" >> $GITHUB_ENV
+            echo "KEYSTORE_PASS=psikita_staging_key" >> $GITHUB_ENV
+            echo "KEY_PASS=psikita_staging_key" >> $GITHUB_ENV
+          fi
+
+      - name: Build Android Release APK with Gradle
+        working-directory: mobile/android
+        env:
+          EXPO_PUBLIC_API_BASE_URL: https://api.staging.psikita.muammarzaki.tech/core
+          EXPO_PUBLIC_DEMO_MODE: "false"
+          EXPO_PUBLIC_USE_MOCK_FALLBACK: "false"
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon -x test
+
+      - name: Sign & Align Android Release APK
+        working-directory: mobile/android
+        run: |
+          BUILT_APK=$(find app/build/outputs/apk/release -name "*.apk" | head -n 1)
+          if [ -z "$BUILT_APK" ]; then
+            echo "Error: File APK tidak ditemukan di app/build/outputs/apk/release"
+            exit 1
+          fi
+          echo "APK berhasil dibangun: $BUILT_APK"
+
+          BUILD_TOOLS_DIR=$(ls -d $ANDROID_HOME/build-tools/* | sort -V | tail -n 1)
+          echo "Menggunakan Android Build Tools: $BUILD_TOOLS_DIR"
+
+          mkdir -p ../dist-apk
+          FINAL_APK="../dist-apk/psikita-staging.apk"
+
+          # Zipalign
+          $BUILD_TOOLS_DIR/zipalign -v -p 4 "$BUILT_APK" temp-aligned.apk || cp "$BUILT_APK" temp-aligned.apk
+
+          # Sign dengan apksigner
+          $BUILD_TOOLS_DIR/apksigner sign \
+            --ks "$KEYSTORE_FILE" \
+            --ks-pass "pass:$KEYSTORE_PASS" \
+            --ks-key-alias "$KEYSTORE_ALIAS" \
+            --key-pass "pass:$KEY_PASS" \
+            --out "$FINAL_APK" \
+            temp-aligned.apk
+
+          # Verifikasi tanda tangan
+          $BUILD_TOOLS_DIR/apksigner verify --verbose "$FINAL_APK"
+          echo "APK berhasil ditandatangani di $FINAL_APK"
+
+      - name: Prepare Release Metadata
+        id: release_meta
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            if [ -n "${{ github.event.inputs.version_name }}" ]; then
+              TAG="${{ github.event.inputs.version_name }}"
+            else
+              TAG="staging-v1.0.0-b${{ github.run_number }}"
+            fi
+            TITLE="PsiKita Staging ($TAG)"
+            NOTES="${{ github.event.inputs.release_notes }}"
+          else
+            TAG="${{ github.ref_name }}"
+            TITLE="PsiKita Staging Release ($TAG)"
+            NOTES="Automated staging build triggered by tag $TAG"
+          fi
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "title=$TITLE" >> $GITHUB_OUTPUT
+          echo "notes=$NOTES" >> $GITHUB_OUTPUT
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: psikita-staging-apk
+          path: mobile/dist-apk/psikita-staging.apk
+          retention-days: 14
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.release_meta.outputs.tag }}
+          name: ${{ steps.release_meta.outputs.title }}
+          body: |
+            ### 📱 PsiKita Android Staging Build
+            - **Target API**: `https://api.staging.psikita.muammarzaki.tech/core`
+            - **Build Number**: `${{ github.run_number }}`
+            - **Commit**: `${{ github.sha }}`
+            - **Dijalankan oleh**: `@${{ github.actor }}`
+
+            ### 📋 Catatan Rilis:
+            ${{ steps.release_meta.outputs.notes }}
+
+            ---
+            *Unduh file `psikita-staging.apk` di bagian Assets di bawah untuk diuji pada perangkat Android.*
+          draft: false
+          prerelease: true
+          files: mobile/dist-apk/psikita-staging.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

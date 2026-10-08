@@ -11,18 +11,8 @@ import {
   triageService,
 } from "@/api";
 import {
-  SubmitTriageDto,
-} from "@/types/api";
-import {
   queryKeys,
 } from "../useQueryKeys";
-
-/**
- * triage queries.
- *
- * Moved verbatim out of the former single-file useApiQueries.ts.
- */
-
 import {
   callWithSignal,
   getJitteredInterval,
@@ -56,22 +46,6 @@ export function useTriageQueue() {
       callWithSignal(triageService.getTriageQueue, signal),
     refetchInterval: () => getJitteredInterval(15000), // 13-17s dengan jitter
     refetchIntervalInBackground: false,
-  });
-}
-
-/**
- * Mutation hook for triage submission
- */
-export function useSubmitTriage() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (dto: SubmitTriageDto) => triageService.submitTriage(dto),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.matching.waitingRoom(),
-      });
-      queryClient.invalidateQueries({ queryKey: queryKeys.triage.queue() });
-    },
   });
 }
 

@@ -1,10 +1,7 @@
 import {
   useQuery,
-  useMutation,
 } from "@tanstack/react-query";
-import { ApiError } from "@/api/client";
 import type { PaginatedResult } from "@/api/response";
-import { assertCapabilityLive } from "@/config/capabilities";
 import {
   consultationService,
 } from "@/api";
@@ -70,25 +67,4 @@ export function useRoomMessages(
     data: query.data?.data,
     meta: query.data?.meta,
   };
-}
-
-/** Chat writes are intentionally unavailable until a message POST contract exists. */
-export function useSendMessage(roomId: string) {
-  return useMutation({
-    mutationFn: (_dto: {
-      content: string;
-      contentType?: "TEXT" | "IMAGE" | "DOCUMENT" | "AUDIO";
-      senderRole?: "PATIENT" | "PRACTITIONER";
-    }) => {
-      if (!roomId.trim()) {
-        throw new ApiError(
-          "Room server belum tersedia",
-          400,
-          "CONSULTATION_CONTEXT_UNAVAILABLE",
-        );
-      }
-      assertCapabilityLive("chatWrite");
-      return consultationService.sendMessage(roomId, _dto);
-    },
-  });
 }

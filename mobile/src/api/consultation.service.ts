@@ -6,7 +6,6 @@ import {
   paginatedAdapter,
   requireServerId,
   withQueryParams,
-  zodAdapter,
   type PaginatedResult,
 } from "./response";
 import {
@@ -14,7 +13,6 @@ import {
   CreateConsultationDto,
   ConsultationResponseDto,
   MessageResponseDto,
-  RtcConfigurationResponseDto,
 } from "@/types/api";
 
 const consultationParticipantSchema = z.object({
@@ -187,16 +185,6 @@ function messageAdapter(expectedRoomId: string) {
   };
 }
 
-const rtcConfigurationSchema = z.object({
-  iceServers: z.array(
-    z.object({
-      urls: z.union([z.string().min(1), z.array(z.string().min(1)).min(1)]),
-      username: z.string().optional(),
-      credential: z.string().optional(),
-    }),
-  ),
-});
-
 const createConsultationRequestSchema = z.object({
   practitionerId: z.string().trim().min(1),
   matchingRequestId: z.string().trim().min(1).optional(),
@@ -272,17 +260,6 @@ export const consultationService = {
       adapter: paginatedAdapter(messageAdapter(normalizedRoomId)),
       signal,
     });
-  },
-
-  async getIceServers(
-    roomId: string,
-    signal?: AbortSignal,
-  ): Promise<RtcConfigurationResponseDto> {
-    const normalizedRoomId = requireServerId(roomId, "roomId");
-    return apiRequest<RtcConfigurationResponseDto>(
-      `/rooms/${encodeURIComponent(normalizedRoomId)}/ice-servers`,
-      { adapter: zodAdapter(rtcConfigurationSchema), signal },
-    );
   },
 
   async getConsultations(

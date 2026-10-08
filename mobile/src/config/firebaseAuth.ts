@@ -34,12 +34,16 @@
 import { getApp, getApps, initializeApp, type FirebaseApp } from "firebase/app";
 import {
   getAuth,
+  GoogleAuthProvider,
   inMemoryPersistence,
   initializeAuth,
+  signInWithPopup,
   type Auth,
 } from "firebase/auth";
+import { Platform } from "react-native";
 
 import { firebaseConfig } from "./firebaseConfig";
+import { isDemoMode } from "./demoMode";
 
 function resolveApp(): FirebaseApp {
   return getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
@@ -63,4 +67,40 @@ export function getFirebaseAuth(): Auth {
     cachedAuth = getAuth(app);
   }
   return cachedAuth;
+}
+
+/**
+ * Opens a Google Sign-In popup with Firebase Auth and returns the ID token.
+ * In demo mode or non-web environments, gracefully handles fallback to isolated fixtures.
+ */
+export async function signInWithGooglePopup(): Promise<string> {
+  if (Platform.OS !== "web") {
+    if (isDemoMode()) {
+      return "dev-mock-google-id-token";
+    }
+    throw new Error("Login Google popup hanya tersedia di browser web.");
+  }
+
+  const auth = getFirebaseAuth();
+  const provider = new GoogleAuthProvider();
+  provider.addScope("email");
+  provider.addScope("profile");
+  provider.setCustomParameters({ prompt: "select_account" });
+
+  try {
+    const credential = await signInWithPopup(auth, provider);
+    const idToken = await credential.user.getIdToken();
+    return idToken;
+  } catch (error: any) {
+    if (
+      error?.code === "auth/popup-closed-by-user" ||
+      error?.code === "auth/cancelled-popup-request"
+    ) {
+      throw error;
+    }
+    if (isDemoMode()) {
+      return "dev-mock-google-id-token";
+    }
+    throw error;
+  }
 }

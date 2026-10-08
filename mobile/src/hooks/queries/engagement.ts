@@ -83,20 +83,6 @@ export function useRequestWithdrawal() {
   });
 }
 
-export function useActivateCrisis() {
-  return useMutation({
-    mutationFn: async () => {
-      assertCapabilityLive("crisisEscalation");
-
-      throw new ApiError(
-        "Endpoint eskalasi krisis belum tersedia",
-        501,
-        "CAPABILITY_UNAVAILABLE",
-      );
-    },
-  });
-}
-
 /**
  * Hook to retrieve hospital referral for a consultation
  */

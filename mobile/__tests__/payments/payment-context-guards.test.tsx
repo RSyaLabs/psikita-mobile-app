@@ -318,19 +318,20 @@ describe("payment context and boundary guards", () => {
     request.resolve({ accepted: true, eligibility: "UNKNOWN" });
   });
 
-  it("blocks the billing-order hook and service when payment capability is unavailable", async () => {
+  it("blocks the billing-order service when payment capability is unavailable", async () => {
     capabilityRefuses("CAPABILITY_UNAVAILABLE", "Pembayaran belum tersedia");
     global.fetch = jest.fn() as unknown as typeof fetch;
-    const createBillingOrder = (hooks as any).useCreateBillingOrder;
 
-    expect(typeof createBillingOrder).toBe("function");
-    const { result } = renderHook(() => createBillingOrder(), { wrapper });
-    result.current.mutate({
-      consultationId: "fabricated",
-      dto: { orderType: "INITIAL" },
-    });
-
-    await waitFor(() => expect(result.current.isError).toBe(true));
+    await expect(
+      paymentService.createBillingOrder("fabricated", {
+        orderType: "INITIAL",
+        durationMinutes: 30,
+        payerType: "SELF_PAY",
+        practitionerType: "PSYCHOLOGIST",
+        level: {},
+        idempotencyKey: "test-idem-key",
+      }),
+    ).rejects.toThrow("Pembayaran belum tersedia");
     expect(global.fetch).not.toHaveBeenCalled();
   });
 });

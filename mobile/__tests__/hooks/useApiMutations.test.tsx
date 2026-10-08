@@ -8,14 +8,11 @@ import { authService } from "@/api/auth.service";
 import { consultationService } from "@/api/consultation.service";
 import { notesService } from "@/api/notes.service";
 import { practitionerService } from "@/api/practitioner.service";
-import { triageService } from "@/api/triage.service";
 import {
   useLogin,
-  useSubmitTriage,
   useCreateSoapNote,
   useRequestWithdrawal,
   useApprovePractitioner,
-  useSendMessage,
 } from "@/hooks/useApiQueries";
 
 jest.mock("@/api/client", () => ({
@@ -33,9 +30,6 @@ jest.mock("@/api/notes.service", () => ({
 jest.mock("@/api/practitioner.service", () => ({
   practitionerService: { approveProfile: jest.fn() },
 }));
-jest.mock("@/api/triage.service", () => ({
-  triageService: { submitTriage: jest.fn() },
-}));
 jest.mock("@/utils/storage", () => ({
   secureStorage: {
     getItem: jest.fn().mockResolvedValue(null),
@@ -48,7 +42,6 @@ const mockAuthService = jest.mocked(authService);
 const mockConsultationService = jest.spyOn(consultationService, "sendMessage");
 const mockNotesService = jest.mocked(notesService);
 const mockPractitionerService = jest.mocked(practitionerService);
-const mockTriageService = jest.mocked(triageService);
 
 let currentAuth: AuthContextValue | undefined;
 
@@ -107,35 +100,6 @@ describe("TanStack React Query Mutations Suite", () => {
     expect(result.current.data?.user?.username).toBe("account");
   });
 
-  it("submits a valid triage assessment", async () => {
-    mockTriageService.submitTriage.mockResolvedValue({
-      id: "triage-1",
-      patientId: "patient-1",
-      assessedBy: "patient-1",
-      score: 12,
-      hasRedFlags: false,
-      level: "GREEN",
-      disposition: "PENDING",
-      answers: { q1: "often" },
-      assessmentType: "SELF_ASSESSMENT",
-      createdAt: "2026-09-25T00:00:00.000Z",
-      updatedAt: "2026-09-25T00:00:00.000Z",
-    });
-    const queryClient = createTestQueryClient();
-    const { result } = renderHook(() => useSubmitTriage(), {
-      wrapper: wrapperFor(queryClient),
-    });
-
-    act(() => {
-      result.current.mutate({
-        answers: { q1: "often", anxietyLevel: "MODERATE" },
-      });
-    });
-
-    await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(result.current.data?.disposition).toBe("PENDING");
-  });
-
   it("rejects raw consultation IDs for SOAP writes", async () => {
     const queryClient = createTestQueryClient();
     const { result } = renderHook(() => useCreateSoapNote(), {
@@ -187,22 +151,5 @@ describe("TanStack React Query Mutations Suite", () => {
     });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-  });
-
-  it("keeps chat writes unavailable without transport", async () => {
-    const queryClient = createTestQueryClient();
-    const { result } = renderHook(() => useSendMessage("room-1"), {
-      wrapper: wrapperFor(queryClient),
-    });
-
-    act(() => {
-      result.current.mutate({ content: "Halo dokter", senderRole: "PATIENT" });
-    });
-
-    await waitFor(() => expect(result.current.isError).toBe(true));
-    expect(result.current.error).toMatchObject({
-      error: "CHAT_WRITE_UNAVAILABLE",
-    });
-    expect(mockConsultationService).not.toHaveBeenCalled();
   });
 });

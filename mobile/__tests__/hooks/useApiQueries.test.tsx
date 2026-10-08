@@ -16,7 +16,6 @@ import {
   useConsultations,
   usePrescriptions,
   useRoomMessages,
-  useInfiniteArticles,
 } from "@/hooks/useApiQueries";
 
 jest.mock("@/api/article.service", () => ({
@@ -228,20 +227,5 @@ describe("TanStack React Query Hooks Suite", () => {
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(result.current.data).toEqual(["practitioner-1"]);
-  });
-
-  it("keeps the legacy article hook single-page", async () => {
-    const queryClient = createTestQueryClient();
-    const { result } = renderHook(() => useInfiniteArticles(), {
-      wrapper: wrapperFor(queryClient),
-    });
-    await waitFor(() => expect(result.current.isSuccess).toBe(true));
-
-    await act(async () => {
-      await result.current.fetchNextPage();
-    });
-
-    expect(result.current.data?.pages).toHaveLength(1);
-    expect(mockArticleService.getArticles).toHaveBeenCalledTimes(1);
   });
 });

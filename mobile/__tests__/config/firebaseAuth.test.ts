@@ -34,6 +34,9 @@ const mockGetApp = jest.fn();
 const mockGetApps = jest.fn();
 const mockInitializeAuth = jest.fn();
 const mockGetAuth = jest.fn();
+const mockSignInWithPopup = jest.fn();
+const mockAddScope = jest.fn();
+const mockSetCustomParameters = jest.fn();
 
 jest.mock("firebase/app", () => ({
   initializeApp: (...args: unknown[]) => mockInitializeApp(...args),
@@ -44,6 +47,11 @@ jest.mock("firebase/app", () => ({
 jest.mock("firebase/auth", () => ({
   initializeAuth: (...args: unknown[]) => mockInitializeAuth(...args),
   getAuth: (...args: unknown[]) => mockGetAuth(...args),
+  GoogleAuthProvider: jest.fn().mockImplementation(() => ({
+    addScope: mockAddScope,
+    setCustomParameters: mockSetCustomParameters,
+  })),
+  signInWithPopup: (...args: unknown[]) => mockSignInWithPopup(...args),
   // inMemoryPersistence is a sentinel object in the real SDK. Its identity is
   // what the assertions below compare against.
   inMemoryPersistence: { __sentinel: "inMemoryPersistence" },
@@ -67,6 +75,9 @@ beforeEach(() => {
   mockGetApps.mockReset();
   mockInitializeAuth.mockReset();
   mockGetAuth.mockReset();
+  mockSignInWithPopup.mockReset();
+  mockAddScope.mockReset();
+  mockSetCustomParameters.mockReset();
 
   mockGetApps.mockReturnValue([]);
   mockInitializeApp.mockReturnValue({ name: "[DEFAULT]", options: {} });
@@ -144,5 +155,48 @@ describe("getFirebaseAuth", () => {
 
     expect(() => getFirebaseAuth()).not.toThrow();
     expect(mockGetAuth).toHaveBeenCalled();
+  });
+});
+
+import { Platform } from "react-native";
+
+describe("signInWithGooglePopup", () => {
+  const originalPlatform = Platform.OS;
+
+  beforeEach(() => {
+    Platform.OS = "web";
+  });
+
+  afterAll(() => {
+    Platform.OS = originalPlatform;
+  });
+
+  it("opens Google popup and returns idToken on success", async () => {
+    const mockUser = {
+      getIdToken: jest.fn().mockResolvedValue("mock-firebase-id-token"),
+    };
+    mockSignInWithPopup.mockResolvedValue({ user: mockUser });
+
+    const { signInWithGooglePopup } = loadAuthModule();
+    const token = await signInWithGooglePopup();
+
+    expect(token).toBe("mock-firebase-id-token");
+    expect(mockSignInWithPopup).toHaveBeenCalledTimes(1);
+    expect(mockAddScope).toHaveBeenCalledWith("email");
+    expect(mockAddScope).toHaveBeenCalledWith("profile");
+    expect(mockSetCustomParameters).toHaveBeenCalledWith({
+      prompt: "select_account",
+    });
+  });
+
+  it("propagates user popup cancellation", async () => {
+    const cancelError = new Error("Popup closed by user");
+    (cancelError as any).code = "auth/popup-closed-by-user";
+    mockSignInWithPopup.mockRejectedValue(cancelError);
+
+    const { signInWithGooglePopup } = loadAuthModule();
+    await expect(signInWithGooglePopup()).rejects.toMatchObject({
+      code: "auth/popup-closed-by-user",
+    });
   });
 });

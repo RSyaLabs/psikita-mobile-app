@@ -5,7 +5,6 @@ import {
 } from "@tanstack/react-query";
 import { ApiError } from "@/api/client";
 import {
-  createBillingOrderIdempotencyKey,
   isServerPaymentContext,
 } from "@/api/payment.service";
 import { assertCapabilityLive } from "@/config/capabilities";
@@ -13,7 +12,6 @@ import {
   paymentService,
 } from "@/api";
 import {
-  CreateBillingOrderDto,
   CreatePaymentInput,
   BpjsEligibilityDto,
   BpjsEligibilityInput,
@@ -43,77 +41,6 @@ export function useValidatedServerPaymentContext(consultationId?: string) {
     error: query.error,
     refetch: query.refetch,
   };
-}
-
-/**
- * The contract requires `idempotencyKey` on CreateBillingOrderDto. It was left to
- * the caller, which means a screen could either omit it and fail zod validation at
- * submit time, or invent a fresh random one per attempt and defeat the purpose of
- * the field entirely. The key is derived from the order intent instead, so the same
- * intent always produces the same key and a retried submit is deduplicated by the
- * server rather than charged twice.
- */
-type CreateBillingOrderVariables = {
-  consultationId: string;
-  dto: Omit<CreateBillingOrderDto, "idempotencyKey">;
-};
-
-/** Guarded no-content billing-order mutation; no screen uses this as context. */
-export function useCreateBillingOrder() {
-  const mutation = useMutation({
-    mutationFn: ({ consultationId, dto }: CreateBillingOrderVariables) => {
-      assertCapabilityLive("payment");
-      const idempotencyKey = createBillingOrderIdempotencyKey(
-        consultationId,
-        dto as CreateBillingOrderDto,
-      );
-
-      return paymentService.createBillingOrder(consultationId, {
-        ...dto,
-        idempotencyKey,
-      });
-    },
-  });
-  const pendingRef = useRef(false);
-
-  const mutate = useCallback(
-    (
-      variables: CreateBillingOrderVariables,
-      options?: MutateOptions<void, Error, CreateBillingOrderVariables>,
-    ) => {
-      if (pendingRef.current) return;
-
-      pendingRef.current = true;
-      mutation.mutate(variables, {
-        ...options,
-        onSettled: (...args: any[]) => {
-          pendingRef.current = false;
-          (
-            options?.onSettled as ((...settledArgs: any[]) => void) | undefined
-          )?.(...args);
-        },
-      });
-    },
-    [mutation],
-  );
-
-  const mutateAsync = useCallback(
-    async (variables: CreateBillingOrderVariables) => {
-      if (pendingRef.current) {
-        throw new Error("A billing-order submission is already pending");
-      }
-
-      pendingRef.current = true;
-      try {
-        return await mutation.mutateAsync(variables);
-      } finally {
-        pendingRef.current = false;
-      }
-    },
-    [mutation],
-  );
-
-  return { ...mutation, mutate, mutateAsync };
 }
 
 /**

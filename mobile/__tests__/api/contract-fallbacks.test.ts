@@ -25,7 +25,7 @@ describe("live contract fallback surfaces", () => {
     expect(referral).toContain("Rujukan rumah sakit belum tersedia");
 
     const savedPrescriptionModal = source(
-      "src/components/modals/PatientModals.tsx",
+      "src/components/modals/index.ts",
     );
     expect(savedPrescriptionModal).not.toContain("RX-2026-0910");
 

@@ -185,11 +185,13 @@ async function runServiceTestSuite() {
   await testCase(
     "Prescription: Get Digital Prescription by Consultation",
     async () => {
-      const rx =
-        await prescriptionService.getPrescriptionByConsultation(
-          "consultation_123",
-        );
+      const res = await prescriptionService.getPrescriptions({
+        consultationId: "consultation_123",
+        limit: 1,
+      });
+      const rx = res.data[0];
       if (
+        !rx ||
         !rx.id ||
         rx.consultationId !== "consultation_123" ||
         !Array.isArray(rx.medications) ||

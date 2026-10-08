@@ -19,6 +19,8 @@ import { AuthLoginModal, RegisterPatientModal } from "@/components/modals";
 import { LoginHeroCarousel, GoogleIcon } from "@/components/auth";
 import { haptics } from "@/utils/haptics";
 import { useAuth } from "@/hooks/useAuth";
+import { useGoogleLogin } from "@/hooks/useApiQueries";
+import { signInWithGooglePopup } from "@/config/firebaseAuth";
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -32,6 +34,13 @@ export default function LoginScreen() {
   >("login");
   const [loginErrorMsg, setLoginErrorMsg] = useState<string | null>(null);
   const [showRegisterModal, setShowRegisterModal] = useState(false);
+
+  const googleLoginMutation = useGoogleLogin();
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const [authFeedback, setAuthFeedback] = useState<{
+    type: "info" | "error";
+    message: string;
+  } | null>(null);
 
   useEffect(() => {
     if (status === "authenticated" && homeRoute) {
@@ -50,13 +59,36 @@ export default function LoginScreen() {
     router.push(ROUTES.PATIENT.TRIAGE);
   };
 
-  const handleGoogleLogin = () => {
+  const handleGoogleLogin = async () => {
     haptics.selection();
-    setLoginModalTab("login");
-    setLoginErrorMsg(
-      "Login Google belum tersedia. Gunakan email dan kata sandi.",
-    );
-    setShowLoginModal(true);
+    setAuthFeedback(null);
+    setGoogleLoading(true);
+
+    try {
+      const idToken = await signInWithGooglePopup();
+      await googleLoginMutation.mutateAsync({ idToken });
+    } catch (err: any) {
+      if (
+        err?.code === "auth/popup-closed-by-user" ||
+        err?.code === "auth/cancelled-popup-request"
+      ) {
+        haptics.light();
+        setAuthFeedback({
+          type: "info",
+          message: "Masuk dengan Google dibatalkan.",
+        });
+      } else {
+        haptics.error();
+        setAuthFeedback({
+          type: "error",
+          message:
+            err?.message ||
+            "Gagal masuk dengan Google. Silakan periksa koneksi atau coba lagi.",
+        });
+      }
+    } finally {
+      setGoogleLoading(false);
+    }
   };
 
   const handleOpenAccountLogin = () => {
@@ -131,15 +163,55 @@ export default function LoginScreen() {
               />
             </Button>
 
+            {authFeedback && (
+              <Box
+                className={`w-full p-3 rounded-xl border flex-row items-center justify-between ${
+                  authFeedback.type === "error"
+                    ? "bg-destructive/10 border-destructive/20"
+                    : "bg-muted border-border"
+                }`}
+              >
+                <Text
+                  size="xs"
+                  className={`font-medium flex-1 ${
+                    authFeedback.type === "error"
+                      ? "text-destructive"
+                      : "text-muted-foreground"
+                  }`}
+                >
+                  {authFeedback.message}
+                </Text>
+                <Pressable
+                  onPress={() => setAuthFeedback(null)}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                  className="ml-2 p-1"
+                >
+                  <Text
+                    size="xs"
+                    className={`font-bold ${
+                      authFeedback.type === "error"
+                        ? "text-destructive"
+                        : "text-muted-foreground"
+                    }`}
+                  >
+                    ✕
+                  </Text>
+                </Pressable>
+              </Box>
+            )}
+
             <Button
               variant="outline"
               size="lg"
               onPress={handleGoogleLogin}
-              className="w-full h-[50px] rounded-2xl border border-border bg-card active:bg-muted flex-row items-center justify-center"
+              disabled={googleLoading || googleLoginMutation.isPending}
+              className="w-full h-[50px] rounded-2xl border border-border bg-card active:bg-muted flex-row items-center justify-center disabled:opacity-60"
             >
               <GoogleIcon size={18} />
               <ButtonText className="text-foreground font-semibold text-sm ml-2.5">
-                Lanjutkan dengan Google
+                {googleLoading || googleLoginMutation.isPending
+                  ? "Menghubungkan ke Google..."
+                  : "Lanjutkan dengan Google"}
               </ButtonText>
             </Button>
 

@@ -45,3 +45,21 @@ jest.mock("expo-router", () => ({
   useSegments: () => [],
   Link: "Link",
 }));
+
+// Mock Firebase (ESM modules not transformed by Jest)
+jest.mock("firebase/app", () => ({
+  initializeApp: jest.fn(() => ({ name: "[DEFAULT]", options: {} })),
+  getApp: jest.fn(() => ({ name: "[DEFAULT]", options: {} })),
+  getApps: jest.fn(() => []),
+}));
+
+jest.mock("firebase/auth", () => ({
+  initializeAuth: jest.fn(() => ({ name: "auth/mock" })),
+  getAuth: jest.fn(() => ({ name: "auth/mock" })),
+  GoogleAuthProvider: jest.fn().mockImplementation(() => ({
+    addScope: jest.fn(),
+    setCustomParameters: jest.fn(),
+  })),
+  signInWithPopup: jest.fn(),
+  inMemoryPersistence: { __sentinel: "inMemoryPersistence" },
+}));

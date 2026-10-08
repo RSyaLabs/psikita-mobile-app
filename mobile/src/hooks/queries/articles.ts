@@ -1,6 +1,5 @@
 import {
   useQuery,
-  useInfiniteQuery,
 } from "@tanstack/react-query";
 import {
   articleService,
@@ -44,24 +43,6 @@ export function useArticles<T = any[]>(
     staleTime: 10 * 60 * 1000,
     placeholderData: (previousData) => previousData,
     select: options?.select,
-  });
-}
-
-export function useInfiniteArticles(category?: string, query?: string) {
-  return useInfiniteQuery({
-    queryKey: [...queryKeys.articles.list(category, query), "infinite"] as const,
-    queryFn: async ({ signal }) =>
-      toListData(
-        await callWithSignal(
-          articleService.getArticles,
-          signal,
-          category,
-          query,
-        ),
-      ),
-    initialPageParam: 0,
-    getNextPageParam: () => undefined,
-    staleTime: 10 * 60 * 1000,
   });
 }
 

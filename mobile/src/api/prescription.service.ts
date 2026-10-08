@@ -124,35 +124,6 @@ export const prescriptionService = {
   },
 
   /**
-   * Ambil resep tunggal untuk konsultasi tertentu
-   */
-  async getPrescriptionByConsultation(
-    consultationId: string,
-    signal?: AbortSignal,
-  ): Promise<PrescriptionResponseDto> {
-    const path = withQueryParams("/prescriptions", {
-      consultationId,
-      limit: 1,
-    });
-    const result = await apiRequest<PaginatedResult<PrescriptionResponseDto>>(
-      path,
-      {
-        adapter: prescriptionListAdapter,
-        signal,
-      },
-    );
-    const prescription = result.data[0];
-    if (!prescription) {
-      throw new ApiError(
-        "Resep tidak ditemukan",
-        404,
-        "PRESCRIPTION_NOT_FOUND",
-      );
-    }
-    return prescription;
-  },
-
-  /**
    * Ambil Rujukan Rumah Sakit Satu Sehat
    */
   async getReferralByConsultation(

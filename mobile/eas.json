@@ -14,6 +14,21 @@
         "bundleIdentifier": "id.psikita.app"
       }
     },
+    "staging": {
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_DEMO_MODE": "false",
+        "EXPO_PUBLIC_USE_MOCK_FALLBACK": "false",
+        "EXPO_PUBLIC_API_BASE_URL": "https://api.staging.psikita.muammarzaki.tech/core"
+      },
+      "android": {
+        "package": "id.psikita.app",
+        "buildType": "apk"
+      },
+      "ios": {
+        "bundleIdentifier": "id.psikita.app"
+      }
+    },
     "demo": {
       "distribution": "internal",
       "env": {

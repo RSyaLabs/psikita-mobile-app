@@ -14,6 +14,7 @@ import {
   TokenResponseDto,
   PasswordLoginDto,
   PasswordRegisterDto,
+  GoogleLoginDto,
   CreatePractitionerDto,
   RequestOtpDto,
   VerifyOtpDto,
@@ -125,6 +126,12 @@ function useAuthLoginMutation<TVariables extends object>(
 export function useLogin() {
   return useAuthLoginMutation((dto: PasswordLoginDto) =>
     authService.loginWithPassword(dto),
+  );
+}
+
+export function useGoogleLogin() {
+  return useAuthLoginMutation((dto: GoogleLoginDto) =>
+    authService.loginWithGoogle(dto),
   );
 }
 
