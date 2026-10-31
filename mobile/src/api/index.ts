@@ -9,5 +9,3 @@ export * from "./prescription.service";
 export * from "./payment.service";
 export * from "./practitioner.service";
 export * from "./ledger.service";
-export * from "./article.service";
-export * from "./notification.service";

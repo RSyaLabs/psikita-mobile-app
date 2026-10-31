@@ -3,27 +3,12 @@ import fs from "node:fs";
 import path from "node:path";
 import { renderWithClient } from "../utils/test-utils";
 import { Heading } from "@/components/ui";
-import ArticlesScreen from "../../app/(patient)/patient/articles";
 
 const mobileRoot = path.resolve(__dirname, "../..");
 
 function source(relativePath: string): string {
   return fs.readFileSync(path.join(mobileRoot, relativePath), "utf8");
 }
-
-// The screen needs these two hooks to render its chrome (header, search field,
-// category chips, tab bar). The list query result is irrelevant to the
-// accessibility contract under test.
-jest.mock("@/hooks/useApiQueries", () => ({
-  useArticles: () => ({
-    data: [],
-    isLoading: false,
-    isFetching: false,
-    isError: false,
-    refetch: jest.fn(),
-  }),
-  usePrefetchData: () => ({ prefetchArticle: jest.fn() }),
-}));
 
 type HeadingTestProps = {
   level?: 1 | 2 | 3 | 4 | 5 | 6;
@@ -96,22 +81,5 @@ describe("static accessibility contracts", () => {
     const content = source("scripts/deep-gluestack-audit.ts");
     expect(content).toContain("primitiveContractFindings");
     expect(content).toContain("NON_SEMANTIC_TAILWIND");
-  });
-
-  it("gives the article search field a programmatic name", () => {
-    const view = renderWithClient(React.createElement(ArticlesScreen));
-    const searchField = view.getByPlaceholderText(
-      "Cari topik, gejala, atau kata kunci...",
-    );
-
-    // The programmatic name is what a screen reader announces, and that comes from
-    // accessibilityLabel. The earlier version of this test asserted nativeID,
-    // reasoning that React Native forwards `id` as nativeID. That was never
-    // observed to be true: Gluestack's Input consumes `id` for its FormControl
-    // and does not pass it through to the host TextInput, so the assertion
-    // failed for a reason that had nothing to do with accessibility. Asserting
-    // the announced name keeps the test strict about the thing that matters.
-    expect(searchField.props.accessibilityLabel).toBe("Cari artikel");
-    expect(searchField.props.name).toBe("articleSearch");
   });
 });

@@ -42,13 +42,6 @@ describe("unsupported action copy guards (source text, not behaviour)", () => {
     );
   });
 
-  it("does not claim article sharing succeeded", () => {
-    const content = source("app/(patient)/patient/article-detail.tsx");
-    expect(content).not.toContain("Tautan Berhasil Disalin");
-    expect(content).not.toContain("Membuka WhatsApp");
-    expect(content).toContain("Share artikel belum tersedia");
-  });
-
   it("does not simulate share, export, or upload success in practitioner modals", () => {
     const content = sourceAll("src/components/modals/practitioner");
     expect(content).not.toContain("Tautan Tersalin!");

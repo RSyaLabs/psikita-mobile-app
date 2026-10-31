@@ -112,7 +112,6 @@ export default function PractitionerDashboardScreen() {
         <PractitionerQuickActions
           onOpenHistory={() => router.push(ROUTES.PRACTITIONER.HISTORY)}
           onOpenDiagnosis={() => router.push(ROUTES.PRACTITIONER.DIAGNOSIS)}
-          onOpenWithdraw={() => router.push(ROUTES.PRACTITIONER.WITHDRAW)}
           onOpenProfile={() => router.push(ROUTES.PRACTITIONER.PROFILE)}
         />
       </ScrollView>

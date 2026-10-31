@@ -7,11 +7,6 @@ describe("Query key factory", () => {
     expect(
       queryKeys.practitioner.list({ type: "PSYCHOLOGIST", page: 2 }),
     ).toEqual(["practitioner", "list", { type: "PSYCHOLOGIST", page: 2 }]);
-    expect(queryKeys.articles.list("Anxiety", "tidur")).toEqual([
-      "articles",
-      "list",
-      { category: "Anxiety", query: expect.stringMatching(/^p/) },
-    ]);
   });
 
   it("keeps sensitive identifiers out of detail and room keys", () => {

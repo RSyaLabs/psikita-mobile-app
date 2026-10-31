@@ -102,13 +102,6 @@ export const CATALOG_DATA: CatalogRoleGroup[] = [
             tag: "Utama",
           },
           {
-            id: "P-01d",
-            name: "Pusat Notifikasi",
-            desc: "Pemberitahuan jadwal sesi, obat, dan status rujukan",
-            route: ROUTES.PATIENT.NOTIFICATIONS,
-            tag: "Notifikasi",
-          },
-          {
             id: "P-02",
             name: "Triase & Skrining GAD-7",
             desc: "Asesmen bertahap evaluasi tingkat kecemasan & deteksi red flags",
@@ -238,22 +231,8 @@ export const CATALOG_DATA: CatalogRoleGroup[] = [
         ],
       },
       {
-        subTitle: "Edukasi & Profil Pasien",
+        subTitle: "Profil Pasien",
         screens: [
-          {
-            id: "P-10",
-            name: "Artikel & Edukasi Mental",
-            desc: "Kumpulan artikel psikoedukasi, tips tidur & manajemen kecemasan",
-            route: ROUTES.PATIENT.ARTICLES,
-            tag: "Edukasi",
-          },
-          {
-            id: "P-10b",
-            name: "Detail Artikel Edukasi",
-            desc: "Tampilan baca lengkap dengan estimasi durasi baca & referensi klinis",
-            route: ROUTES.PATIENT.ARTICLE_DETAIL,
-            tag: "Bacaan",
-          },
           {
             id: "P-11",
             name: "Profil & Rekam Medis Pasien",
@@ -323,22 +302,8 @@ export const CATALOG_DATA: CatalogRoleGroup[] = [
         ],
       },
       {
-        subTitle: "Finansial, Riwayat & Akun",
+        subTitle: "Riwayat & Akun",
         screens: [
-          {
-            id: "K-05",
-            name: "Dompet & Penarikan Saldo (Withdraw)",
-            desc: "Total pendapatan bersih sesi, pemotongan PPh 21 & permohonan penarikan dana",
-            route: ROUTES.PRACTITIONER.WITHDRAW,
-            tag: "Payout",
-          },
-          {
-            id: "K-05b",
-            name: "Rekening Bank Mitra",
-            desc: "Manajemen rekening penerima transfer bagi dokter dan psikolog",
-            route: ROUTES.PRACTITIONER.BANK_ACCOUNT,
-            tag: "Rekening",
-          },
           {
             id: "K-06",
             name: "Riwayat Sesi Praktisi",

@@ -37,9 +37,7 @@ GATED = [
     "/patient/dashboard",
     "/patient/triage",
     "/patient/doctors",
-    "/patient/articles",
     "/patient/history",
-    "/patient/notifications",
     "/patient/profile",
     "/patient/edit-profile",
     "/patient/checkout",
@@ -50,8 +48,6 @@ GATED = [
     "/practitioner/history",
     "/practitioner/chat",
     "/practitioner/war-room",
-    "/practitioner/withdraw",
-    "/practitioner/bank-account",
     "/practitioner/profile",
     "/practitioner/diagnosis",
 ]

@@ -3,7 +3,6 @@ import { act, renderHook, waitFor } from "@testing-library/react-native";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { createTestQueryClient } from "../utils/test-utils";
 import { ApiError } from "@/api/client";
-import { articleService } from "@/api/article.service";
 import { consultationService } from "@/api/consultation.service";
 import { ledgerService } from "@/api/ledger.service";
 import { patientService } from "@/api/patient.service";
@@ -18,9 +17,6 @@ import {
   useRoomMessages,
 } from "@/hooks/useApiQueries";
 
-jest.mock("@/api/article.service", () => ({
-  articleService: { getArticles: jest.fn() },
-}));
 jest.mock("@/api/consultation.service", () => ({
   consultationService: {
     getConsultations: jest.fn(),
@@ -40,7 +36,6 @@ jest.mock("@/api/prescription.service", () => ({
   prescriptionService: { getPrescriptions: jest.fn() },
 }));
 
-const mockArticleService = jest.mocked(articleService);
 const mockConsultationService = jest.mocked(consultationService);
 const mockLedgerService = jest.mocked(ledgerService);
 const mockPatientService = jest.mocked(patientService);
@@ -131,17 +126,6 @@ describe("TanStack React Query Hooks Suite", () => {
         "CAPABILITY_UNAVAILABLE",
       ),
     );
-    mockArticleService.getArticles.mockResolvedValue([
-      {
-        id: "article-1",
-        title: "Article",
-        category: "Anxiety",
-        duration: "5 min",
-        readsCount: "10",
-        image: "https://example.test/article.jpg",
-        summary: "Summary",
-      },
-    ]);
   });
 
   it("retrieves the active patient profile", async () => {

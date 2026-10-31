@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
-  Bell,
   Smile,
   Meh,
   Clock,
@@ -116,17 +115,6 @@ export default function PatientDashboard() {
                 Cek kabarmu hari ini atau lanjutkan sesi konselingmu.
               </Text>
             </VStack>
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Lihat notifikasi"
-              onPress={() => {
-                haptics.light();
-                router.push(ROUTES.PATIENT.NOTIFICATIONS);
-              }}
-              className="w-10 h-10 rounded-full bg-card items-center justify-center border border-border active:opacity-80"
-            >
-              <Bell size={18} className="text-foreground" />
-            </Pressable>
           </HStack>
         </VStack>
 

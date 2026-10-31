@@ -7,7 +7,6 @@ import { ApiError } from "@/api/client";
 import {
   requireActiveConsultationContext,
 } from "@/clinical/activeConsultation";
-import { assertCapabilityLive } from "@/config/capabilities";
 import {
   prescriptionService,
   paymentService,
@@ -62,23 +61,6 @@ export function useSubmitFeedback() {
       queryClient.invalidateQueries({
         queryKey: queryKeys.consultations.all,
       });
-    },
-  });
-}
-
-/**
- * Mutation hook for practitioner payout/withdrawal request
- */
-export function useRequestWithdrawal() {
-  return useMutation({
-    mutationFn: async (_variables: { amount: number; bank: string }) => {
-      assertCapabilityLive("withdrawal");
-
-      throw new ApiError(
-        "Endpoint penarikan belum tersedia",
-        501,
-        "CAPABILITY_UNAVAILABLE",
-      );
     },
   });
 }

@@ -57,13 +57,10 @@ export default function PatientLayout() {
       <Stack.Screen name="patient/overtime-modal" />
       <Stack.Screen name="patient/rating" />
       <Stack.Screen name="patient/history" />
-      <Stack.Screen name="patient/articles" />
-      <Stack.Screen name="patient/article-detail" />
       <Stack.Screen name="patient/assessment-result" />
       <Stack.Screen name="patient/doctors" />
       <Stack.Screen name="patient/doctor-detail" />
       <Stack.Screen name="patient/edit-profile" />
-      <Stack.Screen name="patient/notifications" />
       <Stack.Screen name="patient/profile" />
       <Stack.Screen name="patient/prescription" />
       <Stack.Screen name="patient/referral" />

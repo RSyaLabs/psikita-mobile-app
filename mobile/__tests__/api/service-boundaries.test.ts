@@ -1,11 +1,9 @@
 import * as client from "@/api/client";
 import * as capabilities from "@/config/capabilities";
 import {
-  articleService,
   consultationService,
   matchingService,
   notesService,
-  notificationService,
   patientService,
   paymentService,
   practitionerService,
@@ -25,28 +23,6 @@ describe("service data-source boundaries", () => {
   afterAll(() => {
     request.mockRestore();
     capability.mockRestore();
-  });
-
-  it("keeps articles unavailable without calling an undocumented endpoint", async () => {
-    request.mockRejectedValue(new Error("must not be called"));
-
-    await expect(articleService.getArticles()).rejects.toMatchObject({
-      name: "ApiError",
-      statusCode: 501,
-      error: "CAPABILITY_UNAVAILABLE",
-    });
-    expect(request).not.toHaveBeenCalled();
-  });
-
-  it("keeps notifications unavailable without calling an undocumented endpoint", async () => {
-    request.mockRejectedValue(new Error("must not be called"));
-
-    await expect(notificationService.getNotifications()).rejects.toMatchObject({
-      name: "ApiError",
-      statusCode: 501,
-      error: "CAPABILITY_UNAVAILABLE",
-    });
-    expect(request).not.toHaveBeenCalled();
   });
 
   it.each([
@@ -184,20 +160,6 @@ describe("service data-source boundaries", () => {
     request.mockRejectedValue(new Error("must not be called"));
 
     await expect(consultationService.getConsultations()).rejects.toMatchObject({
-      name: "ApiError",
-      statusCode: 501,
-      error: "CAPABILITY_UNAVAILABLE",
-    });
-    expect(request).not.toHaveBeenCalled();
-  });
-
-  it("keeps notification writes unavailable without transport", async () => {
-    capability.mockReturnValue("unavailable");
-    request.mockRejectedValue(new Error("must not be called"));
-
-    await expect(
-      notificationService.markAsRead("notification_1"),
-    ).rejects.toMatchObject({
       name: "ApiError",
       statusCode: 501,
       error: "CAPABILITY_UNAVAILABLE",

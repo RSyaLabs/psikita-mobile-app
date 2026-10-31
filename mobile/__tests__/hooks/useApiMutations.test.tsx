@@ -11,7 +11,6 @@ import { practitionerService } from "@/api/practitioner.service";
 import {
   useLogin,
   useCreateSoapNote,
-  useRequestWithdrawal,
   useApprovePractitioner,
 } from "@/hooks/useApiQueries";
 
@@ -123,20 +122,6 @@ describe("TanStack React Query Mutations Suite", () => {
       error: "CONSULTATION_CONTEXT_UNAVAILABLE",
     });
     expect(mockNotesService.createSoapNote).not.toHaveBeenCalled();
-  });
-
-  it("keeps withdrawal unavailable without local success", async () => {
-    const queryClient = createTestQueryClient();
-    const { result } = renderHook(() => useRequestWithdrawal(), {
-      wrapper: wrapperFor(queryClient),
-    });
-
-    act(() => {
-      result.current.mutate({ amount: 2500000, bank: "BCA" });
-    });
-
-    await waitFor(() => expect(result.current.isError).toBe(true));
-    expect(result.current.data).toBeUndefined();
   });
 
   it("submits practitioner approval through the server mutation", async () => {

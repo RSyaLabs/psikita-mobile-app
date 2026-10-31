@@ -1,6 +1,6 @@
-export type PatientTab = "beranda" | "sesi" | "jurnal" | "akun";
+export type PatientTab = "beranda" | "sesi" | "akun";
 
-export type PractitionerTab = "beranda" | "sesi" | "keuangan" | "profil";
+export type PractitionerTab = "beranda" | "sesi" | "profil";
 
 export interface NavTabItem<T extends string> {
   id: T;

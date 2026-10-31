@@ -1,7 +1,6 @@
 import fs from "fs";
 import path from "path";
 import { ROUTES } from "@/constants/routes";
-import { isNotificationActionRoute } from "@/api/notification.service";
 
 const { auditRouteSource } = require("../../scripts/route-audit");
 
@@ -132,20 +131,6 @@ describe("Expo Router route registry", () => {
     expect(new Set(publicPaths).size).toBe(routeSpecs.length);
   });
 
-  it("validates notification action routes against the public registry", () => {
-    const sampleRoutes = [
-      ROUTES.PATIENT.PRESCRIPTION,
-      ROUTES.PATIENT.CHAT_ROOM,
-      ROUTES.PATIENT.DOCTORS,
-    ];
-
-    for (const route of sampleRoutes) {
-      expect(registryPaths.has(route)).toBe(true);
-      expect(route).not.toMatch(groupOnlyRoutePattern);
-      expect(isNotificationActionRoute(route)).toBe(true);
-    }
-  });
-
   it("audits indirect route data throughout app and src", () => {
     const requiredSources = [
       "app/(patient)/patient/history.tsx",
@@ -155,7 +140,6 @@ describe("Expo Router route registry", () => {
       // decomposed. They now live in the catalog data module, which is the
       // single place every catalog link resolves through.
       "src/data/catalog.tsx",
-      "src/api/notification.service.ts",
     ];
     const issues: unknown[] = [];
 
@@ -243,7 +227,6 @@ describe("Expo Router route registry", () => {
   it("does not retain the deleted login-form catalog or audit entry", () => {
     const routeSources = [
       path.join(MOBILE_ROOT, "src/constants/routes.ts"),
-      path.join(MOBILE_ROOT, "src/api/notification.service.ts"),
       path.join(MOBILE_ROOT, "app/index.tsx"),
       path.join(MOBILE_ROOT, "scripts/e2e-audit.ts"),
     ];

@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
-  Building2,
   Calendar,
   Check,
   ChevronRight,
@@ -11,7 +10,6 @@ import {
   Settings,
   ShieldCheck,
   Star,
-  Wallet,
 } from "lucide-react-native";
 import {
   Box,
@@ -39,16 +37,12 @@ import { ROUTES } from "@/constants";
 import { haptics } from "@/utils/haptics";
 import {
   usePractitionerProfile,
-  useLedgerAccounts,
 } from "@/hooks/useApiQueries";
-import { resolveServerValue } from "@/utils/server-value";
-import { formatRupiah } from "@/utils/format";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function PractitionerProfileScreen() {
   const router = useRouter();
   const { data: profile } = usePractitionerProfile();
-  const { data: accountsData } = useLedgerAccounts();
   const { signOut } = useAuth();
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [showScheduleModal, setShowScheduleModal] = useState(false);
@@ -227,54 +221,6 @@ export default function PractitionerProfileScreen() {
                     Senin–Jumat • 09:00–17:00
                   </Text>
                 </VStack>
-              </HStack>
-              <ChevronRight size={16} className="text-muted-foreground" />
-            </Pressable>
-
-            <Pressable
-              onPress={() => router.push(ROUTES.PRACTITIONER.WITHDRAW)}
-              accessibilityRole="button"
-              accessibilityLabel="Lihat penghasilan dan insentif"
-              className="py-2.5 flex-row items-center justify-between border-t border-border active:opacity-80"
-            >
-              <HStack space="sm" className="items-center">
-                <Box className="w-8 h-8 rounded-xl bg-muted items-center justify-center">
-                  <Wallet size={16} className="text-secondary" />
-                </Box>
-                <VStack space="xs">
-                  <Text size="xs" className="font-bold text-foreground">
-                    Lihat penghasilan dan insentif
-                  </Text>
-                  <Text size="xs" className="text-[10px] text-muted-foreground">
-                    {resolveServerValue(
-                      accountsData?.data?.[0]?.balance,
-                      (v) => `${formatRupiah(v)} tersedia`,
-                      "Saldo belum dapat dimuat",
-                    )}
-                  </Text>
-                </VStack>
-              </HStack>
-              <ChevronRight size={16} className="text-muted-foreground" />
-            </Pressable>
-
-            <Pressable
-              onPress={() => router.push(ROUTES.PRACTITIONER.BANK_ACCOUNT)}
-              accessibilityRole="button"
-              accessibilityLabel="Rekening Bank Mitra"
-              className="py-2.5 flex-row items-center justify-between border-t border-border active:opacity-80"
-            >
-              <HStack space="sm" className="items-center">
-                <Box className="w-8 h-8 rounded-xl bg-muted items-center justify-center">
-                  <Building2 size={16} className="text-secondary" />
-                </Box>
-                {/* No account line here. This used to be static JSX reading
-                    "BCA •••• 8820 (dr. Andi)" with no server call at all: a
-                    masked account number and a hardcoded owner name on the
-                    finance screen. The API exposes no bank-account resource, so
-                    the line stays gone until one exists. */}
-                <Text size="xs" className="font-bold text-foreground">
-                  Rekening Bank Mitra
-                </Text>
               </HStack>
               <ChevronRight size={16} className="text-muted-foreground" />
             </Pressable>

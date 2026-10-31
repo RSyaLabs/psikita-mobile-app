@@ -15,11 +15,6 @@ export type RoomMessageParams = PageParams & {
   after?: string;
 };
 
-type ArticleListParams = {
-  category?: string;
-  query?: string;
-};
-
 type ListParams = Readonly<Record<string, unknown>>;
 type JsonRecord = Record<string, unknown>;
 
@@ -190,30 +185,5 @@ export const queryKeys = {
         "iceServers",
         privacyToken(roomId),
       ] as const,
-  },
-  articles: {
-    all: ["articles"] as const,
-    list: (params?: ArticleListParams | string, search?: string) => {
-      // The object form used to drop `search` entirely, so
-      // list(undefined, "anxiety"), list(undefined, "depression") and list() all
-      // produced the same key and different searches shared one cache entry.
-      // Both forms now serialise the search term.
-      const normalized =
-        typeof params === "string"
-          ? { category: params, query: search }
-          : { ...(params ?? {}), query: params?.query ?? search };
-      return [
-        ...queryKeys.articles.all,
-        "list",
-        privacyParams(normalized),
-      ] as const;
-    },
-    detail: (id?: string) =>
-      [...queryKeys.articles.all, "detail", privacyToken(id)] as const,
-  },
-  notifications: {
-    all: ["notifications"] as const,
-    list: (category?: string) =>
-      [...queryKeys.notifications.all, "list", { category }] as const,
   },
 };

@@ -1,5 +1,5 @@
 import React from "react";
-import { Calendar, FileText, TrendingUp, User } from "lucide-react-native";
+import { Calendar, FileText, User } from "lucide-react-native";
 import {
   VStack,
   HStack,
@@ -12,14 +12,12 @@ import {
 interface PractitionerQuickActionsProps {
   onOpenHistory: () => void;
   onOpenDiagnosis: () => void;
-  onOpenWithdraw: () => void;
   onOpenProfile: () => void;
 }
 
 export function PractitionerQuickActions({
   onOpenHistory,
   onOpenDiagnosis,
-  onOpenWithdraw,
   onOpenProfile,
 }: PractitionerQuickActionsProps) {
   return (
@@ -62,25 +60,6 @@ export function PractitionerQuickActions({
               className="font-semibold text-foreground text-[11px]"
             >
               Catatan
-            </Text>
-          </Pressable>
-        </Card>
-
-        <Card className="flex-1 bg-card rounded-2xl p-3 border border-border">
-          <Pressable
-            onPress={onOpenWithdraw}
-            accessibilityRole="button"
-            accessibilityLabel="Buka laporan keuangan dan pencairan dana"
-            className="items-center gap-2 active:opacity-80"
-          >
-            <Box className="w-9 h-9 rounded-xl bg-muted items-center justify-center">
-              <TrendingUp size={16} className="text-secondary" />
-            </Box>
-            <Text
-              size="xs"
-              className="font-semibold text-foreground text-[11px]"
-            >
-              Laporan
             </Text>
           </Pressable>
         </Card>

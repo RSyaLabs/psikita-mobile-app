@@ -20,7 +20,7 @@ describe("deterministic QA gates", () => {
     // jest.setup.ts installs the block by replacing global.fetch with a mock
     // that rejects, so the gate is asserted by exercising the real call path
     // instead of grepping the setup file for its message string.
-    await expect(fetch("https://example.test/api/articles")).rejects.toThrow(
+    await expect(fetch("https://example.test/api/consultations")).rejects.toThrow(
       "Network access is disabled in unit tests",
     );
   });

@@ -8,10 +8,7 @@ export type CapabilityKey =
   | "matching"
   | "payment"
   | "bpjsEligibility"
-  | "articles"
-  | "notifications"
   | "chatWrite"
-  | "withdrawal"
   | "prescriptions"
   | "crisisEscalation";
 
@@ -21,10 +18,7 @@ const CAPABILITY_MAP: Record<CapabilityKey, CapabilityState> = {
   matching: "live",
   payment: "live",
   bpjsEligibility: "live",
-  articles: "unavailable",
-  notifications: "unavailable",
   chatWrite: "unavailable",
-  withdrawal: "unavailable",
   prescriptions: "live",
   crisisEscalation: "unavailable",
 };
@@ -51,18 +45,9 @@ const CAPABILITY_FAILURE: Record<CapabilityKey, { message: string; code: string 
     message: "Kelayakan BPJS belum tersedia",
     code: "CAPABILITY_UNAVAILABLE",
   },
-  articles: { message: "Artikel belum tersedia", code: "CAPABILITY_UNAVAILABLE" },
-  notifications: {
-    message: "Notifikasi belum tersedia",
-    code: "CAPABILITY_UNAVAILABLE",
-  },
   chatWrite: {
     message: "Pengiriman pesan belum tersedia",
     code: "CHAT_WRITE_UNAVAILABLE",
-  },
-  withdrawal: {
-    message: "Penarikan belum tersedia",
-    code: "CAPABILITY_UNAVAILABLE",
   },
   prescriptions: {
     message: "Resep belum tersedia",

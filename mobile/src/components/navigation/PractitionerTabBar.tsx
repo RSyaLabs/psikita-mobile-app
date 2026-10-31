@@ -1,6 +1,6 @@
 import React from "react";
 import { useRouter } from "expo-router";
-import { LayoutDashboard, Calendar, Wallet, User } from "lucide-react-native";
+import { LayoutDashboard, Calendar, User } from "lucide-react-native";
 import { HStack, Text, Pressable } from "@/components/ui";
 import { PractitionerTab } from "@/types";
 import { ROUTES } from "@/constants";
@@ -30,17 +30,6 @@ export function PractitionerTabBar({ activeTab }: PractitionerTabBarProps) {
       route: ROUTES.PRACTITIONER.HISTORY,
       icon: (active: boolean) => (
         <Calendar
-          size={18}
-          className={active ? "text-primary" : "text-muted-foreground"}
-        />
-      ),
-    },
-    {
-      id: "keuangan" as PractitionerTab,
-      label: "Keuangan",
-      route: ROUTES.PRACTITIONER.WITHDRAW,
-      icon: (active: boolean) => (
-        <Wallet
           size={18}
           className={active ? "text-primary" : "text-muted-foreground"}
         />
