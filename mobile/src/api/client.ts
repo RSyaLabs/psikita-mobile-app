@@ -5,7 +5,6 @@
 
 import { secureStorage } from "../utils/storage";
 import { ApiError, noContentAdapter, parseApiData } from "./response";
-import { devFixtureFor, isDevVoidFixture } from "@/config/devFixtureRouter";
 
 import type { ResponseAdapter } from "./response";
 
@@ -268,35 +267,6 @@ export async function apiRequest<T>(
       );
     }
   };
-  // Development fixture interception. Returns undefined for every endpoint that
-  // has no fixture, and undefined outright when the flag is off, so the request
-  // below proceeds exactly as it did before this check existed.
-  const fixture = devFixtureFor(endpoint, options?.body);
-  if (fixture !== undefined) {
-    if (isDevVoidFixture(fixture)) {
-      if (adapter) {
-        return parseApiData(undefined, requireResponseAdapter(adapter));
-      }
-      return undefined as T;
-    }
-
-    let adapterInput = fixture;
-    if (
-      Array.isArray(fixture) &&
-      (fixture as any).data !== undefined &&
-      (fixture as any).meta !== undefined
-    ) {
-      adapterInput = {
-        data: (fixture as any).data,
-        meta: (fixture as any).meta,
-      };
-    }
-
-    if (adapter) {
-      return parseApiData(adapterInput, requireResponseAdapter(adapter));
-    }
-    return adapterInput as T;
-  }
 
   const responseAdapter = requireResponseAdapter(adapter);
   const url = resolveApiUrl(endpoint);

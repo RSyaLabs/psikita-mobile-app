@@ -26,7 +26,6 @@ import {
 } from "@/hooks/useApiQueries";
 import { createTestQueryClient } from "../utils/test-utils";
 import * as capabilities from "@/config/capabilities";
-import * as demoMode from "@/config/demoMode";
 import * as apiQueries from "@/hooks/useApiQueries";
 import * as paymentQueries from "@/hooks/queries/payment";
 
@@ -97,7 +96,6 @@ describe("payment and BPJS contract flow", () => {
   beforeEach(() => {
     mockRouter.push.mockClear();
     jest.spyOn(capabilities, "getCapability").mockReturnValue("live");
-    jest.spyOn(demoMode, "isDemoMode").mockReturnValue(false);
     // Test-only adapter boundary: the real service validator remains strict.
     jest.spyOn(paymentApi, "isServerPaymentContext").mockReturnValue(true);
   });
@@ -394,7 +392,6 @@ describe("payment and BPJS contract flow", () => {
   });
 
   it("uses a one-shot BPJS mutation without automatic retries", async () => {
-    const demo = jest.spyOn(demoMode, "isDemoMode").mockReturnValue(false);
     const checkEligibility = jest
       .spyOn(paymentService, "checkBpjsEligibility")
       .mockResolvedValue(BPJS_ELIGIBILITY_ACCEPTED);
@@ -422,11 +419,9 @@ describe("payment and BPJS contract flow", () => {
 
     await waitFor(() => expect(checkEligibility).toHaveBeenCalledTimes(1));
     expect(result.current.data).toEqual(BPJS_ELIGIBILITY_ACCEPTED);
-    demo.mockRestore();
   });
 
   it("does not automatically retry a rejected BPJS POST", async () => {
-    const demo = jest.spyOn(demoMode, "isDemoMode").mockReturnValue(false);
     const checkEligibility = jest
       .spyOn(paymentService, "checkBpjsEligibility")
       .mockRejectedValue(new Error("temporary failure"));
@@ -454,13 +449,12 @@ describe("payment and BPJS contract flow", () => {
 
     await waitFor(() => expect(result.current.isError).toBe(true));
     expect(checkEligibility).toHaveBeenCalledTimes(1);
-    demo.mockRestore();
   });
+
   it("blocks a duplicate payment mutation while the first request is pending", async () => {
     const capability = jest
       .spyOn(capabilities, "getCapability")
       .mockReturnValue("live");
-    const demo = jest.spyOn(demoMode, "isDemoMode").mockReturnValue(false);
     let resolvePayment: ((value: any) => void) | undefined;
     const createPayment = jest
       .spyOn(paymentService, "createPayment")
@@ -485,7 +479,6 @@ describe("payment and BPJS contract flow", () => {
       grossAmount: 1,
     });
     capability.mockRestore();
-    demo.mockRestore();
   });
 
   it("does not call the payment service when the audited capability is unavailable", async () => {
@@ -503,7 +496,6 @@ describe("payment and BPJS contract flow", () => {
           "CAPABILITY_UNAVAILABLE",
         );
       });
-    const demo = jest.spyOn(demoMode, "isDemoMode").mockReturnValue(false);
     const createPayment = jest.spyOn(paymentService, "createPayment");
     const { result } = renderHook(() => useCreatePayment(), {
       wrapper: queryWrapper,
@@ -514,24 +506,6 @@ describe("payment and BPJS contract flow", () => {
     await waitFor(() => expect(result.current.isError).toBe(true));
     expect(createPayment).not.toHaveBeenCalled();
     capability.mockRestore();
-    demo.mockRestore();
-  });
-  it("does not call the payment service in demo mode", async () => {
-    const capability = jest
-      .spyOn(capabilities, "getCapability")
-      .mockReturnValue("live");
-    const demo = jest.spyOn(demoMode, "isDemoMode").mockReturnValue(true);
-    const createPayment = jest.spyOn(paymentService, "createPayment");
-    const { result } = renderHook(() => useCreatePayment(), {
-      wrapper: queryWrapper,
-    });
-
-    result.current.mutate(payment);
-
-    await waitFor(() => expect(result.current.isError).toBe(true));
-    expect(createPayment).not.toHaveBeenCalled();
-    capability.mockRestore();
-    demo.mockRestore();
   });
 
   it("sends the server-issued context and never authors an amount", async () => {

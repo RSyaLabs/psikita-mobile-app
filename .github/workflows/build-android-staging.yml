@@ -74,8 +74,6 @@ jobs:
         working-directory: mobile
         env:
           EXPO_PUBLIC_API_BASE_URL: https://api.staging.psikita.muammarzaki.tech/core
-          EXPO_PUBLIC_DEMO_MODE: "false"
-          EXPO_PUBLIC_USE_MOCK_FALLBACK: "false"
           CI: "false"
         run: |
           npx expo prebuild --platform android --clean --no-install
@@ -110,8 +108,6 @@ jobs:
         working-directory: mobile/android
         env:
           EXPO_PUBLIC_API_BASE_URL: https://api.staging.psikita.muammarzaki.tech/core
-          EXPO_PUBLIC_DEMO_MODE: "false"
-          EXPO_PUBLIC_USE_MOCK_FALLBACK: "false"
           GRADLE_OPTS: "-Xmx4096m -XX:MaxMetaspaceSize=1024m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
           _JAVA_OPTIONS: "-Xmx4096m"
         run: |

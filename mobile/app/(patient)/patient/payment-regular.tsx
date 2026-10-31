@@ -4,10 +4,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { haptics } from "@/utils/haptics";
 import { safeNavigateBack } from "@/utils/navigation";
 import { getCapability } from "@/config/capabilities";
-import { isDemoMode } from "@/config/demoMode";
 import { ROUTES } from "@/constants/routes";
 import {
-  DataSourceBanner,
   ErrorState,
   LoadingState,
   UnavailableState,
@@ -16,7 +14,6 @@ import {
   ArrowLeft,
   Clock,
   CheckCircle2,
-  FlaskConical,
   Zap,
 } from "lucide-react-native";
 import { PaymentMethodSelector } from "@/components/patient/payment";
@@ -41,16 +38,9 @@ import {
   useValidatedServerPaymentContext,
 } from "@/hooks/useApiQueries";
 
-/**
- * `demo` is deliberately NOT a settlement. It records that the reviewer ran the
- * traced demo jump, which opens the chat room with no server round-trip and no
- * confirmed payment. Only `settled` is written after `isPaymentSettled` returns
- * true, so no consumer of this union can read `demo` as a real transaction.
- */
 type PaymentViewState =
   | "idle"
   | "pending"
-  | "demo"
   | "settled"
   | "expired"
   | "cancelled"
@@ -71,16 +61,9 @@ export default function PaymentRegularScreen() {
     doctorName?: string;
     consultationId?: string;
   }>();
-  // Single gate for whether anything demo-flavoured may run here. The raw env
-  // flag is never read in this screen: isDemoMode() already covers both flags.
-  const demoMode = isDemoMode();
-  const doctorName =
-    (Array.isArray(params.doctorName)
-      ? params.doctorName[0]
-      : params.doctorName) ||
-    (demoMode ? "Rina Amelia, M.Psi, Psikolog (simulasi)" : undefined);
-  // Route value only. No invented consultation id: without one the screen says
-  // so instead of opening a room for a consultation that does not exist.
+  const doctorName = Array.isArray(params.doctorName)
+    ? params.doctorName[0]
+    : params.doctorName;
   const consultationId = Array.isArray(params.consultationId)
     ? params.consultationId[0]
     : params.consultationId;
@@ -98,8 +81,6 @@ export default function PaymentRegularScreen() {
   );
   const [paymentState, setPaymentState] = useState<PaymentViewState>("idle");
   const submitInFlight = useRef(false);
-  // False once the screen unmounts, so an in-flight payment cannot write state to a
-  // component that no longer exists.
   const isMountedRef = useRef(true);
   useEffect(() => {
     return () => {
@@ -111,49 +92,20 @@ export default function PaymentRegularScreen() {
   const isPaying =
     createPaymentMutation.isPending || paymentState === "pending";
   const isSettled = paymentState === "settled";
-  const isDemoTrace = paymentState === "demo";
-  // The money write only ever runs against a live capability and a
-  // server-issued context. Demo mode never enables it; it only enables the
-  // separate traced jump below.
   const paymentEnabled =
     paymentCapability === "live" &&
-    !demoMode &&
     Boolean(serverContext) &&
     isContextSuccess &&
     !isContextFetching &&
     !isContextError &&
     !isSettled;
-  // Reviewer traceability lives here: a demo-only jump that is explicitly not
-  // a payment. It needs a real consultation id to navigate with.
-  const canTraceDemoFlow = demoMode && Boolean(consultationId) && !isPaying;
   const paymentUnavailable =
-    !demoMode &&
-    (paymentCapability === "unavailable" ||
-      (!isContextLoading &&
-        !isContextFetching &&
-        !isContextError &&
-        (!serverContext || !isContextSuccess) &&
-        !isSettled));
-
-  const handleDemoTrace = () => {
-    if (!canTraceDemoFlow || !consultationId || submitInFlight.current) {
-      haptics.error();
-      return;
-    }
-
-    submitInFlight.current = true;
-    // Never "settled": nothing was sent and nothing was confirmed.
-    setPaymentState("demo");
-    haptics.medium();
-    setTimeout(() => {
-      if (!isMountedRef.current) return;
-      submitInFlight.current = false;
-      router.push({
-        pathname: ROUTES.PATIENT.CHAT_ROOM,
-        params: { consultationId },
-      });
-    }, 500);
-  };
+    paymentCapability === "unavailable" ||
+    (!isContextLoading &&
+      !isContextFetching &&
+      !isContextError &&
+      (!serverContext || !isContextSuccess) &&
+      !isSettled);
 
   const handlePay = async () => {
     if (!paymentEnabled || isPaying || isSettled || submitInFlight.current) {
@@ -298,44 +250,6 @@ export default function PaymentRegularScreen() {
             paymentEnabled={paymentEnabled}
           />
 
-          {demoMode &&
-            !isContextError &&
-            !isContextLoading &&
-            !isContextFetching &&
-            paymentCapability !== "unavailable" && (
-              <DataSourceBanner
-                source="demo"
-                label="Mode demo"
-                description="Pembayaran dinonaktifkan. Mode demo tidak dapat menyelesaikan transaksi dan tidak ada konfirmasi server apa pun."
-              />
-            )}
-
-          {demoMode &&
-            !isContextError &&
-            !isContextLoading &&
-            !isContextFetching && (
-            <Box className="rounded-2xl border border-warning/30 bg-warning/10 p-3.5 flex-row items-center gap-3">
-              <FlaskConical size={20} className="text-warning" />
-              <Box className="flex-1">
-                <Text size="xs" bold className="text-foreground">
-                  Simulasi, bukan transaksi sungguhan
-                </Text>
-                <Text size="xs" className="text-muted-foreground">
-                  Tidak ada permintaan ke server dan tidak ada settlement yang
-                  dikonfirmasi. Ruang konsultasi hanya dibuka untuk penelusuran
-                  alur.
-                </Text>
-              </Box>
-            </Box>
-          )}
-
-          {demoMode && !consultationId && (
-            <UnavailableState
-              label="Simulasi belum bisa ditelusuri"
-              description="Tidak ada consultationId dari route, jadi ruang chat tidak dibuka. Buka layar ini dari daftar konsultasi agar ID diteruskan oleh server."
-            />
-          )}
-
           {paymentCapability === "unavailable" ? (
             <UnavailableState
               label="Konteks pembayaran belum tersedia"
@@ -406,38 +320,6 @@ export default function PaymentRegularScreen() {
                     : "Bayar belum tersedia"}
             </ButtonText>
           </Button>
-
-          {demoMode && consultationId && (
-            <Button
-              size="lg"
-              variant="outline"
-              isDisabled={!canTraceDemoFlow}
-              onPress={handleDemoTrace}
-              className="w-full h-[50px] border-warning/40 bg-card flex-row items-center justify-center gap-2 active:opacity-90"
-            >
-              <ButtonIcon as={FlaskConical} className="text-foreground" />
-              <ButtonText className="text-foreground font-bold text-sm">
-                {isDemoTrace
-                  ? "Membuka ruang chat (simulasi)..."
-                  : "Telusuri alur chat (simulasi)"}
-              </ButtonText>
-            </Button>
-          )}
-
-          {isDemoTrace && (
-            <Box className="rounded-2xl border border-warning/30 bg-warning/10 p-3.5 flex-row items-center gap-3 mt-1">
-              <FlaskConical size={22} className="text-warning" />
-              <Box className="flex-1">
-                <Text size="xs" bold className="text-foreground">
-                  Simulasi pembayaran — bukan transaksi sungguhan
-                </Text>
-                <Text size="xs" className="text-muted-foreground">
-                  Server tidak pernah dipanggil dan tidak ada settlement yang
-                  dikonfirmasi, jadi konsultasi tetap terkunci di mode ini.
-                </Text>
-              </Box>
-            </Box>
-          )}
 
           {paymentState === "settled" && (
             <Box className="bg-muted rounded-2xl p-3.5 border border-border flex-row items-center gap-3 mt-1">

@@ -20,14 +20,12 @@ import {
 } from "@/components/ui";
 import { PatientTabBar } from "@/components/navigation/PatientTabBar";
 import {
-  DataSourceBanner,
   EmptyState,
   ErrorState,
   LoadingState,
   UnavailableState,
 } from "@/components/common";
 import { getCapability } from "@/config/capabilities";
-import { DEV_FIXTURE_UNDOCUMENTED_NOTICE } from "@/config/devFixtures";
 import { haptics } from "@/utils/haptics";
 import { safeNavigateBack } from "@/utils/navigation";
 import { ROUTES } from "@/constants/routes";
@@ -53,12 +51,6 @@ export default function ArticlesScreen() {
 
   const categories = ["Semua", "Anxiety", "Self-Love", "Tidur"];
   const isPending = isLoading || isFetching;
-  const showDemoBanner =
-    articlesCapability === "demo" &&
-    !isPending &&
-    !isError &&
-    !articlesUnavailable &&
-    articles.length > 0;
   const featuredArticle = articles[0];
 
   const handleOpenArticle = (item: ArticleDto) => {
@@ -163,13 +155,6 @@ export default function ArticlesScreen() {
         }}
         showsVerticalScrollIndicator={false}
       >
-        {showDemoBanner && (
-          <DataSourceBanner
-            source="demo"
-            label="Mode demo — endpoint tidak ada di kontrak"
-            description={DEV_FIXTURE_UNDOCUMENTED_NOTICE}
-          />
-        )}
         {articlesUnavailable ? (
           <UnavailableState
             label="Artikel belum tersedia"

@@ -20,10 +20,8 @@ import {
   VStack,
 } from "@/components/ui";
 import { CLINICAL_CONSTANTS, getIcd10Description, ROUTES } from "@/constants";
-import { isDemoMode } from "@/config/demoMode";
 import {
   BackendIntegrationBanner,
-  DataSourceBanner,
   UnavailableState,
 } from "@/components/common";
 import {
@@ -33,22 +31,6 @@ import {
 } from "@/hooks/useApiQueries";
 import { haptics } from "@/utils/haptics";
 
-/**
- * Reviewer-only fixture for exploring the SOAP form. It is never a patient
- * record: the save button stays disabled while these exact strings are still in
- * the form, so simulation content cannot reach the server as a real note.
- */
-const DEMO_DRAFT = {
-  icd10: "F41.1",
-  subjective:
-    "Pasien mengeluhkan rasa cemas berlebih dan gelisah saat menghadapi beban kerja harian.",
-  objective:
-    "Afek cemas, kontak mata baik, tanda vital stabil (TD 120/80 mmHg, N 78x/m).",
-  assessment:
-    "Generalized Anxiety Disorder (GAD) derajat sedang, respon emosional adaptif.",
-  plan: "Edukasi teknik relaksasi napas 4-7-8, sleep hygiene reguler, kontrol evaluasi 2 minggu.",
-} as const;
-
 export default function DiagnosisScreen() {
   const router = useRouter();
   const { consultationId: routeConsultationId } = useLocalSearchParams<{
@@ -57,47 +39,21 @@ export default function DiagnosisScreen() {
   const consultationId = Array.isArray(routeConsultationId)
     ? routeConsultationId[0]
     : routeConsultationId;
-  // Single gate for demo-only affordances. The raw env flag is never read in
-  // this screen: isDemoMode() already covers both flags.
-  const demoMode = isDemoMode();
-  // Route value only. No invented consultation id: without one the form stays
-  // empty and unsavable instead of looking like a real patient record.
   const consultation = useActiveConsultation(consultationId);
   const context = consultation.context;
   const soapMutation = useCreateSoapNote();
   const finishMutation = useFinishConsultation();
-  // The fixture only seeds a form the reviewer opened on purpose, by deep-linking
-  // a real consultation id. Without that id the fields stay empty so nothing
-  // here can be mistaken for clinical data coming from the server.
-  const seedDemoDraft = Boolean(demoMode && consultationId);
-  const [selectedIcd, setSelectedIcd] = useState(
-    seedDemoDraft ? DEMO_DRAFT.icd10 : "",
-  );
-  const [subjective, setSubjective] = useState(
-    seedDemoDraft ? DEMO_DRAFT.subjective : "",
-  );
-  const [objective, setObjective] = useState(
-    seedDemoDraft ? DEMO_DRAFT.objective : "",
-  );
-  const [assessment, setAssessment] = useState(
-    seedDemoDraft ? DEMO_DRAFT.assessment : "",
-  );
-  const [plan, setPlan] = useState(seedDemoDraft ? DEMO_DRAFT.plan : "");
+
+  const [selectedIcd, setSelectedIcd] = useState("");
+  const [subjective, setSubjective] = useState("");
+  const [objective, setObjective] = useState("");
+  const [assessment, setAssessment] = useState("");
+  const [plan, setPlan] = useState("");
   const [saved, setSaved] = useState(false);
   const soapConfirmed = saved && soapMutation.isSuccess;
-  // True while every field still holds the untouched simulation fixture. Saving
-  // is blocked until the practitioner replaces it with their own wording.
-  const isDemoDraft =
-    selectedIcd === DEMO_DRAFT.icd10 &&
-    subjective === DEMO_DRAFT.subjective &&
-    objective === DEMO_DRAFT.objective &&
-    assessment === DEMO_DRAFT.assessment &&
-    plan === DEMO_DRAFT.plan;
-
   const selectedDescription = getIcd10Description(selectedIcd);
   const canSave = Boolean(
     context &&
-    !isDemoDraft &&
     selectedIcd &&
     selectedDescription &&
     subjective.trim() &&
@@ -176,15 +132,6 @@ export default function DiagnosisScreen() {
           )}
         </HStack>
 
-        {demoMode && (
-          <DataSourceBanner
-            source="demo"
-            label="Mode demo"
-            description="Isi formulir di bawah adalah contoh simulasi untuk penelusuran UI, bukan rekam medis pasien. Simpan tetap dinonaktifkan selama isian contoh itu belum diganti."
-            className="mb-3"
-          />
-        )}
-
         {!context && (
           <BackendIntegrationBanner
             endpoint="POST /notes/consultation/:id/soap"
@@ -197,7 +144,7 @@ export default function DiagnosisScreen() {
         {!consultationId && (
           <UnavailableState
             label="Formulir clinical belum bisa diisi"
-            description="Tidak ada consultationId dari route, jadi tidak ada konteks server untuk diisi maupun disimpan. Buka layar ini dari daftar konsultasi agar ID diteruskan oleh server, atau telusuri lewat deep-link pada mode demo."
+            description="Tidak ada consultationId dari route, jadi tidak ada konteks server untuk diisi maupun disimpan. Buka layar ini dari daftar konsultasi aktif agar ID diteruskan oleh server."
             className="mb-3"
           />
         )}
@@ -277,11 +224,9 @@ export default function DiagnosisScreen() {
               </Text>
             </HStack>
             <Text size="xs" className="text-muted-foreground">
-              {isDemoDraft
-                ? "Isian masih contoh simulasi. Ganti seluruh isian contoh agar tidak tersimpan sebagai catatan pasien."
-                : soapConfirmed
-                  ? "SOAP terkonfirmasi server. Finish masih memerlukan aksi eksplisit."
-                  : "Belum ada SOAP yang terkonfirmasi server."}
+              {soapConfirmed
+                ? "SOAP terkonfirmasi server. Finish masih memerlukan aksi eksplisit."
+                : "Belum ada SOAP yang terkonfirmasi server."}
             </Text>
           </Card>
 

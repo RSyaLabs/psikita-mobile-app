@@ -1,6 +1,8 @@
 import { decodeBase64Url } from "@/utils/base64";
 import { decodeAccessToken, isTokenExpired } from "@/utils/jwt";
-import { DEV_FIXTURE_TOKEN } from "@/config/devFixtures";
+
+const TEST_JWT_TOKEN =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LXVzZXItMDAxIiwic2lkIjoidGVzdC1zZXNzaW9uLTAwMSIsImVtYWlsIjoidXNlckB0ZXN0LmludmFsaWQiLCJyb2xlIjoiVVNFUiIsImlzQWN0aXZlIjp0cnVlLCJpYXQiOjE3NjcyMjU2MDAsImV4cCI6NDEwMjQ0NDgwMH0.c2lnbmF0dXJl";
 
 /**
  * The web build could never complete a sign-in. `decodeAccessToken` decoded the
@@ -106,8 +108,8 @@ describe("base64url decoding without host globals", () => {
 });
 
 describe("decodeAccessToken", () => {
-  it("returns claims for the fixture token", () => {
-    const claims = decodeAccessToken(DEV_FIXTURE_TOKEN);
+  it("returns claims for a valid access token", () => {
+    const claims = decodeAccessToken(TEST_JWT_TOKEN);
     expect(claims).not.toBeNull();
     expect(claims?.role).toBe("USER");
     expect(isTokenExpired(claims)).toBe(false);
@@ -141,7 +143,7 @@ describe("decodeAccessToken", () => {
     const original = globalThis.Buffer;
     try {
       Reflect.deleteProperty(globalThis as { Buffer?: unknown }, "Buffer");
-      const claims = decodeAccessToken(DEV_FIXTURE_TOKEN);
+      const claims = decodeAccessToken(TEST_JWT_TOKEN);
       expect(claims).not.toBeNull();
       expect(claims?.role).toBe("USER");
     } finally {

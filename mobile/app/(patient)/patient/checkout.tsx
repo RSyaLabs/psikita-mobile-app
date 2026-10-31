@@ -28,7 +28,6 @@ import {
   useValidatedServerPaymentContext,
 } from "@/hooks/useApiQueries";
 import { getCapability } from "@/config/capabilities";
-import { isDemoMode } from "@/config/demoMode";
 import { ROUTES } from "@/constants";
 import {
   ErrorState,
@@ -48,9 +47,7 @@ export default function CheckoutScreen() {
     consultationId?: string;
   }>();
 
-  // Route parameters only. A fabricated id here made the payment screen show a
-  // record the server never issued, which is the exact illusion the fixture
-  // layer exists to avoid. A reviewer deep-links with a real id instead.
+  // Route parameters only. Only verified server consultation IDs are accepted.
   const doctorId = Array.isArray(params.doctorId)
     ? params.doctorId[0]
     : params.doctorId;
@@ -91,26 +88,22 @@ export default function CheckoutScreen() {
     (paymentContextQuery?.isSuccess ?? Boolean(serverContext)) &&
     !(paymentContextQuery?.isFetching ?? false) &&
     !(paymentContextQuery?.isError ?? false);
-  const demoMode = isDemoMode();
   const paymentCapability = getCapability("payment");
   const bpjsCapability = getCapability("bpjsEligibility");
   const paymentEnabled =
     paymentCapability === "live" &&
-    !demoMode &&
     contextReady &&
     Boolean(serverContext);
   const bpjsEnabled =
     bpjsCapability === "live" &&
-    !demoMode &&
     contextReady &&
     Boolean(serverContext);
   const paymentUnavailable =
-    !demoMode &&
-    (paymentCapability === "unavailable" ||
-      (!isContextLoading &&
-        !isContextFetching &&
-        !isContextError &&
-        !contextReady));
+    paymentCapability === "unavailable" ||
+    (!isContextLoading &&
+      !isContextFetching &&
+      !isContextError &&
+      !contextReady);
 
   const openPayment = (pathname: string, enabled = paymentEnabled) => {
     if (!enabled || !serverContext) {

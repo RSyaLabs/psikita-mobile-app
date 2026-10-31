@@ -32,7 +32,6 @@ import {
 import { useLogin } from "@/hooks/useApiQueries";
 import { getHomeRouteForResponse } from "@/hooks/useAuth";
 import { haptics } from "@/utils/haptics";
-import { DevQuickLoginChips } from "./DevQuickLoginChips";
 import { ForgotPasswordView } from "./ForgotPasswordView";
 
 /**
@@ -191,14 +190,6 @@ export function AuthLoginModal({
         <ModalBody className="pt-3 pb-0 mb-0">
           {tab === "login" ? (
             <VStack space="sm" className="w-full">
-              <DevQuickLoginChips
-                onSelectAccount={(selectedUsername) => {
-                  setUsername(selectedUsername);
-                  setPassword("password123");
-                  setErrorMsg(null);
-                }}
-              />
-
               <FormControl
                 id="login-username-field"
                 isRequired

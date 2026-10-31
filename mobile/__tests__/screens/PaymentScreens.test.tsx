@@ -16,7 +16,6 @@ const mockRouter = {
 };
 const mockUseLocalSearchParams = jest.fn(() => ({}));
 const mockGetCapability = jest.fn();
-const mockIsDemoMode = jest.fn(() => false);
 const mockUsePractitioner = jest.fn();
 const mockUsePatientProfile = jest.fn();
 const mockUseCreatePayment = jest.fn();
@@ -33,10 +32,6 @@ jest.mock("expo-router", () => ({
 
 jest.mock("@/config/capabilities", () => ({
   getCapability: (key: string) => mockGetCapability(key),
-}));
-
-jest.mock("@/config/demoMode", () => ({
-  isDemoMode: () => mockIsDemoMode(),
 }));
 
 jest.mock("@/hooks/useApiQueries", () => ({
@@ -91,7 +86,6 @@ describe("payment screen fail-closed interactions", () => {
       if (key === "bpjsEligibility") return "live";
       return "unavailable";
     });
-    mockIsDemoMode.mockReturnValue(false);
     mockUsePractitioner.mockReturnValue({ data: undefined });
     mockUsePatientProfile.mockReturnValue({
       data: undefined,
@@ -122,102 +116,6 @@ describe("payment screen fail-closed interactions", () => {
     expect(cta).toBeTruthy();
     expect(mockPaymentMutateAsync).not.toHaveBeenCalled();
     expect(mockRouter.push).not.toHaveBeenCalled();
-  });
-
-  it("blocks regular payment requests in demo mode even with a server context", () => {
-    mockGetCapability.mockImplementation((key: string) =>
-      key === "payment" ? "live" : "live",
-    );
-    mockIsDemoMode.mockReturnValue(true);
-    mockUseValidatedServerPaymentContext.mockReturnValue({
-      context: serverContext,
-    });
-    renderWithClient(<PaymentRegularScreen />);
-
-    expect(screen.getByText("Mode demo")).toBeTruthy();
-    fireEvent.press(screen.getByText("Bayar belum tersedia"));
-
-    expect(mockPaymentMutateAsync).not.toHaveBeenCalled();
-    expect(mockRouter.push).not.toHaveBeenCalled();
-  });
-
-  it("never reports a settled payment in demo mode, and traces the flow as a labelled simulation", async () => {
-    // The money write must stay fail-closed in demo mode, and the only way to
-    // follow the flow onward is a control that says out loud it is a
-    // simulation. Before this, a mock flag set "settled" locally and pushed
-    // the consultation route without the server ever being asked.
-    mockGetCapability.mockReturnValue("live");
-    mockIsDemoMode.mockReturnValue(true);
-    mockUseValidatedServerPaymentContext.mockReturnValue({
-      context: serverContext,
-    });
-    mockUseLocalSearchParams.mockReturnValue({ consultationId: "consultation-7" });
-    renderWithClient(<PaymentRegularScreen />);
-
-    fireEvent.press(screen.getByText("Bayar belum tersedia"));
-
-    expect(mockPaymentMutateAsync).not.toHaveBeenCalled();
-    expect(mockRouter.push).not.toHaveBeenCalled();
-
-    fireEvent.press(screen.getByText("Telusuri alur chat (simulasi)"));
-
-    // The trace waits 500ms before navigating, so the assertion has to wait
-    // too. Everything before it is synchronous and already asserted.
-    await waitFor(() =>
-      expect(mockRouter.push).toHaveBeenCalledWith({
-        pathname: "/patient/chat-room",
-        params: { consultationId: "consultation-7" },
-      }),
-    );
-    expect(screen.getByText("Simulasi pembayaran — bukan transaksi sungguhan")).toBeTruthy();
-    expect(screen.queryByText(/Settlement terkonfirmasi/i)).toBeNull();
-    expect(mockPaymentMutateAsync).not.toHaveBeenCalled();
-  });
-
-  it("refuses to trace the demo flow at all without a route-supplied consultation id", () => {
-    // The hardcoded demo id was deleted, so a reviewer has to deep-link with
-    // one. Silently substituting a fixture id here is what let the flow look
-    // server-confirmed when it was not.
-    mockGetCapability.mockReturnValue("live");
-    mockIsDemoMode.mockReturnValue(true);
-    mockUseValidatedServerPaymentContext.mockReturnValue({
-      context: serverContext,
-    });
-    mockUseLocalSearchParams.mockReturnValue({});
-    renderWithClient(<PaymentRegularScreen />);
-
-    expect(screen.getByText("Simulasi belum bisa ditelusuri")).toBeTruthy();
-    expect(screen.queryByText("Telusuri alur chat (simulasi)")).toBeNull();
-  });
-
-  it("never confirms BPJS in demo mode, and labels the trace as a simulation", () => {
-    mockGetCapability.mockReturnValue("live");
-    mockIsDemoMode.mockReturnValue(true);
-    mockUseLocalSearchParams.mockReturnValue({ consultationId: "consultation-7" });
-    renderWithClient(<PaymentBpjsScreen />);
-
-    expect(screen.getByText("Simulasi BPJS — bukan verifikasi nyata")).toBeTruthy();
-    expect(screen.getByText("Simulasi: BPJS tidak diverifikasi")).toBeTruthy();
-    // The live CTA must not exist in demo mode at all.
-    expect(screen.queryByText("Verifikasi dan lanjut")).toBeNull();
-    expect(screen.getByText("Lanjut ke chat (simulasi)")).toBeTruthy();
-
-    fireEvent.press(screen.getByText("Lanjut ke chat (simulasi)"));
-
-    expect(mockBpjsMutate).not.toHaveBeenCalled();
-    expect(mockRouter.push).toHaveBeenCalledWith({
-      pathname: "/patient/chat-room",
-      params: { consultationId: "consultation-7" },
-    });
-  });
-
-  it("refuses the BPJS demo trace without a route-supplied consultation id", () => {
-    mockGetCapability.mockReturnValue("live");
-    mockIsDemoMode.mockReturnValue(true);
-    mockUseLocalSearchParams.mockReturnValue({});
-    renderWithClient(<PaymentBpjsScreen />);
-
-    expect(screen.getByText("Simulasi BPJS belum bisa ditelusuri")).toBeTruthy();
   });
 
   it.each([
@@ -414,22 +312,5 @@ describe("payment screen fail-closed interactions", () => {
 
     fireEvent.press(screen.getByText("Coba lagi"));
     expect(mockBpjsMutate).toHaveBeenCalledTimes(1);
-  });
-
-  it("does not issue a BPJS request in demo mode", () => {
-    mockIsDemoMode.mockReturnValue(true);
-    mockUsePatientProfile.mockReturnValue({
-      data: { bpjsNumber: "member-1" },
-      isLoading: false,
-    });
-    mockGetCapability.mockReturnValue("live");
-    mockUseValidatedServerPaymentContext.mockReturnValue({
-      context: serverContext,
-    });
-    renderWithClient(<PaymentBpjsScreen />);
-
-    expect(screen.getByText("Mode demo")).toBeTruthy();
-    expect(screen.queryByText("Coba lagi")).toBeNull();
-    expect(mockBpjsMutate).not.toHaveBeenCalled();
   });
 });

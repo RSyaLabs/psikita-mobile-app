@@ -5,7 +5,6 @@ import {
   AlertTriangle,
   ArrowLeft,
   Check,
-  FlaskConical,
   ShieldCheck,
 } from "lucide-react-native";
 import {
@@ -25,9 +24,7 @@ import {
   VStack,
 } from "@/components/ui";
 import { getCapability } from "@/config/capabilities";
-import { isDemoMode } from "@/config/demoMode";
 import {
-  DataSourceBanner,
   ErrorState,
   LoadingState,
   UnavailableState,
@@ -44,8 +41,6 @@ import { ROUTES } from "@/constants/routes";
 export default function PaymentBpjsScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ consultationId?: string }>();
-  // Single demo gate; the raw env flag is never read in this screen.
-  const demoMode = isDemoMode();
   // Route value only. No invented consultation id.
   const consultationId = Array.isArray(params.consultationId)
     ? params.consultationId[0]
@@ -74,7 +69,6 @@ export default function PaymentBpjsScreen() {
   const bpjsCapability = getCapability("bpjsEligibility");
   const canRequestEligibility =
     bpjsCapability === "live" &&
-    !demoMode &&
     Boolean(serverBillingOrderId && memberNumber) &&
     isContextSuccess &&
     isProfileReady &&
@@ -83,14 +77,10 @@ export default function PaymentBpjsScreen() {
     !isContextError &&
     !isProfileError;
   const isSubmitting = eligibilityMutation.isPending;
-  // A demo run is never a BPJS verification. Outside demo mode the CTA needs
-  // the server acceptance; in demo mode it only opens the chat room so a
-  // reviewer can trace the flow, and it is labelled as a simulation.
   const canConfirmBpjs =
     Boolean(consultationId) &&
     !isSubmitting &&
-    (demoMode || eligibilityMutation.isSuccess);
-  const isDemoSource = demoMode;
+    eligibilityMutation.isSuccess;
   const prerequisitesLoading =
     isContextLoading ||
     isContextFetching ||
@@ -98,9 +88,8 @@ export default function PaymentBpjsScreen() {
     isProfileFetching;
   const prerequisitesError = isContextError || isProfileError;
   const requestUnavailable =
-    !isDemoSource &&
-    (bpjsCapability === "unavailable" ||
-      (!prerequisitesLoading && !prerequisitesError && !canRequestEligibility));
+    bpjsCapability === "unavailable" ||
+    (!prerequisitesLoading && !prerequisitesError && !canRequestEligibility);
 
   const handleRetry = () => {
     if (
@@ -129,28 +118,23 @@ export default function PaymentBpjsScreen() {
       haptics.error();
       return;
     }
-    // Nothing here records a verification. In demo mode this is a traced jump
-    // to the chat room; outside it the server already accepted the request.
-    if (demoMode) haptics.medium();
-    else haptics.success();
+    haptics.success();
     router.push({
       pathname: ROUTES.PATIENT.CHAT_ROOM,
       params: { consultationId },
     });
   };
 
-  const eligibilityLabel = demoMode
-    ? "Simulasi: BPJS tidak diverifikasi"
-    : eligibilityMutation.isError
-      ? "Validasi gagal"
-      : eligibilityMutation.isSuccess
-        ? "Permintaan diterima; detail manfaat belum tersedia"
-        : eligibilityMutation.isPending
-          ? "Memvalidasi..."
-          : isProfileLoading ||
-              isProfileFetching ||
-              isContextLoading ||
-              isContextFetching
+  const eligibilityLabel = eligibilityMutation.isError
+    ? "Validasi gagal"
+    : eligibilityMutation.isSuccess
+      ? "Permintaan diterima; detail manfaat belum tersedia"
+      : eligibilityMutation.isPending
+        ? "Memvalidasi..."
+        : isProfileLoading ||
+            isProfileFetching ||
+            isContextLoading ||
+            isContextFetching
             ? "Memuat data dari server..."
             : "Status eligibility belum tersedia";
 
@@ -183,17 +167,6 @@ export default function PaymentBpjsScreen() {
         showsVerticalScrollIndicator={false}
       >
         <VStack space="md" className="p-5">
-          {isDemoSource &&
-            bpjsCapability !== "unavailable" &&
-            !prerequisitesLoading &&
-            !prerequisitesError &&
-            !eligibilityMutation.isError && (
-              <DataSourceBanner
-                source="demo"
-                label="Mode demo"
-                description="Simulasi saja. BPJS tidak diverifikasi dan tidak ada pembayaran yang diselesaikan dari mode demo."
-              />
-            )}
           {bpjsCapability === "unavailable" ? (
             <UnavailableState
               label="Eligibility BPJS belum tersedia"
@@ -327,31 +300,6 @@ export default function PaymentBpjsScreen() {
               </VStack>
             </HStack>
           </Card>
-
-          {demoMode && !consultationId && (
-            <UnavailableState
-              label="Simulasi BPJS belum bisa ditelusuri"
-              description="Tidak ada consultationId dari route, jadi ruang chat tidak dibuka. Buka layar ini dari daftar konsultasi agar ID diteruskan oleh server."
-            />
-          )}
-
-          {demoMode && (
-            <Card className="rounded-2xl p-4 border border-warning/30 bg-warning/10 gap-2">
-              <HStack space="sm" className="items-center">
-                <FlaskConical size={20} className="text-warning" />
-                <VStack space="xs">
-                  <Text size="sm" bold className="text-foreground">
-                    Simulasi BPJS — bukan verifikasi nyata
-                  </Text>
-                  <Text size="xs" className="text-muted-foreground">
-                    Tombol di bawah hanya membuka ruang chat untuk penelusuran
-                    alur. BPJS tidak diverifikasi dan tidak ada permintaan yang
-                    dikirim ke server.
-                  </Text>
-                </VStack>
-              </HStack>
-            </Card>
-          )}
         </VStack>
       </ScrollView>
 
@@ -368,9 +316,7 @@ export default function PaymentBpjsScreen() {
             <ButtonIcon as={Check} className="text-muted-foreground" />
           )}
           <ButtonText className="text-muted-foreground font-bold text-sm">
-            {demoMode
-              ? "Lanjut ke chat (simulasi)"
-              : "Verifikasi dan lanjut"}
+            Verifikasi dan lanjut
           </ButtonText>
         </Button>
       </Box>

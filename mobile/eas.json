@@ -3,8 +3,6 @@
     "production": {
       "distribution": "internal",
       "env": {
-        "EXPO_PUBLIC_DEMO_MODE": "false",
-        "EXPO_PUBLIC_USE_MOCK_FALLBACK": "false",
         "EXPO_PUBLIC_API_BASE_URL": "https://api.psikita.id"
       },
       "android": {
@@ -14,24 +12,11 @@
     "staging": {
       "distribution": "internal",
       "env": {
-        "EXPO_PUBLIC_DEMO_MODE": "false",
-        "EXPO_PUBLIC_USE_MOCK_FALLBACK": "false",
         "EXPO_PUBLIC_API_BASE_URL": "https://api.staging.psikita.muammarzaki.tech/core"
       },
       "android": {
         "package": "id.psikita.app",
         "buildType": "apk"
-      }
-    },
-    "demo": {
-      "distribution": "internal",
-      "env": {
-        "EXPO_PUBLIC_DEMO_MODE": "true",
-        "EXPO_PUBLIC_USE_MOCK_FALLBACK": "true",
-        "EXPO_PUBLIC_API_BASE_URL": "http://localhost:3000"
-      },
-      "android": {
-        "package": "id.psikita.app.demo"
       }
     }
   }

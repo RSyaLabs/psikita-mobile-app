@@ -134,25 +134,16 @@ npm install
 npx expo start --web --port 8081
 ```
 
-For native targets run `npx expo start` and press `i` or `a`.
+For Android target run `npx expo start` and press `a`.
 
-### Demo mode
+### API Configuration
 
-The app runs with no backend, which is how the UI is meant to be reviewed:
+The app connects directly to the backend API:
 
 ```sh
 # mobile/.env
-EXPO_PUBLIC_DEMO_MODE=true
-EXPO_PUBLIC_USE_MOCK_FALLBACK=true
+EXPO_PUBLIC_API_BASE_URL=https://api.staging.psikita.muammarzaki.tech/core
 ```
-
-Fixtures live in `mobile/src/config/fixtures/` and are served by an interceptor in
-`mobile/src/api/client.ts`. Every invented response is logged with a greppable
-`[DEV-FIXTURE]` marker. Both flags must be off in a production build; `eas.json`
-pins `false` for both on the `production` profile.
-
-Web sessions are kept in memory only and never written to browser storage, so a
-reload signs you out.
 
 ---
 
@@ -161,16 +152,15 @@ reload signs you out.
 ```
 mobile/app/          route screens, grouped by role (patient, practitioner, admin, auth)
 mobile/src/api/      service layer, one module per domain, zod-validated responses
-mobile/src/config/   demo gate, capability map, fixture router
+mobile/src/config/   capability map
 mobile/src/hooks/    react-query hooks, one file per domain
 mobile/src/components/ui/   Gluestack wrappers
 staging-openapi.json the contract of record, 113 paths
 ```
 
 **Capability map.** `src/config/capabilities.ts` declares which features have a
-real server endpoint. `assertCapabilityLive` refuses a money write when the
-capability is not live, so a screen cannot present a simulated success as a real
-settlement.
+real server endpoint (`live`) or are currently pending backend implementation (`unavailable`).
+`assertCapabilityLive` refuses writes fail-closed when the capability is not live.
 
 **Strict response parsing.** Schemas reject a response that is missing a
 contract-required field instead of inventing a value, so an absent `items` array

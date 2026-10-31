@@ -17,7 +17,6 @@ import {
   Text,
   VStack,
 } from "@/components/ui";
-import { isDemoMode } from "@/config/demoMode";
 import { ROUTES } from "@/constants/routes";
 import {
   useActiveConsultation,
@@ -34,9 +33,6 @@ export default function PractitionerChatScreen() {
   const consultationId = Array.isArray(routeConsultationId)
     ? routeConsultationId[0]
     : routeConsultationId;
-  // Single gate for demo-only affordances. The raw env flag is never read in
-  // this screen: isDemoMode() already covers both flags.
-  const demoMode = isDemoMode();
   // Route value only. No invented consultation id: without one the screen says
   // so instead of opening a room for a consultation that does not exist.
   const consultation = useActiveConsultation(consultationId);
@@ -94,13 +90,6 @@ export default function PractitionerChatScreen() {
               Practitioner chat membutuhkan consultation ID dan room ID dari
               respons server.
             </Text>
-            {demoMode && (
-              <Text size="sm" className="text-muted-foreground">
-                Mode demo: tidak ada ID yang dikarang di layar ini. Telusuri
-                alur lewat deep-link dengan consultation ID asli, misalnya{" "}
-                {ROUTES.PRACTITIONER.CHAT}?consultationId=...
-              </Text>
-            )}
             {consultation.isError && (
               <Alert action="error">
                 <AlertIcon />

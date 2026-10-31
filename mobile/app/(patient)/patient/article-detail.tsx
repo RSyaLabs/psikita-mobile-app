@@ -11,7 +11,6 @@ import {
   X,
 } from "lucide-react-native";
 import {
-  DataSourceBanner,
   ErrorState,
   LoadingState,
   UnavailableState,
@@ -172,13 +171,6 @@ export default function ArticleDetailScreen() {
         }}
         showsVerticalScrollIndicator={false}
       >
-        {articleCapability === "demo" && (
-          <DataSourceBanner
-            source="demo"
-            label="Mode demo"
-            description="Artikel ini memakai data demo dan bukan informasi klinis live."
-          />
-        )}
         {/* Title */}
         <Heading
           level={1}

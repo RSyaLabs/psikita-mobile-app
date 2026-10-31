@@ -9,7 +9,6 @@ import * as paymentApi from "@/api/payment.service";
 import * as apiBarrel from "@/api";
 import * as hooks from "@/hooks/useApiQueries";
 import * as capabilities from "@/config/capabilities";
-import * as demoMode from "@/config/demoMode";
 import { createTestQueryClient } from "../utils/test-utils";
 
 const originalFetch = global.fetch;
@@ -59,7 +58,6 @@ function deferred<T>() {
 describe("payment context and boundary guards", () => {
   beforeEach(() => {
     jest.spyOn(capabilities, "getCapability").mockReturnValue("live");
-    jest.spyOn(demoMode, "isDemoMode").mockReturnValue(false);
     // The payment module reaches the capability check through
     // assertCapabilityLive, which reads getCapability through its own local
     // binding. A spy on getCapability alone therefore no longer reaches the
@@ -179,53 +177,6 @@ describe("payment context and boundary guards", () => {
         },
       } as any),
     ).rejects.toMatchObject({ error: "CAPABILITY_UNAVAILABLE" });
-    expect(global.fetch).not.toHaveBeenCalled();
-  });
-
-  it.each([
-    [
-      "payment",
-      () =>
-        paymentService.createPayment({
-          methodType: "E_WALLET",
-          channelCode: "GOPAY",
-          context: {
-            consultationId: "consultation-1",
-            billingOrderId: "server-order-1",
-          } as any,
-        }),
-    ],
-    [
-      "BPJS eligibility",
-      () =>
-        paymentService.checkBpjsEligibility(
-          {
-            consultationId: "consultation-1",
-            billingOrderId: "server-order-1",
-          } as any,
-          "member-1",
-        ),
-    ],
-    [
-      "billing order",
-      () =>
-        paymentService.createBillingOrder("consultation-1", {
-          orderType: "INITIAL",
-        } as any),
-    ],
-  ])("blocks %s in demo mode before fetch", async (_name, operation) => {
-    // Demo mode is the real guard own decision, so the stub installed in
-    // beforeEach is dropped here and the actual guard runs against the
-    // mocked isDemoMode. This keeps the assertion about the payment path
-    // not reaching fetch, rather than about the guard table.
-    (capabilities.assertCapabilityLive as jest.Mock).mockRestore();
-    (capabilities.getCapability as jest.Mock).mockReturnValue("live");
-    (demoMode.isDemoMode as jest.Mock).mockReturnValue(true);
-    global.fetch = jest.fn() as unknown as typeof fetch;
-
-    await expect(operation()).rejects.toMatchObject({
-      error: "CAPABILITY_UNAVAILABLE",
-    });
     expect(global.fetch).not.toHaveBeenCalled();
   });
 

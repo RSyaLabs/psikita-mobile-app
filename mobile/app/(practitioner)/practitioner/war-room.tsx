@@ -19,7 +19,6 @@ import {
   Text,
   VStack,
 } from "@/components/ui";
-import { isDemoMode } from "@/config/demoMode";
 import { ROUTES } from "@/constants";
 import { BackendIntegrationBanner } from "@/components/common";
 import { useClaimMatching, useTriageQueue } from "@/hooks/useApiQueries";
@@ -29,25 +28,21 @@ import { safeNavigateBack } from "@/utils/navigation";
 export default function WarRoomScreen() {
   const router = useRouter();
   const queue = useTriageQueue();
-  // Single gate for demo-only affordances. The raw env flag is never read in
-  // this screen: isDemoMode() already covers both flags.
-  const demoMode = isDemoMode();
   const claimMutation = useClaimMatching();
-  // Set when a claim succeeded but there is no room to open, so the screen can
-  // say so instead of navigating somewhere invented.
   const [claimNotice, setClaimNotice] = useState<string | null>(null);
 
+  const activeQueueItem = queue.data?.[0];
+  const canClaim = Boolean(activeQueueItem?.id);
+
   const handleClaim = () => {
-    if (!demoMode) {
+    if (!activeQueueItem?.id) {
       haptics.error();
       return;
     }
     setClaimNotice(null);
     haptics.medium();
-    claimMutation.mutate("dev-match-0001", {
+    claimMutation.mutate(activeQueueItem.id, {
       onSuccess: (data) => {
-        // Server-issued id or nothing. Without one there is no room to open, so
-        // the screen reports that instead of substituting a fixture id.
         const consultationId = data.activeConsultation?.consultationId;
         if (!consultationId) {
           setClaimNotice(
@@ -150,25 +145,25 @@ export default function WarRoomScreen() {
           />
 
           <Button
-            isDisabled={!demoMode || claimMutation.isPending}
+            isDisabled={!canClaim || claimMutation.isPending}
             onPress={handleClaim}
-            className={`w-full rounded-xl ${demoMode ? "bg-primary" : ""}`}
+            className={`w-full rounded-xl ${canClaim ? "bg-primary" : ""}`}
             accessibilityLabel={
-              demoMode ? "Klaim antrean demo" : "Klaim antrean belum tersedia"
+              canClaim ? "Klaim antrean" : "Belum ada antrean untuk diklaim"
             }
           >
             <ButtonText
               className={
-                demoMode
+                canClaim
                   ? "text-primary-foreground font-semibold"
                   : "text-muted-foreground"
               }
             >
               {claimMutation.isPending
                 ? "Mengklaim antrean..."
-                : demoMode
-                  ? "Klaim matching (Mode Mock Demo)"
-                  : "Klaim matching belum tersedia"}
+                : canClaim
+                  ? "Klaim matching antrean"
+                  : "Belum ada antrean untuk diklaim"}
             </ButtonText>
           </Button>
 
@@ -177,16 +172,6 @@ export default function WarRoomScreen() {
               <AlertIcon />
               <AlertText>{claimNotice}</AlertText>
             </Alert>
-          )}
-
-          {!demoMode && (
-            <HStack space="xs" className="items-center">
-              <ShieldAlert size={14} className="text-muted-foreground" />
-              <Text size="xs" className="text-muted-foreground">
-                Klaim matching hanya tersedia di mode demo. Tanpa ID dari
-                server, layar ini tidak membuka ruang chat apa pun.
-              </Text>
-            </HStack>
           )}
         </VStack>
       </ScrollView>

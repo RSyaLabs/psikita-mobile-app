@@ -27,21 +27,25 @@ describe("service data-source boundaries", () => {
     capability.mockRestore();
   });
 
-  it("selects article fixtures explicitly in demo mode without making a request", async () => {
-    capability.mockReturnValue("demo");
+  it("keeps articles unavailable without calling an undocumented endpoint", async () => {
     request.mockRejectedValue(new Error("must not be called"));
 
-    await expect(articleService.getArticles()).resolves.toHaveLength(4);
+    await expect(articleService.getArticles()).rejects.toMatchObject({
+      name: "ApiError",
+      statusCode: 501,
+      error: "CAPABILITY_UNAVAILABLE",
+    });
     expect(request).not.toHaveBeenCalled();
   });
 
-  it("selects notification fixtures explicitly in demo mode without making a request", async () => {
-    capability.mockReturnValue("demo");
+  it("keeps notifications unavailable without calling an undocumented endpoint", async () => {
     request.mockRejectedValue(new Error("must not be called"));
 
-    await expect(notificationService.getNotifications()).resolves.toHaveLength(
-      5,
-    );
+    await expect(notificationService.getNotifications()).rejects.toMatchObject({
+      name: "ApiError",
+      statusCode: 501,
+      error: "CAPABILITY_UNAVAILABLE",
+    });
     expect(request).not.toHaveBeenCalled();
   });
 
@@ -187,22 +191,7 @@ describe("service data-source boundaries", () => {
     expect(request).not.toHaveBeenCalled();
   });
 
-  it("keeps notification writes demo-local without transport", async () => {
-    capability.mockReturnValue("demo");
-    request.mockRejectedValue(new Error("must not be called"));
-
-    await expect(
-      notificationService.markAsRead("notification_1"),
-    ).resolves.toEqual({
-      success: true,
-    });
-    await expect(notificationService.markAllAsRead()).resolves.toEqual({
-      success: true,
-    });
-    expect(request).not.toHaveBeenCalled();
-  });
-
-  it("keeps notification writes unavailable in production without transport", async () => {
+  it("keeps notification writes unavailable without transport", async () => {
     capability.mockReturnValue("unavailable");
     request.mockRejectedValue(new Error("must not be called"));
 

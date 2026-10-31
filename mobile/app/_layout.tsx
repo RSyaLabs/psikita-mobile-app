@@ -9,7 +9,6 @@ import { Box } from "@/components/ui";
 import { QueryProvider } from "@/providers/QueryProvider";
 import { AuthProvider } from "@/providers/AuthProvider";
 import { AppErrorBoundary } from "@/components/common/AppErrorBoundary";
-import { DevFixtureBanner } from "@/components/common/DevFixtureBanner";
 import { colors } from "@/theme/colors";
 
 export default function RootLayout() {
@@ -78,11 +77,6 @@ export default function RootLayout() {
                   which took the whole app down before login. Compose objects. */}
               <Box style={outerStyle}>
                 <Box style={mobileStyle}>
-                  {/*
-                   * The fixture banner sits above the navigator, framed inside the
-                   * mobile container so it aligns with the phone viewport width.
-                   */}
-                  <DevFixtureBanner />
                   <Stack
                     screenOptions={{
                       headerShown: false,

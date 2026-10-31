@@ -13,7 +13,6 @@ import {
 } from "@/components/ui";
 import { PatientTabBar } from "@/components/navigation/PatientTabBar";
 import {
-  DataSourceBanner,
   EmptyState,
   ErrorState,
   LoadingState,
@@ -24,7 +23,6 @@ import {
   NotificationItemCard,
 } from "@/components/patient/notifications";
 import { getCapability } from "@/config/capabilities";
-import { DEV_FIXTURE_UNDOCUMENTED_NOTICE } from "@/config/devFixtures";
 import { haptics } from "@/utils/haptics";
 import { isNotificationActionRoute } from "@/api/notification.service";
 import {
@@ -75,12 +73,6 @@ export default function NotificationsScreen() {
   };
 
   const isPending = isLoading || isFetching;
-  const showDemoBanner =
-    notificationsCapability === "demo" &&
-    !isPending &&
-    !isError &&
-    !notificationsUnavailable &&
-    notifications.length > 0;
 
   return (
     <SafeAreaView className="flex-1 bg-background">
@@ -137,14 +129,6 @@ export default function NotificationsScreen() {
         }}
         showsVerticalScrollIndicator={false}
       >
-        {showDemoBanner && (
-          <DataSourceBanner
-            source="demo"
-            label="Mode demo — endpoint tidak ada di kontrak"
-            description={DEV_FIXTURE_UNDOCUMENTED_NOTICE}
-          />
-        )}
-
         {isPending ? (
           <LoadingState label="Memuat notifikasi..." />
         ) : notificationsUnavailable ? (
