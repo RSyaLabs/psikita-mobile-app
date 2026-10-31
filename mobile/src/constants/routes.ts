@@ -40,10 +40,4 @@ export const ROUTES = {
     HISTORY: "/practitioner/history",
     PROFILE: "/practitioner/profile",
   },
-  ADMIN: {
-    DASHBOARD: "/admin/dashboard",
-    VERIFICATION: "/admin/verification",
-    LEDGER: "/admin/ledger",
-    SETTINGS: "/admin/settings",
-  },
 } as const;

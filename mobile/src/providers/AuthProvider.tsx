@@ -38,7 +38,7 @@ const persistedSessionSchema = z.object({
   user: z.object({
     id: z.string().trim().min(1),
     email: z.string().trim().min(1),
-    role: z.enum(["patient", "practitioner", "admin"]),
+    role: z.enum(["patient", "practitioner"]),
     isActive: z.literal(true),
   }),
 });

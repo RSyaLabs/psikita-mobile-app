@@ -14,7 +14,6 @@ const ROUTES_TO_TEST = [
   ...Object.values(ROUTES.AUTH),
   ...Object.values(ROUTES.PATIENT),
   ...Object.values(ROUTES.PRACTITIONER),
-  ...Object.values(ROUTES.ADMIN),
 ];
 
 // Default is the Expo web dev server (metro). Point E2E_BASE_URL at any

@@ -49,7 +49,6 @@ export default function LauncherScreen() {
       all: totalScreensCount,
       patient: 0,
       practitioner: 0,
-      admin: 0,
       auth: 0,
     };
     CATALOG_DATA.forEach((g) => {

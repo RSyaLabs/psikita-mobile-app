@@ -4,15 +4,9 @@ import { renderWithAuth } from "../utils/test-utils";
 import LoginScreen from "../../app/(auth)/login";
 import { mockRouter } from "../../jest.setup";
 import { authService } from "@/api/auth.service";
-import { signInWithGooglePopup } from "@/config/firebaseAuth";
 import { setAuthToken } from "@/api/client";
 import { secureStorage } from "@/utils/storage";
 import { useAuth, type AuthContextValue } from "@/hooks/useAuth";
-
-jest.mock("@/config/firebaseAuth", () => ({
-  signInWithGooglePopup: jest.fn(),
-  getFirebaseAuth: jest.fn(),
-}));
 
 jest.mock("@/api/auth.service", () => ({
   authService: {
@@ -37,11 +31,8 @@ const mockRequestOtp = authService.requestOtp as jest.MockedFunction<
 const mockVerifyOtp = authService.verifyOtp as jest.MockedFunction<
   typeof authService.verifyOtp
 >;
-const mockSignInWithGooglePopup = signInWithGooglePopup as jest.MockedFunction<
-  typeof signInWithGooglePopup
->;
 
-type ServerRole = "ADMIN" | "USER" | "PSYCHIATRIST" | "PSYCHOLOGIST";
+type ServerRole = "USER" | "PSYCHIATRIST" | "PSYCHOLOGIST";
 
 /**
  * A real-shaped JWT, because the app now reads the role out of the token
@@ -130,39 +121,9 @@ describe("LoginScreen safe authentication flow", () => {
     expect(mockLogin).not.toHaveBeenCalled();
   });
 
-  it("authenticates with Google and navigates when popup succeeds", async () => {
-    mockSignInWithGooglePopup.mockResolvedValue("test-google-id-token");
-    mockGoogleLogin.mockResolvedValue(serverResponse("USER"));
-
-    renderLogin();
-    fireEvent.press(screen.getByText("Lanjutkan dengan Google"));
-
-    await waitFor(() => {
-      expect(mockGoogleLogin).toHaveBeenCalledWith({
-        idToken: "test-google-id-token",
-      });
-      expect(mockRouter.replace).toHaveBeenCalledWith("/patient/dashboard");
-    });
-  });
-
-  it("shows cancellation notice when Google popup is cancelled", async () => {
-    const cancelError = new Error("Popup closed");
-    (cancelError as any).code = "auth/popup-closed-by-user";
-    mockSignInWithGooglePopup.mockRejectedValue(cancelError);
-
-    renderLogin();
-    fireEvent.press(screen.getByText("Lanjutkan dengan Google"));
-
-    await waitFor(() => {
-      expect(screen.getByText("Masuk dengan Google dibatalkan.")).toBeTruthy();
-    });
-    expect(mockGoogleLogin).not.toHaveBeenCalled();
-  });
-
   it.each([
     ["USER", "/patient/dashboard"],
     ["PSYCHOLOGIST", "/practitioner/dashboard"],
-    ["ADMIN", "/admin/dashboard"],
   ] as const)(
     "routes a validated %s response to its role home",
     async (role, home) => {

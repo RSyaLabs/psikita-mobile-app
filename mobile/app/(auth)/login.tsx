@@ -16,11 +16,9 @@ import {
   ScrollView,
 } from "@/components/ui";
 import { AuthLoginModal, RegisterPatientModal } from "@/components/modals";
-import { LoginHeroCarousel, GoogleIcon } from "@/components/auth";
+import { LoginHeroCarousel } from "@/components/auth";
 import { haptics } from "@/utils/haptics";
 import { useAuth } from "@/hooks/useAuth";
-import { useGoogleLogin } from "@/hooks/useApiQueries";
-import { signInWithGooglePopup } from "@/config/firebaseAuth";
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -35,8 +33,6 @@ export default function LoginScreen() {
   const [loginErrorMsg, setLoginErrorMsg] = useState<string | null>(null);
   const [showRegisterModal, setShowRegisterModal] = useState(false);
 
-  const googleLoginMutation = useGoogleLogin();
-  const [googleLoading, setGoogleLoading] = useState(false);
   const [authFeedback, setAuthFeedback] = useState<{
     type: "info" | "error";
     message: string;
@@ -57,38 +53,6 @@ export default function LoginScreen() {
   const handleCheckCondition = () => {
     haptics.medium();
     router.push(ROUTES.PATIENT.TRIAGE);
-  };
-
-  const handleGoogleLogin = async () => {
-    haptics.selection();
-    setAuthFeedback(null);
-    setGoogleLoading(true);
-
-    try {
-      const idToken = await signInWithGooglePopup();
-      await googleLoginMutation.mutateAsync({ idToken });
-    } catch (err: any) {
-      if (
-        err?.code === "auth/popup-closed-by-user" ||
-        err?.code === "auth/cancelled-popup-request"
-      ) {
-        haptics.light();
-        setAuthFeedback({
-          type: "info",
-          message: "Masuk dengan Google dibatalkan.",
-        });
-      } else {
-        haptics.error();
-        setAuthFeedback({
-          type: "error",
-          message:
-            err?.message ||
-            "Gagal masuk dengan Google. Silakan periksa koneksi atau coba lagi.",
-        });
-      }
-    } finally {
-      setGoogleLoading(false);
-    }
   };
 
   const handleOpenAccountLogin = () => {
@@ -203,36 +167,10 @@ export default function LoginScreen() {
             <Button
               variant="outline"
               size="lg"
-              onPress={handleGoogleLogin}
-              disabled={googleLoading || googleLoginMutation.isPending}
-              className="w-full h-[50px] rounded-2xl border border-border bg-card active:bg-muted flex-row items-center justify-center disabled:opacity-60"
-            >
-              <GoogleIcon size={18} />
-              <ButtonText className="text-foreground font-semibold text-sm ml-2.5">
-                {googleLoading || googleLoginMutation.isPending
-                  ? "Menghubungkan ke Google..."
-                  : "Lanjutkan dengan Google"}
-              </ButtonText>
-            </Button>
-
-            <HStack className="items-center my-2 w-full">
-              <Box className="flex-1 h-[1px] bg-border" />
-              <Text
-                size="xs"
-                className="px-3 text-muted-foreground font-medium"
-              >
-                atau
-              </Text>
-              <Box className="flex-1 h-[1px] bg-border" />
-            </HStack>
-
-            <Button
-              variant="outline"
-              size="lg"
               onPress={handleOpenAccountLogin}
-              className="w-full h-[48px] rounded-2xl border border-border bg-card active:bg-muted flex-row items-center justify-center"
+              className="w-full h-[50px] rounded-2xl border border-border bg-card active:bg-muted flex-row items-center justify-center mt-1"
             >
-              <KeyRound size={16} className="text-foreground mr-2" />
+              <KeyRound size={18} className="text-foreground mr-2" />
               <ButtonText className="text-foreground font-semibold text-sm">
                 Masuk dengan Akun
               </ButtonText>

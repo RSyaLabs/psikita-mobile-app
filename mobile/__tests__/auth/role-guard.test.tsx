@@ -7,7 +7,6 @@ import { secureStorage } from "@/utils/storage";
 import { ROUTES } from "@/constants/routes";
 import PatientLayout from "../../app/(patient)/_layout";
 import PractitionerLayout from "../../app/(practitioner)/_layout";
-import AdminLayout from "../../app/(admin)/_layout";
 
 const mockRouter = {
   push: jest.fn(),
@@ -112,7 +111,6 @@ describe("protected role guards", () => {
   it.each([
     ["patient", PatientLayout],
     ["practitioner", PractitionerLayout],
-    ["admin", AdminLayout],
   ] as const)(
     "does not render the %s group without a session",
     async (_role, Layout) => {
@@ -184,7 +182,6 @@ describe("protected role guards", () => {
       "PSYCHOLOGIST",
       ROUTES.PRACTITIONER.DASHBOARD,
     ],
-    ["admin", AdminLayout, "ADMIN", ROUTES.ADMIN.DASHBOARD],
   ] as const)(
     "renders %s only for its matching server role",
     async (_role, Layout, serverRole, _home) => {
@@ -192,11 +189,7 @@ describe("protected role guards", () => {
       mockGetItem.mockResolvedValue(
         persistedUser(
           `${_role}-1`,
-          serverRole === "USER"
-            ? "patient"
-            : serverRole === "PSYCHOLOGIST"
-              ? "practitioner"
-              : "admin",
+          serverRole === "USER" ? "patient" : "practitioner",
         ),
       );
 
@@ -210,9 +203,8 @@ describe("protected role guards", () => {
   );
 
   it.each([
-    [PatientLayout, "ADMIN", ROUTES.ADMIN.DASHBOARD],
+    [PatientLayout, "PSYCHOLOGIST", ROUTES.PRACTITIONER.DASHBOARD],
     [PractitionerLayout, "USER", ROUTES.PATIENT.DASHBOARD],
-    [AdminLayout, "PSYCHOLOGIST", ROUTES.PRACTITIONER.DASHBOARD],
   ] as const)(
     "redirects a wrong-role user to their own home route",
     async (Layout, serverRole, home) => {
@@ -220,11 +212,7 @@ describe("protected role guards", () => {
       mockGetItem.mockResolvedValue(
         persistedUser(
           "wrong-role",
-          serverRole === "ADMIN"
-            ? "admin"
-            : serverRole === "USER"
-              ? "patient"
-              : "practitioner",
+          serverRole === "USER" ? "patient" : "practitioner",
         ),
       );
 

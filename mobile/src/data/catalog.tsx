@@ -29,7 +29,7 @@ export interface CatalogSubGroup {
 }
 
 export interface CatalogRoleGroup {
-  roleId: "all" | "auth" | "patient" | "practitioner" | "admin";
+  roleId: "all" | "auth" | "patient" | "practitioner";
   title: string;
   subtitle: string;
   icon: React.ReactNode;
@@ -352,51 +352,6 @@ export const CATALOG_DATA: CatalogRoleGroup[] = [
             desc: "Pengaturan kuota pasien harian, jadwal operasional & tarif konsultasi",
             route: ROUTES.PRACTITIONER.PROFILE,
             tag: "Pengaturan",
-          },
-        ],
-      },
-    ],
-  },
-  {
-    roleId: "admin",
-    title: "4. Alur Admin & Pengawasan",
-    subtitle:
-      "Pusat kendali kepatuhan regulasi medis, verifikasi STR & pembukuan platform",
-    icon: <ShieldCheck size={20} className="text-foreground" />,
-    themeColor: "foreground",
-    badgeBg: "bg-muted",
-    badgeText: "text-foreground",
-    subGroups: [
-      {
-        subTitle: "Audit, Finansial & Konfigurasi",
-        screens: [
-          {
-            id: "A-01",
-            name: "Admin Dashboard Platform",
-            desc: "Ringkasan metrik konsultasi, praktisi aktif & kepuasan layanan",
-            route: ROUTES.ADMIN.DASHBOARD,
-            tag: "Eksekutif",
-          },
-          {
-            id: "A-02",
-            name: "Verifikasi STR/SIP Praktisi",
-            desc: "Validasi 4-titik nomor STR KKI/KTKI, NIK Satu Sehat & persetujuan akun",
-            route: ROUTES.ADMIN.VERIFICATION,
-            tag: "Audit Medis",
-          },
-          {
-            id: "A-03",
-            name: "Ledger Transaksi & Klaim BPJS",
-            desc: "Pembukuan berpasangan (Double-Entry), rekonsiliasi QRIS & tagihan BPJS",
-            route: ROUTES.ADMIN.LEDGER,
-            tag: "Akuntansi",
-          },
-          {
-            id: "A-04",
-            name: "Pengaturan Platform & SATUSEHAT API",
-            desc: "Konfigurasi bridging Kemenkes, parameter triase & manajemen staf",
-            route: ROUTES.ADMIN.SETTINGS,
-            tag: "Kemenkes API",
           },
         ],
       },

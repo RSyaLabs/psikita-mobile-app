@@ -5,7 +5,7 @@ import { ROUTES } from "@/constants/routes";
 import { decodeAccessToken } from "@/utils/jwt";
 import type { TokenResponseDto } from "@/types/api";
 
-export type AppRole = "patient" | "practitioner" | "admin";
+export type AppRole = "patient" | "practitioner";
 export type AuthStatus = "loading" | "authenticated" | "unauthenticated";
 
 export interface AuthUser {
@@ -67,8 +67,6 @@ export function appRoleFromServerRole(role: unknown): AppRole | null {
     case "PSYCHOLOGIST":
     case "PSYCHIATRIST":
       return "practitioner";
-    case "ADMIN":
-      return "admin";
     default:
       return null;
   }
@@ -80,8 +78,6 @@ export function appRoleFromPersistedRole(role: unknown): AppRole | null {
       return "patient";
     case "practitioner":
       return "practitioner";
-    case "admin":
-      return "admin";
     default:
       return null;
   }
@@ -139,8 +135,6 @@ export function getHomeRouteForRole(role: AppRole): string {
       return ROUTES.PATIENT.DASHBOARD;
     case "practitioner":
       return ROUTES.PRACTITIONER.DASHBOARD;
-    case "admin":
-      return ROUTES.ADMIN.DASHBOARD;
   }
 }
 

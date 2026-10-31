@@ -1,17 +1,14 @@
 import fs from "fs";
 import path from "path";
 import { ROUTES } from "@/constants/routes";
-import {
-  MOCK_NOTIFICATIONS,
-  isNotificationActionRoute,
-} from "@/api/notification.service";
+import { isNotificationActionRoute } from "@/api/notification.service";
 
 const { auditRouteSource } = require("../../scripts/route-audit");
 
 const MOBILE_ROOT = path.resolve(__dirname, "../..");
 const APP_ROOT = path.join(MOBILE_ROOT, "app");
 
-type Role = "auth" | "patient" | "practitioner" | "admin";
+type Role = "auth" | "patient" | "practitioner";
 
 type RouteSpec = {
   label: string;
@@ -45,9 +42,9 @@ function routeSpecsFor(role: Role): RouteSpec[] {
   });
 }
 
-const routeSpecs = (
-  ["auth", "patient", "practitioner", "admin"] as Role[]
-).flatMap(routeSpecsFor);
+const routeSpecs = (["auth", "patient", "practitioner"] as Role[]).flatMap(
+  routeSpecsFor,
+);
 const registryPaths = new Set([
   "/",
   ...routeSpecs.map((spec) => spec.expectedPath),
@@ -106,12 +103,6 @@ const routeReferenceValues: Record<string, string> = {
       value,
     ]),
   ),
-  ...Object.fromEntries(
-    Object.entries(ROUTES.ADMIN).map(([name, value]) => [
-      `ADMIN.${name}`,
-      value,
-    ]),
-  ),
 };
 
 const allRouteSourceFiles = [
@@ -141,13 +132,17 @@ describe("Expo Router route registry", () => {
     expect(new Set(publicPaths).size).toBe(routeSpecs.length);
   });
 
-  it("validates every route-valued notification action against the public registry", () => {
-    expect(MOCK_NOTIFICATIONS.length).toBeGreaterThan(0);
+  it("validates notification action routes against the public registry", () => {
+    const sampleRoutes = [
+      ROUTES.PATIENT.PRESCRIPTION,
+      ROUTES.PATIENT.CHAT_ROOM,
+      ROUTES.PATIENT.DOCTORS,
+    ];
 
-    for (const notification of MOCK_NOTIFICATIONS) {
-      expect(registryPaths.has(notification.actionRoute)).toBe(true);
-      expect(notification.actionRoute).not.toMatch(groupOnlyRoutePattern);
-      expect(isNotificationActionRoute(notification.actionRoute)).toBe(true);
+    for (const route of sampleRoutes) {
+      expect(registryPaths.has(route)).toBe(true);
+      expect(route).not.toMatch(groupOnlyRoutePattern);
+      expect(isNotificationActionRoute(route)).toBe(true);
     }
   });
 

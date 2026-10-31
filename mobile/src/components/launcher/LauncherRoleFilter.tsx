@@ -3,7 +3,7 @@ import { ScrollView } from "react-native";
 import { Pressable, Text } from "@/components/ui";
 import { haptics } from "@/utils/haptics";
 
-export type RoleFilterKey = "all" | "patient" | "practitioner" | "admin" | "auth";
+export type RoleFilterKey = "all" | "patient" | "practitioner" | "auth";
 
 interface LauncherRoleFilterProps {
   selectedRole: RoleFilterKey;
@@ -20,7 +20,6 @@ export function LauncherRoleFilter({
     { id: "all", label: `Semua (${roleCounts.all || 0})` },
     { id: "patient", label: `Pasien (${roleCounts.patient || 0})` },
     { id: "practitioner", label: `Praktisi (${roleCounts.practitioner || 0})` },
-    { id: "admin", label: `Admin (${roleCounts.admin || 0})` },
     { id: "auth", label: `Auth (${roleCounts.auth || 0})` },
   ];
 

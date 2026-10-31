@@ -54,10 +54,6 @@ GATED = [
     "/practitioner/bank-account",
     "/practitioner/profile",
     "/practitioner/diagnosis",
-    "/admin/dashboard",
-    "/admin/verification",
-    "/admin/ledger",
-    "/admin/settings",
 ]
 
 

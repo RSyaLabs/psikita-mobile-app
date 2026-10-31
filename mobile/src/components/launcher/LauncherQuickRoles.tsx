@@ -68,23 +68,6 @@ export function LauncherQuickRoles() {
               🩺 Praktisi
             </Text>
           </Pressable>
-
-          <Pressable
-            onPress={() => {
-              haptics.selection();
-              router.push(ROUTES.ADMIN.DASHBOARD);
-            }}
-            className="flex-1 py-2 px-1.5 rounded-xl bg-muted border border-border items-center justify-center active:opacity-75"
-          >
-            <Text
-              size="xs"
-              className="font-bold text-foreground text-[11px]"
-              isTruncated
-              numberOfLines={Platform.OS === "web" ? undefined : 1}
-            >
-              🛡️ Admin
-            </Text>
-          </Pressable>
         </HStack>
       </VStack>
     </Card>

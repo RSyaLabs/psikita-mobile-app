@@ -11,7 +11,6 @@ export * from "./queries/auth";
 export * from "./queries/payment";
 export * from "./queries/notes";
 export * from "./queries/prescription";
-export * from "./queries/admin";
 export * from "./queries/articles";
 export * from "./queries/notifications";
 export * from "./queries/chat";
