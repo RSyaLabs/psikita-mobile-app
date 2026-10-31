@@ -1,7 +1,7 @@
 # PsiKita
 
 Mobile telehealth client for mental-health consultation, built with Expo Router,
-NativeWind v4 and Gluestack UI v5. Runs on iOS, Android and the web from one codebase.
+NativeWind v4 and Gluestack UI v5. Dedicated for Android and Web.
 
 Three roles share the app: patients book and attend consultations, practitioners
 run their practice, admins verify practitioners and reconcile the ledger.

@@ -1,6 +1,6 @@
 /**
  * Universal Storage Adapter (Web & Testing / Node Environment)
- * On Native (Android / iOS), Metro bundler resolves storage.native.ts directly.
+ * On Native (Android), Metro bundler resolves storage.native.ts directly.
  * Web tokens stay in memory; do not persist bearer tokens in browser storage.
  */
 const inMemoryStorage = new Map<string, string>();

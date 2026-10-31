@@ -1,6 +1,18 @@
 {
   "version": 1,
   "skills": {
+    "expo-overview": {
+      "source": "expo/skills",
+      "sourceType": "github",
+      "skillPath": "plugins/expo/skills/expo-overview/SKILL.md",
+      "computedHash": "55fa500c2637fbcc25bc933e3b8efea2b96a2568243d05d6728aee7a651a9246"
+    },
+    "expo-router": {
+      "source": "expo/skills",
+      "sourceType": "github",
+      "skillPath": "plugins/expo/skills/expo-router/SKILL.md",
+      "computedHash": "8cd1a4358b14380b259b79e22c4170016a077ec316dc36a09f810efd8120ece3"
+    },
     "gluestack-ui-v5": {
       "source": "gluestack/agent-skills",
       "sourceType": "github",

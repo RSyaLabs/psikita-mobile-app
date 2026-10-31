@@ -96,7 +96,7 @@ for (const file of allFiles) {
       issues.push({
         type: "RAW_HTML_ELEMENT",
         file: relPath,
-        detail: `Found raw HTML tag <${htmlMatch[1]}> which may break on native iOS/Android`,
+        detail: `Found raw HTML tag <${htmlMatch[1]}> which may break on native Android`,
       });
     }
   }

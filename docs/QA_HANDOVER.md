@@ -236,7 +236,7 @@ Untuk menguji seluruh alur antarmuka tanpa ketergantungan jaringan eksternal:
    cd mobile
    npm start
    ```
-3. Buka di simulator Android (`a`), iOS (`i`), atau Web (`w`).
+3. Buka di emulator Android (`a`) atau Web (`w`).
 
 ### 5.2. Menjalankan Otomasi E2E Maestro
 

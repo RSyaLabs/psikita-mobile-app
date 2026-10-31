@@ -3,7 +3,7 @@ import * as Haptics from "expo-haptics";
 
 /**
  * Universal Haptic Feedback Utility
- * Native (iOS/Android): Provides tactile vibration cues
+ * Native (Android): Provides tactile vibration cues
  * Web: Safe no-op natively to prevent unhandled rejection crashes
  */
 const isWeb = Platform.OS === "web";

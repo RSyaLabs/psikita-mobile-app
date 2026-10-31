@@ -8,11 +8,9 @@ Arsitektur otomasi pengujian end-to-end (E2E) deklaratif mengadopsi standar indu
    # Windows (PowerShell)
    curl -fsSL "https://get.maestro.mobile.dev" | powershell -Command -
    ```
-2. Jalankan aplikasi di emulator Android atau iOS Simulator:
+2. Jalankan aplikasi di emulator atau perangkat fisik Android:
    ```bash
    npm run android
-   # atau
-   npm run ios
    ```
 
 ## Menjalankan E2E Flows

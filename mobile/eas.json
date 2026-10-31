@@ -9,9 +9,6 @@
       },
       "android": {
         "package": "id.psikita.app"
-      },
-      "ios": {
-        "bundleIdentifier": "id.psikita.app"
       }
     },
     "staging": {
@@ -24,9 +21,6 @@
       "android": {
         "package": "id.psikita.app",
         "buildType": "apk"
-      },
-      "ios": {
-        "bundleIdentifier": "id.psikita.app"
       }
     },
     "demo": {
@@ -38,9 +32,6 @@
       },
       "android": {
         "package": "id.psikita.app.demo"
-      },
-      "ios": {
-        "bundleIdentifier": "id.psikita.app.demo"
       }
     }
   }

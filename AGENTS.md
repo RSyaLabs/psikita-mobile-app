@@ -66,7 +66,7 @@ npm run test:ci                  # every suite and test must pass. Verified 2026
 
 ### Known unverified areas
 
-- **Native (iOS/Android) is not covered by the gate and has not been run on a
+- **Native (Android) is not covered by the gate and has not been run on a
   device.** Claims about native behaviour in this repo are derived from
   `react-native-css-interop`'s property allowlist and react-native's own types,
   not from execution. Say so rather than implying it was tested.
