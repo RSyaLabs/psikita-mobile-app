@@ -30,6 +30,7 @@ import {
   useFinishConsultation,
   useCdssPatientAlerts,
   useCreateCarePlan,
+  useDiagnosisCodes,
 } from "@/hooks/useApiQueries";
 import { haptics } from "@/utils/haptics";
 
@@ -46,7 +47,13 @@ export default function DiagnosisScreen() {
   const soapMutation = useCreateSoapNote();
   const finishMutation = useFinishConsultation();
   const { data: cdssAlerts } = useCdssPatientAlerts(context?.patientId);
+  const { data: serverIcdCodes } = useDiagnosisCodes({ system: "ICD10" });
   const carePlanMutation = useCreateCarePlan();
+
+  const availableIcdCodes =
+    serverIcdCodes && serverIcdCodes.length > 0
+      ? serverIcdCodes
+      : CLINICAL_CONSTANTS.ICD_10_CODES;
 
   const [selectedIcd, setSelectedIcd] = useState("");
   const [subjective, setSubjective] = useState("");
@@ -55,7 +62,9 @@ export default function DiagnosisScreen() {
   const [plan, setPlan] = useState("");
   const [saved, setSaved] = useState(false);
   const soapConfirmed = saved && soapMutation.isSuccess;
-  const selectedDescription = getIcd10Description(selectedIcd);
+  const selectedItem = availableIcdCodes.find((i) => i.code === selectedIcd);
+  const selectedDescription =
+    (selectedItem as any)?.label ?? getIcd10Description(selectedIcd);
   const canSave = Boolean(
     context &&
     selectedIcd &&
@@ -182,7 +191,7 @@ export default function DiagnosisScreen() {
               Kode ICD-10
             </Text>
             <HStack space="xs" className="items-center flex-wrap">
-              {CLINICAL_CONSTANTS.ICD_10_CODES.map((item) => (
+              {availableIcdCodes.map((item) => (
                 <Pressable
                   key={item.code}
                   onPress={() => {

@@ -185,4 +185,38 @@ export const authService = {
       adapter: otpResponseAdapter,
     });
   },
+
+  /**
+   * Hapus akun pengguna aktif (jadwal 30 hari sesuai regulasi privasi)
+   */
+  async deleteAccount(): Promise<{
+    message: string;
+    scheduledDeletionAt?: string;
+  }> {
+    return apiRequest<{ message: string; scheduledDeletionAt?: string }>(
+      "/user/me",
+      {
+        method: "DELETE",
+      },
+    );
+  },
+
+  /**
+   * Dapatkan metode login / identitas yang terhubung
+   */
+  async getIdentities(): Promise<{
+    identities: Array<{
+      provider: string;
+      identifier?: string;
+      linkedAt?: string;
+    }>;
+  }> {
+    return apiRequest<{
+      identities: Array<{
+        provider: string;
+        identifier?: string;
+        linkedAt?: string;
+      }>;
+    }>("/user/identities");
+  },
 };

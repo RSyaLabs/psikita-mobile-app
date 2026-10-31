@@ -72,4 +72,21 @@ export const lmsService = {
   getMyProgress: async (signal?: AbortSignal): Promise<LmsProgressDto> => {
     return apiRequest<LmsProgressDto>("/lms/my-progress", { signal });
   },
+
+  getActiveTest: async (signal?: AbortSignal): Promise<any> => {
+    return apiRequest<any>("/lms/active-test", { signal });
+  },
+
+  getTestHistory: async (signal?: AbortSignal): Promise<any[]> => {
+    const res = await apiRequest<any>("/lms/test-history", { signal });
+    if (Array.isArray(res)) return res;
+    if (isRecord(res) && Array.isArray((res as any).data)) return (res as any).data;
+    return [];
+  },
+
+  evaluatePromotion: async (): Promise<any> => {
+    return apiRequest<any>("/lms/evaluate-promotion", {
+      method: "POST",
+    });
+  },
 };

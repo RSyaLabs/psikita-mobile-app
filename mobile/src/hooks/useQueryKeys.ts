@@ -233,4 +233,14 @@ export const queryKeys = {
     form: (code: string) =>
       [...queryKeys.psychometrics.all, "form", privacyToken(code)] as const,
   },
+  diagnosisCodes: {
+    all: ["diagnosisCodes"] as const,
+    list: (params?: { system?: string; search?: string }) =>
+      [
+        ...queryKeys.diagnosisCodes.all,
+        "list",
+        params?.system ?? "ALL",
+        params?.search ?? "",
+      ] as const,
+  },
 };

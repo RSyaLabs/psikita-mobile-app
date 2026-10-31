@@ -250,4 +250,37 @@ export const practitionerService = {
       adapter: noContentAdapter,
     });
   },
+
+  /**
+   * Dapatkan profil kompetensi klinis praktisi
+   */
+  async getCompetencyProfile(
+    practitionerId: string,
+    signal?: AbortSignal,
+  ): Promise<any> {
+    const id = requireServerId(practitionerId, "practitionerId");
+    return apiRequest(
+      `/practitioners/${encodeURIComponent(id)}/competency-profile`,
+      {
+        signal,
+      },
+    );
+  },
+
+  /**
+   * Perbarui profil kompetensi klinis praktisi
+   */
+  async updateCompetencyProfile(
+    practitionerId: string,
+    dto: Record<string, unknown>,
+  ): Promise<any> {
+    const id = requireServerId(practitionerId, "practitionerId");
+    return apiRequest(
+      `/practitioners/${encodeURIComponent(id)}/competency-profile`,
+      {
+        method: "PUT",
+        body: JSON.stringify(dto),
+      },
+    );
+  },
 };
