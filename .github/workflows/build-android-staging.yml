@@ -10,7 +10,7 @@ on:
       release_notes:
         description: "Catatan rilis / changelog"
         required: false
-        default: "Build staging Android PsiKita terhubung ke https://api.staging.psikita.muammarzaki.tech/core"
+        default: "Build staging Android SeraPhany terhubung ke https://api.staging.seraphany.id/core"
   push:
     tags:
       - "v*"
@@ -73,7 +73,7 @@ jobs:
       - name: Generate Android Native Project (Expo Prebuild)
         working-directory: mobile
         env:
-          EXPO_PUBLIC_API_BASE_URL: https://api.staging.psikita.muammarzaki.tech/core
+          EXPO_PUBLIC_API_BASE_URL: https://api.staging.seraphany.id/core
           CI: "false"
         run: |
           npx expo prebuild --platform android --clean --no-install
@@ -107,7 +107,7 @@ jobs:
       - name: Build Android Release APK with Gradle
         working-directory: mobile/android
         env:
-          EXPO_PUBLIC_API_BASE_URL: https://api.staging.psikita.muammarzaki.tech/core
+          EXPO_PUBLIC_API_BASE_URL: https://api.staging.seraphany.id/core
           GRADLE_OPTS: "-Xmx4096m -XX:MaxMetaspaceSize=1024m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
           _JAVA_OPTIONS: "-Xmx4096m"
         run: |
@@ -180,7 +180,7 @@ jobs:
           name: ${{ steps.release_meta.outputs.title }}
           body: |
             ### 📱 PsiKita Android Staging Build
-            - **Target API**: `https://api.staging.psikita.muammarzaki.tech/core`
+            - **Target API**: `https://api.staging.seraphany.id/core`
             - **Build Number**: `${{ github.run_number }}`
             - **Commit**: `${{ github.sha }}`
             - **Dijalankan oleh**: `@${{ github.actor }}`

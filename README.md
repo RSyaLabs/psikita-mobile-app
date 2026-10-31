@@ -142,7 +142,7 @@ The app connects directly to the backend API:
 
 ```sh
 # mobile/.env
-EXPO_PUBLIC_API_BASE_URL=https://api.staging.psikita.muammarzaki.tech/core
+EXPO_PUBLIC_API_BASE_URL=https://api.staging.seraphany.id/core
 ```
 
 ---

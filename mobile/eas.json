@@ -12,7 +12,7 @@
     "staging": {
       "distribution": "internal",
       "env": {
-        "EXPO_PUBLIC_API_BASE_URL": "https://api.staging.psikita.muammarzaki.tech/core"
+        "EXPO_PUBLIC_API_BASE_URL": "https://api.staging.seraphany.id/core"
       },
       "android": {
         "package": "id.psikita.app",
