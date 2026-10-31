@@ -1,5 +1,5 @@
 import { apiRequest } from "./client";
-import { isRecord } from "./response";
+import { isRecord, withQueryParams } from "./response";
 
 export interface PostReplyDto {
   id: string;
@@ -39,8 +39,11 @@ export interface CreateReplyPayload {
 
 export const communityService = {
   getPosts: async (category?: string, signal?: AbortSignal): Promise<PostDto[]> => {
-    const query = category && category !== "Semua" ? `?category=${encodeURIComponent(category)}` : "";
-    const response = await apiRequest<unknown>(`/posts${query}`, { signal });
+    const path =
+      category && category !== "Semua"
+        ? withQueryParams("/posts", { category })
+        : "/posts";
+    const response = await apiRequest<unknown>(path, { signal });
     if (Array.isArray(response)) {
       return response as PostDto[];
     }

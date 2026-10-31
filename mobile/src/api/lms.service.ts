@@ -1,5 +1,5 @@
 import { apiRequest } from "./client";
-import { isRecord } from "./response";
+import { isRecord, withQueryParams } from "./response";
 
 export interface LmsCourseDto {
   id: string;
@@ -47,8 +47,8 @@ export interface LmsProgressDto {
 
 export const lmsService = {
   getCourses: async (topic?: string, signal?: AbortSignal): Promise<LmsCourseDto[]> => {
-    const query = topic ? `?topic=${encodeURIComponent(topic)}` : "";
-    const response = await apiRequest<unknown>(`/lms/courses${query}`, { signal });
+    const path = topic ? withQueryParams("/lms/courses", { topic }) : "/lms/courses";
+    const response = await apiRequest<unknown>(path, { signal });
     if (Array.isArray(response)) {
       return response as LmsCourseDto[];
     }
