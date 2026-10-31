@@ -231,6 +231,46 @@ export const CATALOG_DATA: CatalogRoleGroup[] = [
         ],
       },
       {
+        subTitle: "Edukasi, Komunitas & Tindak Lanjut",
+        screens: [
+          {
+            id: "P-10",
+            name: "Kelas & Modul Psikoedukasi",
+            desc: "Kurikulum pembelajaran kesehatan mental berbasis sains dan panduan klinis",
+            route: ROUTES.PATIENT.COURSES,
+            tag: "LMS",
+          },
+          {
+            id: "P-10b",
+            name: "Detail Modul Pembelajaran",
+            desc: "Silabus bab, modul baca interaktif, dan tracking progres belajar",
+            route: ROUTES.PATIENT.COURSE_DETAIL,
+            tag: "Materi",
+          },
+          {
+            id: "P-12",
+            name: "Ruang Cerita & Komunitas",
+            desc: "Dukungan sebaya anonim, berbagi pengalaman pemulihan & diskusi aman",
+            route: ROUTES.PATIENT.COMMUNITY,
+            tag: "Komunitas",
+          },
+          {
+            id: "P-12b",
+            name: "Diskusi & Balasan Komunitas",
+            desc: "Utas diskusi dan respons penyemangat dari sesama pasien dan psikolog",
+            route: ROUTES.PATIENT.COMMUNITY_DETAIL,
+            tag: "Diskusi",
+          },
+          {
+            id: "P-13",
+            name: "Sesi Kontrol & Lanjutan",
+            desc: "Penjadwalan kontrol berkala dan pemantauan klinis berkelanjutan",
+            route: ROUTES.PATIENT.FOLLOW_UPS,
+            tag: "Follow-up",
+          },
+        ],
+      },
+      {
         subTitle: "Profil Pasien",
         screens: [
           {

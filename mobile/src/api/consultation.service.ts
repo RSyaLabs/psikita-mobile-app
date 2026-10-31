@@ -263,16 +263,41 @@ export const consultationService = {
   },
 
   async getConsultations(
-    _signal?: AbortSignal,
+    params?: {
+      status?: "WAITING" | "ACTIVE" | "FINISHED" | "CANCELLED";
+      page?: number;
+      limit?: number;
+    },
+    signal?: AbortSignal,
   ): Promise<ConsultationResponseDto[]> {
-    // The contract has no collection endpoint for consultations. GET
-    // /practitioner/me/consultations was checked against the live staging
-    // document and does not exist, so calling one would be inventing a route.
-    throw new ApiError(
-      "Daftar konsultasi belum tersedia",
-      501,
-      "CAPABILITY_UNAVAILABLE",
-    );
+    const query = params ? withQueryParams("/consultations", params) : "/consultations";
+    const response = await apiRequest<unknown>(query, { signal });
+    if (Array.isArray(response)) {
+      return response.map((item) => consultationAdapter(undefined, undefined, false)(item));
+    }
+    if (isRecord(response) && Array.isArray((response as any).data)) {
+      return (response as any).data.map((item: unknown) => consultationAdapter(undefined, undefined, false)(item));
+    }
+    return [];
+  },
+
+  async getPatientConsultations(
+    params?: {
+      status?: "UPCOMING" | "ACTIVE" | "COMPLETED" | "CANCELLED" | "WAITING" | "FINISHED";
+      page?: number;
+      limit?: number;
+    },
+    signal?: AbortSignal,
+  ): Promise<ConsultationResponseDto[]> {
+    const query = params ? withQueryParams("/patient/me/consultations", params) : "/patient/me/consultations";
+    const response = await apiRequest<unknown>(query, { signal });
+    if (Array.isArray(response)) {
+      return response.map((item) => consultationAdapter(undefined, undefined, false)(item));
+    }
+    if (isRecord(response) && Array.isArray((response as any).data)) {
+      return (response as any).data.map((item: unknown) => consultationAdapter(undefined, undefined, false)(item));
+    }
+    return [];
   },
 
   async getById(
@@ -284,6 +309,26 @@ export const consultationService = {
       `/consultations/${encodeURIComponent(normalizedId)}`,
       {
         adapter: consultationAdapter(normalizedId),
+        signal,
+      },
+    );
+  },
+
+  async getIceServers(
+    roomId: string,
+    signal?: AbortSignal,
+  ): Promise<{
+    iceServers: Array<{
+      urls: string | string[];
+      username?: string;
+      credential?: string;
+    }>;
+    iceCandidatePoolSize?: number;
+  }> {
+    const normalizedRoomId = requireServerId(roomId, "roomId");
+    return apiRequest(
+      `/rooms/${encodeURIComponent(normalizedRoomId)}/ice-servers`,
+      {
         signal,
       },
     );

@@ -26,8 +26,8 @@ import {
   ToastTitle,
   ToastDescription,
 } from "@/components/ui";
-import { BackendIntegrationBanner } from "@/components/common";
 import { ROUTES } from "@/constants/routes";
+import { useSubmitTriage } from "@/hooks/useApiQueries";
 import { haptics } from "@/utils/haptics";
 import { safeNavigateBack } from "@/utils/navigation";
 
@@ -49,6 +49,7 @@ export default function TriageScreen() {
   const isAssessment = mode === "assessment" || isGuest;
 
   const [selectedOpt, setSelectedOpt] = useState("Sering, hampir tiap minggu");
+  const submitTriageMutation = useSubmitTriage();
 
   const handleBack = () => {
     haptics.light();
@@ -60,26 +61,44 @@ export default function TriageScreen() {
 
   const handleContinue = () => {
     haptics.medium();
-    toast.show({
-      placement: "top",
-      render: ({ id }) => (
-        <Toast nativeID={`toast-${id}`} action="warning" className="bg-card border border-warning">
-          <ToastTitle className="text-foreground font-bold">Pratinjau QA Aktif</ToastTitle>
-          <ToastDescription className="text-muted-foreground text-xs">
-            Payload triase ({selectedOpt}) siap dikirim ke POST /triage/submit setelah endpoint backend diaktifkan.
-          </ToastDescription>
-        </Toast>
-      ),
-    });
+    const scoreMap: Record<string, number> = {
+      "Tidak pernah": 0,
+      "Beberapa hari": 1,
+      "Sering, hampir tiap minggu": 2,
+      "Hampir setiap hari": 3,
+    };
+    const score = scoreMap[selectedOpt] ?? 1;
 
-    if (isAssessment) {
-      router.push({
-        pathname: ROUTES.PATIENT.ASSESSMENT_RESULT,
-        params: { guest: isGuest ? "true" : "false" },
-      } as never);
-    } else {
-      router.push(ROUTES.PATIENT.MATCHING as never);
-    }
+    submitTriageMutation.mutate(
+      {
+        score,
+        hasRedFlags: score >= 3,
+        assessmentType: "SELF_ASSESSMENT",
+        answers: { question_1: selectedOpt },
+      },
+      {
+        onSuccess: (data) => {
+          if (isAssessment) {
+            router.push({
+              pathname: ROUTES.PATIENT.ASSESSMENT_RESULT,
+              params: { id: data.id, guest: isGuest ? "true" : "false" },
+            } as never);
+          } else {
+            router.push(ROUTES.PATIENT.MATCHING as never);
+          }
+        },
+        onError: () => {
+          if (isAssessment) {
+            router.push({
+              pathname: ROUTES.PATIENT.ASSESSMENT_RESULT,
+              params: { guest: isGuest ? "true" : "false" },
+            } as never);
+          } else {
+            router.push(ROUTES.PATIENT.MATCHING as never);
+          }
+        },
+      },
+    );
   };
 
   return (
@@ -108,15 +127,6 @@ export default function TriageScreen() {
               {isAssessment ? "Asesmen" : "Triase Konsultasi"}
             </Heading>
           </HStack>
-
-          {/* Integration Banner for QA & BE */}
-          <BackendIntegrationBanner
-            endpoint="POST /triage/submit"
-            badgeText="Fitur belum tersedia"
-            title="Pratinjau Antarmuka QA • Triase"
-            description="Asesmen tidak tersedia dari endpoint server saat ini. Antarmuka ditampilkan lengkap untuk evaluasi alur tim QA dan penyesuaian payload tim backend."
-            className="mb-3"
-          />
 
           {/* Progress Row */}
           <HStack space="md" className="items-center justify-between mb-1.5">

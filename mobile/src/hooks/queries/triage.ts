@@ -60,6 +60,21 @@ export function useTriageAssessment(id?: string) {
 }
 
 /**
+ * Mutation hook for submitting patient triage assessment
+ */
+export function useSubmitTriage() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (dto: import("@/types/api").SubmitTriageDto) =>
+      triageService.submitTriage(dto),
+    onSuccess: (data) => {
+      queryClient.setQueryData(queryKeys.triage.detail(data.id), data);
+      queryClient.invalidateQueries({ queryKey: queryKeys.triage.queue() });
+    },
+  });
+}
+
+/**
  * Mutation hook for claiming matching request
  */
 export function useClaimMatching() {

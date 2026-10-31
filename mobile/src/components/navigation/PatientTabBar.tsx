@@ -1,6 +1,6 @@
 import React from "react";
 import { useRouter } from "expo-router";
-import { Home, Calendar, User } from "lucide-react-native";
+import { Home, Calendar, BookOpen, User } from "lucide-react-native";
 import { HStack, Text, Pressable } from "@/components/ui";
 import { PatientTab } from "@/types";
 import { ROUTES } from "@/constants";
@@ -30,6 +30,17 @@ export function PatientTabBar({ activeTab }: PatientTabBarProps) {
       route: ROUTES.PATIENT.HISTORY,
       icon: (active: boolean) => (
         <Calendar
+          size={18}
+          className={active ? "text-primary" : "text-muted-foreground"}
+        />
+      ),
+    },
+    {
+      id: "edukasi" as PatientTab,
+      label: "Edukasi",
+      route: ROUTES.PATIENT.COURSES,
+      icon: (active: boolean) => (
+        <BookOpen
           size={18}
           className={active ? "text-primary" : "text-muted-foreground"}
         />

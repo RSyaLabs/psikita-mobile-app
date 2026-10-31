@@ -19,6 +19,7 @@ import { ROUTES } from "@/constants";
 import {
   useActiveConsultation,
   useConsultationNotes,
+  useCarePlan,
 } from "@/hooks/useApiQueries";
 import { resolveServerValue } from "@/utils/server-value";
 import { haptics } from "@/utils/haptics";
@@ -46,6 +47,7 @@ export default function SessionSummaryScreen() {
   const context = consultation.context;
   const targetConsultationId = context?.consultationId || consultationId || "";
   const notesQuery = useConsultationNotes(targetConsultationId);
+  const { data: carePlan } = useCarePlan(targetConsultationId);
   const note = notesQuery.data?.[0];
   const soap = note?.soap ?? note?.soapData;
 
@@ -167,6 +169,44 @@ export default function SessionSummaryScreen() {
                 </Text>
               </Card>
             ))}
+
+            {carePlan && (
+              <Card className="bg-card rounded-2xl p-4 border border-border gap-2">
+                <Text size="xs" bold className="text-secondary uppercase tracking-wider text-[11px]">
+                  Rencana Perawatan (Care Plan)
+                </Text>
+                {carePlan.diagnosisSummary && (
+                  <Text size="xs" bold className="text-foreground mt-1">
+                    Fokus Klinis: {carePlan.diagnosisSummary}
+                  </Text>
+                )}
+                {carePlan.goals && carePlan.goals.length > 0 && (
+                  <VStack space="xs" className="mt-1">
+                    <Text size="xs" bold className="text-foreground text-[11px]">
+                      Target Pemulihan:
+                    </Text>
+                    {carePlan.goals.map((goal, idx) => (
+                      <Text key={idx} size="xs" className="text-muted-foreground text-[11px]">
+                        • {goal}
+                      </Text>
+                    ))}
+                  </VStack>
+                )}
+                {carePlan.interventions && carePlan.interventions.length > 0 && (
+                  <VStack space="xs" className="mt-2 pt-2 border-t border-border/50">
+                    <Text size="xs" bold className="text-foreground text-[11px]">
+                      Intervensi & Latihan Mandiri:
+                    </Text>
+                    {carePlan.interventions.map((iv, idx) => (
+                      <Text key={idx} size="xs" className="text-muted-foreground text-[11px]">
+                        • {iv.title}: {iv.description}
+                      </Text>
+                    ))}
+                  </VStack>
+                )}
+              </Card>
+            )}
+
             {downloadDisabledButton}
           </VStack>
         )}

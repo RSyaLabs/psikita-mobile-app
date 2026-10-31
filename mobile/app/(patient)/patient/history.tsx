@@ -27,7 +27,7 @@ import {
   LoadingState,
   UnavailableState,
 } from "@/components/common";
-import { useConsultations } from "@/hooks/useApiQueries";
+import { usePatientConsultations } from "@/hooks/useApiQueries";
 import { ROUTES } from "@/constants/routes";
 import { safeNavigateBack } from "@/utils/navigation";
 
@@ -52,7 +52,7 @@ function isCapabilityUnavailable(error: unknown): boolean {
 export default function HistoryScreen() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("Semua");
-  const consultations = useConsultations();
+  const consultations = usePatientConsultations();
   const sessions = consultations.data ?? [];
   const isPending = consultations.isLoading || consultations.isFetching;
   const capabilityUnavailable =

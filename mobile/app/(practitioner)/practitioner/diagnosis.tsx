@@ -28,6 +28,8 @@ import {
   useActiveConsultation,
   useCreateSoapNote,
   useFinishConsultation,
+  useCdssPatientAlerts,
+  useCreateCarePlan,
 } from "@/hooks/useApiQueries";
 import { haptics } from "@/utils/haptics";
 
@@ -43,6 +45,8 @@ export default function DiagnosisScreen() {
   const context = consultation.context;
   const soapMutation = useCreateSoapNote();
   const finishMutation = useFinishConsultation();
+  const { data: cdssAlerts } = useCdssPatientAlerts(context?.patientId);
+  const carePlanMutation = useCreateCarePlan();
 
   const [selectedIcd, setSelectedIcd] = useState("");
   const [subjective, setSubjective] = useState("");
@@ -150,6 +154,29 @@ export default function DiagnosisScreen() {
         )}
 
         <VStack space="sm">
+          {cdssAlerts && cdssAlerts.length > 0 && (
+            <Card className="bg-amber-500/10 rounded-2xl p-4 border border-amber-500/30 gap-1.5">
+              <HStack space="xs" className="items-center">
+                <ShieldAlert size={16} className="text-amber-600" />
+                <Text size="xs" bold className="text-amber-800 uppercase tracking-wider text-[11px]">
+                  Rekomendasi CDSS Klinis
+                </Text>
+              </HStack>
+              {cdssAlerts.map((alert) => (
+                <VStack key={alert.id} space="xs" className="mt-1">
+                  <Text size="xs" bold className="text-foreground">
+                    [{alert.severity}] {alert.message}
+                  </Text>
+                  {alert.recommendations?.map((rec, rIdx) => (
+                    <Text key={rIdx} size="xs" className="text-muted-foreground text-[11px]">
+                      • {rec}
+                    </Text>
+                  ))}
+                </VStack>
+              ))}
+            </Card>
+          )}
+
           <Card className="bg-card rounded-2xl p-4 border border-border gap-3">
             <Text size="sm" bold className="text-foreground">
               Kode ICD-10

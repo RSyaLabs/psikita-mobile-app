@@ -26,6 +26,7 @@ import {
   HStack,
   Pressable,
   Avatar,
+  AvatarImage,
   AvatarFallbackText,
   ScrollView,
 } from "@/components/ui";
@@ -35,12 +36,13 @@ import {
   PatientPrivacyModal,
 } from "@/components/modals";
 import { PatientTabBar } from "@/components/navigation/PatientTabBar";
-import { usePatientProfile } from "@/hooks/useApiQueries";
+import { usePatientProfile, useMyAvatar } from "@/hooks/useApiQueries";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function ProfileScreen() {
   const router = useRouter();
   const { data: patient } = usePatientProfile();
+  const { data: avatarData } = useMyAvatar();
   const { signOut } = useAuth();
 
   const [showHelpModal, setShowHelpModal] = useState(false);
@@ -76,6 +78,9 @@ export default function ProfileScreen() {
         </HStack>
         <VStack space="xs" className="items-center">
           <Avatar size="2xl" className="border-2 border-primary-foreground/20">
+            {avatarData?.avatarUrl ? (
+              <AvatarImage source={{ uri: avatarData.avatarUrl }} />
+            ) : null}
             <AvatarFallbackText>{getInitials(patientName)}</AvatarFallbackText>
           </Avatar>
           <Heading size="md" bold className="text-primary-foreground mt-1">

@@ -8,6 +8,8 @@ import {
   AlertCircle,
   Frown,
   ChevronRight,
+  MessageSquare,
+  Calendar,
 } from "lucide-react-native";
 import {
   Box,
@@ -260,6 +262,54 @@ export default function PatientDashboard() {
                 </Text>
                 <Text size="xs" className="text-muted-foreground">
                   Cek tingkat stres & kecemasan
+                </Text>
+              </VStack>
+              <ChevronRight size={18} className="text-muted-foreground" />
+            </Pressable>
+
+            {/* Ruang Cerita & Komunitas */}
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Ruang cerita dan komunitas"
+              onPress={() => {
+                haptics.light();
+                router.push(ROUTES.PATIENT.COMMUNITY);
+              }}
+              className="bg-card px-4 py-3.5 rounded-2xl flex-row items-center justify-between border border-border active:bg-muted"
+            >
+              <VStack space="xs">
+                <HStack space="xs" className="items-center">
+                  <MessageSquare size={14} className="text-secondary" />
+                  <Text size="sm" bold className="text-foreground">
+                    Ruang cerita & komunitas
+                  </Text>
+                </HStack>
+                <Text size="xs" className="text-muted-foreground">
+                  Dukungan sebaya & berbagi cerita aman
+                </Text>
+              </VStack>
+              <ChevronRight size={18} className="text-muted-foreground" />
+            </Pressable>
+
+            {/* Sesi Kontrol & Lanjutan */}
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Sesi kontrol dan lanjutan"
+              onPress={() => {
+                haptics.light();
+                router.push(ROUTES.PATIENT.FOLLOW_UPS);
+              }}
+              className="bg-card px-4 py-3.5 rounded-2xl flex-row items-center justify-between border border-border active:bg-muted"
+            >
+              <VStack space="xs">
+                <HStack space="xs" className="items-center">
+                  <Calendar size={14} className="text-secondary" />
+                  <Text size="sm" bold className="text-foreground">
+                    Sesi kontrol & lanjutan
+                  </Text>
+                </HStack>
+                <Text size="xs" className="text-muted-foreground">
+                  Jadwal tindak lanjut dari psikolog
                 </Text>
               </VStack>
               <ChevronRight size={18} className="text-muted-foreground" />

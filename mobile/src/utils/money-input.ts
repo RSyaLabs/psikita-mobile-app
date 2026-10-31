@@ -1,16 +1,8 @@
 /**
- * One parser for money typed into a form, shared by every withdrawal screen.
- *
- * Both screens previously rolled their own and disagreed. bank-account.tsx
- * called parseInt(raw || "0", 10), which stops at the first non-digit, so
- * "1e9" parsed as 1 and the request asked the server for one rupiah.
- * withdraw.tsx called Number(raw.replace(/\D/g, "")), which deleted the "e"
- * and turned the same "1e9" into 19. Neither rejected letters, and neither
- * refused zero, so an empty field still produced a request.
+ * One parser for money typed into a form.
  *
  * The rule here is deliberately strict: digits and grouping separators only.
- * Anything the user typed that is not a plain number is a mistake worth
- * showing them, not something to guess at.
+ * Anything the user typed that is not a plain number is rejected safely.
  */
 
 const GROUPING = /[.\s,_]/g;

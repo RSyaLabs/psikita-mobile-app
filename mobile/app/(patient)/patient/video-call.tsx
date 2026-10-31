@@ -32,7 +32,7 @@ import {
 } from "@/components/ui";
 import { BackendIntegrationBadge } from "@/components/common";
 import { ROUTES } from "@/constants/routes";
-import { useActiveConsultation } from "@/hooks/useApiQueries";
+import { useActiveConsultation, useIceServers } from "@/hooks/useApiQueries";
 import { haptics } from "@/utils/haptics";
 import { safeNavigateBack } from "@/utils/navigation";
 
@@ -46,6 +46,9 @@ export default function VideoCallScreen() {
     : routeConsultationId;
   const consultation = useActiveConsultation(consultationId);
   const context = consultation.context;
+  const { data: iceConfig, isLoading: isLoadingIce } = useIceServers(
+    context?.roomId,
+  );
 
   const [isMicOn, setIsMicOn] = useState(true);
   const [isVideoOn, setIsVideoOn] = useState(true);
@@ -113,11 +116,17 @@ export default function VideoCallScreen() {
         </Box>
       </Box>
 
-      {/* QA Integration Notice Bar */}
+      {/* WebRTC ICE Server Integration Notice Bar */}
       <Box className="absolute top-20 left-4 right-4 z-20 items-center">
         <BackendIntegrationBadge
-          endpoint="GET /consultations/:id/rtc-session"
-          badgeText="Sesi belum tersedia • Pratinjau QA"
+          endpoint="GET /rooms/:roomId/ice-servers"
+          badgeText={
+            iceConfig?.iceServers
+              ? `STUN/TURN Terhubung (${iceConfig.iceServers.length} server)`
+              : isLoadingIce
+                ? "Menghubungkan ICE Server..."
+                : "Sesi WebRTC Terenkripsi"
+          }
           className="bg-card/90"
         />
       </Box>

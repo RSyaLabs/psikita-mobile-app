@@ -37,12 +37,15 @@ import { ROUTES } from "@/constants";
 import { haptics } from "@/utils/haptics";
 import {
   usePractitionerProfile,
+  useMyAvatar,
 } from "@/hooks/useApiQueries";
+import { getInitials } from "@/utils/format";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function PractitionerProfileScreen() {
   const router = useRouter();
   const { data: profile } = usePractitionerProfile();
+  const { data: avatarData } = useMyAvatar();
   const { signOut } = useAuth();
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [showScheduleModal, setShowScheduleModal] = useState(false);
@@ -103,12 +106,14 @@ export default function PractitionerProfileScreen() {
         <Card className="bg-primary rounded-3xl p-4 items-center mb-3 border-0">
           <VStack space="xs" className="items-center">
             <Avatar className="w-16 h-16 rounded-full border-2 border-primary-foreground/30 mb-1">
-              <AvatarImage
-                source={{
-                  uri: "https://images.unsplash.com/photo-1584432810601-6c7f27d2362b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3ODkwNzA0NDh8&ixlib=rb-4.1.0&q=80&w=1080",
-                }}
-              />
-              <AvatarFallbackText>NP</AvatarFallbackText>
+              {avatarData?.avatarUrl ? (
+                <AvatarImage
+                  source={{
+                    uri: avatarData.avatarUrl,
+                  }}
+                />
+              ) : null}
+              <AvatarFallbackText>{getInitials(fullName)}</AvatarFallbackText>
             </Avatar>
             <Heading size="md" className="font-bold text-primary-foreground">
               {fullName}

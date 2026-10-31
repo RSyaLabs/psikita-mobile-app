@@ -114,7 +114,21 @@ export function useConsultations<T = ConsultationResponseDto[]>(options?: {
 }) {
   return useQuery({
     queryKey: queryKeys.consultations.list(),
-    queryFn: ({ signal }) => consultationService.getConsultations(signal),
+    queryFn: ({ signal }) => consultationService.getConsultations(undefined, signal),
+    select: options?.select,
+  });
+}
+
+/**
+ * Hook to retrieve personal consultation history for the authenticated patient
+ */
+export function usePatientConsultations<T = ConsultationResponseDto[]>(options?: {
+  status?: "UPCOMING" | "ACTIVE" | "COMPLETED" | "CANCELLED" | "WAITING" | "FINISHED";
+  select?: (data: ConsultationResponseDto[]) => T;
+}) {
+  return useQuery({
+    queryKey: [...queryKeys.consultations.all, "patient", options?.status ?? "all"] as const,
+    queryFn: ({ signal }) => consultationService.getPatientConsultations({ status: options?.status }, signal),
     select: options?.select,
   });
 }
@@ -164,5 +178,19 @@ export function useConsultationNotes(consultationId: string) {
       ),
     enabled: !!consultationId,
     staleTime: 10 * 60 * 1000,
+  });
+}
+
+/**
+ * Hook to retrieve WebRTC STUN/TURN ICE servers configuration
+ */
+export function useIceServers(roomId?: string) {
+  const normalizedRoomId = roomId?.trim() || "";
+  return useQuery({
+    queryKey: queryKeys.consultations.iceServers(normalizedRoomId),
+    queryFn: ({ signal }) =>
+      callWithSignal(consultationService.getIceServers, signal, normalizedRoomId),
+    enabled: Boolean(normalizedRoomId),
+    staleTime: 5 * 60 * 1000,
   });
 }

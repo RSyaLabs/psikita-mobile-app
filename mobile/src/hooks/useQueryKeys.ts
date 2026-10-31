@@ -186,4 +186,51 @@ export const queryKeys = {
         privacyToken(roomId),
       ] as const,
   },
+  lms: {
+    all: ["lms"] as const,
+    list: (topic?: string) =>
+      [...queryKeys.lms.all, "list", topic ?? "all"] as const,
+    detail: (courseId: string) =>
+      [...queryKeys.lms.all, "detail", privacyToken(courseId)] as const,
+    progress: () =>
+      [...queryKeys.lms.all, "progress"] as const,
+  },
+  community: {
+    all: ["community"] as const,
+    list: (category?: string) =>
+      [...queryKeys.community.all, "list", category ?? "all"] as const,
+    detail: (postId: string) =>
+      [...queryKeys.community.all, "detail", privacyToken(postId)] as const,
+    replies: (postId: string) =>
+      [...queryKeys.community.all, "replies", privacyToken(postId)] as const,
+  },
+  carePlan: {
+    all: ["carePlan"] as const,
+    byConsultation: (consultationId: string) =>
+      [...queryKeys.carePlan.all, "byConsultation", privacyToken(consultationId)] as const,
+  },
+  followUps: {
+    all: ["followUps"] as const,
+    my: () => [...queryKeys.followUps.all, "my"] as const,
+    slots: (followUpId: string) =>
+      [...queryKeys.followUps.all, "slots", privacyToken(followUpId)] as const,
+  },
+  cdss: {
+    all: ["cdss"] as const,
+    alerts: () => [...queryKeys.cdss.all, "alerts"] as const,
+    patientAlerts: (patientId: string) =>
+      [...queryKeys.cdss.all, "patient", privacyToken(patientId), "alerts"] as const,
+  },
+  avatar: {
+    all: ["avatar"] as const,
+    my: () => [...queryKeys.avatar.all, "my"] as const,
+    byUser: (userId: string) =>
+      [...queryKeys.avatar.all, "user", privacyToken(userId)] as const,
+  },
+  psychometrics: {
+    all: ["psychometrics"] as const,
+    instruments: () => [...queryKeys.psychometrics.all, "instruments"] as const,
+    form: (code: string) =>
+      [...queryKeys.psychometrics.all, "form", privacyToken(code)] as const,
+  },
 };

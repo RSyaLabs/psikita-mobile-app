@@ -66,6 +66,11 @@ export default function PatientLayout() {
       <Stack.Screen name="patient/referral" />
       <Stack.Screen name="patient/session-summary" />
       <Stack.Screen name="patient/video-call" />
+      <Stack.Screen name="patient/courses" />
+      <Stack.Screen name="patient/course-detail" />
+      <Stack.Screen name="patient/community" />
+      <Stack.Screen name="patient/community-detail" />
+      <Stack.Screen name="patient/follow-ups" />
     </Stack>
   );
 }

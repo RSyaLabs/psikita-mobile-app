@@ -25,6 +25,11 @@ export const ROUTES = {
     SESSION_SUMMARY: "/patient/session-summary",
     VIDEO_CALL: "/patient/video-call",
     EDIT_PROFILE: "/patient/edit-profile",
+    COURSES: "/patient/courses",
+    COURSE_DETAIL: "/patient/course-detail",
+    COMMUNITY: "/patient/community",
+    COMMUNITY_DETAIL: "/patient/community-detail",
+    FOLLOW_UPS: "/patient/follow-ups",
   },
   PRACTITIONER: {
     REGISTER: "/practitioner/register",

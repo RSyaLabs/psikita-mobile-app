@@ -30,6 +30,7 @@ import {
 import {
   usePatientProfile,
   useUpdatePatientProfile,
+  useMyAvatar,
 } from "@/hooks/useApiQueries";
 import { getInitials } from "@/utils/format";
 import { haptics } from "@/utils/haptics";
@@ -40,6 +41,7 @@ export default function EditProfileScreen() {
   const router = useRouter();
   const toast = useToast();
   const { data: profile } = usePatientProfile();
+  const { data: avatarData } = useMyAvatar();
   const updateProfileMutation = useUpdatePatientProfile();
   const isLoading = updateProfileMutation.isPending;
 
@@ -193,11 +195,13 @@ export default function EditProfileScreen() {
         <Box className="items-center my-3">
           <Box className="relative">
             <Avatar size="2xl" className="border-2 border-border shadow-sm">
-              <AvatarImage
-                source={{
-                  uri: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=400&q=80",
-                }}
-              />
+              {avatarData?.avatarUrl ? (
+                <AvatarImage
+                  source={{
+                    uri: avatarData.avatarUrl,
+                  }}
+                />
+              ) : null}
               {/* getInitials falls back to the generic "PK", not a borrowed
                   person's name, so an empty field never greets the patient as
                   someone they are not. */}
