@@ -96,6 +96,43 @@ const referralAdapter = (value: unknown): ReferralResponseDto => {
 
 const prescriptionListAdapter = paginatedAdapter(prescriptionAdapter);
 
+export interface FacilityResponseDto {
+  id: string;
+  name: string;
+  address: string;
+  distanceKm: number;
+  hasPsychiatry: boolean;
+  latitude: number;
+  longitude: number;
+  city?: string;
+  type?: string;
+  phone?: string;
+  bpjsCovered?: boolean;
+}
+
+export interface ReferralLetterResponseDto {
+  referralId: string;
+  letterNumber?: string;
+  pdfUrl?: string;
+  downloadUrl?: string;
+  issuedAt?: string;
+  validUntil?: string;
+}
+
+export interface MedicationSuggestionsDto {
+  diagnosisCode: string;
+  patientId?: string;
+  cdssAlerts?: any[];
+  suggestions: Array<{
+    id?: string;
+    name: string;
+    genericName?: string;
+    dosageForm?: string;
+    strength?: string;
+    rationale?: string;
+  }>;
+}
+
 export const prescriptionService = {
   /**
    * Ambil Resep Digital Berdasarkan Konsultasi
@@ -136,5 +173,61 @@ export const prescriptionService = {
       { adapter: collectionAdapter(referralAdapter), signal },
     );
     return referrals[0] ?? null;
+  },
+
+  /**
+   * Cari faskes dan RS rujukan jiwa terdekat dari domisili pasien
+   */
+  async getNearestFacilities(
+    params?: { latitude?: number; longitude?: number; limit?: number },
+    signal?: AbortSignal,
+  ): Promise<FacilityResponseDto[]> {
+    const path = params
+      ? withQueryParams("/referral/nearest-facilities", params)
+      : "/referral/nearest-facilities";
+    const res = await apiRequest<unknown>(path, { signal });
+    if (Array.isArray(res)) return res as FacilityResponseDto[];
+    if (res && Array.isArray((res as any).data)) {
+      return (res as any).data as FacilityResponseDto[];
+    }
+    return [];
+  },
+
+  /**
+   * Unduh informasi surat rujukan digital
+   */
+  async getReferralLetter(
+    referralId: string,
+    signal?: AbortSignal,
+  ): Promise<ReferralLetterResponseDto> {
+    const id = requireServerId(referralId, "referralId");
+    return apiRequest<ReferralLetterResponseDto>(
+      `/consultation/referral/${encodeURIComponent(id)}/letter`,
+      { signal },
+    );
+  },
+
+  /**
+   * Buat / generate surat rujukan digital
+   */
+  async generateReferralLetter(
+    referralId: string,
+  ): Promise<ReferralLetterResponseDto> {
+    const id = requireServerId(referralId, "referralId");
+    return apiRequest<ReferralLetterResponseDto>(
+      `/consultation/referral/${encodeURIComponent(id)}/letter`,
+      { method: "POST" },
+    );
+  },
+
+  /**
+   * Rekomendasi obat berdasarkan diagnosis & CDSS
+   */
+  async getMedicationSuggestions(
+    params: { diagnosisCode: string; patientId?: string },
+    signal?: AbortSignal,
+  ): Promise<MedicationSuggestionsDto> {
+    const path = withQueryParams("/medications/suggestions", params);
+    return apiRequest<MedicationSuggestionsDto>(path, { signal });
   },
 };

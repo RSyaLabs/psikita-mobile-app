@@ -6,6 +6,7 @@ import {
   Download,
   Headphones,
   ChevronRight,
+  MapPin,
 } from "lucide-react-native";
 import {
   Box,
@@ -28,7 +29,7 @@ import {
   CareTeamModal,
 } from "@/components/patient/referral";
 import { haptics } from "@/utils/haptics";
-import { useReferral } from "@/hooks/useApiQueries";
+import { useReferral, useNearestFacilities } from "@/hooks/useApiQueries";
 import { ROUTES } from "@/constants";
 import { safeNavigateBack } from "@/utils/navigation";
 
@@ -45,6 +46,7 @@ export default function ReferralScreen() {
     ? consultationIdParam[0]
     : consultationIdParam;
   const { data: referral } = useReferral(consultationId);
+  const { data: nearestFacilities } = useNearestFacilities();
 
   const hospitalName =
     referral?.targetHospital ||
@@ -108,6 +110,34 @@ export default function ReferralScreen() {
           diagnosisIcd={diagnosisIcd}
           referralNumber={referralNumber}
         />
+
+        {/* Fasilitas Jiwa & Rumah Sakit Terdekat */}
+        {nearestFacilities && nearestFacilities.length > 0 && (
+          <Card className="bg-card rounded-3xl p-4 mb-3.5 border border-border gap-2">
+            <HStack space="xs" className="items-center mb-1">
+              <MapPin size={16} className="text-secondary" />
+              <Heading size="xs" bold className="text-foreground">
+                Fasilitas Kesehatan Jiwa Terdekat
+              </Heading>
+            </HStack>
+            {nearestFacilities.slice(0, 3).map((f) => (
+              <Box
+                key={f.id}
+                className="p-2.5 rounded-xl bg-muted/60 border border-border"
+              >
+                <Text size="xs" bold className="text-foreground">
+                  {f.name}
+                </Text>
+                <Text size="xs" className="text-muted-foreground text-[11px]">
+                  {f.address} •{" "}
+                  {f.distanceKm
+                    ? `${f.distanceKm.toFixed(1)} km`
+                    : "Dalam kota"}
+                </Text>
+              </Box>
+            ))}
+          </Card>
+        )}
 
         <ReferralSatuSehatCard />
 

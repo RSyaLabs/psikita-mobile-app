@@ -176,3 +176,27 @@ export function useVerifyOtp() {
     mutationFn: (dto: VerifyOtpDto) => authService.verifyOtp(dto),
   });
 }
+
+/**
+ * Mutation hook for requesting password reset email
+ */
+export function useForgotPassword() {
+  return useMutation({
+    mutationFn: (email: string) => authService.forgotPassword(email),
+  });
+}
+
+/**
+ * Mutation hook for resetting password with token
+ */
+export function useResetPassword() {
+  return useMutation({
+    mutationFn: ({
+      token,
+      newPassword,
+    }: {
+      token: string;
+      newPassword: string;
+    }) => authService.resetPassword(token, newPassword),
+  });
+}

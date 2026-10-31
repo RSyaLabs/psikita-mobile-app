@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { SERVER_ROLES } from "@/constants/enums";
 import { apiRequest } from "./client";
-import { zodAdapter } from "./response";
+import { zodAdapter, noContentAdapter } from "./response";
 import {
   PasswordLoginDto,
   PasswordRegisterDto,
@@ -218,5 +218,69 @@ export const authService = {
         linkedAt?: string;
       }>;
     }>("/user/identities");
+  },
+
+  /**
+   * Minta email reset password
+   */
+  async forgotPassword(email: string): Promise<void> {
+    await apiRequest<void>("/auth/password/forgot", {
+      method: "POST",
+      body: JSON.stringify({ email }),
+      skipAuth: true,
+      adapter: noContentAdapter,
+    });
+  },
+
+  /**
+   * Reset password dengan token
+   */
+  async resetPassword(token: string, newPassword: string): Promise<void> {
+    await apiRequest<void>("/auth/password/reset", {
+      method: "POST",
+      body: JSON.stringify({ token, newPassword }),
+      skipAuth: true,
+      adapter: noContentAdapter,
+    });
+  },
+
+  /**
+   * Refresh token
+   */
+  async refreshToken(refreshToken: string): Promise<TokenResponseDto> {
+    return apiRequest<TokenResponseDto>("/auth/refresh", {
+      method: "POST",
+      body: JSON.stringify({ refreshToken }),
+      skipAuth: true,
+      adapter: tokenResponseAdapter,
+    });
+  },
+
+  /**
+   * Ubah password pengguna login
+   */
+  async updatePassword(dto: {
+    oldPassword?: string;
+    newPassword: string;
+  }): Promise<void> {
+    await apiRequest<void>("/user/password", {
+      method: "PUT",
+      body: JSON.stringify(dto),
+      adapter: noContentAdapter,
+    });
+  },
+
+  /**
+   * Ubah username atau email
+   */
+  async updateProfile(dto: {
+    username?: string;
+    email?: string;
+  }): Promise<void> {
+    await apiRequest<void>("/user/profile", {
+      method: "PATCH",
+      body: JSON.stringify(dto),
+      adapter: noContentAdapter,
+    });
   },
 };

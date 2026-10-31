@@ -441,6 +441,48 @@ export const paymentService = {
   },
 
   /**
+   * Cek langsung kelayakan peserta BPJS via Bridging Core
+   */
+  async bridgeBpjsEligibility(memberNumber: string): Promise<any> {
+    const normalized = requireContextValue(memberNumber, "memberNumber");
+    return apiRequest<any>("/bpjs/bridging/eligibility", {
+      method: "POST",
+      body: JSON.stringify({ memberNumber: normalized }),
+    });
+  },
+
+  /**
+   * Ambil rujukan faskes BPJS berdasarkan nomor rujukan
+   */
+  async getBpjsReferral(
+    referralNumber: string,
+    signal?: AbortSignal,
+  ): Promise<any> {
+    const normalized = requireContextValue(referralNumber, "referralNumber");
+    return apiRequest<any>(
+      `/bpjs/bridging/referrals/${encodeURIComponent(normalized)}`,
+      { signal },
+    );
+  },
+
+  /**
+   * Submit klaim BPJS untuk billing order
+   */
+  async submitBillingOrderBpjs(
+    billingOrderId: string,
+    payload: Record<string, unknown>,
+  ): Promise<any> {
+    const id = requireContextValue(billingOrderId, "billingOrderId");
+    return apiRequest<any>(
+      `/billing-orders/${encodeURIComponent(id)}/bpjs/submit`,
+      {
+        method: "POST",
+        body: JSON.stringify(payload),
+      },
+    );
+  },
+
+  /**
    * Kirim Ulasan dan Penilaian Konsultasi
    */
   async submitFeedback(

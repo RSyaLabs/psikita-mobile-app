@@ -89,4 +89,22 @@ export const lmsService = {
       method: "POST",
     });
   },
+
+  startCompetencyTest: async (targetLevel: number = 1): Promise<any> => {
+    return apiRequest<any>("/lms/competency-test/start", {
+      method: "POST",
+      body: { targetLevel },
+    });
+  },
+
+  submitCompetencyTest: async (dto: {
+    attemptId: string;
+    questionId: string;
+    selectedOptionId: string;
+  }): Promise<any> => {
+    return apiRequest<any>("/lms/competency-test/submit", {
+      method: "POST",
+      body: dto,
+    });
+  },
 };

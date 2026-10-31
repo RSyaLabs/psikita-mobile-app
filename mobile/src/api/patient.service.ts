@@ -49,6 +49,24 @@ const patientDtoAdapter = (value: unknown): PatientResponseDto => {
 };
 const patientListAdapter = paginatedAdapter(patientDtoAdapter);
 
+export interface PatientConsultationResultDto {
+  consultationId: string;
+  sessionDate: string;
+  practitionerName: string;
+  patientFacingAdvice: string;
+  referral?: Record<string, unknown> | null;
+  referrals?: Array<Record<string, unknown>>;
+  prescriptionCode?: string | null;
+  prescriptionStatus?:
+    | "ACTIVE"
+    | "CLAIMED"
+    | "USED"
+    | "EXPIRED"
+    | "REVOKED"
+    | null;
+  prescriptionExpiresAt?: string | null;
+}
+
 export const patientService = {
   /**
    * Profil Pasien saat ini (me)
@@ -102,5 +120,33 @@ export const patientService = {
       adapter: patientListAdapter,
       signal,
     });
+  },
+
+  /**
+   * Hasil akhir konsultasi pasien (Results Tab)
+   */
+  async getMyResults(
+    signal?: AbortSignal,
+  ): Promise<PatientConsultationResultDto[]> {
+    const res = await apiRequest<unknown>("/patient/me/results", { signal });
+    if (Array.isArray(res)) return res as PatientConsultationResultDto[];
+    if (res && Array.isArray((res as any).data)) {
+      return (res as any).data as PatientConsultationResultDto[];
+    }
+    return [];
+  },
+
+  /**
+   * Detail hasil akhir konsultasi spesifik
+   */
+  async getResultDetail(
+    consultationId: string,
+    signal?: AbortSignal,
+  ): Promise<PatientConsultationResultDto> {
+    const id = requireServerId(consultationId, "consultationId");
+    return apiRequest<PatientConsultationResultDto>(
+      `/patient/me/results/${encodeURIComponent(id)}`,
+      { signal },
+    );
   },
 };

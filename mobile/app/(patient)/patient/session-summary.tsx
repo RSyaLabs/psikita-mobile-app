@@ -20,6 +20,7 @@ import {
   useActiveConsultation,
   useConsultationNotes,
   useCarePlan,
+  usePatientResultDetail,
 } from "@/hooks/useApiQueries";
 import { resolveServerValue } from "@/utils/server-value";
 import { haptics } from "@/utils/haptics";
@@ -48,6 +49,7 @@ export default function SessionSummaryScreen() {
   const targetConsultationId = context?.consultationId || consultationId || "";
   const notesQuery = useConsultationNotes(targetConsultationId);
   const { data: carePlan } = useCarePlan(targetConsultationId);
+  const { data: resultDetail } = usePatientResultDetail(targetConsultationId);
   const note = notesQuery.data?.[0];
   const soap = note?.soap ?? note?.soapData;
 
@@ -156,6 +158,17 @@ export default function SessionSummaryScreen() {
                 Status server: {context?.status ?? "Tersedia"}
               </Text>
             </Card>
+
+            {resultDetail?.patientFacingAdvice && (
+              <Card className="bg-secondary/10 rounded-2xl p-4 border border-secondary/20 gap-1.5">
+                <Text size="xs" bold className="text-secondary uppercase tracking-wider text-[11px]">
+                  Panduan Pasien dari Dokter
+                </Text>
+                <Text size="sm" className="text-foreground leading-relaxed">
+                  {resultDetail.patientFacingAdvice}
+                </Text>
+              </Card>
+            )}
             {receivedSections.map((section) => (
               <Card
                 key={section.key}
