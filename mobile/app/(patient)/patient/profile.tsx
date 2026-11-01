@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useRouter } from "expo-router";
-import { Image as RNImage } from "react-native";
+import { Image as RNImage, Alert, ActivityIndicator, Linking } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   Edit3,
@@ -10,6 +10,8 @@ import {
   HelpCircle,
   MessageSquare,
   Shield,
+  ShieldCheck,
+  ExternalLink,
   LogOut,
   ChevronRight,
 } from "lucide-react-native";
@@ -36,14 +38,40 @@ import {
 } from "@/components/modals";
 import { AppIcon } from "@/components/common/AppIcon";
 import { PatientTabBar } from "@/components/navigation/PatientTabBar";
-import { usePatientProfile, useMyAvatar } from "@/hooks/useApiQueries";
+import {
+  usePatientProfile,
+  useMyAvatar,
+  useMyVerificationStatus,
+  useStartDiditVerification,
+} from "@/hooks/useApiQueries";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function ProfileScreen() {
   const router = useRouter();
   const { data: patient } = usePatientProfile();
   const { data: avatarData } = useMyAvatar();
+  const { data: kycStatus } = useMyVerificationStatus();
+  const startKycMutation = useStartDiditVerification();
+  const isKycStarting = startKycMutation.isPending;
+  const isKycVerified =
+    kycStatus?.status === "APPROVED" || kycStatus?.status === "VERIFIED";
   const { signOut } = useAuth();
+
+  const handleStartKyc = async () => {
+    haptics.selection();
+    try {
+      const session = await startKycMutation.mutateAsync();
+      if (session?.url) {
+        await Linking.openURL(session.url);
+      }
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Terjadi kesalahan saat memulai sesi Didit KYC. Silakan coba lagi.";
+      Alert.alert("Gagal Memulai Verifikasi", message);
+    }
+  };
 
   const [showHelpModal, setShowHelpModal] = useState(false);
   const [showCsModal, setShowCsModal] = useState(false);
@@ -128,6 +156,65 @@ export default function ProfileScreen() {
               </Text>
             </VStack>
           </HStack>
+        </Card>
+
+        {/* Didit KYC Identity Verification Card */}
+        <Card className="bg-card rounded-2xl p-4 border border-border mb-4">
+          <VStack space="sm">
+            <HStack space="md" className="items-center">
+              <Box className="w-10 h-10 rounded-full bg-primary/10 items-center justify-center">
+                <AppIcon icon={ShieldCheck} size={20} tone="primary" />
+              </Box>
+              <VStack space="xs" className="flex-1">
+                <HStack space="xs" className="items-center justify-between">
+                  <Text size="sm" bold className="text-foreground">
+                    Verifikasi Identitas (KYC)
+                  </Text>
+                  <Text
+                    size="sm"
+                    className={
+                      isKycVerified
+                        ? "text-primary font-bold"
+                        : "text-muted-foreground font-medium"
+                    }
+                  >
+                    {isKycVerified
+                      ? "Terverifikasi"
+                      : kycStatus?.status === "IN_PROGRESS"
+                        ? "Diproses"
+                        : "Belum Verifikasi"}
+                  </Text>
+                </HStack>
+                <Text size="sm" className="text-muted-foreground font-medium leading-relaxed">
+                  {isKycVerified
+                    ? "Identitas terhubung dengan validasi KTP & Satu Sehat."
+                    : "Verifikasi KTP melalui Didit KYC untuk perlindungan rekam medis."}
+                </Text>
+              </VStack>
+            </HStack>
+
+            {!isKycVerified && (
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Mulai Verifikasi Didit KYC"
+                onPress={handleStartKyc}
+                disabled={isKycStarting}
+                className="mt-1 bg-primary py-2.5 px-4 rounded-xl flex-row items-center justify-center active:opacity-80"
+              >
+                {isKycStarting ? (
+                  <ActivityIndicator size="small" color="#FFFFFF" />
+                ) : (
+                  <HStack space="xs" className="items-center">
+                    <AppIcon icon={ShieldCheck} size={16} color="#FFFFFF" />
+                    <Text size="sm" className="font-bold text-white">
+                      Verifikasi Sekarang (Didit KYC)
+                    </Text>
+                    <ExternalLink size={14} color="#FFFFFF" />
+                  </HStack>
+                )}
+              </Pressable>
+            )}
+          </VStack>
         </Card>
 
         {/* Group Akun */}

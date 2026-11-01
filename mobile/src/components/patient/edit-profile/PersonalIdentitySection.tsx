@@ -106,7 +106,7 @@ export function PersonalIdentitySection({
         <HStack space="sm">
           <FormControl className="flex-1">
             <FormControlLabel>
-              <FormControlLabelText className="text-xs font-bold text-foreground">
+              <FormControlLabelText className="text-sm font-bold text-foreground">
                 Tanggal Lahir
               </FormControlLabelText>
             </FormControlLabel>
@@ -115,13 +115,13 @@ export function PersonalIdentitySection({
                 value={birthDate}
                 onChangeText={onChangeBirthDate}
                 placeholder="12/05/1998"
-                className="text-foreground text-xs"
+                className="text-foreground text-sm"
               />
             </Input>
           </FormControl>
 
           <VStack space="xs" className="flex-1">
-            <Text size="xs" bold className="text-foreground mb-1">
+            <Text size="sm" bold className="text-foreground mb-1">
               Jenis Kelamin
             </Text>
             <HStack space="xs">
@@ -137,7 +137,7 @@ export function PersonalIdentitySection({
                 }`}
               >
                 <Text
-                  size="xs"
+                  size="sm"
                   bold
                   className={
                     gender === "FEMALE"
@@ -160,7 +160,7 @@ export function PersonalIdentitySection({
                 }`}
               >
                 <Text
-                  size="xs"
+                  size="sm"
                   bold
                   className={
                     gender === "MALE"
@@ -177,7 +177,7 @@ export function PersonalIdentitySection({
 
         <FormControl>
           <FormControlLabel>
-            <FormControlLabelText className="text-xs font-bold text-foreground">
+            <FormControlLabelText className="text-sm font-bold text-foreground">
               No. WhatsApp Aktif
             </FormControlLabelText>
           </FormControlLabel>
@@ -186,7 +186,7 @@ export function PersonalIdentitySection({
               value={phone}
               onChangeText={onChangePhone}
               keyboardType="phone-pad"
-              className="text-foreground text-xs"
+              className="text-foreground text-sm"
             />
           </Input>
         </FormControl>

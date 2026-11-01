@@ -9,6 +9,7 @@ import {
   noContentAdapter,
   zodAdapter,
 } from "../src/api/client";
+import { identityVerificationService } from "../src/api/identity-verification.service";
 import { secureStorage } from "../src/utils/storage";
 
 describe("SeraPhany API Client Suite", () => {
@@ -144,6 +145,110 @@ describe("SeraPhany API Client Suite", () => {
 
       const healthy = await checkBackendHealth();
       expect(healthy).toBe(false);
+    });
+  });
+
+  describe("Didit Identity Verification Service (KYC)", () => {
+    it("should initiate user Didit verification session via POST /identity/verification/didit/session", async () => {
+      const mockSession = {
+        sessionId: "session_didit_001",
+        sessionToken: "token_jwt_secret",
+        url: "https://verification.didit.me/v1/session/session_didit_001",
+        status: "Not Started",
+      };
+
+      global.fetch = jest.fn().mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        headers: {
+          get: (header: string) =>
+            header === "content-type" ? "application/json" : "150",
+        },
+        json: async () => mockSession,
+      });
+
+      const res = await identityVerificationService.startAccountVerification();
+      expect(res.sessionId).toBe("session_didit_001");
+      expect(res.url).toBe("https://verification.didit.me/v1/session/session_didit_001");
+      expect(res.status).toBe("Not Started");
+      expect(global.fetch).toHaveBeenCalledWith(
+        "https://api.staging.seraphany.id/core/identity/verification/didit/session",
+        expect.objectContaining({
+          method: "POST",
+        }),
+      );
+    });
+
+    it("should fetch account verification status via GET /identity/verification/me", async () => {
+      const mockStatus = {
+        status: "APPROVED",
+        verifiedAt: "2026-11-01T20:00:00.000Z",
+        vendor: "DIDIT",
+      };
+
+      global.fetch = jest.fn().mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        headers: {
+          get: (header: string) =>
+            header === "content-type" ? "application/json" : "100",
+        },
+        json: async () => mockStatus,
+      });
+
+      const res = await identityVerificationService.getMyVerificationStatus();
+      expect(res.status).toBe("APPROVED");
+      expect(res.vendor).toBe("DIDIT");
+    });
+
+    it("should return default NOT_STARTED status when user has no verification record (404)", async () => {
+      global.fetch = jest.fn().mockResolvedValueOnce({
+        ok: false,
+        status: 404,
+        headers: {
+          get: (name: string) =>
+            name === "content-type" ? "application/json" : null,
+        },
+        json: async () => ({
+          statusCode: 404,
+          message: "Verification record not found",
+          error: "NOT_FOUND",
+        }),
+      });
+
+      const res = await identityVerificationService.getMyVerificationStatus();
+      expect(res).toEqual({ status: "NOT_STARTED" });
+    });
+
+    it("should initiate practitioner verification session via POST /practitioner/{id}/verify-identity", async () => {
+      const mockSession = {
+        sessionId: "session_prac_999",
+        sessionToken: "token_practitioner",
+        url: "https://verification.didit.me/v1/session/session_prac_999",
+        status: "Not Started",
+      };
+
+      global.fetch = jest.fn().mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        headers: {
+          get: (header: string) =>
+            header === "content-type" ? "application/json" : "150",
+        },
+        json: async () => mockSession,
+      });
+
+      const res = await identityVerificationService.startPractitionerVerification(
+        "prac-uuid-123",
+      );
+      expect(res.sessionId).toBe("session_prac_999");
+      expect(res.url).toBe("https://verification.didit.me/v1/session/session_prac_999");
+      expect(global.fetch).toHaveBeenCalledWith(
+        "https://api.staging.seraphany.id/core/practitioner/prac-uuid-123/verify-identity",
+        expect.objectContaining({
+          method: "POST",
+        }),
+      );
     });
   });
 });

@@ -243,4 +243,8 @@ export const queryKeys = {
         params?.search ?? "",
       ] as const,
   },
+  identityVerification: {
+    all: ["identityVerification"] as const,
+    my: () => [...queryKeys.identityVerification.all, "my"] as const,
+  },
 };

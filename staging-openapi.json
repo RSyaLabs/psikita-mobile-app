@@ -189,7 +189,7 @@
     },
     "/health/dependencies": {
       "get": {
-        "description": "Checks non-critical external dependencies: S3 object storage, Payment Gateway, and Satu Sehat. These do not affect application readiness.",
+        "description": "Checks non-critical external dependencies: S3 object storage, Payment Gateway, Satu Sehat, Didit configuration, and SMTP connectivity. These do not affect application readiness. Didit is checked locally without contacting its API; SMTP verification opens a connection but sends no email.",
         "operationId": "HealthController_dependencies",
         "parameters": [],
         "responses": {
@@ -1710,48 +1710,6 @@
         ]
       }
     },
-    "/patient/{patientId}/verify-identity": {
-      "post": {
-        "operationId": "PatientController_startVerification",
-        "parameters": [
-          {
-            "name": "patientId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Verification session created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PatientResponseDto"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "User is not authenticated"
-          },
-          "403": {
-            "description": "User lacks required policies or permissions"
-          }
-        },
-        "security": [
-          {
-            "access-token": []
-          }
-        ],
-        "summary": "Get current authenticated user profile",
-        "tags": [
-          "Patients"
-        ]
-      }
-    },
     "/patient/me": {
       "get": {
         "operationId": "PatientController_getMyProfile",
@@ -1772,6 +1730,7 @@
             "access-token": []
           }
         ],
+        "summary": "Get current authenticated user profile",
         "tags": [
           "Patients"
         ]
@@ -1967,15 +1926,14 @@
         ]
       }
     },
-    "/patient/{patientId}/review": {
+    "/patient/{patientId}/status": {
       "put": {
-        "operationId": "PatientController_review",
+        "operationId": "PatientController_updateStatus",
         "parameters": [
           {
             "name": "patientId",
             "required": true,
             "in": "path",
-            "description": "The unique identifier of the patient",
             "schema": {
               "type": "string"
             }
@@ -1986,14 +1944,14 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ReviewPatientDto"
+                "$ref": "#/components/schemas/UpdatePatientStatusDto"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Patient profile status updated after manual review",
+            "description": "",
             "content": {
               "application/json": {
                 "schema": {
@@ -2014,7 +1972,7 @@
             "access-token": []
           }
         ],
-        "summary": "Review patient profile status (manual review)",
+        "summary": "Suspend or reactivate a patient profile without disabling its account",
         "tags": [
           "Patients"
         ]
@@ -2650,6 +2608,53 @@
         "summary": "Handle Didit identity verification webhook",
         "tags": [
           "Webhooks"
+        ]
+      }
+    },
+    "/identity/verification/didit/session": {
+      "post": {
+        "operationId": "AccountDiditVerificationController_start",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdentityVerificationSessionResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Start Didit verification for the signed-in account",
+        "tags": [
+          "Identity verification"
+        ]
+      }
+    },
+    "/identity/verification/me": {
+      "get": {
+        "operationId": "AccountDiditVerificationController_getMine",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Get the signed-in account identity verification status",
+        "tags": [
+          "Identity verification"
         ]
       }
     },
@@ -6021,6 +6026,7 @@
     },
     "/practitioner/{practitionerId}/verify-identity": {
       "post": {
+        "description": "This route requires a practitioner profile to exist. New accounts must complete KYC through POST /identity/verification/didit/session before creating a practitioner profile.",
         "operationId": "PractitionerController_startVerification",
         "parameters": [
           {
@@ -6049,7 +6055,7 @@
             "access-token": []
           }
         ],
-        "summary": "Start an asynchronous Didit KYC identity verification session for practitioner",
+        "summary": "Start Didit KYC for an existing practitioner profile (legacy onboarding route)",
         "tags": [
           "Practitioners"
         ]
@@ -6393,6 +6399,7 @@
     },
     "/practitioner/{practitionerId}/nik-review": {
       "put": {
+        "description": "Updates the NIK review state of an existing profile. New-account Didit KYC is account-scoped and this route does not resolve a pending Didit account verification.",
         "operationId": "PractitionerVerificationController_reviewNik",
         "parameters": [
           {
@@ -6438,7 +6445,7 @@
             "access-token": []
           }
         ],
-        "summary": "Review practitioner NIK verification via Dukcapil",
+        "summary": "Review NIK verification for an existing practitioner profile",
         "tags": [
           "Practitioners"
         ]
@@ -16135,6 +16142,7 @@
     },
     "/follow-ups/me": {
       "get": {
+        "description": "Returns follow-up sessions for the signed-in patient. Optionally filter by lifecycle status.",
         "operationId": "ConsultationFollowUpController_mine",
         "parameters": [
           {
@@ -16142,7 +16150,6 @@
             "required": false,
             "in": "query",
             "schema": {
-              "type": "string",
               "enum": [
                 "ISSUED",
                 "BOOKED",
@@ -16151,13 +16158,30 @@
                 "NO_SHOW",
                 "EXPIRED",
                 "REVOKED"
-              ]
+              ],
+              "type": "string"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FollowUpResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication is required."
+          },
+          "403": {
+            "description": "Only patient accounts may use this endpoint."
           }
         },
         "security": [
@@ -16173,11 +16197,28 @@
     },
     "/follow-ups": {
       "get": {
+        "description": "Returns follow-up sessions issued by the signed-in psychologist or psychiatrist.",
         "operationId": "ConsultationFollowUpController_issued",
         "parameters": [],
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FollowUpResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication is required."
+          },
+          "403": {
+            "description": "Only practitioners may use this endpoint."
           }
         },
         "security": [
@@ -16199,6 +16240,7 @@
             "name": "id",
             "required": true,
             "in": "path",
+            "description": "Follow-up identifier",
             "schema": {
               "type": "string"
             }
@@ -16207,14 +16249,25 @@
             "name": "date",
             "required": true,
             "in": "query",
+            "description": "Date to search, in YYYY-MM-DD format",
             "schema": {
+              "example": "2026-11-15",
               "type": "string"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "Available slots for the requested date."
+          },
+          "401": {
+            "description": "Authentication is required."
+          },
+          "403": {
+            "description": "The caller cannot access this follow-up."
+          },
+          "404": {
+            "description": "Follow-up was not found."
           }
         },
         "security": [
@@ -16222,6 +16275,7 @@
             "access-token": []
           }
         ],
+        "summary": "List bookable time slots for a follow-up",
         "tags": [
           "Consultation Follow-ups"
         ]
@@ -16235,6 +16289,7 @@
             "name": "id",
             "required": true,
             "in": "path",
+            "description": "Follow-up identifier",
             "schema": {
               "type": "string"
             }
@@ -16267,8 +16322,23 @@
           }
         },
         "responses": {
-          "201": {
-            "description": ""
+          "200": {
+            "description": "The follow-up slot was booked."
+          },
+          "400": {
+            "description": "The slot start time or request is invalid."
+          },
+          "401": {
+            "description": "Authentication is required."
+          },
+          "403": {
+            "description": "The caller cannot book this follow-up."
+          },
+          "404": {
+            "description": "Follow-up was not found."
+          },
+          "409": {
+            "description": "The slot is no longer available or the request conflicts with an existing booking."
           }
         },
         "security": [
@@ -16276,6 +16346,7 @@
             "access-token": []
           }
         ],
+        "summary": "Book an available follow-up time slot",
         "tags": [
           "Consultation Follow-ups"
         ]
@@ -16289,6 +16360,7 @@
             "name": "id",
             "required": true,
             "in": "path",
+            "description": "Follow-up identifier",
             "schema": {
               "type": "string"
             }
@@ -16311,8 +16383,23 @@
           }
         ],
         "responses": {
-          "201": {
-            "description": ""
+          "200": {
+            "description": "The booked slot was released."
+          },
+          "400": {
+            "description": "Idempotency-Key header is required."
+          },
+          "401": {
+            "description": "Authentication is required."
+          },
+          "403": {
+            "description": "Only the patient may release this follow-up."
+          },
+          "404": {
+            "description": "Follow-up was not found."
+          },
+          "409": {
+            "description": "The follow-up cannot be released in its current state."
           }
         },
         "security": [
@@ -16320,6 +16407,7 @@
             "access-token": []
           }
         ],
+        "summary": "Release a booked follow-up slot",
         "tags": [
           "Consultation Follow-ups"
         ]
@@ -16333,6 +16421,7 @@
             "name": "id",
             "required": true,
             "in": "path",
+            "description": "Follow-up identifier",
             "schema": {
               "type": "string"
             }
@@ -16349,8 +16438,23 @@
           }
         },
         "responses": {
-          "201": {
-            "description": ""
+          "200": {
+            "description": "The follow-up was revoked."
+          },
+          "400": {
+            "description": "A revocation reason is required."
+          },
+          "401": {
+            "description": "Authentication is required."
+          },
+          "403": {
+            "description": "The caller cannot revoke this follow-up."
+          },
+          "404": {
+            "description": "Follow-up was not found."
+          },
+          "409": {
+            "description": "The follow-up cannot be revoked in its current state."
           }
         },
         "security": [
@@ -16358,6 +16462,7 @@
             "access-token": []
           }
         ],
+        "summary": "Revoke a follow-up",
         "tags": [
           "Consultation Follow-ups"
         ]
@@ -16371,14 +16476,27 @@
             "name": "id",
             "required": true,
             "in": "path",
+            "description": "Follow-up identifier",
             "schema": {
               "type": "string"
             }
           }
         ],
         "responses": {
-          "201": {
-            "description": ""
+          "200": {
+            "description": "The follow-up review was approved."
+          },
+          "401": {
+            "description": "Authentication is required."
+          },
+          "403": {
+            "description": "Only administrators may approve follow-ups."
+          },
+          "404": {
+            "description": "Follow-up was not found."
+          },
+          "409": {
+            "description": "The follow-up is not awaiting review."
           }
         },
         "security": [
@@ -16386,6 +16504,7 @@
             "access-token": []
           }
         ],
+        "summary": "Approve a follow-up review",
         "tags": [
           "Consultation Follow-ups"
         ]
@@ -17321,29 +17440,17 @@
           "phoneNumber"
         ]
       },
-      "ReviewPatientDto": {
+      "UpdatePatientStatusDto": {
         "type": "object",
         "properties": {
           "status": {
             "type": "string",
+            "description": "New status for the patient profile. SUSPENDED prevents use of the profile while leaving the associated account enabled; ACTIVE reactivates it.",
             "enum": [
-              "PENDING_MANUAL_REVIEW",
               "ACTIVE",
-              "REJECTED",
               "SUSPENDED"
             ],
-            "example": "ACTIVE",
-            "description": "New patient profile status after manual review. Cannot be set to PENDING_MANUAL_REVIEW."
-          },
-          "reasonCode": {
-            "type": "string",
-            "example": "NIK_DUKCAPIL_MISMATCH",
-            "description": "Reason code explaining the review outcome, required when the status is REJECTED or SUSPENDED"
-          },
-          "referenceId": {
-            "type": "string",
-            "example": "session-xyz",
-            "description": "External verification reference / session ID"
+            "example": "SUSPENDED"
           }
         },
         "required": [
@@ -17976,6 +18083,37 @@
         "required": [
           "items",
           "meta"
+        ]
+      },
+      "IdentityVerificationSessionResponseDto": {
+        "type": "object",
+        "properties": {
+          "sessionId": {
+            "type": "string",
+            "example": "session_01j7xyz...",
+            "description": "Unique identifier for the Didit verification session. Use this to correlate the session with its verification status."
+          },
+          "sessionToken": {
+            "type": "string",
+            "example": "eyJhbGciOi...short-lived-session-token",
+            "description": "Short-lived Didit session token used to initialize the native iOS or Android SDK. Treat as sensitive and do not persist or log it."
+          },
+          "url": {
+            "type": "string",
+            "example": "https://verification.didit.me/v1/session/session_01j7xyz...",
+            "description": "Didit-hosted URL that the client can open to complete identity verification."
+          },
+          "status": {
+            "type": "string",
+            "example": "Not Started",
+            "description": "Initial status returned by Didit when the verification session is created."
+          }
+        },
+        "required": [
+          "sessionId",
+          "sessionToken",
+          "url",
+          "status"
         ]
       },
       "LedgerAccountDto": {
@@ -20354,31 +20492,6 @@
           "date",
           "timezone",
           "slots"
-        ]
-      },
-      "IdentityVerificationSessionResponseDto": {
-        "type": "object",
-        "properties": {
-          "sessionId": {
-            "type": "string",
-            "example": "session_01j7xyz...",
-            "description": "Unique session identifier from the verification provider"
-          },
-          "url": {
-            "type": "string",
-            "example": "https://verification.didit.me/v1/session/session_01j7xyz...",
-            "description": "URL to redirect the user to complete verification"
-          },
-          "status": {
-            "type": "string",
-            "example": "Not Started",
-            "description": "Initial session status"
-          }
-        },
-        "required": [
-          "sessionId",
-          "url",
-          "status"
         ]
       },
       "UpdatePractitionerDto": {
@@ -26828,6 +26941,61 @@
           "activeCount",
           "stuckInTestCount",
           "totalPsychologists"
+        ]
+      },
+      "FollowUpResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "patientId": {
+            "type": "string"
+          },
+          "practitionerId": {
+            "type": "string"
+          },
+          "originConsultationId": {
+            "type": "string"
+          },
+          "consultationId": {
+            "type": "object",
+            "nullable": true
+          },
+          "status": {
+            "type": "string"
+          },
+          "durationMinutes": {
+            "type": "number"
+          },
+          "validFrom": {
+            "type": "string"
+          },
+          "validUntil": {
+            "type": "string"
+          },
+          "scheduledAt": {
+            "type": "object",
+            "nullable": true
+          },
+          "chainDepth": {
+            "type": "number"
+          },
+          "requiresAdminReview": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "patientId",
+          "practitionerId",
+          "originConsultationId",
+          "status",
+          "durationMinutes",
+          "validFrom",
+          "validUntil",
+          "chainDepth",
+          "requiresAdminReview"
         ]
       },
       "BookFollowUpDto": {

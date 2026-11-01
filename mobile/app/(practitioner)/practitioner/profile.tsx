@@ -1,10 +1,12 @@
 import React, { useState } from "react";
+import { Alert, ActivityIndicator, Linking } from "react-native";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   Calendar,
   Check,
   ChevronRight,
+  ExternalLink,
   HelpCircle,
   LogOut,
   Settings,
@@ -38,6 +40,8 @@ import { haptics } from "@/utils/haptics";
 import {
   usePractitionerProfile,
   useMyAvatar,
+  useStartPractitionerVerification,
+  useStartDiditVerification,
 } from "@/hooks/useApiQueries";
 import { getInitials } from "@/utils/format";
 import { useAuth } from "@/hooks/useAuth";
@@ -63,6 +67,36 @@ export default function PractitionerProfileScreen() {
   // "4.9 / 128 sesi" is a fabricated track record.
   const rating = profile?.rating?.toString();
   const totalSessions = profile?.totalSessions?.toString();
+
+  const startPractitionerVerificationMutation =
+    useStartPractitionerVerification();
+  const startAccountVerificationMutation = useStartDiditVerification();
+  const isVerifying =
+    startPractitionerVerificationMutation.isPending ||
+    startAccountVerificationMutation.isPending;
+
+  const handleStartVerification = async () => {
+    haptics.selection();
+    try {
+      let session;
+      if (profile?.id) {
+        session = await startPractitionerVerificationMutation.mutateAsync(
+          profile.id,
+        );
+      } else {
+        session = await startAccountVerificationMutation.mutateAsync();
+      }
+      if (session?.url) {
+        await Linking.openURL(session.url);
+      }
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Terjadi kesalahan saat memulai sesi Didit KYC. Silakan coba lagi.";
+      Alert.alert("Gagal Memulai Verifikasi", message);
+    }
+  };
 
   const handleSignOut = async () => {
     haptics.medium();
@@ -195,9 +229,30 @@ export default function PractitionerProfileScreen() {
                 ) : null}
               </>
             ) : (
-              <Text size="sm" className="text-muted-foreground font-medium leading-relaxed">
-                Nomor STR dan SIPP ditampilkan setelah verifikasi selesai.
-              </Text>
+              <VStack space="sm">
+                <Text size="sm" className="text-muted-foreground font-medium leading-relaxed">
+                  Nomor STR dan SIPP ditampilkan setelah verifikasi selesai.
+                </Text>
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel="Mulai Verifikasi Identitas Didit KYC"
+                  onPress={handleStartVerification}
+                  disabled={isVerifying}
+                  className="mt-1 bg-primary py-2.5 px-4 rounded-xl flex-row items-center justify-center active:opacity-80"
+                >
+                  {isVerifying ? (
+                    <ActivityIndicator size="small" color="#FFFFFF" />
+                  ) : (
+                    <HStack space="xs" className="items-center">
+                      <ShieldCheck size={16} color="#FFFFFF" />
+                      <Text size="sm" className="font-bold text-white">
+                        Mulai Verifikasi Identitas (KYC)
+                      </Text>
+                      <ExternalLink size={14} color="#FFFFFF" />
+                    </HStack>
+                  )}
+                </Pressable>
+              </VStack>
             )}
           </VStack>
         </Card>
