@@ -10,8 +10,9 @@
     "test:watch": "jest --watch",
     "test:ci": "jest --ci --maxWorkers=2",
     "test:integration": "cross-env PSIKITA_INTEGRATION=1 tsx --env-file=.env scripts/test-services.ts",
+    "audit": "tsx scripts/contract-audit.ts",
     "audit:contracts": "tsx scripts/contract-audit.ts",
-    "audit:routes": "tsx scripts/e2e-audit.ts"
+    "audit:routes": "tsx scripts/contract-audit.ts"
   },
   "dependencies": {
     "@expo/html-elements": "^57.0.0",
