@@ -69,7 +69,7 @@ export default function OvertimeModalScreen() {
           accessibilityRole="button"
           accessibilityLabel="Kembali ke chat"
         >
-          <ArrowLeft size={20} className="text-foreground" />
+          <ArrowLeft size={22} color="#262130" />
         </Pressable>
         <Heading size="sm" bold className="text-foreground">
           Ruang Konsultasi

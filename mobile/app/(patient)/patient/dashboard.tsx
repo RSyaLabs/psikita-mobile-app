@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useRouter } from "expo-router";
+import { Image as RNImage } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   Smile,
@@ -33,6 +34,8 @@ import { usePatientProfile, usePractitioners } from "@/hooks/useApiQueries";
 import { haptics } from "@/utils/haptics";
 import { ROUTES } from "@/constants/routes";
 
+const SeraPhanyLogo = require("../../../assets/icon.png");
+
 export default function PatientDashboard() {
   const router = useRouter();
   const toast = useToast();
@@ -56,27 +59,27 @@ export default function PatientDashboard() {
     {
       id: "Tenang",
       label: "Tenang",
-      icon: <Smile size={18} className="text-primary" />,
+      icon: <Smile size={20} color="#4A3B6B" />,
     },
     {
       id: "Biasa",
       label: "Biasa",
-      icon: <Meh size={18} className="text-primary" />,
+      icon: <Meh size={20} color="#4A3B6B" />,
     },
     {
       id: "Lelah",
       label: "Lelah",
-      icon: <Clock size={18} className="text-primary" />,
+      icon: <Clock size={20} color="#4A3B6B" />,
     },
     {
       id: "Cemas",
       label: "Cemas",
-      icon: <AlertCircle size={18} className="text-primary" />,
+      icon: <AlertCircle size={20} color="#4A3B6B" />,
     },
     {
       id: "Sedih",
       label: "Sedih",
-      icon: <Frown size={18} className="text-primary" />,
+      icon: <Frown size={20} color="#4A3B6B" />,
     },
   ];
 
@@ -109,14 +112,18 @@ export default function PatientDashboard() {
         {/* Header Greeting */}
         <VStack space="xs" className="px-5 pt-3">
           <HStack className="justify-between items-center">
-            <VStack>
-              <Heading size="xl" bold className="text-foreground">
+            <VStack className="flex-1 pr-3">
+              <Heading size="xl" bold className="text-foreground text-2xl font-bold tracking-tight">
                 {patientFirstName ? `Halo, ${patientFirstName}` : "Halo"}
               </Heading>
-              <Text size="xs" className="text-muted-foreground mt-0.5">
+              <Text size="sm" className="text-muted-foreground mt-0.5 font-medium">
                 Cek kabarmu hari ini atau lanjutkan sesi konselingmu.
               </Text>
             </VStack>
+            <RNImage
+              source={SeraPhanyLogo}
+              style={{ width: 44, height: 44, borderRadius: 12 }}
+            />
           </HStack>
         </VStack>
 
@@ -147,9 +154,9 @@ export default function PatientDashboard() {
                 haptics.medium();
                 router.push(ROUTES.PATIENT.CHAT_ROOM);
               }}
-              className="bg-secondary px-3.5 py-2 rounded-full h-auto min-h-0"
+              className="bg-primary px-4 py-2 rounded-full h-auto min-h-0"
             >
-              <ButtonText className="text-xs font-semibold text-secondary-foreground">
+              <ButtonText className="text-sm font-bold text-primary-foreground">
                 Lanjut
               </ButtonText>
             </Button>
@@ -160,7 +167,7 @@ export default function PatientDashboard() {
         <VStack space="sm" className="px-5 mt-3">
           {/* Vibe Section */}
           <VStack space="xs" className="pt-1">
-            <Text size="xs" className="font-semibold text-muted-foreground">
+            <Text size="sm" className="font-bold text-foreground">
               Check-in hari ini
             </Text>
             <HStack space="xs">
@@ -170,22 +177,20 @@ export default function PatientDashboard() {
                   <Pressable
                     key={mood.id}
                     onPress={() => handleMoodSelect(mood.id)}
-                    // Selection was previously conveyed by colour alone, so the
-                    // chosen mood was invisible to a screen reader.
                     accessibilityRole="button"
                     accessibilityLabel={`Suasana ${mood.label}`}
                     accessibilityState={{ selected: isSelected }}
-                    className={`flex-1 py-2 rounded-xl items-center justify-center border border-border active:opacity-80 ${
+                    className={`flex-1 py-2.5 rounded-xl items-center justify-center border border-border active:opacity-80 ${
                       isSelected ? "bg-muted border-primary" : "bg-card"
                     }`}
                   >
                     {mood.icon}
                     <Text
-                      size="xs"
-                      className={`text-[11px] mt-1 ${
+                      size="sm"
+                      className={`text-xs mt-1.5 ${
                         isSelected
                           ? "font-bold text-foreground"
-                          : "font-medium text-muted-foreground"
+                          : "font-semibold text-muted-foreground"
                       }`}
                     >
                       {mood.label}
@@ -212,14 +217,14 @@ export default function PatientDashboard() {
               className="bg-card px-4 py-3.5 rounded-2xl flex-row items-center justify-between border border-border active:bg-muted"
             >
               <VStack space="xs">
-                <Text size="sm" bold className="text-foreground">
+                <Text size="sm" bold className="text-foreground font-bold">
                   Konsultasi langsung
                 </Text>
-                <Text size="xs" className="text-muted-foreground">
+                <Text size="sm" className="text-muted-foreground font-medium">
                   {onlineCount} psikolog online
                 </Text>
               </VStack>
-              <ChevronRight size={18} className="text-muted-foreground" />
+              <ChevronRight size={18} color="#4B4656" />
             </Pressable>
 
             {/* Jadwalkan Sesi */}
@@ -233,14 +238,14 @@ export default function PatientDashboard() {
               className="bg-card px-4 py-3.5 rounded-2xl flex-row items-center justify-between border border-border active:bg-muted"
             >
               <VStack space="xs">
-                <Text size="sm" bold className="text-foreground">
+                <Text size="sm" bold className="text-foreground font-bold">
                   Jadwalkan sesi
                 </Text>
-                <Text size="xs" className="text-muted-foreground">
+                <Text size="sm" className="text-muted-foreground font-medium">
                   Pilih dokter & jam
                 </Text>
               </VStack>
-              <ChevronRight size={18} className="text-muted-foreground" />
+              <ChevronRight size={18} color="#4B4656" />
             </Pressable>
 
             {/* Tes Mandiri */}
@@ -257,14 +262,14 @@ export default function PatientDashboard() {
               className="bg-card px-4 py-3.5 rounded-2xl flex-row items-center justify-between border border-border active:bg-muted"
             >
               <VStack space="xs">
-                <Text size="sm" bold className="text-foreground">
+                <Text size="sm" bold className="text-foreground font-bold">
                   Tes mandiri
                 </Text>
-                <Text size="xs" className="text-muted-foreground">
+                <Text size="sm" className="text-muted-foreground font-medium">
                   Cek tingkat stres & kecemasan
                 </Text>
               </VStack>
-              <ChevronRight size={18} className="text-muted-foreground" />
+              <ChevronRight size={18} color="#4B4656" />
             </Pressable>
 
             {/* Ruang Cerita & Komunitas */}
@@ -279,16 +284,16 @@ export default function PatientDashboard() {
             >
               <VStack space="xs">
                 <HStack space="xs" className="items-center">
-                  <MessageSquare size={14} className="text-secondary" />
-                  <Text size="sm" bold className="text-foreground">
+                  <MessageSquare size={16} color="#4A3B6B" />
+                  <Text size="sm" bold className="text-foreground font-bold">
                     Ruang cerita & komunitas
                   </Text>
                 </HStack>
-                <Text size="xs" className="text-muted-foreground">
+                <Text size="sm" className="text-muted-foreground font-medium">
                   Dukungan sebaya & berbagi cerita aman
                 </Text>
               </VStack>
-              <ChevronRight size={18} className="text-muted-foreground" />
+              <ChevronRight size={18} color="#4B4656" />
             </Pressable>
 
             {/* Sesi Kontrol & Lanjutan */}
@@ -303,16 +308,16 @@ export default function PatientDashboard() {
             >
               <VStack space="xs">
                 <HStack space="xs" className="items-center">
-                  <Calendar size={14} className="text-secondary" />
-                  <Text size="sm" bold className="text-foreground">
+                  <Calendar size={16} color="#4A3B6B" />
+                  <Text size="sm" bold className="text-foreground font-bold">
                     Sesi kontrol & lanjutan
                   </Text>
                 </HStack>
-                <Text size="xs" className="text-muted-foreground">
+                <Text size="sm" className="text-muted-foreground font-medium">
                   Jadwal tindak lanjut dari psikolog
                 </Text>
               </VStack>
-              <ChevronRight size={18} className="text-muted-foreground" />
+              <ChevronRight size={18} color="#4B4656" />
             </Pressable>
           </VStack>
         </VStack>

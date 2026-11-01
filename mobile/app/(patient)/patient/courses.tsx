@@ -57,8 +57,8 @@ export default function CoursesScreen() {
         <HStack space="xs" className="items-center justify-between">
           <VStack space="xs">
             <HStack space="xs" className="items-center">
-              <Sparkles size={16} className="text-secondary" />
-              <Text size="xs" bold className="text-secondary uppercase tracking-widest text-[11px]">
+              <Sparkles size={16} color="#4A3B6B" />
+              <Text size="xs" bold className="text-primary uppercase tracking-widest text-xs font-bold">
                 Psikoedukasi Klinis
               </Text>
             </HStack>
@@ -67,30 +67,30 @@ export default function CoursesScreen() {
             </Heading>
           </VStack>
           {progress && (
-            <Badge variant="solid" action="success" className="rounded-full px-2.5 py-1">
+            <Badge variant="solid" action="primary" className="rounded-full px-3 py-1 bg-primary">
               <HStack space="xs" className="items-center">
-                <CheckCircle2 size={12} className="text-white" />
-                <BadgeText className="text-[11px] font-bold text-white">
+                <CheckCircle2 size={14} color="#FFFFFF" />
+                <BadgeText className="text-xs font-bold text-white">
                   {progress.totalCoursesCompleted ?? 0} Selesai
                 </BadgeText>
               </HStack>
             </Badge>
           )}
         </HStack>
-        <Text size="xs" className="text-muted-foreground mt-0.5">
+        <Text size="sm" className="text-muted-foreground mt-0.5 font-medium">
           Pelajari modul kesehatan mental berbasis sains dan panduan klinis dokter.
         </Text>
 
         {/* Search Bar */}
         <Box className="mt-2.5 mb-1">
-          <Input className="h-10 bg-muted rounded-xl border-border px-3">
-            <Search size={16} className="text-muted-foreground mr-2" />
+          <Input className="h-11 bg-muted rounded-xl border-border px-3.5 flex-row items-center">
+            <Search size={18} color="#4B4656" style={{ marginRight: 8 }} />
             <InputField
               value={searchQuery}
               onChangeText={setSearchQuery}
               placeholder="Cari topik atau materi kelas..."
-              placeholderTextColor="#625E6E"
-              className="text-xs text-foreground"
+              placeholderTextColor="#757086"
+              className="text-sm font-medium text-foreground p-0 flex-1"
             />
           </Input>
         </Box>
@@ -107,16 +107,16 @@ export default function CoursesScreen() {
                     haptics.selection();
                     setSelectedTopic(topic);
                   }}
-                  className={`px-3 py-1.5 rounded-full border ${
+                  className={`px-4 py-2 rounded-full border ${
                     isSelected
-                      ? "bg-secondary border-secondary"
+                      ? "bg-primary border-primary"
                       : "bg-card border-border"
                   }`}
                 >
                   <Text
-                    size="xs"
-                    className={`font-semibold text-[11px] ${
-                      isSelected ? "text-secondary-foreground" : "text-muted-foreground"
+                    size="sm"
+                    className={`text-sm ${
+                      isSelected ? "text-primary-foreground font-bold" : "text-foreground font-semibold"
                     }`}
                   >
                     {topic}
@@ -176,8 +176,8 @@ export default function CoursesScreen() {
                 <HStack space="sm" className="items-start justify-between">
                   <VStack space="xs" className="flex-1 pr-2">
                     {course.topic && (
-                      <Badge variant="outline" action="muted" className="self-start rounded-md px-2 py-0.5 mb-1">
-                        <BadgeText className="text-[10px] font-semibold text-secondary">
+                      <Badge variant="outline" action="muted" className="self-start rounded-full px-2.5 py-0.5 mb-1.5 border-primary/30 bg-primary/5">
+                        <BadgeText className="text-xs font-bold text-primary">
                           {course.topic}
                         </BadgeText>
                       </Badge>
@@ -185,26 +185,26 @@ export default function CoursesScreen() {
                     <Heading size="sm" bold className="text-foreground">
                       {course.title}
                     </Heading>
-                    <Text size="xs" className="text-muted-foreground line-clamp-2 mt-1">
+                    <Text size="sm" className="text-muted-foreground line-clamp-2 mt-1 font-normal leading-relaxed">
                       {course.description}
                     </Text>
-                    <HStack space="md" className="items-center mt-3 pt-2 border-t border-border/50">
+                    <HStack space="md" className="items-center mt-3 pt-2.5 border-t border-border/50">
                       <HStack space="xs" className="items-center">
-                        <Clock size={13} className="text-muted-foreground" />
-                        <Text size="xs" className="text-[11px] text-muted-foreground font-medium">
+                        <Clock size={15} color="#4B4656" />
+                        <Text size="sm" className="text-sm text-muted-foreground font-medium">
                           {course.estimatedMinutes ?? 15} Menit
                         </Text>
                       </HStack>
                       <HStack space="xs" className="items-center">
-                        <Award size={13} className="text-muted-foreground" />
-                        <Text size="xs" className="text-[11px] text-muted-foreground font-medium">
+                        <Award size={15} color="#4B4656" />
+                        <Text size="sm" className="text-sm text-muted-foreground font-medium">
                           {course.totalLessons ?? 3} Modul
                         </Text>
                       </HStack>
                     </HStack>
                   </VStack>
                   <Box className="w-8 h-8 rounded-full bg-muted items-center justify-center mt-1">
-                    <ChevronRight size={18} className="text-muted-foreground" />
+                    <ChevronRight size={18} color="#4B4656" />
                   </Box>
                 </HStack>
               </Pressable>

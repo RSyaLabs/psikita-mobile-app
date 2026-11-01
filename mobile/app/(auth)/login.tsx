@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Image } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { ROUTES } from "@/constants/routes";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -52,7 +53,10 @@ export default function LoginScreen() {
 
   const handleCheckCondition = () => {
     haptics.medium();
-    router.push(ROUTES.PATIENT.TRIAGE);
+    router.push({
+      pathname: ROUTES.PATIENT.TRIAGE,
+      params: { guest: "true" },
+    } as any);
   };
 
   const handleOpenAccountLogin = () => {
@@ -84,27 +88,28 @@ export default function LoginScreen() {
       >
         <Box className="w-full max-w-[440px] flex-1 justify-between">
           <Box>
-            {/* Top Meta: Brand Row & Trust Badge */}
-            <Box className="mb-3.5">
-              <HStack space="sm" className="items-center mb-1">
-                <Box className="w-8 h-8 bg-primary rounded-xl items-center justify-center">
-                  <Lock size={16} className="text-primary-foreground" />
-                </Box>
-                <Heading
-                  level={1}
-                  size="xl"
-                  bold
-                  className="text-foreground tracking-tight"
-                >
-                  SeraPhany
-                </Heading>
+            {/* Top Meta: Official Brand Logo & Identity */}
+            <Box className="mb-4">
+              <HStack space="md" className="items-center mb-1">
+                <Image
+                  source={require("../../assets/icon.png")}
+                  style={{ width: 44, height: 44, borderRadius: 12 }}
+                  resizeMode="contain"
+                />
+                <VStack>
+                  <Heading
+                    level={1}
+                    size="2xl"
+                    bold
+                    className="text-foreground tracking-tight"
+                  >
+                    SeraPhany
+                  </Heading>
+                  <Text className="text-sm font-semibold text-muted-foreground">
+                    Ruang aman untuk bercerita
+                  </Text>
+                </VStack>
               </HStack>
-              <Text
-                size="xs"
-                className="text-muted-foreground font-medium pl-0.5"
-              >
-                Ruang aman untuk bercerita
-              </Text>
             </Box>
 
             {/* Hero Carousel Zone */}
@@ -168,10 +173,10 @@ export default function LoginScreen() {
               variant="outline"
               size="lg"
               onPress={handleOpenAccountLogin}
-              className="w-full h-[50px] rounded-2xl border border-border bg-card active:bg-muted flex-row items-center justify-center mt-1"
+              className="w-full h-[52px] rounded-2xl border border-border bg-card active:bg-muted flex-row items-center justify-center mt-1"
             >
-              <KeyRound size={18} className="text-foreground mr-2" />
-              <ButtonText className="text-foreground font-semibold text-sm">
+              <KeyRound size={20} className="text-foreground mr-2" />
+              <ButtonText className="text-foreground font-bold text-base">
                 Masuk dengan Akun
               </ButtonText>
             </Button>
@@ -179,9 +184,9 @@ export default function LoginScreen() {
             <Pressable
               onPress={handleOpenForgotPassword}
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-              className="pt-2 items-center"
+              className="pt-2.5 items-center"
             >
-              <Text size="xs" className="text-secondary font-semibold text-xs">
+              <Text className="text-sm text-primary font-bold">
                 Lupa kata sandi?
               </Text>
             </Pressable>
@@ -191,7 +196,7 @@ export default function LoginScreen() {
               className="items-center justify-center pt-3 pb-2"
             >
               <HStack space="xs" className="items-center">
-                <Text size="xs" className="text-muted-foreground font-medium">
+                <Text className="text-sm text-muted-foreground font-medium">
                   Belum punya akun?
                 </Text>
                 <Pressable
@@ -201,14 +206,14 @@ export default function LoginScreen() {
                   }}
                   hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 >
-                  <Text size="xs" bold className="text-primary underline">
+                  <Text className="text-sm font-bold text-primary underline">
                     Daftar Pasien Baru
                   </Text>
                 </Pressable>
               </HStack>
 
-              <HStack space="xs" className="items-center pt-1">
-                <Text size="xs" className="text-muted-foreground font-medium">
+              <HStack space="xs" className="items-center pt-1.5">
+                <Text className="text-sm text-muted-foreground font-medium">
                   Tertarik praktik di SeraPhany?
                 </Text>
                 <Pressable
@@ -218,7 +223,7 @@ export default function LoginScreen() {
                   }}
                   hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 >
-                  <Text size="xs" bold className="text-primary underline">
+                  <Text className="text-sm font-bold text-primary underline">
                     Daftar Mitra Praktisi
                   </Text>
                 </Pressable>

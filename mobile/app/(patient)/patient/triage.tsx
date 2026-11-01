@@ -121,7 +121,7 @@ export default function TriageScreen() {
               accessibilityLabel="Kembali"
               className="p-1 -ml-1 active:opacity-70"
             >
-              <ArrowLeft size={22} className="text-foreground" />
+              <ArrowLeft size={22} color="#262130" />
             </Pressable>
             <Heading size="xl" bold className="text-foreground">
               {isAssessment ? "Asesmen" : "Triase Konsultasi"}
@@ -130,17 +130,17 @@ export default function TriageScreen() {
 
           {/* Progress Row */}
           <HStack space="md" className="items-center justify-between mb-1.5">
-            <Text size="xs" bold className="text-foreground">
+            <Text size="sm" bold className="text-foreground font-bold">
               {isAssessment
                 ? "Pertanyaan 3 dari 5 • Skrining Mandiri"
                 : "Pertanyaan 3 dari 5 • Menuju Konsultasi"}
             </Text>
-            <Text size="xs" className="text-muted-foreground font-medium">
+            <Text size="sm" className="text-muted-foreground font-semibold">
               60%
             </Text>
           </HStack>
-          <Progress value={60} className="w-full h-1.5 bg-muted rounded-full">
-            <ProgressFilledTrack className="bg-secondary" />
+          <Progress value={60} className="w-full h-2 bg-muted rounded-full">
+            <ProgressFilledTrack className="bg-primary" />
           </Progress>
         </VStack>
 
@@ -200,7 +200,7 @@ export default function TriageScreen() {
             onPress={handleBack}
             className="h-[52px] px-6 rounded-xl bg-card border-border active:bg-muted flex-row items-center justify-center"
           >
-            <ButtonIcon as={ArrowLeft} className="text-foreground mr-1" />
+            <ButtonIcon as={ArrowLeft} color="#262130" className="mr-1" />
             <ButtonText className="text-foreground font-semibold text-base">
               Kembali
             </ButtonText>
@@ -208,25 +208,20 @@ export default function TriageScreen() {
 
           <Button
             size="lg"
-            // No accessibilityLabel override. The button is fully enabled and
-            // routes to matching, so announcing it as "Asesmen belum tersedia"
-            // told a screen-reader user the opposite of what pressing it does.
-            // WCAG 2.5.3 requires the accessible name to contain the visible
-            // label, so the visible text is left to be the name.
             onPress={handleContinue}
-            className="flex-1 h-[52px] bg-secondary rounded-xl active:opacity-90"
+            className="flex-1 h-[52px] bg-primary rounded-xl active:opacity-90"
           >
-            <ButtonText className="text-secondary-foreground font-semibold text-base">
+            <ButtonText className="text-white font-bold text-base">
               {isAssessment ? "Lihat Hasil Evaluasi" : "Cari Psikolog"}
             </ButtonText>
-            <ButtonIcon as={ArrowRight} className="text-secondary-foreground" />
+            <ButtonIcon as={ArrowRight} color="#FFFFFF" />
           </Button>
         </HStack>
 
         {/* Secure Note */}
         <Card className="bg-muted rounded-xl p-3 border border-border flex-row items-center gap-2.5">
-          <Lock size={16} className="text-foreground" />
-          <Text size="xs" className="text-foreground flex-1">
+          <Lock size={16} color="#4A3B6B" />
+          <Text size="sm" className="text-foreground flex-1 font-medium">
             Jawabanmu tersimpan secara privat. {isAssessment ? "Hasil evaluasi mandiri akan ditampilkan setelah ini." : "Hasil triase digunakan untuk menentukan psikolog yang sesuai."}
           </Text>
         </Card>

@@ -176,7 +176,7 @@ export default function DoctorsDirectoryScreen() {
           onPress={() => safeNavigateBack(router, ROUTES.PATIENT.DASHBOARD)}
           className="w-10 h-10 rounded-full bg-card border border-border items-center justify-center active:bg-muted"
         >
-          <ChevronLeft size={20} className="text-foreground" />
+          <ChevronLeft size={22} color="#262130" />
         </Pressable>
         <Heading size="sm" bold className="text-foreground">
           Pilih Praktisi

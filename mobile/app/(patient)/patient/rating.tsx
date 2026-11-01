@@ -65,7 +65,7 @@ export default function RatingScreen() {
           accessibilityLabel="Kembali"
           className="p-1 -ml-1"
         >
-          <ArrowLeft size={20} className="text-primary-foreground" />
+          <ArrowLeft size={22} color="#FFFFFF" />
         </Pressable>
         <Heading size="md" bold className="text-primary-foreground">
           Ulasan sesi

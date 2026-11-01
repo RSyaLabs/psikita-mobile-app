@@ -54,10 +54,8 @@ export function AppHeader({
               className="p-1 -ml-1 active:opacity-70"
             >
               <ArrowLeft
-                size={20}
-                className={
-                  isPrimary ? "text-primary-foreground" : "text-foreground"
-                }
+                size={22}
+                color={isPrimary ? "#FFFFFF" : "#262130"}
               />
             </Pressable>
           )}

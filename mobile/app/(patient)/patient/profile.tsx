@@ -72,7 +72,7 @@ export default function ProfileScreen() {
             accessibilityLabel="Kembali ke Dashboard"
             className="p-1 -ml-1 active:opacity-70"
           >
-            <ArrowLeft size={22} className="text-primary-foreground" />
+            <ArrowLeft size={22} color="#FFFFFF" />
           </Pressable>
           <Box className="w-6" />
         </HStack>

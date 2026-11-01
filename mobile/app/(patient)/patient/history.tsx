@@ -80,7 +80,7 @@ export default function HistoryScreen() {
             accessibilityLabel="Kembali"
             className="p-1 -ml-1"
           >
-            <ArrowLeft size={22} className="text-primary-foreground" />
+            <ArrowLeft size={22} color="#FFFFFF" />
           </Pressable>
           <Heading level={1} size="lg" bold className="text-primary-foreground">
             Riwayat konsultasi

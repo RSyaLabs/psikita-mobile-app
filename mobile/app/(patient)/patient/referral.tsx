@@ -72,7 +72,7 @@ export default function ReferralScreen() {
             accessibilityRole="button"
             accessibilityLabel="Kembali"
           >
-            <ArrowLeft size={20} className="text-primary-foreground" />
+            <ArrowLeft size={22} color="#FFFFFF" />
           </Pressable>
           <Heading size="md" bold className="text-primary-foreground">
             Rujukan rumah sakit

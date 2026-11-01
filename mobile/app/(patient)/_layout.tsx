@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import {
   Stack,
-  useLocalSearchParams,
+  useGlobalSearchParams,
   useRouter,
   useSegments,
 } from "expo-router";
@@ -13,12 +13,14 @@ import { ROUTES } from "@/constants/routes";
 export default function PatientLayout() {
   const router = useRouter();
   const segments = useSegments();
-  const { guest } = useLocalSearchParams<{ guest?: string }>();
+  const { guest, preview } = useGlobalSearchParams<{ guest?: string; preview?: string }>();
   const { status, user, hasRole, homeRoute } = useAuth();
   const leafSegment = segments[segments.length - 1];
+  const isDevPreview = __DEV__ && preview === "true";
   const isPublicGuestRoute =
-    guest === "true" &&
-    (leafSegment === "triage" || leafSegment === "assessment-result");
+    isDevPreview ||
+    (guest === "true" &&
+      (leafSegment === "triage" || leafSegment === "assessment-result"));
   const redirectRoute = isPublicGuestRoute
     ? null
     : status === "loading"

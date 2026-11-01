@@ -89,15 +89,15 @@ export default function CommunityFeedScreen() {
           }}
           className="w-10 h-10 rounded-full bg-card border border-border items-center justify-center active:bg-muted"
         >
-          <ChevronLeft size={20} className="text-foreground" />
+          <ChevronLeft size={22} color="#262130" />
         </Pressable>
         <VStack space="xs" className="items-center">
           <Heading size="sm" bold className="text-foreground">
             Ruang Cerita & Komunitas
           </Heading>
           <HStack space="xs" className="items-center">
-            <Shield size={11} className="text-secondary" />
-            <Text size="xs" className="text-[10px] text-secondary font-bold">
+            <Shield size={14} color="#4A3B6B" />
+            <Text size="xs" className="text-xs text-primary font-bold">
               Ruang Aman & Terjaga
             </Text>
           </HStack>
@@ -109,14 +109,14 @@ export default function CommunityFeedScreen() {
             haptics.medium();
             setShowCreateModal(true);
           }}
-          className="w-10 h-10 rounded-full bg-secondary items-center justify-center active:opacity-80"
+          className="w-10 h-10 rounded-full bg-primary items-center justify-center active:opacity-80"
         >
-          <Plus size={20} className="text-white" />
+          <Plus size={22} color="#FFFFFF" />
         </Pressable>
       </HStack>
 
       {/* Category Filter Chips */}
-      <Box className="bg-card border-b border-border/50 px-4 py-2">
+      <Box className="bg-card border-b border-border/50 px-4 py-2.5">
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           <HStack space="xs">
             {CATEGORIES.map((cat) => {
@@ -128,14 +128,14 @@ export default function CommunityFeedScreen() {
                     haptics.selection();
                     setSelectedCategory(cat);
                   }}
-                  className={`px-3 py-1.5 rounded-full border ${
-                    isSelected ? "bg-secondary border-secondary" : "bg-card border-border"
+                  className={`px-4 py-2 rounded-full border ${
+                    isSelected ? "bg-primary border-primary" : "bg-card border-border"
                   }`}
                 >
                   <Text
-                    size="xs"
-                    className={`font-semibold text-[11px] ${
-                      isSelected ? "text-secondary-foreground" : "text-muted-foreground"
+                    size="sm"
+                    className={`text-sm ${
+                      isSelected ? "text-primary-foreground font-bold" : "text-foreground font-semibold"
                     }`}
                   >
                     {cat}
@@ -201,39 +201,39 @@ export default function CommunityFeedScreen() {
               >
                 <HStack space="xs" className="items-center justify-between mb-2">
                   <HStack space="xs" className="items-center">
-                    <Box className="w-7 h-7 rounded-full bg-muted items-center justify-center">
-                      <User size={14} className="text-muted-foreground" />
+                    <Box className="w-8 h-8 rounded-full bg-muted items-center justify-center">
+                      <User size={16} color="#4B4656" />
                     </Box>
-                    <Text size="xs" bold className="text-foreground text-[11px]">
+                    <Text size="sm" bold className="text-foreground font-bold">
                       {post.isAnonymous ? "Sahabat SeraPhany" : post.authorName ?? "Pengguna"}
                     </Text>
                   </HStack>
                   {post.category && (
-                    <Badge variant="outline" action="muted" className="rounded-md px-2 py-0.5">
-                      <BadgeText className="text-[10px] font-semibold text-secondary">
+                    <Badge variant="outline" action="muted" className="rounded-full px-2.5 py-0.5 border-primary/30 bg-primary/5">
+                      <BadgeText className="text-xs font-bold text-primary">
                         {post.category}
                       </BadgeText>
                     </Badge>
                   )}
                 </HStack>
 
-                <Heading size="xs" bold className="text-foreground mb-1">
+                <Heading size="sm" bold className="text-foreground mb-1">
                   {post.title}
                 </Heading>
-                <Text size="xs" className="text-muted-foreground line-clamp-3 leading-relaxed">
+                <Text size="sm" className="text-muted-foreground line-clamp-3 leading-relaxed">
                   {post.content}
                 </Text>
 
                 <HStack space="lg" className="items-center mt-3 pt-2.5 border-t border-border/50">
                   <HStack space="xs" className="items-center">
-                    <Heart size={14} className="text-muted-foreground" />
-                    <Text size="xs" className="text-[11px] text-muted-foreground font-medium">
+                    <Heart size={16} color="#4B4656" />
+                    <Text size="sm" className="text-sm text-muted-foreground font-medium">
                       {post.likesCount ?? 0} Dukungan
                     </Text>
                   </HStack>
                   <HStack space="xs" className="items-center">
-                    <MessageSquare size={14} className="text-muted-foreground" />
-                    <Text size="xs" className="text-[11px] text-muted-foreground font-medium">
+                    <MessageSquare size={16} color="#4B4656" />
+                    <Text size="sm" className="text-sm text-muted-foreground font-medium">
                       {post.repliesCount ?? 0} Balasan
                     </Text>
                   </HStack>
@@ -254,36 +254,36 @@ export default function CommunityFeedScreen() {
                 Bagikan Cerita Anda
               </Heading>
               <Pressable onPress={() => setShowCreateModal(false)} className="p-1">
-                <X size={18} className="text-muted-foreground" />
+                <X size={20} color="#262130" />
               </Pressable>
             </HStack>
           </ModalHeader>
           <ModalBody className="pt-3 pb-2 gap-3">
             <VStack space="xs">
-              <Text size="xs" bold className="text-foreground text-[11px]">
+              <Text size="sm" bold className="text-foreground font-semibold">
                 Judul Cerita
               </Text>
-              <Input className="h-10 bg-muted rounded-xl border-border px-3">
+              <Input className="h-11 bg-muted rounded-xl border-border px-3">
                 <InputField
                   value={newTitle}
                   onChangeText={setNewTitle}
                   placeholder="Misal: Caraku menghadapi panic attack hari ini"
-                  className="text-xs text-foreground"
+                  className="text-sm text-foreground"
                 />
               </Input>
             </VStack>
 
             <VStack space="xs">
-              <Text size="xs" bold className="text-foreground text-[11px]">
+              <Text size="sm" bold className="text-foreground font-semibold">
                 Isi Cerita / Pengalaman
               </Text>
-              <Input className="h-24 bg-muted rounded-xl border-border px-3 py-2 items-start">
+              <Input className="h-28 bg-muted rounded-xl border-border px-3 py-2 items-start">
                 <InputField
                   value={newContent}
                   onChangeText={setNewContent}
                   multiline
                   placeholder="Tuliskan pengalaman atau pertanyaanmu dengan nyaman..."
-                  className="text-xs text-foreground h-full text-top"
+                  className="text-sm text-foreground h-full text-top"
                 />
               </Input>
             </VStack>
@@ -292,22 +292,22 @@ export default function CommunityFeedScreen() {
               onPress={() => setIsAnonymous(!isAnonymous)}
               className="flex-row items-center gap-2 pt-1"
             >
-              <Box className={`w-4 h-4 rounded border ${isAnonymous ? "bg-secondary border-secondary" : "border-border"}`} />
-              <Text size="xs" className="text-muted-foreground text-[11px]">
+              <Box className={`w-5 h-5 rounded border ${isAnonymous ? "bg-primary border-primary" : "border-border"}`} />
+              <Text size="sm" className="text-muted-foreground font-medium">
                 Posting sebagai anonim ("Sahabat SeraPhany")
               </Text>
             </Pressable>
           </ModalBody>
           <ModalFooter className="pt-2">
             <Button
-              size="sm"
+              size="lg"
               isDisabled={createPostMutation.isPending}
               onPress={handleCreatePost}
-              className="w-full bg-secondary rounded-xl h-11"
+              className="w-full bg-primary rounded-2xl h-12"
             >
               <HStack space="xs" className="items-center justify-center">
-                <Send size={14} className="text-white" />
-                <ButtonText className="text-xs font-bold text-white">
+                <Send size={18} color="#FFFFFF" />
+                <ButtonText className="text-base font-bold text-white">
                   {createPostMutation.isPending ? "Mengirimkan Cerita..." : "Terbitkan Cerita"}
                 </ButtonText>
               </HStack>

@@ -83,7 +83,7 @@ export default function VideoCallScreen() {
             accessibilityRole="button"
             accessibilityLabel="Kembali ke chat"
           >
-            <ArrowLeft size={18} className="text-primary-foreground" />
+            <ArrowLeft size={22} color="#FFFFFF" />
           </Pressable>
           <Box className="w-2.5 h-2.5 rounded-full bg-secondary" />
           <VStack space="xs">

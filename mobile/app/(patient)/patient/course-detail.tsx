@@ -59,7 +59,7 @@ export default function CourseDetailScreen() {
           }}
           className="w-10 h-10 rounded-full bg-card border border-border items-center justify-center active:bg-muted"
         >
-          <ChevronLeft size={20} className="text-foreground" />
+          <ChevronLeft size={22} color="#262130" />
         </Pressable>
         <Heading size="sm" bold className="text-foreground">
           Detail Materi Kelas
@@ -97,8 +97,8 @@ export default function CourseDetailScreen() {
           {/* Course Hero Info */}
           <Box className="bg-primary rounded-3xl p-5 mb-4 relative overflow-hidden">
             {course.topic && (
-              <Badge variant="solid" action="success" className="self-start rounded-full px-2.5 py-0.5 mb-2">
-                <BadgeText className="text-[10px] font-bold text-white uppercase tracking-wider">
+              <Badge variant="solid" action="primary" className="self-start rounded-full px-3 py-1 mb-2 bg-white/20">
+                <BadgeText className="text-xs font-bold text-white uppercase tracking-wider">
                   {course.topic}
                 </BadgeText>
               </Badge>
@@ -106,19 +106,19 @@ export default function CourseDetailScreen() {
             <Heading size="md" bold className="text-primary-foreground">
               {course.title}
             </Heading>
-            <Text size="xs" className="text-primary-foreground/80 mt-1.5 leading-relaxed">
+            <Text size="sm" className="text-primary-foreground/90 mt-1.5 leading-relaxed font-normal">
               {course.description}
             </Text>
             <HStack space="md" className="items-center mt-4 pt-3 border-t border-primary-foreground/20">
               <HStack space="xs" className="items-center">
-                <Clock size={13} className="text-primary-foreground/90" />
-                <Text size="xs" className="text-primary-foreground/90 text-[11px] font-semibold">
+                <Clock size={16} color="#FFFFFF" />
+                <Text size="sm" className="text-primary-foreground text-sm font-semibold">
                   {course.estimatedMinutes ?? 15} Menit
                 </Text>
               </HStack>
               <HStack space="xs" className="items-center">
-                <Award size={13} className="text-primary-foreground/90" />
-                <Text size="xs" className="text-primary-foreground/90 text-[11px] font-semibold">
+                <Award size={16} color="#FFFFFF" />
+                <Text size="sm" className="text-primary-foreground text-sm font-semibold">
                   {chapters.length} Bab • {allLessons.length} Modul
                 </Text>
               </HStack>
@@ -130,29 +130,29 @@ export default function CourseDetailScreen() {
             <Card className="bg-card rounded-2xl p-4 border border-border mb-4">
               <HStack space="xs" className="items-center justify-between mb-2 pb-2 border-b border-border/50">
                 <HStack space="xs" className="items-center">
-                  <PlayCircle size={16} className="text-secondary" />
-                  <Text size="xs" bold className="text-foreground">
+                  <PlayCircle size={18} color="#4A3B6B" />
+                  <Text size="sm" bold className="text-foreground font-bold">
                     Modul Aktif: {currentLesson.title}
                   </Text>
                 </HStack>
                 {currentLesson.durationMinutes && (
-                  <Text size="xs" className="text-muted-foreground text-[11px]">
+                  <Text size="sm" className="text-muted-foreground font-medium">
                     {currentLesson.durationMinutes} mnt
                   </Text>
                 )}
               </HStack>
-              <Text size="xs" className="text-foreground leading-relaxed my-2">
+              <Text size="sm" className="text-foreground leading-relaxed my-2 font-normal">
                 {currentLesson.content || "Pelajari panduan langkah demi langkah dari psikolog klinis SeraPhany untuk menerapkan strategi koping yang sehat dalam kehidupan harian Anda."}
               </Text>
               <Button
-                size="sm"
+                size="md"
                 isDisabled={completeLessonMutation.isPending}
                 onPress={handleCompleteCurrentLesson}
-                className="mt-3 bg-secondary rounded-xl"
+                className="mt-3 bg-primary rounded-2xl h-11"
               >
                 <HStack space="xs" className="items-center">
-                  <CheckCircle2 size={14} className="text-white" />
-                  <ButtonText className="text-xs font-bold text-white">
+                  <CheckCircle2 size={16} color="#FFFFFF" />
+                  <ButtonText className="text-sm font-bold text-white">
                     {completeLessonMutation.isPending ? "Menyimpan Progres..." : "Tandai Modul Selesai"}
                   </ButtonText>
                 </HStack>
@@ -161,16 +161,16 @@ export default function CourseDetailScreen() {
           )}
 
           {/* Syllabus Chapters & Lessons List */}
-          <Heading size="xs" bold className="text-foreground px-1 mb-2">
+          <Heading size="sm" bold className="text-foreground px-1 mb-2">
             Silabus Pembelajaran
           </Heading>
           <VStack space="sm">
             {chapters.map((chapter, cIdx) => (
               <Card key={chapter.id} className="bg-card rounded-2xl p-4 border border-border">
-                <Text size="xs" bold className="text-secondary uppercase tracking-wider text-[10px] mb-1">
+                <Text size="xs" bold className="text-primary uppercase tracking-wider text-xs mb-1 font-bold">
                   Bab {cIdx + 1}
                 </Text>
-                <Heading size="xs" bold className="text-foreground mb-2">
+                <Heading size="sm" bold className="text-foreground mb-2">
                   {chapter.title}
                 </Heading>
                 <VStack space="xs" className="mt-1">
@@ -183,25 +183,25 @@ export default function CourseDetailScreen() {
                           haptics.selection();
                           setActiveLessonId(lesson.id);
                         }}
-                        className={`p-2.5 rounded-xl flex-row items-center justify-between border ${
+                        className={`p-3 rounded-xl flex-row items-center justify-between border ${
                           isSelected
-                            ? "bg-muted border-secondary"
+                            ? "bg-muted border-primary"
                             : "bg-background border-border"
                         }`}
                       >
                         <HStack space="xs" className="items-center flex-1 pr-2">
-                          <BookOpen size={14} className={isSelected ? "text-secondary" : "text-muted-foreground"} />
+                          <BookOpen size={16} color={isSelected ? "#4A3B6B" : "#4B4656"} />
                           <Text
-                            size="xs"
-                            className={`font-medium text-[11px] ${
-                              isSelected ? "text-foreground font-bold" : "text-muted-foreground"
+                            size="sm"
+                            className={`font-medium text-sm ${
+                              isSelected ? "text-primary font-bold" : "text-foreground"
                             }`}
                           >
                             {lIdx + 1}. {lesson.title}
                           </Text>
                         </HStack>
                         {lesson.isCompleted && (
-                          <CheckCircle2 size={14} className="text-green-600" />
+                          <CheckCircle2 size={16} color="#4A3B6B" />
                         )}
                       </Pressable>
                     );

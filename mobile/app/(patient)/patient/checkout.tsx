@@ -128,7 +128,7 @@ export default function CheckoutScreen() {
             onPress={() => safeNavigateBack(router, ROUTES.PATIENT.DOCTORS)}
             className="p-1 -ml-1"
           >
-            <ArrowLeft size={20} className="text-foreground" />
+            <ArrowLeft size={22} color="#262130" />
           </Pressable>
           <VStack space="xs">
             <Text size="sm" bold className="text-foreground">

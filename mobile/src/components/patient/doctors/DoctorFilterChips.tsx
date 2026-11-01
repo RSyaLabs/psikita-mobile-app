@@ -32,18 +32,18 @@ export function DoctorFilterChips({
               }}
               accessibilityRole="button"
               accessibilityLabel={`Filter ${filter}`}
-              className={`px-3.5 py-1.5 rounded-full border ${
+              className={`px-4 py-2 rounded-full border ${
                 isSelected
                   ? "bg-primary border-primary"
                   : "bg-card border-border"
               }`}
             >
               <Text
-                size="xs"
-                className={`font-semibold text-[11px] ${
+                size="sm"
+                className={`text-sm ${
                   isSelected
                     ? "text-primary-foreground font-bold"
-                    : "text-muted-foreground"
+                    : "text-foreground font-semibold"
                 }`}
               >
                 {filter}

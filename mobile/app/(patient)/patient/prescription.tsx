@@ -55,7 +55,7 @@ export default function PrescriptionScreen() {
             accessibilityLabel="Kembali"
             className="p-1 -ml-1 active:opacity-70"
           >
-            <ArrowLeft size={20} className="text-primary-foreground" />
+            <ArrowLeft size={22} color="#FFFFFF" />
           </Pressable>
           <Heading size="md" bold className="text-primary-foreground">
             Resep digital

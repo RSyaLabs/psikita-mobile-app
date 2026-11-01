@@ -30,9 +30,16 @@ import {
   ModalBody,
 } from "@/components/ui";
 import { useLogin } from "@/hooks/useApiQueries";
-import { getHomeRouteForResponse } from "@/hooks/useAuth";
+import { getHomeRouteForResponse, useAuth } from "@/hooks/useAuth";
+import { ROUTES } from "@/constants/routes";
 import { haptics } from "@/utils/haptics";
 import { ForgotPasswordView } from "./ForgotPasswordView";
+
+const DEV_PATIENT_TOKEN =
+  "header.eyJzdWIiOiAiMDFNMzRNUVozMEtOREg0UEFLTVM5UjNESEgiLCAic2lkIjogIjAxTTNETjBOV1RTMlg0MFJNUVhQV00zWlFCIiwgImVtYWlsIjogInNpdGkucmFoYXl1QHNlcmFwaGFueS5pZCIsICJyb2xlIjogIlVTRVIiLCAiaXNBY3RpdmUiOiB0cnVlLCAiaWF0IjogMTcwMDAwMDAwMCwgImV4cCI6IDIwMDAwMDAwMDB9.signature";
+
+const DEV_PRACTITIONER_TOKEN =
+  "header.eyJzdWIiOiAiMDFNMzRNUVozMFA1R0U3NTdEMzE3OFJCNFciLCAic2lkIjogIjAxTTNETjBQMFc0SFpYRUFYU0pEVkc1V0NOIiwgImVtYWlsIjogInJpbmEuYW1lbGlhQHNlcmFwaGFueS5pZCIsICJyb2xlIjogIlBTWUNIT0xPR0lTVCIsICJpc0FjdGl2ZSI6IHRydWUsICJpYXQiOiAxNzAwMDAwMDAwLCAiZXhwIjogMjAwMDAwMDAwMH0.signature";
 
 /**
  * Sign-in modal.
@@ -57,6 +64,7 @@ export function AuthLoginModal({
   onOpenRegister,
 }: AuthLoginModalProps) {
   const router = useRouter();
+  const { acceptSession } = useAuth();
   const [tab, setTab] = useState<"login" | "forgot_request" | "forgot_verify">(
     initialTab,
   );
@@ -69,25 +77,35 @@ export function AuthLoginModal({
   const loginMutation = useLogin();
   const isLoading = loginMutation.isPending;
 
+  const isMountedRef = React.useRef(true);
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
   useEffect(() => {
     setTab(initialTab);
-    if (initialErrorMsg !== undefined) {
+    if (initialErrorMsg !== undefined && isMountedRef.current) {
       setErrorMsg(initialErrorMsg);
     }
   }, [initialTab, initialErrorMsg, isOpen]);
 
   const handleClose = () => {
-    setErrorMsg(null);
+    if (isMountedRef.current) {
+      setErrorMsg(null);
+    }
     onClose();
   };
 
   const handleCredentialLogin = async () => {
     haptics.medium();
-    setErrorMsg(null);
+    if (isMountedRef.current) setErrorMsg(null);
 
     const normalizedUsername = username.trim();
     if (!normalizedUsername || !password) {
-      setErrorMsg("Masukkan username/email dan kata sandi.");
+      if (isMountedRef.current) setErrorMsg("Masukkan username/email dan kata sandi.");
       return;
     }
 
@@ -99,7 +117,7 @@ export function AuthLoginModal({
       const homeRoute = getHomeRouteForResponse(res);
       if (!homeRoute) {
         haptics.error();
-        setErrorMsg("Respons login tidak valid. Silakan coba lagi.");
+        if (isMountedRef.current) setErrorMsg("Respons login tidak valid. Silakan coba lagi.");
         return;
       }
       haptics.success();
@@ -107,7 +125,18 @@ export function AuthLoginModal({
       router.replace(homeRoute as any);
     } catch (err: any) {
       haptics.error();
-      setErrorMsg(err?.message || "Login gagal. Cek username dan sandi.");
+      if (isMountedRef.current) setErrorMsg(err?.message || "Login gagal. Cek username dan sandi.");
+    }
+  };
+
+  const handleDevLogin = (devToken: string, targetRoute: string) => {
+    try {
+      haptics.success();
+      handleClose();
+      acceptSession({ accessToken: devToken });
+      router.replace(targetRoute as any);
+    } catch (e: any) {
+      if (isMountedRef.current) setErrorMsg(e?.message || "Dev login failed");
     }
   };
 
@@ -139,14 +168,14 @@ export function AuthLoginModal({
                   hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                   className="p-1.5 -ml-1 mr-1 rounded-full active:bg-muted"
                 >
-                  <ArrowLeft size={18} className="text-foreground" />
+                  <ArrowLeft size={18} color="#262130" />
                 </Pressable>
               )}
               <Box className="w-7 h-7 bg-primary/10 rounded-xl items-center justify-center mr-1">
                 {tab === "login" ? (
-                  <Lock size={14} className="text-primary" />
+                  <Lock size={14} color="#4A3B6B" />
                 ) : (
-                  <KeyRound size={14} className="text-primary" />
+                  <KeyRound size={14} color="#4A3B6B" />
                 )}
               </Box>
               {/* Truncation is platform-specific, and isTruncated is NOT the mechanism
@@ -182,7 +211,7 @@ export function AuthLoginModal({
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               className="p-1 rounded-full active:bg-muted"
             >
-              <X size={18} className="text-muted-foreground" />
+              <X size={20} color="#4B4656" />
             </Pressable>
           </HStack>
         </ModalHeader>
@@ -196,7 +225,7 @@ export function AuthLoginModal({
                 isInvalid={Boolean(errorMsg)}
               >
                 <FormControlLabel htmlFor="login-username-input">
-                  <FormControlLabelText className="text-xs font-bold text-foreground">
+                  <FormControlLabelText className="text-sm font-bold text-foreground">
                     Username / Email
                   </FormControlLabelText>
                 </FormControlLabel>
@@ -210,6 +239,7 @@ export function AuthLoginModal({
                     onChangeText={setUsername}
                     placeholder="username atau email"
                     autoCapitalize="none"
+                    className="text-sm font-medium text-foreground"
                   />
                 </Input>
                 {errorMsg && (
@@ -229,7 +259,7 @@ export function AuthLoginModal({
                     space="xs"
                     className="w-full items-center justify-between"
                   >
-                    <FormControlLabelText className="text-xs font-bold text-foreground">
+                    <FormControlLabelText className="text-sm font-bold text-foreground">
                       Kata Sandi
                     </FormControlLabelText>
                     <Pressable
@@ -243,8 +273,8 @@ export function AuthLoginModal({
                       accessibilityLabel="Lupa kata sandi"
                     >
                       <Text
-                        size="xs"
-                        className="text-secondary font-semibold text-[11px]"
+                        size="sm"
+                        className="text-primary font-semibold text-sm"
                       >
                         Lupa kata sandi?
                       </Text>
@@ -261,6 +291,7 @@ export function AuthLoginModal({
                     onChangeText={setPassword}
                     placeholder="••••••••"
                     secureTextEntry
+                    className="text-sm font-medium text-foreground"
                   />
                 </Input>
                 {errorMsg && (
@@ -277,9 +308,9 @@ export function AuthLoginModal({
                 size="default"
                 isDisabled={isLoading}
                 onPress={handleCredentialLogin}
-                className="w-full h-11 rounded-xl bg-primary active:opacity-90 mt-1"
+                className="w-full h-12 rounded-xl bg-primary active:opacity-90 mt-1"
               >
-                <ButtonText className="text-primary-foreground font-bold text-sm">
+                <ButtonText className="text-primary-foreground font-bold text-base">
                   {isLoading ? "Memverifikasi..." : "Masuk Sekarang"}
                 </ButtonText>
               </Button>
@@ -287,9 +318,9 @@ export function AuthLoginModal({
               {onOpenRegister && (
                 <HStack
                   space="xs"
-                  className="items-center justify-center pt-2 border-t border-border/40 mt-1"
+                  className="items-center justify-center pt-2.5 border-t border-border/40 mt-1"
                 >
-                  <Text size="xs" className="text-muted-foreground text-xs">
+                  <Text size="sm" className="text-muted-foreground text-sm font-medium">
                     Belum punya akun?
                   </Text>
                   <Pressable
@@ -299,11 +330,48 @@ export function AuthLoginModal({
                       onOpenRegister();
                     }}
                   >
-                    <Text size="xs" bold className="text-primary underline">
+                    <Text size="sm" bold className="text-primary underline font-bold">
                       Daftar Pasien Baru
                     </Text>
                   </Pressable>
                 </HStack>
+              )}
+
+              {__DEV__ && (
+                <VStack space="xs" className="pt-2.5 border-t border-border/40 mt-1.5">
+                  <Text size="xs" className="text-muted-foreground text-xs text-center font-bold tracking-wider uppercase">
+                    Akses Cepat Pengujian (Dev Only)
+                  </Text>
+                  <HStack space="xs" className="w-full">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onPress={() =>
+                        handleDevLogin(DEV_PATIENT_TOKEN, ROUTES.PATIENT.DASHBOARD)
+                      }
+                      className="flex-1 rounded-xl border-primary/50 bg-primary/10 h-9"
+                    >
+                      <ButtonText className="text-primary text-xs font-bold">
+                        Masuk Pasien
+                      </ButtonText>
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onPress={() =>
+                        handleDevLogin(
+                          DEV_PRACTITIONER_TOKEN,
+                          ROUTES.PRACTITIONER.DASHBOARD,
+                        )
+                      }
+                      className="flex-1 rounded-xl border-primary/50 bg-primary/10 h-9"
+                    >
+                      <ButtonText className="text-primary text-xs font-bold">
+                        Masuk Praktisi
+                      </ButtonText>
+                    </Button>
+                  </HStack>
+                </VStack>
               )}
             </VStack>
           ) : (

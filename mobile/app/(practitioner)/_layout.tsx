@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Stack, useRouter, useSegments } from "expo-router";
+import { Stack, useGlobalSearchParams, useRouter, useSegments } from "expo-router";
 import { colors } from "@/theme/colors";
 import { AuthLoadingState } from "@/providers/AuthProvider";
 import { useAuth } from "@/hooks/useAuth";
@@ -9,7 +9,10 @@ export default function PractitionerLayout() {
   const router = useRouter();
   const segments = useSegments();
   const { status, user, hasRole, homeRoute } = useAuth();
-  const isPublicRegistration = segments[segments.length - 1] === "register";
+  const { preview } = useGlobalSearchParams<{ preview?: string }>();
+  const isDevPreview = __DEV__ && preview === "true";
+  const isPublicRegistration =
+    segments[segments.length - 1] === "register" || isDevPreview;
   const redirectRoute = isPublicRegistration
     ? null
     : status === "loading"

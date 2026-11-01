@@ -164,7 +164,7 @@ export default function PaymentRegularScreen() {
           accessibilityLabel="Kembali ke checkout"
           className="p-1 -ml-1"
         >
-          <ArrowLeft size={20} className="text-foreground" />
+          <ArrowLeft size={22} color="#262130" />
         </Pressable>
         <Heading level={1} size="md" bold className="text-foreground">
           Pembayaran

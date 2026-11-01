@@ -47,7 +47,7 @@ export default function FollowUpsScreen() {
           }}
           className="w-10 h-10 rounded-full bg-card border border-border items-center justify-center active:bg-muted"
         >
-          <ChevronLeft size={20} className="text-foreground" />
+          <ChevronLeft size={22} color="#262130" />
         </Pressable>
         <Heading size="sm" bold className="text-foreground">
           Sesi Kontrol & Lanjutan
@@ -61,12 +61,12 @@ export default function FollowUpsScreen() {
       >
         <Box className="bg-primary/10 rounded-2xl p-4 border border-primary/20 mb-4">
           <HStack space="xs" className="items-center mb-1">
-            <CheckCircle2 size={16} className="text-secondary" />
-            <Text size="xs" bold className="text-foreground">
+            <CheckCircle2 size={18} color="#4A3B6B" />
+            <Text size="sm" bold className="text-foreground font-bold">
               Pemantauan Klinis Berkelanjutan
             </Text>
           </HStack>
-          <Text size="xs" className="text-muted-foreground leading-relaxed">
+          <Text size="sm" className="text-muted-foreground leading-relaxed">
             Daftar sesi kontrol yang direkomendasikan oleh psikolog untuk memantau progres terapi dan evaluasi kondisi mental Anda secara rutin.
           </Text>
         </Box>
@@ -104,42 +104,42 @@ export default function FollowUpsScreen() {
                     action={fu.status === "SCHEDULED" ? "success" : "warning"}
                     className="rounded-full px-2.5 py-0.5"
                   >
-                    <BadgeText className="text-[10px] font-bold text-white uppercase">
+                    <BadgeText className="text-xs font-bold text-white uppercase">
                       {fu.status === "SCHEDULED" ? "Terjadwal" : "Menunggu Booking"}
                     </BadgeText>
                   </Badge>
-                  <Text size="xs" className="text-muted-foreground text-[11px]">
+                  <Text size="sm" className="text-muted-foreground font-medium">
                     Interval: {fu.recommendedIntervalDays} hari
                   </Text>
                 </HStack>
 
-                <Heading size="xs" bold className="text-foreground mb-1">
+                <Heading size="sm" bold className="text-foreground mb-1">
                   {fu.reason || "Evaluasi Pemulihan & Rencana Terapi"}
                 </Heading>
 
                 {fu.notes && (
-                  <Text size="xs" className="text-muted-foreground mt-1 mb-2">
+                  <Text size="sm" className="text-muted-foreground mt-1 mb-2 font-normal">
                     Catatan dokter: {fu.notes}
                   </Text>
                 )}
 
                 <HStack space="sm" className="items-center justify-between mt-3 pt-3 border-t border-border/50">
                   <HStack space="xs" className="items-center">
-                    <User size={14} className="text-muted-foreground" />
-                    <Text size="xs" className="text-[11px] text-muted-foreground">
+                    <User size={16} color="#4B4656" />
+                    <Text size="sm" className="text-sm text-muted-foreground font-medium">
                       {fu.practitionerName ?? "Psikolog SeraPhany"}
                     </Text>
                   </HStack>
                   {fu.status !== "SCHEDULED" && (
                     <Button
-                      size="xs"
+                      size="sm"
                       onPress={() => {
                         haptics.medium();
                         router.push(ROUTES.PATIENT.DOCTORS);
                       }}
-                      className="bg-secondary px-3 py-1.5 rounded-xl h-auto"
+                      className="bg-primary px-4 py-2 rounded-xl h-auto"
                     >
-                      <ButtonText className="text-[11px] font-bold text-white">
+                      <ButtonText className="text-sm font-bold text-white">
                         Pilih Jadwal
                       </ButtonText>
                     </Button>

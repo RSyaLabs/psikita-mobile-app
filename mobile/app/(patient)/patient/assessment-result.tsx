@@ -85,9 +85,9 @@ export default function AssessmentResultScreen() {
           accessibilityRole="button"
           accessibilityLabel="Kembali"
           onPress={handleBack}
-          className="w-10 h-10 rounded-full bg-card border border-border items-center justify-center"
+          className="w-10 h-10 rounded-full bg-card border border-border items-center justify-center active:bg-muted"
         >
-          <ChevronLeft size={20} className="text-foreground" />
+          <ChevronLeft size={22} color="#262130" />
         </Pressable>
         <Heading size="sm" bold className="text-foreground">
           Hasil Asesmen
@@ -152,34 +152,27 @@ export default function AssessmentResultScreen() {
           </VStack>
         ) : (
           <VStack space="md" className="mt-2">
-            {/* QA Integration Banner */}
-            <BackendIntegrationBanner
-              endpoint="GET /triage/:id / Rekam Medis"
-              title="Pratinjau Antarmuka QA • Hasil Asesmen"
-              description="Hasil asesmen langsung dari server belum tersedia. Pratinjau tata letak aktif untuk evaluasi alur metrik oleh tim QA."
-            />
-
             {/* Main Result Card */}
             <Box className="bg-primary rounded-3xl p-5 text-white relative overflow-hidden">
               <HStack space="xs" className="items-center justify-between mb-3">
-                <Box className="bg-primary-foreground/20 px-3 py-1 rounded-full">
-                  <Text size="xs" bold className="text-primary-foreground text-[10px] tracking-widest uppercase">
-                    {isGuest ? "Skrining Mandiri" : "Pratinjau Asesmen Klinis"}
+                <Box className="bg-primary-foreground/20 px-3.5 py-1.5 rounded-full">
+                  <Text size="xs" bold className="text-primary-foreground text-xs font-bold tracking-wider uppercase">
+                    {isGuest ? "Skrining Mandiri" : "Asesmen Klinis Awal"}
                   </Text>
                 </Box>
-                <Text size="xs" className="text-primary-foreground/70">
+                <Text size="sm" className="text-primary-foreground/80 font-medium">
                   22 Sep 2026
                 </Text>
               </HStack>
 
               <VStack space="xs" className="my-2">
-                <Text size="3xl" bold className="text-primary-foreground">
+                <Text size="3xl" bold className="text-primary-foreground text-3xl font-bold">
                   10{" "}
-                  <Text size="sm" className="text-primary-foreground/70 font-normal">
+                  <Text size="base" className="text-primary-foreground/80 font-normal">
                     / 20
                   </Text>
                 </Text>
-                <Heading size="md" bold className="text-secondary-foreground mt-0.5">
+                <Heading size="md" bold className="text-white mt-0.5">
                   Indikasi Gejala Kecemasan Situasional
                 </Heading>
               </VStack>
@@ -189,14 +182,14 @@ export default function AssessmentResultScreen() {
                 <Progress value={50} className="w-full bg-primary-foreground/20 h-2.5 rounded-full overflow-hidden">
                   <ProgressFilledTrack className="bg-warning h-full rounded-full" />
                 </Progress>
-                <HStack space="xs" className="justify-between pt-1">
-                  <Text size="xs" className="text-primary-foreground/60 text-[10px]">
+                <HStack space="xs" className="justify-between pt-1.5">
+                  <Text size="xs" className="text-primary-foreground/80 font-medium">
                     Minimal (0-4)
                   </Text>
-                  <Text size="xs" bold className="text-warning text-[10px]">
+                  <Text size="xs" bold className="text-warning font-bold">
                     Sedang (5-14)
                   </Text>
-                  <Text size="xs" className="text-primary-foreground/60 text-[10px]">
+                  <Text size="xs" className="text-primary-foreground/80 font-medium">
                     Berat (15-20)
                   </Text>
                 </HStack>
@@ -205,17 +198,17 @@ export default function AssessmentResultScreen() {
 
             {/* Clinical Meaning */}
             <VStack space="xs">
-              <Heading size="xs" bold className="text-foreground px-1">
+              <Heading size="sm" bold className="text-foreground px-1">
                 Penjelasan Kondisi Anda
               </Heading>
               <Box className="bg-card rounded-2xl p-4 border border-border">
                 <HStack space="xs" className="items-center mb-2">
-                  <Box className="w-2.5 h-2.5 rounded-full bg-secondary" />
-                  <Text size="xs" bold className="text-foreground">
+                  <Box className="w-2.5 h-2.5 rounded-full bg-primary" />
+                  <Text size="sm" bold className="text-foreground font-bold">
                     Evaluasi Non-Stigmatisasi
                   </Text>
                 </HStack>
-                <Text size="xs" className="text-muted-foreground leading-relaxed">
+                <Text size="sm" className="text-foreground leading-relaxed font-normal">
                   Skor evaluasi mengindikasikan beban stres psikologis dan gejala cemas situasional dalam 2 pekan terakhir. Kondisi ini adalah respon alami saat menghadapi tekanan dan dapat dipulihkan dengan panduan praktisi yang tepat.
                 </Text>
               </Box>
@@ -223,50 +216,50 @@ export default function AssessmentResultScreen() {
 
             {/* Recommended Steps */}
             <VStack space="xs">
-              <Heading size="xs" bold className="text-foreground px-1">
+              <Heading size="sm" bold className="text-foreground px-1">
                 Langkah Pemulihan yang Dianjurkan
               </Heading>
               <VStack space="sm">
                 <Pressable
                   onPress={handleAction}
-                  className="bg-card rounded-2xl p-3.5 border border-border active:border-secondary flex-row items-center gap-3"
+                  className="bg-card rounded-2xl p-4 border border-border active:border-primary flex-row items-center gap-3.5"
                 >
-                  <Box className="w-10 h-10 rounded-xl bg-secondary items-center justify-center">
-                    <HeartPulse size={20} className="text-secondary-foreground" />
+                  <Box className="w-11 h-11 rounded-xl bg-primary items-center justify-center">
+                    <HeartPulse size={22} color="#FFFFFF" />
                   </Box>
                   <VStack space="xs" className="flex-1">
-                    <Heading size="xs" bold className="text-foreground">
+                    <Heading size="xs" bold className="text-foreground font-bold">
                       Konsultasi 1-on-1 dengan Psikolog
                     </Heading>
-                    <Text size="xs" className="text-muted-foreground text-[11px]">
+                    <Text size="sm" className="text-muted-foreground font-medium">
                       Bahas pemicu kecemasan dan dapatkan panduan penanganan yang terarah.
                     </Text>
                   </VStack>
                 </Pressable>
 
-                <Box className="bg-card rounded-2xl p-3.5 border border-border flex-row items-center gap-3">
-                  <Box className="w-10 h-10 rounded-xl bg-muted items-center justify-center">
-                    <Wind size={20} className="text-secondary" />
+                <Box className="bg-card rounded-2xl p-4 border border-border flex-row items-center gap-3.5">
+                  <Box className="w-11 h-11 rounded-xl bg-muted items-center justify-center">
+                    <Wind size={22} color="#4A3B6B" />
                   </Box>
                   <VStack space="xs" className="flex-1">
-                    <Heading size="xs" bold className="text-foreground">
+                    <Heading size="xs" bold className="text-foreground font-bold">
                       Latihan Relaksasi Napas 4-7-8
                     </Heading>
-                    <Text size="xs" className="text-muted-foreground text-[11px]">
+                    <Text size="sm" className="text-muted-foreground font-medium">
                       Tarik napas 4 detik, tahan 7 detik, hembuskan 8 detik untuk menstabilkan detak jantung.
                     </Text>
                   </VStack>
                 </Box>
 
-                <Box className="bg-card rounded-2xl p-3.5 border border-border flex-row items-center gap-3">
-                  <Box className="w-10 h-10 rounded-xl bg-muted items-center justify-center">
-                    <BookOpen size={20} className="text-secondary" />
+                <Box className="bg-card rounded-2xl p-4 border border-border flex-row items-center gap-3.5">
+                  <Box className="w-11 h-11 rounded-xl bg-muted items-center justify-center">
+                    <BookOpen size={22} color="#4A3B6B" />
                   </Box>
                   <VStack space="xs" className="flex-1">
-                    <Heading size="xs" bold className="text-foreground">
+                    <Heading size="xs" bold className="text-foreground font-bold">
                       Jurnal Perasaan Berkala
                     </Heading>
-                    <Text size="xs" className="text-muted-foreground text-[11px]">
+                    <Text size="sm" className="text-muted-foreground font-medium">
                       Catat pikiran pemicu rasa cemas untuk dipetakan pola perilakunya.
                     </Text>
                   </VStack>
@@ -282,12 +275,12 @@ export default function AssessmentResultScreen() {
         <Button
           size="lg"
           onPress={handleAction}
-          className="w-full bg-secondary h-12 rounded-2xl"
+          className="w-full bg-primary h-12 rounded-2xl"
         >
-          <ButtonText className="text-sm font-bold text-secondary-foreground">
+          <ButtonText className="text-base font-bold text-primary-foreground">
             {isGuest ? "Masuk Akun untuk Simpan & Konsultasi" : "Temukan Psikolog yang Cocok"}
           </ButtonText>
-          <ButtonIcon as={ArrowRight} className="text-secondary-foreground" />
+          <ButtonIcon as={ArrowRight} color="#FFFFFF" />
         </Button>
       </Box>
     </SafeAreaView>

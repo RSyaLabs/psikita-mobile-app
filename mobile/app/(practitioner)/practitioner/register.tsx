@@ -187,8 +187,8 @@ export default function PractitionerRegisterScreen() {
         <VStack space="xs" className="mb-5">
           <HStack space="xs" className="items-center justify-between">
             <Text
-              size="xs"
-              className="font-bold text-foreground tracking-wide uppercase text-[11px]"
+              size="sm"
+              className="font-bold text-foreground tracking-wide uppercase text-xs"
             >
               {step === 1
                 ? "Langkah 1/2 • Identitas & Profesi"
@@ -196,9 +196,9 @@ export default function PractitionerRegisterScreen() {
             </Text>
             <Badge
               variant="outline"
-              className="border-primary/30 bg-primary/5 px-2 py-0.5 rounded-full"
+              className="border-primary/30 bg-primary/5 px-2.5 py-0.5 rounded-full"
             >
-              <BadgeText className="text-[10px] font-bold text-primary">
+              <BadgeText className="text-xs font-bold text-primary">
                 {practitionerType === "PSYCHOLOGIST"
                   ? "Psikolog Klinis"
                   : "Dokter Psikiater"}

@@ -81,7 +81,7 @@ export default function MatchingScreen() {
             accessibilityLabel="Kembali ke dashboard"
             className="p-1 -ml-1 active:opacity-70"
           >
-            <ArrowLeft size={22} className="text-foreground" />
+            <ArrowLeft size={22} color="#262130" />
           </Pressable>
           <Heading size="xl" bold className="text-foreground">
             Pencocokan
