@@ -15,21 +15,21 @@ import { haptics } from "@/utils/haptics";
 export const CAROUSEL_SLIDES = [
   {
     id: "1",
-    title: "Lagi banyak pikiran?",
-    subtitle: "Ceritakan apa yang sedang kamu rasakan.",
+    title: "Temukan. Pahami. Sayangi diri.",
+    subtitle: "Ruang aman untuk bercerita bersama SeraPhany.",
     image:
       "https://images.unsplash.com/photo-1770108763069-1e5729f01b2f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3ODkwNzEwNDJ8&ixlib=rb-4.1.0&q=80&w=1080",
   },
   {
     id: "2",
-    title: "Konsultasi dengan psikolog.",
-    subtitle: "Bicara langsung dengan psikolog atau psikiater.",
+    title: "Konsultasi profesional privat.",
+    subtitle: "Bicara langsung dengan psikolog atau psikiater berlisensi.",
     image:
       "https://images.unsplash.com/photo-1573495804664-b1c0849525af?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
   },
   {
     id: "3",
-    title: "Dukungan BPJS Kesehatan.",
+    title: "Dukungan BPJS & Faskes.",
     subtitle: "Dapat digunakan dengan rujukan faskes pertama.",
     image:
       "https://images.unsplash.com/photo-1758691461990-03b49d969495?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",

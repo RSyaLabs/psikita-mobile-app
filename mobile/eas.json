@@ -3,10 +3,10 @@
     "production": {
       "distribution": "internal",
       "env": {
-        "EXPO_PUBLIC_API_BASE_URL": "https://api.psikita.id"
+        "EXPO_PUBLIC_API_BASE_URL": "https://api.seraphany.id"
       },
       "android": {
-        "package": "id.psikita.app"
+        "package": "id.seraphany.app"
       }
     },
     "staging": {
@@ -15,7 +15,7 @@
         "EXPO_PUBLIC_API_BASE_URL": "https://api.staging.seraphany.id/core"
       },
       "android": {
-        "package": "id.psikita.app",
+        "package": "id.seraphany.app",
         "buildType": "apk"
       }
     }

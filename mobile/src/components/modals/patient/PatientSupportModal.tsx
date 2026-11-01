@@ -81,7 +81,7 @@ export function PatientSupportModal({
         <ModalBody className="pt-3 pb-1">
           <VStack space="md">
             <Text size="xs" className="text-muted-foreground leading-relaxed">
-              Tim Care Navigator PsiKita siap membantu kendala teknis
+              Tim Care Navigator SeraPhany siap membantu kendala teknis
               konsultasi, pertanyaan resep digital, atau proses rujukan BPJS
               Anda.
             </Text>
@@ -110,7 +110,7 @@ export function PatientSupportModal({
                   </Text>
                 </HStack>
                 <Text size="xs" className="text-muted-foreground pl-6">
-                  halo@psikita.id
+                  halo@seraphany.id
                 </Text>
               </Box>
 

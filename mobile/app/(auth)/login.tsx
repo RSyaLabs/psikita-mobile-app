@@ -96,14 +96,14 @@ export default function LoginScreen() {
                   bold
                   className="text-foreground tracking-tight"
                 >
-                  PsiKita
+                  SeraPhany
                 </Heading>
               </HStack>
               <Text
                 size="xs"
                 className="text-muted-foreground font-medium pl-0.5"
               >
-                Layanan Konsultasi Kesehatan Mental
+                Ruang aman untuk bercerita
               </Text>
             </Box>
 
@@ -209,7 +209,7 @@ export default function LoginScreen() {
 
               <HStack space="xs" className="items-center pt-1">
                 <Text size="xs" className="text-muted-foreground font-medium">
-                  Tertarik praktik di PsiKita?
+                  Tertarik praktik di SeraPhany?
                 </Text>
                 <Pressable
                   onPress={() => {

@@ -58,7 +58,7 @@ export function CareTeamModal({ isOpen, onClose }: CareTeamModalProps) {
         <ModalBody className="pt-3 pb-1">
           <VStack space="md">
             <Text size="xs" className="text-muted-foreground leading-relaxed">
-              Tim Care Navigator PsiKita siap memandu proses administrasi di
+              Tim Care Navigator SeraPhany siap memandu proses administrasi di
               rumah sakit tujuan agar antrean dan klaim BPJS berjalan lancar.
             </Text>
 

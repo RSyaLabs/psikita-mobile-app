@@ -417,15 +417,15 @@ describe("web storage", () => {
 
     try {
       await webStorage.secureStorage.setItem(
-        "psikita_access_token",
+        "seraphany_access_token",
         "test-token",
       );
       await expect(
-        webStorage.secureStorage.getItem("psikita_access_token"),
+        webStorage.secureStorage.getItem("seraphany_access_token"),
       ).resolves.toBe("test-token");
-      await webStorage.secureStorage.removeItem("psikita_access_token");
+      await webStorage.secureStorage.removeItem("seraphany_access_token");
       await expect(
-        webStorage.secureStorage.getItem("psikita_access_token"),
+        webStorage.secureStorage.getItem("seraphany_access_token"),
       ).resolves.toBeNull();
       expect(localStorage.getItem).not.toHaveBeenCalled();
       expect(localStorage.setItem).not.toHaveBeenCalled();

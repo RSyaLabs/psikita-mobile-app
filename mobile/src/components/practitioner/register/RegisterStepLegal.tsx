@@ -233,7 +233,7 @@ export function RegisterStepLegal({
                 PENDING & INACTIVE
               </Text>
               . Praktisi belum dapat menerima pasien sampai NIK & STR lolos
-              verifikasi manual Tim Medis PsiKita.
+              verifikasi manual Tim Medis SeraPhany.
             </Text>
           </VStack>
         </HStack>

@@ -3,23 +3,23 @@
 @tailwind utilities;
 
 :root:root {
-  --primary: 30 51 34;
+  --primary: 107 91 149;
   --primary-foreground: 255 255 255;
-  --secondary: 45 107 63;
+  --secondary: 94 129 89;
   --secondary-foreground: 255 255 255;
-  --background: 237 242 237;
-  --foreground: 30 51 34;
+  --background: 248 247 238;
+  --foreground: 47 42 61;
   --card: 255 255 255;
   --popover: 255 255 255;
-  --popover-foreground: 30 51 34;
-  --muted: 228 239 229;
-  --muted-foreground: 96 111 96;
+  --popover-foreground: 47 42 61;
+  --muted: 241 235 250;
+  --muted-foreground: 98 94 110;
   --destructive: 207 36 36;
-  --border: 198 214 202;
-  --input: 198 214 202;
-  --ring: 45 107 63;
-  --accent: 228 239 229;
-  --accent-foreground: 30 51 34;
+  --border: 221 216 231;
+  --input: 221 216 231;
+  --ring: 107 91 149;
+  --accent: 216 201 240;
+  --accent-foreground: 47 42 61;
   --warning: 165 90 5;
   --warning-foreground: 255 255 255;
 }

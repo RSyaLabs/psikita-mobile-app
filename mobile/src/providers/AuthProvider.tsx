@@ -30,7 +30,7 @@ import {
 } from "@/hooks/useAuth";
 import type { TokenResponseDto } from "@/types/api";
 
-export const AUTH_USER_STORAGE_KEY = "psikita_auth_user";
+export const AUTH_USER_STORAGE_KEY = "seraphany_auth_user";
 export const AUTH_SESSION_VERSION = 1 as const;
 
 const persistedSessionSchema = z.object({

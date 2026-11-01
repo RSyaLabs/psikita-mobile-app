@@ -41,9 +41,14 @@ import {
 } from "node:http";
 
 const UPSTREAM =
+  process.env.SERAPHANY_PROXY_TARGET ??
   process.env.PSIKITA_PROXY_TARGET ??
-  "http://staging.psikita.muammarzaki.tech:3000";
-const PORT = Number(process.env.PSIKITA_PROXY_PORT ?? 4000);
+  "https://api.staging.seraphany.id/core";
+const PORT = Number(
+  process.env.SERAPHANY_PROXY_PORT ??
+  process.env.PSIKITA_PROXY_PORT ??
+  4000,
+);
 const HOST = "127.0.0.1";
 
 /** Hop-by-hop and length headers that must not be copied between the two hops. */

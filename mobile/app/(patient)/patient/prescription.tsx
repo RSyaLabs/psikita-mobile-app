@@ -162,7 +162,7 @@ export default function PrescriptionScreen() {
                       size="xs"
                       className="text-primary-foreground/70 text-[11px]"
                     >
-                      Berlaku di RS dan apotek rekanan PsiKita
+                      Berlaku di RS dan apotek rekanan SeraPhany
                     </Text>
                   </VStack>
                 </HStack>

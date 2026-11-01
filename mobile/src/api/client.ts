@@ -1,5 +1,5 @@
 /**
- * PsiKita Core API — Universal Fetch Client
+ * SeraPhany Core API — Universal Fetch Client
  * Mendukung autentikasi Bearer token, timeout, error handling, dan health check
  */
 
@@ -19,7 +19,7 @@ export type { ResponseAdapter } from "./response";
 export const API_BASE_URL =
   process.env.EXPO_PUBLIC_API_BASE_URL || "http://localhost:3000";
 
-const TOKEN_KEY = "psikita_access_token";
+const TOKEN_KEY = "seraphany_access_token";
 let currentAccessToken: string | null = null;
 let tokenEpoch = 0;
 let authContextEpoch = 0;

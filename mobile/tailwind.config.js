@@ -63,6 +63,18 @@ module.exports = {
         },
         divider: "rgb(var(--border) / <alpha-value>)",
         chip: "rgb(var(--muted) / <alpha-value>)",
+        sera: {
+          purple: "#6b5b95",
+          cream: "#f8f7ee",
+          ink: "#2f2a3d",
+          muted: "#625e6e",
+          line: "#ddd8e7",
+          sage: "#a7c4a0",
+          "sage-deep": "#5e8159",
+          "sage-mist": "#e7efe3",
+          lavender: "#d8c9f0",
+          "lavender-mist": "#f1ebfa",
+        },
       },
       fontFamily: {
         sans: ["System", "Inter", "sans-serif"],

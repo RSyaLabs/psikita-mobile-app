@@ -1,10 +1,10 @@
-appId: com.psikita.mobile
+appId: id.seraphany.app
 ---
 - launchApp:
     clearState: true
 
 # 1. Onboarding & Authentication Flow
-- assertVisible: "PsiKita"
+- assertVisible: "SeraPhany"
 - assertVisible: "Layanan Konsultasi Kesehatan Mental"
 - tapOn:
     text: "Masuk dengan Akun"

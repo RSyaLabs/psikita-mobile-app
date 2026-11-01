@@ -56,7 +56,7 @@ export interface ShareHistoryModalProps {
 export function ShareHistoryModal({
   isOpen,
   onClose,
-  summaryUrl = "https://psikita.id/practitioner/nadia-p/summary-sept2026",
+  summaryUrl = "https://seraphany.id/practitioner/nadia-p/summary-sept2026",
 }: ShareHistoryModalProps) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="md">

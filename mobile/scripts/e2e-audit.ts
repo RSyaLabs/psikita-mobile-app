@@ -88,7 +88,7 @@ function validateRouteRegistry() {
 async function runE2EAudit() {
   validateRouteRegistry();
   console.log("==============================================================");
-  console.log("🔬 AUDIT RINCI INTEGRASI & KESEHATAN RUTE PSIKITA MOBILE");
+  console.log("🔬 AUDIT RINCI INTEGRASI & KESEHATAN RUTE SERAPHANY MOBILE");
   console.log("==============================================================");
   console.log(`Target: ${BASE_URL} | Total Rute: ${ROUTES_TO_TEST.length}\n`);
 

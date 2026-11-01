@@ -89,7 +89,7 @@ describe("LoginScreen safe authentication flow", () => {
   beforeEach(async () => {
     jest.clearAllMocks();
     setAuthToken(null);
-    await secureStorage.removeItem("psikita_auth_user");
+    await secureStorage.removeItem("seraphany_auth_user");
     mockLogin.mockResolvedValue(serverResponse("USER"));
     mockGoogleLogin.mockResolvedValue(serverResponse("USER"));
     mockRequestOtp.mockResolvedValue({ message: "OTP sent" });

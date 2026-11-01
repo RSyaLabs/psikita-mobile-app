@@ -80,7 +80,7 @@ export function ReferralFaqAccordion() {
           </AccordionHeader>
           <AccordionContent>
             <AccordionContentText>
-              Tim pendamping PsiKita Care dapat membantu proses administrasi di
+              Tim pendamping SeraPhany Care dapat membantu proses administrasi di
               fasilitas kesehatan tujuan.
             </AccordionContentText>
           </AccordionContent>

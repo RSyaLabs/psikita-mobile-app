@@ -120,7 +120,7 @@ export function RegisterPatientModal({
               <Toast nativeID={id} action="success">
                 <ToastTitle>Registrasi Berhasil</ToastTitle>
                 <ToastDescription>
-                  Akun Anda berhasil dibuat. Selamat datang di PsiKita!
+                  Akun Anda berhasil dibuat. Selamat datang di SeraPhany!
                 </ToastDescription>
               </Toast>
             ),
@@ -294,7 +294,7 @@ export function RegisterPatientModal({
               className="text-center text-muted-foreground text-[11px] leading-relaxed px-1"
             >
               Dengan mendaftar, Anda menyetujui Syarat & Ketentuan serta
-              Kebijakan Privasi PsiKita.
+              Kebijakan Privasi SeraPhany.
             </Text>
 
             {onOpenLogin && (

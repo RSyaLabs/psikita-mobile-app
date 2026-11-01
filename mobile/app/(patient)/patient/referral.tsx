@@ -174,7 +174,7 @@ export default function ReferralScreen() {
                   Butuh bantuan menggunakan surat ini?
                 </Text>
                 <Text size="xs" className="text-muted-foreground text-[11px]">
-                  Care Team PsiKita siap dampingi proses rujukan ke RS.
+                  Care Team SeraPhany siap dampingi proses rujukan ke RS.
                 </Text>
               </VStack>
             </HStack>

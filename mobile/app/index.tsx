@@ -128,7 +128,7 @@ export default function LauncherScreen() {
                 bold
                 className="text-foreground tracking-tight"
               >
-                Katalog Layar PsiKita
+                Katalog Layar SeraPhany
               </Heading>
             </HStack>
             <Badge

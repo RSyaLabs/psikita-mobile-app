@@ -1,24 +1,24 @@
 {
   "expo": {
-    "name": "PsiKita",
-    "slug": "psikita-mobile",
+    "name": "SeraPhany",
+    "slug": "seraphany-mobile",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
-    "scheme": "psikita",
+    "scheme": "seraphany",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#1E3322"
+      "backgroundColor": "#f8f7ee"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#F6F8F6"
+        "backgroundColor": "#f8f7ee"
       },
-      "package": "id.psikita.app"
+      "package": "id.seraphany.app"
     },
     "web": {
       "bundler": "metro",

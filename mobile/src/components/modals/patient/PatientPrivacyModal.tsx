@@ -102,7 +102,7 @@ export function PatientPrivacyModal({
                 </Text>
               </HStack>
               <Text size="xs" className="text-muted-foreground leading-relaxed">
-                PsiKita tunduk pada regulasi kerahasiaan medis Kemenkes RI dan
+                SeraPhany tunduk pada regulasi kerahasiaan medis Kemenkes RI dan
                 Undang-Undang Perlindungan Data Pribadi No. 27 Tahun 2022. Data
                 medis Anda tidak pernah diperjualbelikan kepada pihak ketiga.
               </Text>

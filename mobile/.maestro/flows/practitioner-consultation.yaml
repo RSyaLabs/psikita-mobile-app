@@ -1,10 +1,10 @@
-appId: com.psikita.mobile
+appId: id.seraphany.app
 ---
 - launchApp:
     clearState: true
 
 # 1. Practitioner Authentication Flow
-- assertVisible: "PsiKita"
+- assertVisible: "SeraPhany"
 - tapOn:
     text: "Masuk dengan Akun"
     optional: true

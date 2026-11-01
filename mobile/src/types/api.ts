@@ -1,5 +1,5 @@
 /**
- * PsiKita Core API — Data Transfer Objects (DTOs)
+ * SeraPhany Core API — Data Transfer Objects (DTOs)
  * Sesuai dengan spesifikasi OpenAPI 3.0 (openapi-21-09-2026.json)
  */
 

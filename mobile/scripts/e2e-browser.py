@@ -91,7 +91,7 @@ async def main() -> None:
         await page.wait_for_timeout(3_000)
 
         # Open the account form, which is behind one button on the landing screen.
-        for label in ("Masuk dengan Akun", "Masuk dengan Akun Psikita"):
+        for label in ("Masuk dengan Akun", "Masuk dengan Akun SeraPhany", "Masuk dengan Akun Psikita"):
             btn = page.get_by_role("button", name=label)
             if await btn.count():
                 await btn.first.click()

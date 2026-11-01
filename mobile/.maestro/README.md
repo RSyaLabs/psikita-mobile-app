@@ -1,4 +1,4 @@
-# Maestro E2E Testing Suite for PsiKita Mobile
+# Maestro E2E Testing Suite for SeraPhany Mobile
 
 Arsitektur otomasi pengujian end-to-end (E2E) deklaratif mengadopsi standar industri dari `react-native-template-obytes`.
 

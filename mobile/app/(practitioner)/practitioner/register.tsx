@@ -146,7 +146,7 @@ export default function PractitionerRegisterScreen() {
                 <ToastTitle>Pengajuan Verifikasi Terkirim</ToastTitle>
                 <ToastDescription>
                   Data STR & SIP Anda sedang ditinjau oleh Admin Kemenkes
-                  PsiKita (&lt; 24 jam).
+                  SeraPhany (&lt; 24 jam).
                 </ToastDescription>
               </Toast>
             ),

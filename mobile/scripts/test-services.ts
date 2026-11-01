@@ -20,7 +20,7 @@ if (process.env.PSIKITA_INTEGRATION !== "1") {
 
 async function runServiceTestSuite() {
   console.log("=================================================");
-  console.log("🧪 PSIKITA API SERVICE INTEGRATION TEST SUITE");
+  console.log("🧪 SERAPHANY API SERVICE INTEGRATION TEST SUITE");
   console.log("=================================================\n");
 
   let passed = 0;
