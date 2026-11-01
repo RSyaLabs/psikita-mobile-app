@@ -168,7 +168,7 @@ export default function AssessmentResultScreen() {
               <VStack space="xs" className="my-2">
                 <Text size="3xl" bold className="text-primary-foreground text-3xl font-bold">
                   10{" "}
-                  <Text size="base" className="text-primary-foreground/80 font-normal">
+                  <Text size="md" className="text-primary-foreground/80 font-normal">
                     / 20
                   </Text>
                 </Text>

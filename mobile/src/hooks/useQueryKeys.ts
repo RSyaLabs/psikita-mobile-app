@@ -247,4 +247,8 @@ export const queryKeys = {
     all: ["identityVerification"] as const,
     my: () => [...queryKeys.identityVerification.all, "my"] as const,
   },
+  referrals: {
+    all: ["referrals"] as const,
+    letter: (id: string) => [...queryKeys.referrals.all, "letter", id] as const,
+  },
 };

@@ -177,7 +177,7 @@ export default function CommunityDetailScreen() {
                         {reply.authorName ?? "Sahabat SeraPhany"}
                       </Text>
                       {reply.authorRole === "practitioner" && (
-                        <Badge variant="solid" action="success" className="rounded-md px-2 py-0.5 bg-primary ml-1.5">
+                        <Badge variant="default" className="rounded-md px-2 py-0.5 bg-primary ml-1.5">
                           <BadgeText className="text-sm font-bold text-white">
                             Psikolog
                           </BadgeText>

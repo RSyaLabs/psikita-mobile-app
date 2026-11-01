@@ -66,7 +66,7 @@ export default function CoursesScreen() {
           </VStack>
           <HStack space="xs" className="items-center">
             {progress && (
-              <Badge variant="solid" action="primary" className="rounded-full px-2.5 py-1 bg-primary-foreground/20 mr-1">
+              <Badge variant="default" className="rounded-full px-2.5 py-1 bg-primary-foreground/20 mr-1">
                 <HStack space="xs" className="items-center">
                   <AppIcon icon={CheckCircle2} size={14} color="#FFFFFF" />
                   <BadgeText className="text-sm font-bold text-white">
@@ -181,7 +181,7 @@ export default function CoursesScreen() {
                 <HStack space="sm" className="items-start justify-between">
                   <VStack space="xs" className="flex-1 pr-2">
                     {course.topic && (
-                      <Badge variant="outline" action="muted" className="self-start rounded-full px-2.5 py-0.5 mb-1.5 border-primary/30 bg-primary/5">
+                      <Badge variant="outline" className="self-start rounded-full px-2.5 py-0.5 mb-1.5 border-primary/30 bg-primary/5">
                         <BadgeText className="text-sm font-semibold text-primary">
                           {course.topic}
                         </BadgeText>

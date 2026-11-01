@@ -70,7 +70,7 @@ export const psychometricsService = {
       `/psychometrics/score/dry-run/${encodeURIComponent(code)}`,
       {
         method: "POST",
-        body: dto,
+        body: JSON.stringify(dto),
         signal,
       },
     );

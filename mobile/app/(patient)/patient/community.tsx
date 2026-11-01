@@ -209,8 +209,8 @@ export default function CommunityFeedScreen() {
                     </Text>
                   </HStack>
                   {post.category && (
-                    <Badge variant="outline" action="muted" className="rounded-full px-2.5 py-0.5 border-primary/30 bg-primary/5">
-                      <BadgeText className="text-xs font-bold text-primary">
+                    <Badge variant="outline" className="rounded-full px-2.5 py-0.5 border-primary/30 bg-primary/5">
+                      <BadgeText className="text-sm font-bold text-primary">
                         {post.category}
                       </BadgeText>
                     </Badge>

@@ -93,7 +93,7 @@ export const lmsService = {
   startCompetencyTest: async (targetLevel: number = 1): Promise<any> => {
     return apiRequest<any>("/lms/competency-test/start", {
       method: "POST",
-      body: { targetLevel },
+      body: JSON.stringify({ targetLevel }),
     });
   },
 
@@ -104,7 +104,7 @@ export const lmsService = {
   }): Promise<any> => {
     return apiRequest<any>("/lms/competency-test/submit", {
       method: "POST",
-      body: dto,
+      body: JSON.stringify(dto),
     });
   },
 };

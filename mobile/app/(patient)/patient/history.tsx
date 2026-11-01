@@ -121,21 +121,23 @@ export default function HistoryScreen() {
         showsVerticalScrollIndicator={false}
       >
         {isPending ? (
-          <LoadingState message="Memuat riwayat konsultasi klinis..." />
+          <LoadingState label="Memuat riwayat konsultasi klinis..." />
         ) : capabilityUnavailable ? (
           <UnavailableState
-            title="Riwayat konsultasi belum tersedia"
+            label="Riwayat konsultasi belum tersedia"
             description="Fitur riwayat sesi konsultasi sedang disiapkan oleh tim klinis."
           />
         ) : consultations.isError ? (
           <ErrorState
-            title="Gagal memuat sesi"
+            label="Gagal memuat sesi"
             description="Periksa koneksi Anda dan coba lagi."
-            onRetry={() => consultations.refetch()}
+            onRetry={() => {
+              void consultations.refetch();
+            }}
           />
         ) : filteredSessions.length === 0 ? (
           <EmptyState
-            title="Belum ada riwayat konsultasi"
+            label="Belum ada riwayat konsultasi"
             description="Jadwal sesi dokter atau psikolog Anda akan tercatat di sini setelah Anda berkonsultasi."
             actionLabel="Cari Dokter Spesialis"
             onAction={() => router.push(ROUTES.PATIENT.DOCTORS)}

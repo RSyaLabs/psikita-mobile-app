@@ -133,7 +133,7 @@ export function AuthLoginModal({
     try {
       haptics.success();
       handleClose();
-      acceptSession({ accessToken: devToken });
+      acceptSession({ accessToken: devToken, refreshToken: "" });
       router.replace(targetRoute as any);
     } catch (e: any) {
       if (isMountedRef.current) setErrorMsg(e?.message || "Dev login failed");

@@ -15,6 +15,10 @@ import {
   MessageResponseDto,
 } from "@/types/api";
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
 const consultationParticipantSchema = z.object({
   id: z.string().trim().min(1),
   userId: z.string().trim().min(1),

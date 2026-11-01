@@ -141,7 +141,7 @@ export function DoctorDirectoryCard({
             </VStack>
 
             <Button
-              size="md"
+              size="default"
               onPress={() => onSelect(doctor)}
               className="bg-primary px-5 py-2.5 rounded-xl h-auto"
             >

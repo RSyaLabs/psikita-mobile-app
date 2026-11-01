@@ -97,8 +97,8 @@ export default function CourseDetailScreen() {
           {/* Course Hero Info */}
           <Box className="bg-primary rounded-3xl p-5 mb-4 relative overflow-hidden">
             {course.topic && (
-              <Badge variant="solid" action="primary" className="self-start rounded-full px-3 py-1 mb-2 bg-white/20">
-                <BadgeText className="text-xs font-bold text-white uppercase tracking-wider">
+              <Badge variant="default" className="self-start rounded-full px-3 py-1 mb-2 bg-white/20">
+                <BadgeText className="text-sm font-bold text-white uppercase tracking-wider">
                   {course.topic}
                 </BadgeText>
               </Badge>
@@ -145,7 +145,7 @@ export default function CourseDetailScreen() {
                 {currentLesson.content || "Pelajari panduan langkah demi langkah dari psikolog klinis SeraPhany untuk menerapkan strategi koping yang sehat dalam kehidupan harian Anda."}
               </Text>
               <Button
-                size="md"
+                size="default"
                 isDisabled={completeLessonMutation.isPending}
                 onPress={handleCompleteCurrentLesson}
                 className="mt-3 bg-primary rounded-2xl h-11"

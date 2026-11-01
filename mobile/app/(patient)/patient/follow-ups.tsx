@@ -100,11 +100,10 @@ export default function FollowUpsScreen() {
               <Card key={fu.id} className="bg-card rounded-2xl p-4 border border-border">
                 <HStack space="xs" className="items-center justify-between mb-2">
                   <Badge
-                    variant="solid"
-                    action={fu.status === "SCHEDULED" ? "success" : "warning"}
+                    variant={fu.status === "SCHEDULED" ? "default" : "secondary"}
                     className="rounded-full px-2.5 py-0.5"
                   >
-                    <BadgeText className="text-xs font-bold text-white uppercase">
+                    <BadgeText className="text-sm font-bold text-white uppercase">
                       {fu.status === "SCHEDULED" ? "Terjadwal" : "Menunggu Booking"}
                     </BadgeText>
                   </Badge>
