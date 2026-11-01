@@ -1,32 +1,32 @@
 {
+  "cli": {
+    "version": ">= 12.0.0"
+  },
   "build": {
-    "production": {
+    "preview": {
       "distribution": "internal",
-      "env": {
-        "EXPO_PUBLIC_API_BASE_URL": "https://api.seraphany.id"
-      },
       "android": {
-        "package": "id.seraphany.app"
+        "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_API_BASE_URL": "https://api.staging.seraphany.id/core"
       }
     },
     "staging": {
       "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
       "env": {
         "EXPO_PUBLIC_API_BASE_URL": "https://api.staging.seraphany.id/core"
-      },
-      "android": {
-        "package": "id.seraphany.app",
-        "buildType": "apk"
       }
     },
-    "preview": {
-      "distribution": "internal",
-      "env": {
-        "EXPO_PUBLIC_API_BASE_URL": "https://api.staging.seraphany.id/core"
-      },
+    "production": {
       "android": {
-        "package": "id.seraphany.app",
-        "buildType": "apk"
+        "buildType": "app-bundle"
+      },
+      "env": {
+        "EXPO_PUBLIC_API_BASE_URL": "https://api.seraphany.id"
       }
     }
   }
