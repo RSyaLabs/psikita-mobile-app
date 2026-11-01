@@ -13,14 +13,12 @@ import { ROUTES } from "@/constants/routes";
 export default function PatientLayout() {
   const router = useRouter();
   const segments = useSegments();
-  const { guest, preview } = useGlobalSearchParams<{ guest?: string; preview?: string }>();
+  const { guest } = useGlobalSearchParams<{ guest?: string }>();
   const { status, user, hasRole, homeRoute } = useAuth();
   const leafSegment = segments[segments.length - 1];
-  const isDevPreview = __DEV__ && preview === "true";
   const isPublicGuestRoute =
-    isDevPreview ||
-    (guest === "true" &&
-      (leafSegment === "triage" || leafSegment === "assessment-result"));
+    guest === "true" &&
+    (leafSegment === "triage" || leafSegment === "assessment-result");
   const redirectRoute = isPublicGuestRoute
     ? null
     : status === "loading"

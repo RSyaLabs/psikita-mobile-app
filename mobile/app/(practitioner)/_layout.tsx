@@ -9,10 +9,8 @@ export default function PractitionerLayout() {
   const router = useRouter();
   const segments = useSegments();
   const { status, user, hasRole, homeRoute } = useAuth();
-  const { preview } = useGlobalSearchParams<{ preview?: string }>();
-  const isDevPreview = __DEV__ && preview === "true";
   const isPublicRegistration =
-    segments[segments.length - 1] === "register" || isDevPreview;
+    segments[segments.length - 1] === "register";
   const redirectRoute = isPublicRegistration
     ? null
     : status === "loading"
