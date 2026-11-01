@@ -4,12 +4,13 @@
  */
 
 import { secureStorage } from "../utils/storage";
-import { ApiError, noContentAdapter, parseApiData } from "./response";
+import { ApiError, healthAdapter, noContentAdapter, parseApiData } from "./response";
 
 import type { ResponseAdapter } from "./response";
 
 export {
   ApiError,
+  healthAdapter,
   noContentAdapter,
   parseApiData,
   zodAdapter,
@@ -342,7 +343,7 @@ export async function apiRequest<T>(
       if (!response.ok) {
         throw toSafeHttpError(response.status, undefined);
       }
-      if (responseAdapter !== noContentAdapter) {
+      if (responseAdapter !== noContentAdapter && responseAdapter !== healthAdapter) {
         throw invalidResponseError();
       }
       return parseApiData(undefined, responseAdapter);
@@ -377,7 +378,7 @@ export async function apiRequest<T>(
     }
 
     if (data === undefined) {
-      if (responseAdapter !== noContentAdapter) {
+      if (responseAdapter !== noContentAdapter && responseAdapter !== healthAdapter) {
         throw invalidResponseError();
       }
       return parseApiData(undefined, responseAdapter);
@@ -385,7 +386,7 @@ export async function apiRequest<T>(
 
     if (!jsonResponse) {
       if (data === "") {
-        if (responseAdapter !== noContentAdapter) {
+        if (responseAdapter !== noContentAdapter && responseAdapter !== healthAdapter) {
           throw invalidResponseError();
         }
         return parseApiData(undefined, responseAdapter);
@@ -419,10 +420,10 @@ export async function apiRequest<T>(
  */
 export async function checkBackendHealth(): Promise<boolean> {
   try {
-    await apiRequest<void>("/health/live", {
+    await apiRequest<unknown>("/health/live", {
       timeoutMs: 3000,
       skipAuth: true,
-      adapter: noContentAdapter,
+      adapter: healthAdapter,
     });
     return true;
   } catch {

@@ -8,7 +8,7 @@ const root = path.resolve(__dirname, "..");
 // staging contract instead.
 const openapiPath = process.env.OPENAPI_PATH
   ? path.resolve(root, process.env.OPENAPI_PATH)
-  : path.resolve(root, "../jsonapi/openapi-21-09-2026.json");
+  : path.resolve(root, "../staging-openapi.json");
 const apiDir = path.join(root, "src/api");
 
 if (!fs.existsSync(openapiPath)) {

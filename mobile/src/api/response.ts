@@ -51,6 +51,16 @@ export function noContentAdapter(value: unknown): void {
   }
 }
 
+export function healthAdapter(value: unknown): { status: string } {
+  if (value === undefined) {
+    return { status: "ok" };
+  }
+  if (typeof value === "object" && value !== null) {
+    return value as { status: string };
+  }
+  return { status: "ok" };
+}
+
 /**
  * The one object guard for the whole client boundary.
  *
