@@ -103,12 +103,12 @@ export function UploadDocsModal({
               accessibilityLabel="Pilih berkas STR dan SIPP belum tersedia"
               className="p-3.5 rounded-2xl bg-muted border border-border opacity-60 flex-row items-center gap-3"
             >
-              <FileCheck size={18} className="text-secondary" />
+              <FileCheck size={20} color="#4A3B6B" />
               <VStack className="flex-1">
-                <Text size="xs" bold className="text-foreground">
+                <Text size="sm" bold className="text-foreground font-semibold">
                   Pilih berkas belum tersedia
                 </Text>
-                <Text size="xs" className="text-muted-foreground text-[11px]">
+                <Text size="sm" className="text-muted-foreground font-medium text-sm">
                   Upload native belum memiliki kontrak server
                 </Text>
               </VStack>
@@ -118,9 +118,9 @@ export function UploadDocsModal({
               size="default"
               variant="outline"
               onPress={onClose}
-              className="w-full border-border bg-card h-11 rounded-xl mt-2"
+              className="w-full border-border bg-card h-12 rounded-xl mt-2"
             >
-              <ButtonText className="text-xs font-semibold text-foreground">
+              <ButtonText className="text-sm font-semibold text-foreground">
                 Batal
               </ButtonText>
             </Button>

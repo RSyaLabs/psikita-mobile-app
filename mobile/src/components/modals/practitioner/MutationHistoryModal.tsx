@@ -134,27 +134,27 @@ export function MutationHistoryModal({
                       {item.id}
                     </Text>
                     <Text
-                      size="xs"
-                      className="text-muted-foreground text-[10px]"
+                      size="sm"
+                      className="text-muted-foreground font-medium text-sm"
                     >
                       {item.desc}
                     </Text>
                   </VStack>
                   <VStack space="xs" className="items-end">
                     <Text
-                      size="xs"
+                      size="sm"
                       bold
                       className={
                         item.gross.startsWith("+")
-                          ? "text-secondary"
-                          : "text-destructive"
+                          ? "text-primary font-bold"
+                          : "text-destructive font-bold"
                       }
                     >
                       {item.net}
                     </Text>
                     <Text
-                      size="xs"
-                      className="text-muted-foreground text-[10px]"
+                      size="sm"
+                      className="text-muted-foreground font-medium text-sm"
                     >
                       Bruto: {item.gross}
                     </Text>

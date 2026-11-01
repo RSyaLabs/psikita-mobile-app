@@ -136,23 +136,14 @@ export default function DiagnosisScreen() {
           {context && (
             <Badge
               variant="outline"
-              className="bg-muted border-border rounded-full"
+              className="bg-muted border-border rounded-full px-3 py-1"
             >
-              <BadgeText className="text-[10px] text-foreground">
+              <BadgeText className="text-sm font-semibold text-foreground">
                 {context.status}
               </BadgeText>
             </Badge>
           )}
         </HStack>
-
-        {!context && (
-          <BackendIntegrationBanner
-            endpoint="POST /notes/consultation/:id/soap"
-            title="Pratinjau Antarmuka QA • SOAP & Diagnosis"
-            description="Konteks konsultasi belum tersedia dari respons server. Antarmuka formulir diagnosis ICD-10 dan input SOAP ditampilkan lengkap untuk evaluasi QA."
-            className="mb-3"
-          />
-        )}
 
         {!consultationId && (
           <UnavailableState
@@ -166,18 +157,18 @@ export default function DiagnosisScreen() {
           {cdssAlerts && cdssAlerts.length > 0 && (
             <Card className="bg-amber-500/10 rounded-2xl p-4 border border-amber-500/30 gap-1.5">
               <HStack space="xs" className="items-center">
-                <ShieldAlert size={16} className="text-amber-600" />
-                <Text size="xs" bold className="text-amber-800 uppercase tracking-wider text-[11px]">
+                <ShieldAlert size={16} color="#D97706" />
+                <Text size="sm" bold className="text-amber-800 uppercase tracking-wider font-bold">
                   Rekomendasi CDSS Klinis
                 </Text>
               </HStack>
               {cdssAlerts.map((alert) => (
                 <VStack key={alert.id} space="xs" className="mt-1">
-                  <Text size="xs" bold className="text-foreground">
+                  <Text size="sm" bold className="text-foreground">
                     [{alert.severity}] {alert.message}
                   </Text>
                   {alert.recommendations?.map((rec, rIdx) => (
-                    <Text key={rIdx} size="xs" className="text-muted-foreground text-[11px]">
+                    <Text key={rIdx} size="sm" className="text-muted-foreground font-medium">
                       • {rec}
                     </Text>
                   ))}

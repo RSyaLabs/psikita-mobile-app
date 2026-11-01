@@ -230,12 +230,12 @@ export function ForgotPasswordView({
       >
         <FormControlLabel htmlFor="forgot-otp-input">
           <HStack space="xs" className="w-full items-center justify-between">
-            <FormControlLabelText className="text-xs font-bold text-foreground">
+            <FormControlLabelText className="text-sm font-bold text-foreground">
               Kode OTP (4 Digit)
             </FormControlLabelText>
             <Text
-              size="xs"
-              className="text-[10px] text-muted-foreground font-semibold"
+              size="sm"
+              className="text-sm text-muted-foreground font-semibold"
             >
               {forgotOtp.length}/4
             </Text>
@@ -338,8 +338,8 @@ export function ForgotPasswordView({
         className="items-center py-1 mt-0.5 active:opacity-75"
       >
         <Text
-          size="xs"
-          className="text-muted-foreground text-[11px] underline"
+          size="sm"
+          className="text-muted-foreground text-sm font-medium underline"
         >
           Kirim ulang kode OTP
         </Text>

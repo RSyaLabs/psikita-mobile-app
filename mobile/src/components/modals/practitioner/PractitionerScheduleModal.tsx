@@ -93,37 +93,37 @@ export function PractitionerScheduleModal({
 
         <ModalBody className="pt-3 pb-1">
           <VStack space="sm">
-            <Box className="p-3 rounded-2xl bg-muted border border-border">
-              <Text size="xs" bold className="text-foreground">
+            <Box className="p-3.5 rounded-2xl bg-muted border border-border">
+              <Text size="sm" bold className="text-foreground">
                 Hari Praktik Aktif
               </Text>
               <Text
-                size="xs"
-                className="text-muted-foreground text-[11px] mt-1"
+                size="sm"
+                className="text-muted-foreground font-medium text-sm mt-1"
               >
                 Senin s/d Jumat (Hari Kerja)
               </Text>
             </Box>
 
-            <Box className="p-3 rounded-2xl bg-muted border border-border">
-              <Text size="xs" bold className="text-foreground">
+            <Box className="p-3.5 rounded-2xl bg-muted border border-border">
+              <Text size="sm" bold className="text-foreground">
                 Jam Layanan Telekonsultasi
               </Text>
               <Text
-                size="xs"
-                className="text-muted-foreground text-[11px] mt-1"
+                size="sm"
+                className="text-muted-foreground font-medium text-sm mt-1"
               >
                 09:00 – 17:00 WIB (Durasi 45 menit / sesi)
               </Text>
             </Box>
 
-            <Box className="p-3 rounded-2xl bg-muted border border-border">
-              <Text size="xs" bold className="text-foreground">
+            <Box className="p-3.5 rounded-2xl bg-muted border border-border">
+              <Text size="sm" bold className="text-foreground">
                 Kuota Maksimal Sesi
               </Text>
               <Text
-                size="xs"
-                className="text-muted-foreground text-[11px] mt-1"
+                size="sm"
+                className="text-muted-foreground font-medium text-sm mt-1"
               >
                 8 Pasien per hari (Jeda istirahat 15 menit antar sesi)
               </Text>

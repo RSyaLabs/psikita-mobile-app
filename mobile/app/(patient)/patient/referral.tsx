@@ -123,12 +123,12 @@ export default function ReferralScreen() {
             {nearestFacilities.slice(0, 3).map((f) => (
               <Box
                 key={f.id}
-                className="p-2.5 rounded-xl bg-muted/60 border border-border"
+                className="p-3 rounded-xl bg-muted/60 border border-border"
               >
-                <Text size="xs" bold className="text-foreground">
+                <Text size="sm" bold className="text-foreground">
                   {f.name}
                 </Text>
-                <Text size="xs" className="text-muted-foreground text-[11px]">
+                <Text size="sm" className="text-muted-foreground font-medium mt-0.5">
                   {f.address} •{" "}
                   {f.distanceKm
                     ? `${f.distanceKm.toFixed(1)} km`
@@ -148,16 +148,16 @@ export default function ReferralScreen() {
           size="lg"
           onPress={() => haptics.medium()}
           accessibilityLabel="Unduh surat rujukan digital"
-          className="w-full h-[50px] bg-secondary rounded-xl flex-row items-center justify-center gap-2 mb-3.5 active:opacity-90"
+          className="w-full h-[50px] bg-primary rounded-xl flex-row items-center justify-center gap-2 mb-3.5 active:opacity-90"
         >
-          <ButtonIcon as={Download} className="text-secondary-foreground" />
-          <ButtonText className="text-secondary-foreground font-semibold text-sm">
+          <ButtonIcon as={Download} color="#FFFFFF" />
+          <ButtonText className="text-white font-semibold text-sm">
             Unduh Surat Rujukan PDF
           </ButtonText>
         </Button>
 
         {/* CS Card */}
-        <Card className="bg-card rounded-2xl p-3.5 border border-border">
+        <Card className="bg-card rounded-2xl p-4 border border-border">
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Bantuan pendampingan rujukan RS"
@@ -168,17 +168,17 @@ export default function ReferralScreen() {
             className="flex-row items-center justify-between active:opacity-80"
           >
             <HStack space="md" className="items-center flex-1 mr-2">
-              <Headphones size={20} className="text-primary" />
+              <Headphones size={20} color="#4A3B6B" />
               <VStack space="xs" className="flex-1">
-                <Text size="xs" bold className="text-foreground">
+                <Text size="sm" bold className="text-foreground">
                   Butuh bantuan menggunakan surat ini?
                 </Text>
-                <Text size="xs" className="text-muted-foreground text-[11px]">
+                <Text size="sm" className="text-muted-foreground font-medium">
                   Care Team SeraPhany siap dampingi proses rujukan ke RS.
                 </Text>
               </VStack>
             </HStack>
-            <ChevronRight size={16} className="text-muted-foreground" />
+            <ChevronRight size={18} color="#4B4656" />
           </Pressable>
         </Card>
       </ScrollView>

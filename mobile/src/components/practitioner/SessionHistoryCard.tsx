@@ -46,37 +46,37 @@ export function SessionHistoryCard({
           <AvatarFallbackText>{session.fallbackText}</AvatarFallbackText>
         </Avatar>
         <VStack space="xs" className="flex-1">
-          <Text size="xs" className="font-bold text-foreground">
+          <Text size="sm" className="font-bold text-foreground">
             {session.patientName}
           </Text>
-          <Text size="xs" className="text-[11px] text-muted-foreground">
+          <Text size="sm" className="text-muted-foreground font-medium">
             {session.typeText}
           </Text>
         </VStack>
         <Badge
           variant="outline"
-          className="bg-muted px-2 py-1 rounded-[6px] border border-border"
+          className="bg-muted px-2.5 py-1 rounded-md border border-border"
         >
-          <BadgeText className="text-[11px] font-bold text-foreground">
+          <BadgeText className="text-sm font-bold text-foreground">
             {session.icdCode}
           </BadgeText>
         </Badge>
         <Badge
           variant="outline"
-          className={`px-2 py-1 rounded-full ${
+          className={`px-2.5 py-1 rounded-full ${
             isRunning
               ? "bg-primary/10 border-primary/30"
               : isCompleted
-                ? "bg-secondary/10 border-secondary/30"
+                ? "bg-primary/15 border-primary/30"
                 : "bg-destructive/10 border-destructive/30"
           }`}
         >
           <BadgeText
-            className={`text-[10px] font-bold ${
+            className={`text-sm font-bold ${
               isRunning
                 ? "text-primary"
                 : isCompleted
-                  ? "text-secondary"
+                  ? "text-primary"
                   : "text-destructive"
             }`}
           >
@@ -85,26 +85,26 @@ export function SessionHistoryCard({
         </Badge>
       </HStack>
 
-      <Text size="xs" className="text-muted-foreground">
+      <Text size="sm" className="text-muted-foreground font-medium">
         {session.note}
       </Text>
 
       <HStack space="sm" className="gap-2 pt-1">
         <Pressable
           onPress={onViewMedicalRecord}
-          className="flex-1 bg-card border border-border py-2 rounded-full items-center justify-center active:bg-muted/50"
+          className="flex-1 bg-card border border-border py-2.5 rounded-full items-center justify-center active:bg-muted/50"
         >
-          <Text size="xs" className="text-[11px] font-bold text-foreground">
+          <Text size="sm" className="font-bold text-foreground">
             Lihat rekam medis
           </Text>
         </Pressable>
         <Pressable
           onPress={onScheduleFollowUp}
-          className="flex-1 bg-primary py-2 rounded-full items-center justify-center active:opacity-90"
+          className="flex-1 bg-primary py-2.5 rounded-full items-center justify-center active:opacity-90"
         >
           <Text
-            size="xs"
-            className="text-[11px] font-bold text-primary-foreground"
+            size="sm"
+            className="font-bold text-primary-foreground text-sm"
           >
             {session.actionText ||
               (isCompleted ? "Jadwalkan kontrol ulang" : "Atur jadwal baru")}

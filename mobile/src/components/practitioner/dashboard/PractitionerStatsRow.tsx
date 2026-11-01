@@ -35,37 +35,37 @@ export function PractitionerStatsRow({
   return (
     <HStack space="sm" className="items-center mb-4">
       <Card className="flex-1 bg-card rounded-2xl p-3 border border-border">
-        <Users size={18} className="mb-1 text-secondary" />
+        <Users size={18} color="#4A3B6B" style={{ marginBottom: 4 }} />
         <Heading size="lg" className="font-bold text-foreground">
           {queueLabel}
         </Heading>
         <Text
-          size="xs"
-          className="text-muted-foreground font-medium text-[10px]"
+          size="sm"
+          className="text-muted-foreground font-medium text-sm"
         >
           Antrian
         </Text>
       </Card>
       <Card className="flex-1 bg-card rounded-2xl p-3 border border-border">
-        <Clock size={18} className="mb-1 text-secondary" />
+        <Clock size={18} color="#4A3B6B" style={{ marginBottom: 4 }} />
         <Heading size="lg" className="font-bold text-foreground">
           {todaySessionsLabel}
         </Heading>
         <Text
-          size="xs"
-          className="text-muted-foreground font-medium text-[10px]"
+          size="sm"
+          className="text-muted-foreground font-medium text-sm"
         >
           Sesi hari ini
         </Text>
       </Card>
       <Card className="flex-1 bg-card rounded-2xl p-3 border border-border">
-        <Star size={18} className="mb-1 text-warning fill-warning" />
+        <Star size={18} color="#D97706" fill="#D97706" style={{ marginBottom: 4 }} />
         <Heading size="lg" className="font-bold text-foreground">
           {ratingLabel}
         </Heading>
         <Text
-          size="xs"
-          className="text-muted-foreground font-medium text-[10px]"
+          size="sm"
+          className="text-muted-foreground font-medium text-sm"
         >
           Rating
         </Text>

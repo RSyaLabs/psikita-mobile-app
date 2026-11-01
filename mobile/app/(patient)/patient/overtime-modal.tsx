@@ -131,10 +131,10 @@ export default function OvertimeModalScreen() {
                 }`}
               >
                 <Box className="flex-1 mr-2">
-                  <Text size="xs" bold className="text-foreground">
+                  <Text size="sm" bold className="text-foreground">
                     +15 menit • {PRICE_15}
                   </Text>
-                  <Text size="xs" className="text-muted-foreground text-[11px]">
+                  <Text size="sm" className="text-muted-foreground font-medium text-sm">
                     Pas untuk simpulan dan rencana tindak lanjut
                   </Text>
                 </Box>
@@ -146,7 +146,7 @@ export default function OvertimeModalScreen() {
                   }`}
                 >
                   {selectedOpt === "15" && (
-                    <Check size={12} className="text-primary-foreground" />
+                    <Check size={12} color="#FFFFFF" />
                   )}
                 </Box>
               </Pressable>
@@ -161,10 +161,10 @@ export default function OvertimeModalScreen() {
                 }`}
               >
                 <Box className="flex-1 mr-2">
-                  <Text size="xs" bold className="text-foreground">
+                  <Text size="sm" bold className="text-foreground">
                     +30 menit • {PRICE_30}
                   </Text>
-                  <Text size="xs" className="text-muted-foreground text-[11px]">
+                  <Text size="sm" className="text-muted-foreground font-medium text-sm">
                     Untuk pembahasan mendalam, paling hemat
                   </Text>
                 </Box>
@@ -176,33 +176,33 @@ export default function OvertimeModalScreen() {
                   }`}
                 >
                   {selectedOpt === "30" && (
-                    <Check size={12} className="text-primary-foreground" />
+                    <Check size={12} color="#FFFFFF" />
                   )}
                 </Box>
               </Pressable>
             </VStack>
 
             {/* PayState Card */}
-            <Card className="bg-muted rounded-2xl p-3 border border-border gap-2 w-full">
+            <Card className="bg-muted rounded-2xl p-3.5 border border-border gap-2 w-full">
               <HStack space="xs" className="items-center">
-                <Wallet size={15} className="text-secondary" />
-                <Text size="xs" bold className="text-foreground">
+                <Wallet size={16} color="#4A3B6B" />
+                <Text size="sm" bold className="text-foreground">
                   Ringkasan overtime +{selectedOpt} menit
                 </Text>
               </HStack>
               <HStack space="md" className="items-center justify-between">
-                <Text size="xs" className="text-muted-foreground text-[11px]">
+                <Text size="sm" className="text-muted-foreground font-medium">
                   Perpanjangan {selectedOpt} menit
                 </Text>
-                <Text size="xs" bold className="text-foreground text-[11px]">
+                <Text size="sm" bold className="text-foreground font-semibold">
                   {selectedOpt === "15" ? PRICE_15 : PRICE_30}
                 </Text>
               </HStack>
               <HStack space="md" className="items-center justify-between">
-                <Text size="xs" className="text-muted-foreground text-[11px]">
+                <Text size="sm" className="text-muted-foreground font-medium">
                   GoPay •••• 8821
                 </Text>
-                <Text size="xs" bold className="text-secondary text-[11px]">
+                <Text size="sm" bold className="text-primary font-semibold">
                   Saldo cukup
                 </Text>
               </HStack>

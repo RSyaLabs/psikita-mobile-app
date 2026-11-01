@@ -33,12 +33,12 @@ export function PractitionerQuickActions({
             accessibilityLabel="Buka jadwal riwayat praktisi"
             className="items-center gap-2 active:opacity-80"
           >
-            <Box className="w-9 h-9 rounded-xl bg-muted items-center justify-center">
-              <Calendar size={16} className="text-secondary" />
+            <Box className="w-10 h-10 rounded-xl bg-muted items-center justify-center">
+              <Calendar size={18} color="#4A3B6B" />
             </Box>
             <Text
-              size="xs"
-              className="font-semibold text-foreground text-[11px]"
+              size="sm"
+              className="font-semibold text-foreground text-sm"
             >
               Jadwal
             </Text>
@@ -52,12 +52,12 @@ export function PractitionerQuickActions({
             accessibilityLabel="Buka catatan diagnosis SOAP"
             className="items-center gap-2 active:opacity-80"
           >
-            <Box className="w-9 h-9 rounded-xl bg-muted items-center justify-center">
-              <FileText size={16} className="text-secondary" />
+            <Box className="w-10 h-10 rounded-xl bg-muted items-center justify-center">
+              <FileText size={18} color="#4A3B6B" />
             </Box>
             <Text
-              size="xs"
-              className="font-semibold text-foreground text-[11px]"
+              size="sm"
+              className="font-semibold text-foreground text-sm"
             >
               Catatan
             </Text>
@@ -71,12 +71,12 @@ export function PractitionerQuickActions({
             accessibilityLabel="Buka profil praktisi"
             className="items-center gap-2 active:opacity-80"
           >
-            <Box className="w-9 h-9 rounded-xl bg-muted items-center justify-center">
-              <User size={16} className="text-muted-foreground" />
+            <Box className="w-10 h-10 rounded-xl bg-muted items-center justify-center">
+              <User size={18} color="#4B4656" />
             </Box>
             <Text
-              size="xs"
-              className="font-semibold text-foreground text-[11px]"
+              size="sm"
+              className="font-semibold text-foreground text-sm"
             >
               Profil
             </Text>

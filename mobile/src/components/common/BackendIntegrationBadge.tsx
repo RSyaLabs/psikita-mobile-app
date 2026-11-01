@@ -28,10 +28,10 @@ export function BackendIntegrationBadge({
     <Badge
       testID={testID}
       variant="outline"
-      className={`border-warning/40 bg-warning/10 rounded-full px-2.5 py-1 ${className}`}
+      className={`border-warning/40 bg-warning/10 rounded-full px-3 py-1 ${className}`}
     >
-      <BadgeIcon as={AlertTriangle} className="text-warning mr-1" />
-      <BadgeText className="text-[10px] font-semibold text-warning tracking-wide">
+      <BadgeIcon as={AlertTriangle} color="#D97706" style={{ marginRight: 4 }} />
+      <BadgeText className="text-sm font-semibold text-warning tracking-wide">
         {endpoint ? `${badgeText} • ${endpoint}` : badgeText}
       </BadgeText>
     </Badge>
@@ -67,17 +67,17 @@ export function BackendIntegrationBanner({
       <HStack space="sm" className="items-center justify-between">
         <Badge
           variant="outline"
-          className="border-warning/50 bg-card rounded-full px-2 py-0.5"
+          className="border-warning/50 bg-card rounded-full px-3 py-1"
         >
-          <BadgeIcon as={AlertTriangle} className="text-warning mr-1" />
-          <BadgeText className="text-[10px] font-bold text-warning">
+          <BadgeIcon as={AlertTriangle} color="#D97706" style={{ marginRight: 4 }} />
+          <BadgeText className="text-sm font-bold text-warning">
             {badgeText}
           </BadgeText>
         </Badge>
         {endpoint ? (
-          <HStack space="xs" className="items-center bg-card px-2 py-0.5 rounded-md border border-warning/30">
-            <Server size={11} className="text-muted-foreground" />
-            <Text size="xs" bold className="text-muted-foreground text-[10px]">
+          <HStack space="xs" className="items-center bg-card px-2.5 py-1 rounded-md border border-warning/30">
+            <Server size={14} color="#4B4656" />
+            <Text size="sm" bold className="text-muted-foreground font-semibold">
               {endpoint}
             </Text>
           </HStack>

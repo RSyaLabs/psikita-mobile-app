@@ -46,31 +46,27 @@ export function DoctorScheduleSelector({
             >
               <HStack space="xs" className="items-center mb-1">
                 <Calendar
-                  size={12}
-                  className={
-                    isSelected
-                      ? "text-primary-foreground"
-                      : "text-muted-foreground"
-                  }
+                  size={14}
+                  color={isSelected ? "#FFFFFF" : "#4B4656"}
                 />
                 <Text
-                  size="xs"
-                  className={`text-[10px] ${
+                  size="sm"
+                  className={`text-sm ${
                     isSelected
-                      ? "text-primary-foreground/80 font-medium"
-                      : "text-muted-foreground"
+                      ? "text-primary-foreground/90 font-medium"
+                      : "text-muted-foreground font-medium"
                   }`}
                 >
                   Hari Ini
                 </Text>
               </HStack>
               <Text
-                size="xs"
+                size="sm"
                 bold
                 className={
                   isSelected
-                    ? "text-primary-foreground"
-                    : "text-foreground"
+                    ? "text-primary-foreground font-bold"
+                    : "text-foreground font-semibold"
                 }
               >
                 {slot}

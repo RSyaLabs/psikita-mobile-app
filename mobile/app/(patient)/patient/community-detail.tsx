@@ -107,43 +107,43 @@ export default function CommunityDetailScreen() {
             <Card className="bg-card rounded-2xl p-4 border border-border">
               <HStack space="xs" className="items-center justify-between mb-2">
                 <HStack space="xs" className="items-center">
-                  <Box className="w-8 h-8 rounded-full bg-muted items-center justify-center">
-                    <User size={16} className="text-muted-foreground" />
+                  <Box className="w-9 h-9 rounded-full bg-muted items-center justify-center">
+                    <User size={18} color="#4B4656" />
                   </Box>
                   <VStack space="xs">
-                    <Text size="xs" bold className="text-foreground text-[12px]">
+                    <Text size="sm" bold className="text-foreground font-bold">
                       {post.isAnonymous ? "Sahabat SeraPhany" : post.authorName ?? "Pengguna"}
                     </Text>
-                    <Text size="xs" className="text-muted-foreground text-[10px]">
+                    <Text size="sm" className="text-muted-foreground font-medium">
                       {post.category ?? "Cerita Harian"}
                     </Text>
                   </VStack>
                 </HStack>
                 <HStack space="xs" className="items-center">
-                  <Shield size={12} className="text-secondary" />
-                  <Text size="xs" bold className="text-secondary text-[10px]">
+                  <Shield size={14} color="#4A3B6B" />
+                  <Text size="sm" bold className="text-primary font-bold">
                     Privat & Aman
                   </Text>
                 </HStack>
               </HStack>
 
-              <Heading size="sm" bold className="text-foreground mt-1 mb-2">
+              <Heading size="md" bold className="text-foreground mt-2 mb-2">
                 {post.title}
               </Heading>
-              <Text size="xs" className="text-foreground leading-relaxed">
+              <Text size="sm" className="text-foreground leading-relaxed font-medium">
                 {post.content}
               </Text>
 
               <HStack space="lg" className="items-center mt-4 pt-3 border-t border-border/50">
                 <HStack space="xs" className="items-center">
-                  <Heart size={14} className="text-muted-foreground" />
-                  <Text size="xs" className="text-[11px] text-muted-foreground font-medium">
+                  <Heart size={16} color="#4B4656" />
+                  <Text size="sm" className="text-muted-foreground font-medium">
                     {post.likesCount ?? 0} Dukungan
                   </Text>
                 </HStack>
                 <HStack space="xs" className="items-center">
-                  <MessageSquare size={14} className="text-muted-foreground" />
-                  <Text size="xs" className="text-[11px] text-muted-foreground font-medium">
+                  <MessageSquare size={16} color="#4B4656" />
+                  <Text size="sm" className="text-muted-foreground font-medium">
                     {(replies ?? []).length} Balasan
                   </Text>
                 </HStack>
@@ -151,7 +151,7 @@ export default function CommunityDetailScreen() {
             </Card>
 
             {/* Replies Section */}
-            <Heading size="xs" bold className="text-foreground px-1 mt-2">
+            <Heading size="sm" bold className="text-foreground px-1 mt-3">
               Tanggapan Komunitas ({(replies ?? []).length})
             </Heading>
 
@@ -161,24 +161,24 @@ export default function CommunityDetailScreen() {
               </Box>
             ) : (replies ?? []).length === 0 ? (
               <Card className="p-6 items-center bg-card rounded-2xl border border-border">
-                <Text size="xs" className="text-muted-foreground text-center">
+                <Text size="sm" className="text-muted-foreground text-center font-medium">
                   Belum ada tanggapan. Kirimkan kata-kata penyemangat pertama!
                 </Text>
               </Card>
             ) : (
               <VStack space="sm">
                 {(replies ?? []).map((reply) => (
-                  <Card key={reply.id} className="bg-card rounded-2xl p-3.5 border border-border">
-                    <HStack space="xs" className="items-center mb-1.5">
-                      <Box className="w-6 h-6 rounded-full bg-muted items-center justify-center">
-                        <User size={12} className="text-muted-foreground" />
+                  <Card key={reply.id} className="bg-card rounded-2xl p-4 border border-border">
+                    <HStack space="xs" className="items-center mb-2">
+                      <Box className="w-7 h-7 rounded-full bg-muted items-center justify-center mr-1">
+                        <User size={14} color="#4B4656" />
                       </Box>
-                      <Text size="xs" bold className="text-foreground text-[11px]">
+                      <Text size="sm" bold className="text-foreground font-bold">
                         {reply.authorName ?? "Sahabat SeraPhany"}
                       </Text>
                       {reply.authorRole === "practitioner" && (
-                        <Badge variant="solid" action="success" className="rounded-md px-1.5 py-0">
-                          <BadgeText className="text-[9px] font-bold text-white">
+                        <Badge variant="solid" action="success" className="rounded-md px-2 py-0.5 bg-primary ml-1.5">
+                          <BadgeText className="text-sm font-bold text-white">
                             Psikolog
                           </BadgeText>
                         </Badge>

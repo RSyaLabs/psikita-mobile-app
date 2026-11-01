@@ -20,13 +20,13 @@ export function DoctorAboutCard({
         Tentang Praktisi
       </Heading>
       <Box className="bg-card rounded-2xl p-4 border border-border">
-        <Text size="xs" className="text-muted-foreground leading-relaxed">
+        <Text size="sm" className="text-muted-foreground font-medium text-sm leading-relaxed">
           {aboutText}
         </Text>
         <HStack space="xs" className="mt-3 flex-wrap gap-1.5">
           {tags.map((tag) => (
-            <Box key={tag} className="bg-muted px-2.5 py-1 rounded-lg">
-              <Text size="xs" bold className="text-foreground text-[11px]">
+            <Box key={tag} className="bg-muted px-3 py-1 rounded-lg">
+              <Text size="sm" bold className="text-foreground font-semibold">
                 {tag}
               </Text>
             </Box>

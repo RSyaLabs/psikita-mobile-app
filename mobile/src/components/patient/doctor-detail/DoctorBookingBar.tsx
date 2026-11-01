@@ -22,7 +22,7 @@ export function DoctorBookingBar({
     <Box className="absolute bottom-0 left-0 right-0 bg-card border-t border-border p-4 px-6">
       <HStack space="md" className="items-center justify-between">
         <VStack>
-          <Text size="xs" className="text-muted-foreground text-[11px]">
+          <Text size="sm" className="text-muted-foreground font-medium text-sm">
             Biaya Konsultasi (45 Menit)
           </Text>
           <Heading size="md" bold className="text-foreground">
@@ -36,7 +36,7 @@ export function DoctorBookingBar({
           accessibilityLabel="Lanjut Pembayaran Konsultasi"
           className="bg-primary h-12 px-6 rounded-xl flex-row items-center justify-center"
         >
-          <ButtonText className="text-xs font-bold text-primary-foreground">
+          <ButtonText className="text-sm font-bold text-primary-foreground">
             Pilih Jadwal & Bayar
           </ButtonText>
         </Button>

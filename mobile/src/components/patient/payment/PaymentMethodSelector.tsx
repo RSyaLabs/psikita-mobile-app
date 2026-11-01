@@ -51,25 +51,25 @@ export function PaymentMethodSelector({
         }`}
       >
         <HStack space="md" className="items-center">
-          <Wallet size={18} className="text-secondary" />
+          <Wallet size={20} color="#4A3B6B" />
           <VStack space="xs">
-            <Text size="xs" bold className="text-foreground">
+            <Text size="sm" bold className="text-foreground">
               E-WALLET
             </Text>
-            <Text size="xs" className="text-[10px] text-muted-foreground">
+            <Text size="sm" className="text-muted-foreground font-medium text-sm">
               Kanal dan saldo ditentukan server
             </Text>
           </VStack>
         </HStack>
         <Box
-          className={`w-4 h-4 rounded-full border items-center justify-center ${
+          className={`w-5 h-5 rounded-full border items-center justify-center ${
             selectedMethod === "gopay"
               ? "border-primary bg-primary"
               : "border-border"
           }`}
         >
           {selectedMethod === "gopay" && (
-            <Box className="w-1.5 h-1.5 rounded-full bg-primary-foreground" />
+            <Box className="w-2 h-2 rounded-full bg-primary-foreground" />
           )}
         </Box>
       </Pressable>
@@ -84,48 +84,48 @@ export function PaymentMethodSelector({
         }}
         disabled={!paymentEnabled}
         onPress={() => onSelectMethod("qris")}
-        className={`p-3 rounded-xl border flex-row items-center justify-between active:opacity-90 ${
+        className={`p-3.5 rounded-xl border flex-row items-center justify-between active:opacity-90 ${
           selectedMethod === "qris"
             ? "bg-muted border-primary"
             : "bg-card border-border"
         }`}
       >
         <HStack space="md" className="items-center">
-          <QrCode size={18} className="text-secondary" />
+          <QrCode size={20} color="#4A3B6B" />
           <VStack space="xs">
-            <Text size="xs" bold className="text-foreground">
+            <Text size="sm" bold className="text-foreground">
               QRIS
             </Text>
-            <Text size="xs" className="text-[10px] text-muted-foreground">
+            <Text size="sm" className="text-muted-foreground font-medium text-sm">
               Pindai sekali untuk membayar
             </Text>
           </VStack>
         </HStack>
         <Box
-          className={`w-4 h-4 rounded-full border items-center justify-center ${
+          className={`w-5 h-5 rounded-full border items-center justify-center ${
             selectedMethod === "qris"
               ? "border-primary bg-primary"
               : "border-border"
           }`}
         >
           {selectedMethod === "qris" && (
-            <Box className="w-1.5 h-1.5 rounded-full bg-primary-foreground" />
+            <Box className="w-2 h-2 rounded-full bg-primary-foreground" />
           )}
         </Box>
       </Pressable>
 
       {/* Inactive Credit / Debit Card Option */}
-      <Box className="p-3 rounded-xl border border-border bg-card flex-row items-center justify-between">
+      <Box className="p-3.5 rounded-xl border border-border bg-card flex-row items-center justify-between">
         <VStack space="xs">
-          <Text size="xs" bold className="text-foreground">
+          <Text size="sm" bold className="text-foreground">
             Kartu kredit/debit
           </Text>
-          <Text size="xs" className="text-muted-foreground">
+          <Text size="sm" className="text-muted-foreground font-medium text-sm">
             Belum tersedia dalam kontrak pembayaran.
           </Text>
         </VStack>
-        <Badge variant="outline" className="bg-muted border-border">
-          <BadgeText className="text-[10px] text-muted-foreground">
+        <Badge variant="outline" className="bg-muted border-border px-3 py-1 rounded-full">
+          <BadgeText className="text-sm font-semibold text-muted-foreground">
             Tidak aktif
           </BadgeText>
         </Badge>

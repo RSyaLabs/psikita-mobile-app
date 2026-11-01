@@ -141,10 +141,10 @@ export default function CheckoutScreen() {
         </HStack>
         <Badge
           variant="outline"
-          className="bg-muted px-2.5 py-1 rounded-full flex-row items-center border border-border"
+          className="bg-muted px-3 py-1 rounded-full flex-row items-center border border-border"
         >
-          <Lock size={12} className="text-secondary mr-1" />
-          <BadgeText className="text-[11px] font-bold text-foreground">
+          <Lock size={14} color="#4A3B6B" style={{ marginRight: 4 }} />
+          <BadgeText className="text-sm font-bold text-foreground">
             Aman
           </BadgeText>
         </Badge>
@@ -304,8 +304,8 @@ export default function CheckoutScreen() {
           <ButtonIcon as={ArrowRight} className="text-muted-foreground" />
         </Button>
         <Text
-          size="xs"
-          className="text-center text-muted-foreground text-[10px]"
+          size="sm"
+          className="text-center text-muted-foreground font-medium text-sm leading-relaxed"
         >
           Konteks tagihan harus berasal dari server sebelum pembayaran dapat
           diproses.

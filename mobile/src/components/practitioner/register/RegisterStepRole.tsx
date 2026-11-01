@@ -111,7 +111,7 @@ export function RegisterStepRole({
           >
             Psikolog Klinis
           </Text>
-          <Text size="xs" className="text-muted-foreground text-[10px] mt-0.5">
+          <Text size="sm" className="text-muted-foreground font-medium text-sm mt-0.5">
             Konseling, tes psikologi & psikoterapi
           </Text>
         </Pressable>
@@ -129,18 +129,14 @@ export function RegisterStepRole({
           <HStack space="xs" className="items-center justify-between mb-1">
             <Stethoscope
               size={20}
-              className={
-                practitionerType === "PSYCHIATRIST"
-                  ? "text-primary"
-                  : "text-muted-foreground"
-              }
+              color={practitionerType === "PSYCHIATRIST" ? "#4A3B6B" : "#4B4656"}
             />
             {practitionerType === "PSYCHIATRIST" && (
-              <CheckCircle2 size={16} className="text-primary" />
+              <CheckCircle2 size={16} color="#4A3B6B" />
             )}
           </HStack>
           <Text
-            size="xs"
+            size="sm"
             className={`font-bold ${
               practitionerType === "PSYCHIATRIST"
                 ? "text-primary"
@@ -149,7 +145,7 @@ export function RegisterStepRole({
           >
             Psikiater (Sp.KJ)
           </Text>
-          <Text size="xs" className="text-muted-foreground text-[10px] mt-0.5">
+          <Text size="sm" className="text-muted-foreground font-medium text-sm mt-0.5">
             Diagnosa medis & wewenang resep obat
           </Text>
         </Pressable>
@@ -184,20 +180,20 @@ export function RegisterStepRole({
         {/* NIK KTP (16 Digit) */}
         <FormControl>
           <HStack space="xs" className="items-center justify-between mb-1">
-            <FormControlLabelText className="text-xs font-semibold text-foreground">
+            <FormControlLabelText className="text-sm font-semibold text-foreground">
               Nomor Induk Kependudukan (NIK)
             </FormControlLabelText>
             <Text
-              size="xs"
-              className={`text-[10px] font-bold ${
-                isNikValid ? "text-secondary" : "text-muted-foreground"
+              size="sm"
+              className={`text-sm font-bold ${
+                isNikValid ? "text-primary" : "text-muted-foreground"
               }`}
             >
               {nik.length}/16 Digit
             </Text>
           </HStack>
           <Input
-            className={`bg-background rounded-xl px-3.5 h-12 ${isNikValid ? "border-secondary" : "border-border"}`}
+            className={`bg-background rounded-xl px-3.5 h-12 ${isNikValid ? "border-primary" : "border-border"}`}
           >
             <InputField
               placeholder="3171xxxxxxxxxxxx (16 digit sesuai e-KTP)"
@@ -213,7 +209,7 @@ export function RegisterStepRole({
         {/* No WhatsApp */}
         <FormControl>
           <FormControlLabel>
-            <FormControlLabelText className="text-xs font-semibold text-foreground">
+            <FormControlLabelText className="text-sm font-semibold text-foreground">
               No. WhatsApp Aktif
             </FormControlLabelText>
           </FormControlLabel>
@@ -231,7 +227,7 @@ export function RegisterStepRole({
         {/* Almamater / Asosiasi */}
         <FormControl>
           <FormControlLabel>
-            <FormControlLabelText className="text-xs font-semibold text-foreground">
+            <FormControlLabelText className="text-sm font-semibold text-foreground">
               Almamater Pendidikan Profesi
             </FormControlLabelText>
           </FormControlLabel>
@@ -247,7 +243,7 @@ export function RegisterStepRole({
 
         {/* Pilihan Spesialisasi Chips */}
         <VStack space="xs">
-          <Text size="xs" className="text-xs font-semibold text-foreground">
+          <Text size="sm" className="text-sm font-semibold text-foreground mb-1">
             Fokus Spesialisasi
           </Text>
           <HStack space="xs" className="flex-wrap gap-1.5">
@@ -267,9 +263,9 @@ export function RegisterStepRole({
                   }`}
                 >
                   <Text
-                    size="xs"
-                    className={`text-[11px] font-semibold ${
-                      isSelected ? "text-primary-foreground" : "text-foreground"
+                    size="sm"
+                    className={`text-sm font-semibold ${
+                      isSelected ? "text-primary-foreground font-bold" : "text-foreground font-medium"
                     }`}
                   >
                     {spec}

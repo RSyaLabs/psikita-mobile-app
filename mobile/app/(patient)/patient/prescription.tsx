@@ -27,6 +27,7 @@ import {
   ProgressFilledTrack,
 } from "@/components/ui";
 import { PharmacyPartnerModal } from "@/components/modals";
+import { AppIcon } from "@/components/common/AppIcon";
 import { usePrescriptions } from "@/hooks/useApiQueries";
 import { haptics } from "@/utils/haptics";
 import { ROUTES } from "@/constants";
@@ -93,10 +94,10 @@ export default function PrescriptionScreen() {
             <VStack space="md">
               <HStack space="xs" className="items-center justify-between">
                 <HStack space="xs" className="items-center">
-                  <FileText size={16} className="text-primary-foreground" />
+                  <AppIcon icon={FileText} size={18} color="#FFFFFF" />
                   <Text
-                    size="xs"
-                    className="font-semibold text-primary-foreground text-[11px]"
+                    size="sm"
+                    className="font-bold text-primary-foreground text-sm"
                   >
                     {rx?.prescriptionNumber ||
                       (rx?.id ? `Resep ${rx.id}` : "Nomor resep belum tersedia")}
@@ -104,15 +105,15 @@ export default function PrescriptionScreen() {
                 </HStack>
                 {rx?.doctorName ? (
                   <Text
-                    size="xs"
-                    className="text-primary-foreground/90 text-[11px] font-medium"
+                    size="sm"
+                    className="text-primary-foreground/90 text-sm font-semibold"
                   >
                     {rx.doctorName}
                   </Text>
                 ) : rx?.practitionerId ? (
                   <Text
-                    size="xs"
-                    className="text-primary-foreground/80 text-[10px]"
+                    size="sm"
+                    className="text-primary-foreground/90 text-sm font-medium"
                   >
                     Praktisi {rx.practitionerId}
                   </Text>
@@ -152,15 +153,15 @@ export default function PrescriptionScreen() {
               <Box className="bg-primary-foreground/10 rounded-2xl p-3">
                 <HStack space="md" className="items-center">
                   <Box className="p-2 bg-card rounded-xl">
-                    <QrCode size={36} className="text-foreground" />
+                    <AppIcon icon={QrCode} size={36} tone="foreground" />
                   </Box>
                   <VStack space="xs" className="flex-1">
-                    <Text size="xs" bold className="text-primary-foreground">
+                    <Text size="sm" bold className="text-primary-foreground font-bold">
                       Tunjukkan kode QR ini di apotek
                     </Text>
                     <Text
-                      size="xs"
-                      className="text-primary-foreground/70 text-[11px]"
+                      size="sm"
+                      className="text-primary-foreground/80 text-sm font-medium"
                     >
                       Berlaku di RS dan apotek rekanan SeraPhany
                     </Text>
@@ -172,17 +173,17 @@ export default function PrescriptionScreen() {
         )}
 
         {/* Dose Alert */}
-        <Card className="bg-muted rounded-2xl p-3 mb-3.5 border border-border">
+        <Card className="bg-muted rounded-2xl p-3.5 mb-3.5 border border-border">
           <HStack space="sm" className="items-center">
-            <AlertTriangle size={18} className="text-foreground" />
-            <Text size="xs" bold className="text-foreground flex-1">
+            <AppIcon icon={AlertTriangle} size={20} tone="foreground" />
+            <Text size="sm" bold className="text-foreground flex-1 font-bold">
               Jangan ubah dosis tanpa konsultasi dokter
             </Text>
           </HStack>
         </Card>
 
         {/* Pharmacy Card */}
-        <Card className="bg-card rounded-2xl p-3.5 border border-border mb-3.5">
+        <Card className="bg-card rounded-2xl p-4 border border-border mb-3.5">
           <Pressable
             onPress={() => {
               haptics.light();
@@ -191,17 +192,17 @@ export default function PrescriptionScreen() {
             className="flex-row items-center justify-between active:opacity-80"
           >
             <HStack space="md" className="items-center flex-1 mr-2">
-              <MapPin size={20} className="text-secondary" />
+              <AppIcon icon={MapPin} size={20} tone="primary" />
               <VStack space="xs">
-                <Text size="xs" bold className="text-foreground">
+                <Text size="sm" bold className="text-foreground">
                   Apotek pilihan belum tersedia
                 </Text>
-                <Text size="xs" className="text-muted-foreground text-[11px]">
+                <Text size="sm" className="text-muted-foreground font-medium">
                   Detail apotek belum tersedia
                 </Text>
               </VStack>
             </HStack>
-            <ChevronRight size={18} className="text-muted-foreground" />
+            <AppIcon icon={ChevronRight} size={18} tone="muted" />
           </Pressable>
         </Card>
 

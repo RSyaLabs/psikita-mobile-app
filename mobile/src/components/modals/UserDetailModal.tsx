@@ -83,60 +83,60 @@ export function UserDetailModal({ user, onClose }: UserDetailModalProps) {
                   alt={user.name}
                 />
                 <VStack space="xs" className="flex-1">
-                  <Heading size="xs" bold className="text-foreground">
+                  <Heading size="sm" bold className="text-foreground">
                     {user.name}
                   </Heading>
-                  <Text size="xs" className="text-muted-foreground text-[11px]">
+                  <Text size="sm" className="text-muted-foreground font-medium text-sm">
                     {user.email}
                   </Text>
-                  <Badge className="bg-secondary/15 px-2 py-0.5 rounded-full border-0 self-start mt-0.5">
-                    <BadgeText className="text-[10px] font-bold text-secondary">
+                  <Badge className="bg-primary/15 px-3 py-0.5 rounded-full border-0 self-start mt-1">
+                    <BadgeText className="text-sm font-bold text-primary">
                       {user.status}
                     </BadgeText>
                   </Badge>
                 </VStack>
               </HStack>
 
-              <Box className="p-3 bg-muted rounded-2xl border border-border mt-1">
+              <Box className="p-3.5 bg-muted rounded-2xl border border-border mt-1">
                 <VStack space="xs">
                   <HStack space="md" className="items-center justify-between">
                     <Text
-                      size="xs"
-                      className="text-muted-foreground text-[11px]"
+                      size="sm"
+                      className="text-muted-foreground font-medium text-sm"
                     >
                       Legalitas / Identitas
                     </Text>
                     <Text
-                      size="xs"
+                      size="sm"
                       bold
-                      className="text-foreground text-[11px]"
+                      className="text-foreground font-semibold text-sm"
                     >
                       {user.identifier}
                     </Text>
                   </HStack>
                   <HStack space="md" className="items-center justify-between">
                     <Text
-                      size="xs"
-                      className="text-muted-foreground text-[11px]"
+                      size="sm"
+                      className="text-muted-foreground font-medium text-sm"
                     >
                       Riwayat Interaksi
                     </Text>
                     <Text
-                      size="xs"
+                      size="sm"
                       bold
-                      className="text-foreground text-[11px]"
+                      className="text-foreground font-semibold text-sm"
                     >
                       {user.sessions}
                     </Text>
                   </HStack>
                   <HStack space="md" className="items-center justify-between">
                     <Text
-                      size="xs"
-                      className="text-muted-foreground text-[11px]"
+                      size="sm"
+                      className="text-muted-foreground font-medium text-sm"
                     >
                       Integrasi SATUSEHAT
                     </Text>
-                    <Text size="xs" bold className="text-secondary text-[11px]">
+                    <Text size="sm" bold className="text-primary font-semibold text-sm">
                       {user.satusehat}
                     </Text>
                   </HStack>

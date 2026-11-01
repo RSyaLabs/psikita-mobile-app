@@ -93,56 +93,56 @@ export function PractitionerSettingsModal({
           <VStack space="sm">
             <Box className="p-3 rounded-2xl bg-muted border border-border">
               <HStack space="xs" className="items-center justify-between">
-                <Text size="xs" bold className="text-foreground">
+                <Text size="sm" bold className="text-foreground">
                   Integrasi SATUSEHAT Kemenkes
                 </Text>
-                <Badge className="bg-secondary/20 px-2 py-0.5 rounded-full border-0">
-                  <BadgeText className="text-[10px] font-bold text-secondary">
+                <Badge className="bg-primary/15 px-3 py-0.5 rounded-full border-0">
+                  <BadgeText className="text-sm font-bold text-primary">
                     Terhubung
                   </BadgeText>
                 </Badge>
               </HStack>
               <Text
-                size="xs"
-                className="text-muted-foreground text-[11px] mt-1"
+                size="sm"
+                className="text-muted-foreground font-medium text-sm mt-1"
               >
                 ID Praktisi dan status sinkronisasi belum tersedia dari server.
               </Text>
             </Box>
 
-            <Box className="p-3 rounded-2xl bg-muted border border-border">
+            <Box className="p-3.5 rounded-2xl bg-muted border border-border">
               <HStack space="xs" className="items-center justify-between">
-                <Text size="xs" bold className="text-foreground">
+                <Text size="sm" bold className="text-foreground">
                   Notifikasi Sesi & Panggilan
                 </Text>
-                <Badge className="bg-primary/20 px-2 py-0.5 rounded-full border-0">
-                  <BadgeText className="text-[10px] font-bold text-primary">
+                <Badge className="bg-primary/15 px-3 py-0.5 rounded-full border-0">
+                  <BadgeText className="text-sm font-bold text-primary">
                     Aktif
                   </BadgeText>
                 </Badge>
               </HStack>
               <Text
-                size="xs"
-                className="text-muted-foreground text-[11px] mt-1"
+                size="sm"
+                className="text-muted-foreground font-medium text-sm mt-1"
               >
                 Pemberitahuan darurat dan antrian pasien prioritas tinggi.
               </Text>
             </Box>
 
-            <Box className="p-3 rounded-2xl bg-muted border border-border">
+            <Box className="p-3.5 rounded-2xl bg-muted border border-border">
               <HStack space="xs" className="items-center justify-between">
-                <Text size="xs" bold className="text-foreground">
+                <Text size="sm" bold className="text-foreground">
                   Enkripsi Rekam Medis (AES-256)
                 </Text>
-                <Badge className="bg-secondary/20 px-2 py-0.5 rounded-full border-0">
-                  <BadgeText className="text-[10px] font-bold text-secondary">
+                <Badge className="bg-primary/15 px-3 py-0.5 rounded-full border-0">
+                  <BadgeText className="text-sm font-bold text-primary">
                     Aman
                   </BadgeText>
                 </Badge>
               </HStack>
               <Text
-                size="xs"
-                className="text-muted-foreground text-[11px] mt-1"
+                size="sm"
+                className="text-muted-foreground font-medium text-sm mt-1"
               >
                 Kerahasiaan catatan SOAP terjaga sesuai UU PDP No. 27/2022.
               </Text>

@@ -91,10 +91,10 @@ export default function VideoCallScreen() {
               Belum ada praktisi
             </Text>
             <HStack space="xs" className="items-center">
-              <ShieldCheck size={11} className="text-secondary" />
+              <ShieldCheck size={14} color="#FFFFFF" />
               <Text
-                size="xs"
-                className="text-primary-foreground/70 text-[10px]"
+                size="sm"
+                className="text-primary-foreground/90 font-medium text-sm"
               >
                 Enkripsi Medis Aktif
               </Text>
@@ -103,14 +103,7 @@ export default function VideoCallScreen() {
         </HStack>
 
         <Box className="bg-primary/80 px-3 py-1.5 rounded-xl border border-primary-foreground/20">
-          {/*
-           * The panel is primary, so the label has to be the light foreground.
-           * text-secondary is the dark brand green and disappeared against it.
-           * The duration is not invented either. There is no call session to
-           * read an elapsed time from, and a hardcoded "42:15" is a fabricated
-           * clinical-looking value on a live screen.
-           */}
-          <Text size="xs" bold className="text-primary-foreground">
+          <Text size="sm" bold className="text-primary-foreground">
             Durasi belum tersedia
           </Text>
         </Box>
@@ -142,20 +135,15 @@ export default function VideoCallScreen() {
           resizeMode="cover"
         />
 
-        {/* Remote Audio Indicator
-            The overlay used to name "dr. Andi" while connected to nobody in
-            particular, so it credited a specific person with a call that had no
-            practitioner. The header above already states the honest state, so the
-            indicator carries no name. */}
         <Box className="absolute bottom-28 left-5 bg-primary/85 px-3 py-1.5 rounded-xl flex-row items-center gap-2 border border-primary-foreground/20">
-          <Volume2 size={14} className="text-secondary" />
-          <Text size="xs" bold className="text-primary-foreground text-[11px]">
+          <Volume2 size={16} color="#FFFFFF" />
+          <Text size="sm" bold className="text-primary-foreground font-semibold">
             Sesi video belum tersedia
           </Text>
         </Box>
 
         {/* Patient Floating Self View (PiP) */}
-        <Box className="absolute top-28 right-4 w-28 h-40 bg-primary rounded-2xl overflow-hidden border-2 border-secondary z-20">
+        <Box className="absolute top-28 right-4 w-28 h-40 bg-primary rounded-2xl overflow-hidden border-2 border-primary-foreground/30 z-20">
           {isVideoOn ? (
             <Image
               source={{
@@ -167,17 +155,17 @@ export default function VideoCallScreen() {
             />
           ) : (
             <Box className="w-full h-full items-center justify-center bg-primary">
-              <VideoOff size={24} className="text-muted-foreground" />
+              <VideoOff size={24} color="#CFC8D8" />
               <Text
-                size="xs"
-                className="text-muted-foreground text-[10px] mt-1"
+                size="sm"
+                className="text-primary-foreground/80 font-medium text-sm mt-1"
               >
                 Kamera Mati
               </Text>
             </Box>
           )}
-          <Box className="absolute bottom-1.5 left-1.5 bg-primary/80 px-1.5 py-0.5 rounded">
-            <Text size="xs" bold className="text-primary-foreground text-[9px]">
+          <Box className="absolute bottom-1.5 left-1.5 bg-primary/80 px-2 py-0.5 rounded">
+            <Text size="sm" bold className="text-primary-foreground text-sm font-bold">
               Anda
             </Text>
           </Box>

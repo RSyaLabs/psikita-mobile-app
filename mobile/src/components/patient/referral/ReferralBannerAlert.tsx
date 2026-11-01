@@ -14,12 +14,12 @@ export function ReferralBannerAlert({
   return (
     <Card className="bg-muted rounded-2xl p-3.5 mb-3.5 border border-border">
       <HStack space="md" className="items-center">
-        <AlertTriangle size={20} className="text-foreground" />
+        <AlertTriangle size={20} color="#D97706" />
         <VStack space="xs" className="flex-1">
-          <Text size="xs" bold className="text-foreground">
+          <Text size="sm" bold className="text-foreground">
             {title}
           </Text>
-          <Text size="xs" className="text-muted-foreground text-[11px]">
+          <Text size="sm" className="text-muted-foreground font-medium text-sm leading-relaxed">
             {description}
           </Text>
         </VStack>

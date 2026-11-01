@@ -131,17 +131,17 @@ export function ScheduleFollowUpModal({
                 className="p-3 rounded-2xl bg-muted border border-border opacity-60 flex-row items-center justify-between"
               >
                 <VStack className="flex-1 pr-2">
-                  <Text size="xs" bold className="text-foreground">
+                  <Text size="sm" bold className="text-foreground">
                     {opt.title}
                   </Text>
                   <Text
-                    size="xs"
-                    className="text-muted-foreground text-[11px] mt-0.5"
+                    size="sm"
+                    className="text-muted-foreground font-medium text-sm mt-0.5"
                   >
                     {opt.desc}
                   </Text>
                 </VStack>
-                <Clock size={16} className="text-muted-foreground" />
+                <Clock size={16} color="#4B4656" />
               </Pressable>
             ))}
           </VStack>

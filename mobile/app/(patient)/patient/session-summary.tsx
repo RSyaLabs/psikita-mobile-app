@@ -160,11 +160,11 @@ export default function SessionSummaryScreen() {
             </Card>
 
             {resultDetail?.patientFacingAdvice && (
-              <Card className="bg-secondary/10 rounded-2xl p-4 border border-secondary/20 gap-1.5">
-                <Text size="xs" bold className="text-secondary uppercase tracking-wider text-[11px]">
+              <Card className="bg-primary/10 rounded-2xl p-4 border border-primary/20 gap-1.5">
+                <Text size="sm" bold className="text-primary uppercase tracking-wider font-bold">
                   Panduan Pasien dari Dokter
                 </Text>
-                <Text size="sm" className="text-foreground leading-relaxed">
+                <Text size="sm" className="text-foreground leading-relaxed font-medium">
                   {resultDetail.patientFacingAdvice}
                 </Text>
               </Card>
@@ -174,10 +174,10 @@ export default function SessionSummaryScreen() {
                 key={section.key}
                 className="bg-card rounded-2xl p-4 border border-border gap-2"
               >
-                <Text size="xs" bold className="text-muted-foreground">
+                <Text size="sm" bold className="text-muted-foreground font-semibold">
                   {section.label}
                 </Text>
-                <Text size="sm" className="text-foreground">
+                <Text size="sm" className="text-foreground font-medium">
                   {section.value}
                 </Text>
               </Card>
@@ -185,21 +185,21 @@ export default function SessionSummaryScreen() {
 
             {carePlan && (
               <Card className="bg-card rounded-2xl p-4 border border-border gap-2">
-                <Text size="xs" bold className="text-secondary uppercase tracking-wider text-[11px]">
+                <Text size="sm" bold className="text-primary uppercase tracking-wider font-bold">
                   Rencana Perawatan (Care Plan)
                 </Text>
                 {carePlan.diagnosisSummary && (
-                  <Text size="xs" bold className="text-foreground mt-1">
+                  <Text size="sm" bold className="text-foreground mt-1">
                     Fokus Klinis: {carePlan.diagnosisSummary}
                   </Text>
                 )}
                 {carePlan.goals && carePlan.goals.length > 0 && (
                   <VStack space="xs" className="mt-1">
-                    <Text size="xs" bold className="text-foreground text-[11px]">
+                    <Text size="sm" bold className="text-foreground font-semibold">
                       Target Pemulihan:
                     </Text>
                     {carePlan.goals.map((goal, idx) => (
-                      <Text key={idx} size="xs" className="text-muted-foreground text-[11px]">
+                      <Text key={idx} size="sm" className="text-muted-foreground font-medium">
                         • {goal}
                       </Text>
                     ))}
@@ -207,11 +207,11 @@ export default function SessionSummaryScreen() {
                 )}
                 {carePlan.interventions && carePlan.interventions.length > 0 && (
                   <VStack space="xs" className="mt-2 pt-2 border-t border-border/50">
-                    <Text size="xs" bold className="text-foreground text-[11px]">
+                    <Text size="sm" bold className="text-foreground font-semibold">
                       Intervensi & Latihan Mandiri:
                     </Text>
                     {carePlan.interventions.map((iv, idx) => (
-                      <Text key={idx} size="xs" className="text-muted-foreground text-[11px]">
+                      <Text key={idx} size="sm" className="text-muted-foreground font-medium">
                         • {iv.title}: {iv.description}
                       </Text>
                     ))}

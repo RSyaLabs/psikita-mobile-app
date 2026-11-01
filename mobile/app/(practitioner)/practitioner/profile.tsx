@@ -140,7 +140,7 @@ export default function PractitionerProfileScreen() {
             <Heading size="md" className="font-bold text-foreground">
               {totalSessions ?? "-"}
             </Heading>
-            <Text size="xs" className="text-muted-foreground text-[10px]">
+            <Text size="sm" className="text-muted-foreground font-medium text-sm">
               Total sesi
             </Text>
           </Card>
@@ -148,7 +148,7 @@ export default function PractitionerProfileScreen() {
             <Heading size="md" className="font-bold text-foreground">
               {rating ?? "-"}
             </Heading>
-            <Text size="xs" className="text-muted-foreground text-[10px]">
+            <Text size="sm" className="text-muted-foreground font-medium text-sm">
               Rating
             </Text>
           </Card>
@@ -156,7 +156,7 @@ export default function PractitionerProfileScreen() {
             <Heading size="md" className="font-bold text-foreground">
               6 th
             </Heading>
-            <Text size="xs" className="text-muted-foreground text-[10px]">
+            <Text size="sm" className="text-muted-foreground font-medium text-sm">
               Pengalaman
             </Text>
           </Card>
@@ -166,8 +166,8 @@ export default function PractitionerProfileScreen() {
         <Card className="bg-muted rounded-2xl p-3.5 border border-border mb-3">
           <VStack space="xs">
             <HStack space="sm" className="items-center">
-              <ShieldCheck size={18} className="text-foreground" />
-              <Text size="xs" className="font-bold text-foreground">
+              <ShieldCheck size={18} color="#4A3B6B" />
+              <Text size="sm" className="font-bold text-foreground">
                 {isVerified
                   ? "Terverifikasi penuh"
                   : verificationStatus === "REJECTED"
@@ -179,23 +179,23 @@ export default function PractitionerProfileScreen() {
               <>
                 {strNumber ? (
                   <HStack space="md" className="items-center justify-between">
-                    <Text size="xs" className="text-[11px] text-foreground">
+                    <Text size="sm" className="text-foreground font-medium">
                       {strNumber}
                     </Text>
-                    <Check size={14} className="text-foreground" />
+                    <Check size={15} color="#4A3B6B" />
                   </HStack>
                 ) : null}
                 {sippNumber ? (
                   <HStack space="md" className="items-center justify-between">
-                    <Text size="xs" className="text-[11px] text-foreground">
+                    <Text size="sm" className="text-foreground font-medium">
                       {sippNumber}
                     </Text>
-                    <Check size={14} className="text-foreground" />
+                    <Check size={15} color="#4A3B6B" />
                   </HStack>
                 ) : null}
               </>
             ) : (
-              <Text size="xs" className="text-[11px] text-muted-foreground">
+              <Text size="sm" className="text-muted-foreground font-medium leading-relaxed">
                 Nomor STR dan SIPP ditampilkan setelah verifikasi selesai.
               </Text>
             )}
@@ -216,18 +216,18 @@ export default function PractitionerProfileScreen() {
             >
               <HStack space="sm" className="items-center">
                 <Box className="w-8 h-8 rounded-xl bg-muted items-center justify-center">
-                  <Calendar size={16} className="text-secondary" />
+                  <Calendar size={16} color="#4A3B6B" />
                 </Box>
                 <VStack space="xs">
-                  <Text size="xs" className="font-bold text-foreground">
+                  <Text size="sm" className="font-bold text-foreground">
                     Atur jadwal praktik
                   </Text>
-                  <Text size="xs" className="text-[10px] text-muted-foreground">
+                  <Text size="sm" className="text-muted-foreground font-medium">
                     Senin–Jumat • 09:00–17:00
                   </Text>
                 </VStack>
               </HStack>
-              <ChevronRight size={16} className="text-muted-foreground" />
+              <ChevronRight size={18} color="#4B4656" />
             </Pressable>
 
             <Pressable

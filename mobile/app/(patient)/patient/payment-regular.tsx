@@ -193,27 +193,27 @@ export default function PaymentRegularScreen() {
 
         {/* GateRow */}
         <HStack space="xs" className="items-center mb-4">
-          <Box className="flex-1 bg-muted rounded-xl p-2.5 border border-border">
-            <Text size="xs" bold className="text-foreground">
+          <Box className="flex-1 bg-muted rounded-xl p-3 border border-border">
+            <Text size="sm" bold className="text-foreground">
               1 Checkout
             </Text>
-            <Text size="xs" className="text-[10px] text-secondary">
+            <Text size="sm" className="text-sm font-semibold text-primary">
               Selesai
             </Text>
           </Box>
-          <Box className="flex-1 bg-primary rounded-xl p-2.5">
-            <Text size="xs" bold className="text-primary-foreground">
+          <Box className="flex-1 bg-primary rounded-xl p-3">
+            <Text size="sm" bold className="text-primary-foreground">
               2 Bayar
             </Text>
-            <Text size="xs" className="text-[10px] text-primary-foreground/70">
+            <Text size="sm" className="text-sm font-medium text-primary-foreground/90">
               Berlangsung
             </Text>
           </Box>
-          <Box className="flex-1 bg-card rounded-xl p-2.5 border border-border">
-            <Text size="xs" bold className="text-foreground">
+          <Box className="flex-1 bg-card rounded-xl p-3 border border-border">
+            <Text size="sm" bold className="text-foreground">
               3 Chat
             </Text>
-            <Text size="xs" className="text-[10px] text-muted-foreground">
+            <Text size="sm" className="text-sm font-medium text-muted-foreground">
               Berikutnya
             </Text>
           </Box>

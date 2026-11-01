@@ -196,14 +196,14 @@ export default function PaymentBpjsScreen() {
           <Card className="bg-card rounded-2xl p-4 border border-border gap-3">
             <HStack space="md" className="items-center justify-between">
               <Text
-                size="xs"
+                size="sm"
                 bold
                 className="text-muted-foreground uppercase tracking-wide"
               >
                 Data Kepesertaan JKN
               </Text>
-              <Badge variant="outline" className="bg-muted border-border">
-                <BadgeText className="text-[10px] text-muted-foreground">
+              <Badge variant="outline" className="bg-muted border-border px-3 py-0.5 rounded-full">
+                <BadgeText className="text-sm font-semibold text-muted-foreground">
                   Server
                 </BadgeText>
               </Badge>
@@ -211,40 +211,40 @@ export default function PaymentBpjsScreen() {
 
             <VStack space="xs" className="border-t border-border pt-2.5">
               <HStack space="md" className="items-center justify-between">
-                <Text size="xs" className="text-muted-foreground">
+                <Text size="sm" className="text-muted-foreground font-medium">
                   Nomor Kartu BPJS
                 </Text>
-                <Text size="xs" bold className="text-foreground">
+                <Text size="sm" bold className="text-foreground">
                   {memberNumber ||
                     patientProfile?.bpjsNumber ||
                     "Belum tersedia dari server"}
                 </Text>
               </HStack>
               <HStack space="md" className="items-center justify-between">
-                <Text size="xs" className="text-muted-foreground">
+                <Text size="sm" className="text-muted-foreground font-medium">
                   NIK
                 </Text>
-                <Text size="xs" bold className="text-foreground">
+                <Text size="sm" bold className="text-foreground">
                   {patientProfile?.nik
                     ? `${patientProfile.nik.slice(0, 6)}******${patientProfile.nik.slice(-4)}`
                     : "Tidak dikirim"}
                 </Text>
               </HStack>
               <HStack space="md" className="items-center justify-between">
-                <Text size="xs" className="text-muted-foreground">
+                <Text size="sm" className="text-muted-foreground font-medium">
                   Faskes Tingkat 1
                 </Text>
-                <Text size="xs" bold className="text-foreground">
+                <Text size="sm" bold className="text-foreground">
                   {patientProfile?.faskes1
                     ? `${patientProfile.faskes1} (Faskes 1)`
                     : "Belum tersedia dari server"}
                 </Text>
               </HStack>
               <HStack space="md" className="items-center justify-between">
-                <Text size="xs" className="text-muted-foreground">
+                <Text size="sm" className="text-muted-foreground font-medium">
                   Kelas Perawatan
                 </Text>
-                <Text size="xs" bold className="text-foreground">
+                <Text size="sm" bold className="text-foreground">
                   Belum tersedia dari server
                 </Text>
               </HStack>

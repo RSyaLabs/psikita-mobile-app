@@ -290,8 +290,8 @@ export function RegisterPatientModal({
             </Button>
 
             <Text
-              size="xs"
-              className="text-center text-muted-foreground text-[11px] leading-relaxed px-1"
+              size="sm"
+              className="text-center text-muted-foreground font-medium text-sm leading-relaxed px-1"
             >
               Dengan mendaftar, Anda menyetujui Syarat & Ketentuan serta
               Kebijakan Privasi SeraPhany.

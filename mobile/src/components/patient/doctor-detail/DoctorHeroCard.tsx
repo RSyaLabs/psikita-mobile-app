@@ -48,12 +48,12 @@ export function DoctorHeroCard({
       {/* Verification Pill */}
       <HStack
         space="xs"
-        className="items-center bg-muted px-3 py-1.5 rounded-full mt-3 border border-border"
+        className="items-center bg-muted px-3.5 py-1.5 rounded-full mt-3 border border-border"
       >
-        <ShieldCheck size={14} className="text-secondary" />
+        <ShieldCheck size={16} color="#4A3B6B" />
         <Text
-          size="xs"
-          className="font-semibold text-foreground text-[11px]"
+          size="sm"
+          className="font-semibold text-foreground text-sm"
         >
           {sipNumber}
         </Text>
@@ -68,7 +68,7 @@ export function DoctorHeroCard({
           <Text size="sm" bold className="text-foreground">
             {doctorExp}
           </Text>
-          <Text size="xs" className="text-muted-foreground text-[11px]">
+          <Text size="sm" className="text-muted-foreground font-medium text-sm">
             Pengalaman
           </Text>
         </VStack>
@@ -77,19 +77,19 @@ export function DoctorHeroCard({
           <Text size="sm" bold className="text-foreground">
             1.400+
           </Text>
-          <Text size="xs" className="text-muted-foreground text-[11px]">
+          <Text size="sm" className="text-muted-foreground font-medium text-sm">
             Pasien Selesai
           </Text>
         </VStack>
         <Box className="w-[1px] h-6 bg-border" />
         <VStack space="xs" className="items-center flex-1">
           <HStack space="xs" className="items-center">
-            <Star size={14} className="text-warning fill-warning" />
+            <Star size={15} color="#D97706" fill="#D97706" />
             <Text size="sm" bold className="text-foreground">
               {doctorRating}
             </Text>
           </HStack>
-          <Text size="xs" className="text-muted-foreground text-[11px]">
+          <Text size="sm" className="text-muted-foreground font-medium text-sm">
             ({doctorReviews} ulasan)
           </Text>
         </VStack>

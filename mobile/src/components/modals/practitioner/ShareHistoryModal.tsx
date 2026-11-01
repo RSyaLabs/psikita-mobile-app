@@ -93,15 +93,15 @@ export function ShareHistoryModal({
 
         <ModalBody className="pt-3 pb-1">
           <Text
-            size="xs"
-            className="text-muted-foreground mb-3 leading-relaxed"
+            size="sm"
+            className="text-muted-foreground mb-3 leading-relaxed font-medium"
           >
             Ringkasan metrik klinis Anda (128 sesi terlaksana, kepatuhan RME
             100%, rating 4.9/5.0).
           </Text>
 
           <Box className="p-3 bg-muted rounded-2xl border border-border mb-3">
-            <Text size="xs" className="font-mono text-foreground text-[11px]">
+            <Text size="sm" className="font-mono text-foreground text-sm font-semibold">
               {summaryUrl}
             </Text>
           </Box>
@@ -112,10 +112,10 @@ export function ShareHistoryModal({
               isDisabled
               onPress={() => haptics.error()}
               accessibilityLabel="Salin tautan ringkasan belum tersedia"
-              className="w-full bg-primary h-11 rounded-xl"
+              className="w-full bg-primary h-12 rounded-xl"
             >
-              <ButtonIcon as={Copy} className="text-primary-foreground" />
-              <ButtonText className="text-xs font-bold text-primary-foreground">
+              <ButtonIcon as={Copy} color="#FFFFFF" />
+              <ButtonText className="text-sm font-bold text-primary-foreground">
                 Salin tautan belum tersedia
               </ButtonText>
             </Button>

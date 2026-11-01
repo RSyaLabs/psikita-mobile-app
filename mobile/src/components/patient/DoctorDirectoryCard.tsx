@@ -14,6 +14,7 @@ import {
   AvatarFallbackText,
   AvatarBadge,
 } from "@/components/ui";
+import { AppIcon } from "@/components/common/AppIcon";
 import { getInitials } from "@/utils/format";
 import { formatRupiah } from "@/utils";
 
@@ -23,12 +24,6 @@ export interface DoctorDirectoryItem {
   role: string;
   title: string;
   specialty: string;
-  /**
-   * These four are nullable on purpose. A `number` cannot say "the server did
-   * not answer", so the caller had to invent a rating, a review count, a tenure
-   * and a fee. A patient books a practitioner from this card, and a fabricated
-   * 4.9 with 50 reviews is a purchase decision made on invented data.
-   */
   rating: number | null;
   reviewsCount: number | null;
   experienceYears: number | null;
@@ -53,7 +48,7 @@ export function DoctorDirectoryCard({
     <Pressable
       onPressIn={() => onPrefetch?.(doctor.id)}
       onPress={() => onSelect(doctor)}
-      className="bg-card border border-border rounded-3xl p-4 active:border-secondary active:opacity-95"
+      className="bg-card border border-border rounded-3xl p-4 active:border-primary active:opacity-95"
     >
       <HStack space="md" className="items-start">
         {/* Doctor Avatar with Online Status */}
@@ -64,60 +59,62 @@ export function DoctorDirectoryCard({
           <AvatarImage source={{ uri: doctor.avatar }} />
           <AvatarFallbackText>{getInitials(doctor.name)}</AvatarFallbackText>
           {doctor.isOnline && (
-            <AvatarBadge className="bg-secondary border-2 border-card" />
+            <AvatarBadge className="bg-primary border-2 border-card" />
           )}
         </Avatar>
 
         {/* Doctor Details */}
         <VStack space="xs" className="flex-1">
           <HStack space="xs" className="items-center justify-between">
-            <Box className="bg-muted px-2 py-0.5 rounded-md">
+            <Box className="bg-muted px-2.5 py-1 rounded-md">
               <Text
-                size="xs"
+                size="sm"
                 bold
-                className="text-secondary text-[10px] uppercase tracking-wider"
+                className="text-primary font-bold uppercase tracking-wider text-sm"
               >
                 {doctor.role}
               </Text>
             </Box>
             {doctor.rating !== null && (
-              <>
-                <Star
-                  size={14}
-                  className="text-warning fill-warning"
+              <HStack space="xs" className="items-center">
+                <AppIcon
+                  icon={Star}
+                  size={15}
+                  color="#D97706"
+                  fill="#D97706"
                 />
-                <Text size="xs" bold className="text-foreground">
+                <Text size="sm" bold className="text-foreground font-bold">
                   {doctor.rating}
                 </Text>
                 {doctor.reviewsCount !== null && (
-                  <Text size="xs" className="text-muted-foreground">
+                  <Text size="sm" className="text-muted-foreground font-medium">
                     ({doctor.reviewsCount})
                   </Text>
                 )}
-              </>
+              </HStack>
             )}
           </HStack>
 
-          <Heading size="sm" bold className="text-foreground mt-0.5">
+          <Heading size="md" bold className="text-foreground mt-1">
             {doctor.name}
           </Heading>
-          <Text size="xs" className="text-muted-foreground">
+          <Text size="sm" className="text-muted-foreground font-medium">
             {doctor.specialty}
           </Text>
 
-          <HStack space="md" className="items-center mt-1">
+          <HStack space="md" className="items-center mt-1.5">
             {doctor.experienceYears !== null && (
               <HStack space="xs" className="items-center">
-                <Clock size={12} className="text-muted-foreground" />
-                <Text size="xs" className="text-muted-foreground text-[11px]">
+                <AppIcon icon={Clock} size={14} tone="muted" />
+                <Text size="sm" className="text-muted-foreground font-medium">
                   {doctor.experienceYears} thn pengalaman
                 </Text>
               </HStack>
             )}
             {doctor.supportsBpjs && (
               <HStack space="xs" className="items-center">
-                <ShieldCheck size={12} className="text-secondary" />
-                <Text size="xs" bold className="text-secondary text-[11px]">
+                <AppIcon icon={ShieldCheck} size={14} tone="primary" />
+                <Text size="sm" bold className="text-primary font-bold">
                   BPJS
                 </Text>
               </HStack>
@@ -127,28 +124,28 @@ export function DoctorDirectoryCard({
           {/* Fee and Select Button */}
           <HStack
             space="sm"
-            className="items-center justify-between pt-3 mt-1 border-t border-border"
+            className="items-center justify-between pt-3 mt-2 border-t border-border"
           >
             <VStack space="xs">
-              <Text size="xs" className="text-muted-foreground text-[10px]">
+              <Text size="sm" className="text-muted-foreground font-medium">
                 Tarif Konsultasi
               </Text>
-              <Text size="sm" bold className="text-foreground">
+              <Text size="sm" bold className="text-foreground font-bold">
                 {doctor.fee !== null
                   ? `${formatRupiah(doctor.fee)} `
                   : "Tarif belum tersedia "}
-                <Text size="xs" className="text-muted-foreground font-normal">
+                <Text size="sm" className="text-muted-foreground font-normal">
                   / 45 mnt
                 </Text>
               </Text>
             </VStack>
 
             <Button
-              size="sm"
+              size="md"
               onPress={() => onSelect(doctor)}
-              className="bg-secondary px-4 py-2 rounded-xl h-auto"
+              className="bg-primary px-5 py-2.5 rounded-xl h-auto"
             >
-              <ButtonText className="text-xs font-bold text-secondary-foreground">
+              <ButtonText className="text-sm font-bold text-white">
                 Pilih
               </ButtonText>
             </Button>

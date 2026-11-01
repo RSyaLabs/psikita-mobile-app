@@ -50,10 +50,10 @@ export function PersonalIdentitySection({
         </Heading>
         <HStack
           space="xs"
-          className="items-center bg-secondary/15 px-2 py-0.5 rounded-full"
+          className="items-center bg-primary/10 px-3 py-1 rounded-full"
         >
-          <ShieldCheck size={12} className="text-secondary" />
-          <Text size="xs" bold className="text-secondary text-[10px]">
+          <ShieldCheck size={14} color="#4A3B6B" />
+          <Text size="sm" bold className="text-primary text-sm font-bold">
             Satu Sehat Terhubung
           </Text>
         </HStack>
@@ -61,16 +61,16 @@ export function PersonalIdentitySection({
       <Card className="bg-card rounded-2xl p-4 border border-border gap-3">
         <FormControl>
           <FormControlLabel>
-            <FormControlLabelText className="text-xs font-bold text-foreground">
+            <FormControlLabelText className="text-sm font-bold text-foreground">
               Nama Lengkap (Sesuai KTP)
             </FormControlLabelText>
           </FormControlLabel>
-          <Input className="rounded-xl border-border bg-background h-11 px-3">
+          <Input className="rounded-xl border-border bg-background h-12 px-3.5">
             <InputField
               value={fullName}
               onChangeText={onChangeFullName}
               placeholder="Nama lengkap"
-              className="text-foreground text-xs"
+              className="text-foreground text-sm"
             />
           </Input>
         </FormControl>
@@ -78,26 +78,26 @@ export function PersonalIdentitySection({
         <FormControl>
           <FormControlLabel>
             <HStack space="xs" className="items-center justify-between w-full">
-              <FormControlLabelText className="text-xs font-bold text-foreground">
+              <FormControlLabelText className="text-sm font-bold text-foreground">
                 NIK KTP (16 Digit)
               </FormControlLabelText>
-              <Text size="xs" className="text-secondary text-[11px] font-bold">
+              <Text size="sm" className="text-primary text-sm font-bold">
                 Integrasi Kemenkes
               </Text>
             </HStack>
           </FormControlLabel>
-          <Input className="rounded-xl border-border bg-background h-11 px-3">
+          <Input className="rounded-xl border-border bg-background h-12 px-3.5">
             <InputField
               value={nik}
               onChangeText={onChangeNik}
               placeholder="Contoh: 3174051209900001"
               keyboardType="numeric"
               maxLength={16}
-              className="text-foreground text-xs"
+              className="text-foreground text-sm"
             />
           </Input>
           <FormControlHelper className="mt-1">
-            <FormControlHelperText className="text-[11px] text-muted-foreground">
+            <FormControlHelperText className="text-sm text-muted-foreground font-medium">
               Digunakan untuk validasi rekam medis Satu Sehat Kemenkes
             </FormControlHelperText>
           </FormControlHelper>

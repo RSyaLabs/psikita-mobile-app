@@ -106,7 +106,7 @@ export function RegisterStepLegal({
               className="text-sm text-foreground placeholder:text-muted-foreground"
             />
           </Input>
-          <Text size="xs" className="text-muted-foreground text-[10px] mt-1">
+          <Text size="sm" className="text-muted-foreground font-medium text-sm mt-1">
             Nomor registrasi nasional yang tercatat di portal Kemenkes Satu
             Sehat SDMK.
           </Text>
@@ -157,24 +157,24 @@ export function RegisterStepLegal({
               <>
                 <FileCheck size={24} className="text-secondary" />
                 <Text
-                  size="xs"
-                  className="font-bold text-secondary text-center"
+                  size="sm"
+                  className="font-bold text-primary text-center"
                 >
                   {docsUploaded}
                 </Text>
-                <Text size="xs" className="text-muted-foreground text-[10px]">
+                <Text size="sm" className="text-muted-foreground font-medium text-sm">
                   Berkas terverifikasi siap kirim • Ketuk untuk ubah
                 </Text>
               </>
             ) : (
               <>
-                <Upload size={22} className="text-muted-foreground" />
-                <Text size="xs" className="font-semibold text-foreground">
+                <Upload size={22} color="#4B4656" />
+                <Text size="sm" className="font-semibold text-foreground text-sm">
                   Pilih Berkas STR & SIP (PDF)
                 </Text>
                 <Text
-                  size="xs"
-                  className="text-muted-foreground text-[10px] text-center"
+                  size="sm"
+                  className="text-muted-foreground font-medium text-sm text-center"
                 >
                   PDF/Foto scan resmi • Maksimal 5 MB per berkas
                 </Text>
@@ -202,12 +202,12 @@ export function RegisterStepLegal({
             }`}
           >
             {agreedToEthic && (
-              <CheckCircle2 size={14} className="text-primary-foreground" />
+              <CheckCircle2 size={14} color="#FFFFFF" />
             )}
           </Box>
           <Text
-            size="xs"
-            className="flex-1 text-foreground text-[11px] leading-relaxed"
+            size="sm"
+            className="flex-1 text-foreground font-medium text-sm leading-relaxed"
           >
             Saya menyatakan bahwa seluruh data STR, SIP, dan kualifikasi profesi
             adalah benar, sah, dan dapat dipertanggungjawabkan secara hukum
@@ -219,17 +219,17 @@ export function RegisterStepLegal({
       {/* Anti-Abuse Sandbox Notice */}
       <Card className="bg-primary/5 rounded-2xl p-3 border border-primary/20">
         <HStack space="sm" className="items-start">
-          <ShieldCheck size={18} className="text-primary mt-0.5" />
+          <ShieldCheck size={18} color="#4A3B6B" style={{ marginTop: 2 }} />
           <VStack space="xs" className="flex-1">
-            <Text size="xs" className="font-bold text-primary">
+            <Text size="sm" className="font-bold text-primary">
               Pencegahan Praktik Ilegal & Zero-Trust
             </Text>
             <Text
-              size="xs"
-              className="text-muted-foreground text-[10px] leading-relaxed"
+              size="sm"
+              className="text-muted-foreground font-medium text-sm leading-relaxed"
             >
               Akun baru otomatis berstatus{" "}
-              <Text size="xs" className="font-bold text-foreground text-[10px]">
+              <Text size="sm" className="font-bold text-foreground text-sm">
                 PENDING & INACTIVE
               </Text>
               . Praktisi belum dapat menerima pasien sampai NIK & STR lolos

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useRouter } from "expo-router";
+import { Image as RNImage } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   Edit3,
@@ -11,11 +12,9 @@ import {
   Shield,
   LogOut,
   ChevronRight,
-  ArrowLeft,
 } from "lucide-react-native";
 import { getInitials } from "@/utils/format";
 import { haptics } from "@/utils/haptics";
-import { safeNavigateBack } from "@/utils/navigation";
 import { ROUTES } from "@/constants/routes";
 import {
   Box,
@@ -35,6 +34,7 @@ import {
   PatientSupportModal,
   PatientPrivacyModal,
 } from "@/components/modals";
+import { AppIcon } from "@/components/common/AppIcon";
 import { PatientTabBar } from "@/components/navigation/PatientTabBar";
 import { usePatientProfile, useMyAvatar } from "@/hooks/useApiQueries";
 import { useAuth } from "@/hooks/useAuth";
@@ -63,19 +63,17 @@ export default function ProfileScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-background">
-      {/* Profile Head */}
-      <Box className="bg-primary px-5 pt-3 pb-5 rounded-b-3xl items-center">
+      {/* Profile Header (Root Tab - No Back Button, Authentic Brand Emblem) */}
+      <Box className="bg-primary px-5 pt-3 pb-6 rounded-b-3xl items-center">
         <HStack space="xs" className="w-full justify-between items-center mb-1">
-          <Pressable
-            onPress={() => safeNavigateBack(router, ROUTES.PATIENT.DASHBOARD)}
-            accessibilityRole="button"
-            accessibilityLabel="Kembali ke Dashboard"
-            className="p-1 -ml-1 active:opacity-70"
-          >
-            <ArrowLeft size={22} color="#FFFFFF" />
-          </Pressable>
-          <Box className="w-6" />
+          <Box className="w-8 h-8" />
+          <RNImage
+            source={require("@/../assets/icon.png")}
+            style={{ width: 32, height: 32, borderRadius: 8 }}
+            resizeMode="cover"
+          />
         </HStack>
+
         <VStack space="xs" className="items-center">
           <Avatar size="2xl" className="border-2 border-primary-foreground/20">
             {avatarData?.avatarUrl ? (
@@ -83,10 +81,10 @@ export default function ProfileScreen() {
             ) : null}
             <AvatarFallbackText>{getInitials(patientName)}</AvatarFallbackText>
           </Avatar>
-          <Heading size="md" bold className="text-primary-foreground mt-1">
+          <Heading size="lg" bold className="text-primary-foreground mt-1">
             {patientName}
           </Heading>
-          <Text size="xs" className="text-primary-foreground/80">
+          <Text size="sm" className="text-primary-foreground/90 font-medium">
             Nomor rekam medis: {rmNumber}
           </Text>
 
@@ -97,10 +95,10 @@ export default function ProfileScreen() {
               haptics.light();
               router.push(ROUTES.PATIENT.EDIT_PROFILE);
             }}
-            className="bg-primary-foreground/10 px-3.5 py-1.5 rounded-full flex-row items-center gap-1.5 my-1 active:opacity-80"
+            className="bg-primary-foreground/15 px-4 py-2 rounded-full flex-row items-center gap-2 mt-2 active:opacity-80"
           >
-            <Edit3 size={13} className="text-primary-foreground" />
-            <Text size="xs" className="font-semibold text-primary-foreground">
+            <AppIcon icon={Edit3} size={15} color="#FFFFFF" />
+            <Text size="sm" className="font-semibold text-primary-foreground">
               Ubah profil
             </Text>
           </Pressable>
@@ -110,20 +108,22 @@ export default function ProfileScreen() {
       <ScrollView
         contentContainerStyle={{
           paddingHorizontal: 20,
-          paddingTop: 14,
-          paddingBottom: 100,
+          paddingTop: 16,
+          paddingBottom: 110,
         }}
         showsVerticalScrollIndicator={false}
       >
-        {/* Care Continuity */}
-        <Card className="bg-card rounded-2xl p-3.5 border border-border mb-3.5">
-          <HStack space="sm" className="items-center">
-            <Pill size={18} className="text-secondary" />
+        {/* Care Continuity Banner */}
+        <Card className="bg-card rounded-2xl p-4 border border-border mb-4">
+          <HStack space="md" className="items-center">
+            <Box className="w-10 h-10 rounded-full bg-muted items-center justify-center">
+              <AppIcon icon={Pill} size={20} tone="primary" />
+            </Box>
             <VStack space="xs" className="flex-1">
               <Text size="sm" bold className="text-foreground">
                 Ringkasan perawatan belum tersedia
               </Text>
-              <Text size="xs" className="text-muted-foreground text-[11px]">
+              <Text size="sm" className="text-muted-foreground font-medium leading-relaxed">
                 Resep dan rujukan hanya ditampilkan setelah dimuat dari server.
               </Text>
             </VStack>
@@ -131,61 +131,61 @@ export default function ProfileScreen() {
         </Card>
 
         {/* Group Akun */}
-        <Card className="bg-card rounded-2xl p-3.5 border border-border mb-3.5">
+        <Card className="bg-card rounded-2xl p-4 border border-border mb-4">
           <VStack space="xs">
             <Text
-              size="xs"
-              className="font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 text-[11px]"
+              size="sm"
+              className="font-bold text-muted-foreground uppercase tracking-wider mb-2"
             >
               Akun
             </Text>
             <Pressable
               onPress={() => router.push(ROUTES.PATIENT.HISTORY)}
-              className="py-2.5 flex-row items-center justify-between active:opacity-80"
+              className="py-3 flex-row items-center justify-between active:opacity-80"
             >
               <HStack space="md" className="items-center">
-                <Calendar size={18} className="text-foreground" />
-                <Text size="xs" bold className="text-foreground">
+                <AppIcon icon={Calendar} size={20} tone="primary" />
+                <Text size="sm" className="font-semibold text-foreground">
                   Jadwal saya
                 </Text>
               </HStack>
-              <ChevronRight size={16} className="text-muted-foreground" />
+              <AppIcon icon={ChevronRight} size={18} tone="muted" />
             </Pressable>
 
             <Pressable
               onPress={() => router.push(ROUTES.PATIENT.PRESCRIPTION)}
-              className="py-2.5 flex-row items-center justify-between border-t border-border active:opacity-80"
+              className="py-3 flex-row items-center justify-between border-t border-border active:opacity-80"
             >
               <HStack space="md" className="items-center">
-                <Pill size={18} className="text-foreground" />
-                <Text size="xs" bold className="text-foreground">
+                <AppIcon icon={Pill} size={20} tone="primary" />
+                <Text size="sm" className="font-semibold text-foreground">
                   Resep digital
                 </Text>
               </HStack>
-              <ChevronRight size={16} className="text-muted-foreground" />
+              <AppIcon icon={ChevronRight} size={18} tone="muted" />
             </Pressable>
 
             <Pressable
               onPress={() => router.push(ROUTES.PATIENT.REFERRAL)}
-              className="py-2.5 flex-row items-center justify-between border-t border-border active:opacity-80"
+              className="py-3 flex-row items-center justify-between border-t border-border active:opacity-80"
             >
               <HStack space="md" className="items-center">
-                <FileText size={18} className="text-foreground" />
-                <Text size="xs" bold className="text-foreground">
+                <AppIcon icon={FileText} size={20} tone="primary" />
+                <Text size="sm" className="font-semibold text-foreground">
                   Rujukan rumah sakit
                 </Text>
               </HStack>
-              <ChevronRight size={16} className="text-muted-foreground" />
+              <AppIcon icon={ChevronRight} size={18} tone="muted" />
             </Pressable>
           </VStack>
         </Card>
 
         {/* Group Bantuan */}
-        <Card className="bg-card rounded-2xl p-3.5 border border-border mb-3.5">
+        <Card className="bg-card rounded-2xl p-4 border border-border mb-4">
           <VStack space="xs">
             <Text
-              size="xs"
-              className="font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 text-[11px]"
+              size="sm"
+              className="font-bold text-muted-foreground uppercase tracking-wider mb-2"
             >
               Bantuan
             </Text>
@@ -194,15 +194,15 @@ export default function ProfileScreen() {
                 haptics.light();
                 setShowHelpModal(true);
               }}
-              className="py-2.5 flex-row items-center justify-between active:opacity-80"
+              className="py-3 flex-row items-center justify-between active:opacity-80"
             >
               <HStack space="md" className="items-center">
-                <HelpCircle size={18} className="text-foreground" />
-                <Text size="xs" bold className="text-foreground">
+                <AppIcon icon={HelpCircle} size={20} tone="primary" />
+                <Text size="sm" className="font-semibold text-foreground">
                   Pusat bantuan & FAQ
                 </Text>
               </HStack>
-              <ChevronRight size={16} className="text-muted-foreground" />
+              <AppIcon icon={ChevronRight} size={18} tone="muted" />
             </Pressable>
 
             <Pressable
@@ -210,15 +210,15 @@ export default function ProfileScreen() {
                 haptics.light();
                 setShowCsModal(true);
               }}
-              className="py-2.5 flex-row items-center justify-between border-t border-border active:opacity-80"
+              className="py-3 flex-row items-center justify-between border-t border-border active:opacity-80"
             >
               <HStack space="md" className="items-center">
-                <MessageSquare size={18} className="text-foreground" />
-                <Text size="xs" bold className="text-foreground">
+                <AppIcon icon={MessageSquare} size={20} tone="primary" />
+                <Text size="sm" className="font-semibold text-foreground">
                   Hubungi Tim Support
                 </Text>
               </HStack>
-              <ChevronRight size={16} className="text-muted-foreground" />
+              <AppIcon icon={ChevronRight} size={18} tone="muted" />
             </Pressable>
 
             <Pressable
@@ -226,27 +226,27 @@ export default function ProfileScreen() {
                 haptics.light();
                 setShowPrivacyModal(true);
               }}
-              className="py-2.5 flex-row items-center justify-between border-t border-border active:opacity-80"
+              className="py-3 flex-row items-center justify-between border-t border-border active:opacity-80"
             >
               <HStack space="md" className="items-center">
-                <Shield size={18} className="text-foreground" />
-                <Text size="xs" bold className="text-foreground">
+                <AppIcon icon={Shield} size={20} tone="primary" />
+                <Text size="sm" className="font-semibold text-foreground">
                   Kebijakan privasi & data medis
                 </Text>
               </HStack>
-              <ChevronRight size={16} className="text-muted-foreground" />
+              <AppIcon icon={ChevronRight} size={18} tone="muted" />
             </Pressable>
           </VStack>
         </Card>
 
         {/* Logout */}
-        <Card className="bg-card rounded-2xl p-3.5 border border-border mb-4">
+        <Card className="bg-card rounded-2xl p-4 border border-border mb-4">
           <Pressable
             onPress={handleSignOut}
             className="flex-row items-center gap-3 active:opacity-80"
           >
-            <LogOut size={18} className="text-destructive" />
-            <Text size="xs" bold className="text-destructive">
+            <AppIcon icon={LogOut} size={20} tone="destructive" />
+            <Text size="sm" bold className="text-destructive">
               Keluar Akun
             </Text>
           </Pressable>

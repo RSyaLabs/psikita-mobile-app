@@ -105,13 +105,13 @@ export default function AssessmentResultScreen() {
               <HStack space="sm" className="items-center justify-between">
                 <Badge
                   variant="outline"
-                  className="bg-muted border-border rounded-full"
+                  className="bg-muted border-border rounded-full px-3 py-1"
                 >
-                  <BadgeText className="text-[10px] text-foreground">
+                  <BadgeText className="text-sm font-semibold text-foreground">
                     {result.assessmentType}
                   </BadgeText>
                 </Badge>
-                <Text size="xs" className="text-muted-foreground">
+                <Text size="sm" className="text-muted-foreground font-medium">
                   {formatServerDate(result.createdAt)}
                 </Text>
               </HStack>

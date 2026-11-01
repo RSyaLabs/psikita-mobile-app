@@ -27,15 +27,15 @@ export function PractitionerQueueSection({
         <HStack space="md" className="items-center justify-between">
           <HStack space="sm" className="items-center flex-1 mr-2">
             <Box className="w-9 h-9 rounded-xl bg-warning/15 items-center justify-center">
-              <AlertTriangle size={18} className="text-warning" />
+              <AlertTriangle size={18} color="#D97706" />
             </Box>
             <VStack space="xs" className="flex-1">
-              <Text size="xs" bold className="text-foreground">
+              <Text size="sm" bold className="text-foreground">
                 Status Antrian Triase
               </Text>
               <Text
-                size="xs"
-                className="text-muted-foreground text-[11px]"
+                size="sm"
+                className="text-muted-foreground font-medium"
               >
                 {queueMessage}
               </Text>
@@ -43,12 +43,12 @@ export function PractitionerQueueSection({
           </HStack>
           <Pressable
             onPress={onOpenWarRoom}
-            className="p-2 rounded-xl bg-secondary/15 active:opacity-80 flex-row items-center gap-1"
+            className="px-3 py-1.5 rounded-xl bg-primary/15 active:opacity-80 flex-row items-center gap-1.5"
           >
-            <Text size="xs" className="font-bold text-secondary text-[11px]">
+            <Text size="sm" className="font-bold text-primary text-sm">
               Klaim
             </Text>
-            <ArrowRight size={14} className="text-secondary" />
+            <ArrowRight size={15} color="#4A3B6B" />
           </Pressable>
         </HStack>
       </Card>

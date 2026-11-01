@@ -52,27 +52,27 @@ export function PractitionerNextSessionCard({
           >
             <HStack space="md" className="items-center flex-1 mr-2">
               <Box className="w-10 h-10 rounded-xl bg-primary/10 items-center justify-center">
-                <Clock size={18} className="text-primary" />
+                <Clock size={18} color="#4A3B6B" />
               </Box>
               <VStack space="xs" className="flex-1">
                 <HStack space="xs" className="items-center">
-                  <Text size="xs" className="font-bold text-foreground">
+                  <Text size="sm" className="font-bold text-foreground">
                     {sessionPatient}
                   </Text>
-                  <Box className="w-1.5 h-1.5 rounded-full bg-secondary" />
+                  <Box className="w-1.5 h-1.5 rounded-full bg-primary" />
                   <Text
-                    size="xs"
-                    className="text-secondary font-semibold text-[10px]"
+                    size="sm"
+                    className="text-primary font-semibold text-sm"
                   >
                     Hari ini
                   </Text>
                 </HStack>
-                <Text size="xs" className="text-muted-foreground text-[11px]">
+                <Text size="sm" className="text-muted-foreground font-medium">
                   {sessionTime} • {sessionTopic}
                 </Text>
               </VStack>
             </HStack>
-            <ChevronRight size={16} className="text-muted-foreground" />
+            <ChevronRight size={18} color="#4B4656" />
           </Pressable>
         ) : (
           <Box className="py-2 items-center">

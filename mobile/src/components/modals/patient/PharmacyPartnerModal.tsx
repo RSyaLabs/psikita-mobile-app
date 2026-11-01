@@ -91,16 +91,16 @@ export function PharmacyPartnerModal({
               </Text>
             </VStack>
 
-            <Box className="bg-muted p-3 rounded-2xl border border-border">
+            <Box className="bg-muted p-3.5 rounded-2xl border border-border">
               <HStack space="xs" className="items-center mb-1">
-                <Clock size={14} className="text-secondary" />
-                <Text size="xs" bold className="text-foreground text-[11px]">
+                <Clock size={16} color="#4A3B6B" />
+                <Text size="sm" bold className="text-foreground font-semibold">
                   Jam Buka: 08.00 - 22.00 WIB (Setiap Hari)
                 </Text>
               </HStack>
               <HStack space="xs" className="items-center">
-                <CheckCircle2 size={14} className="text-secondary" />
-                <Text size="xs" className="text-muted-foreground text-[11px]">
+                <CheckCircle2 size={16} color="#4A3B6B" />
+                <Text size="sm" className="text-muted-foreground font-medium text-sm">
                   Stok Sertraline 50mg: Tersedia (20 strip)
                 </Text>
               </HStack>

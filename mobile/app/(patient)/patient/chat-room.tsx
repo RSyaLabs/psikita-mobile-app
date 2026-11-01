@@ -115,9 +115,9 @@ export default function ChatRoomScreen() {
           {context && (
             <Badge
               variant="outline"
-              className="bg-muted border-border rounded-full"
+              className="bg-muted border-border rounded-full px-3 py-1"
             >
-              <BadgeText className="text-[10px] text-foreground">
+              <BadgeText className="text-sm font-semibold text-foreground">
                 Read-only
               </BadgeText>
             </Badge>

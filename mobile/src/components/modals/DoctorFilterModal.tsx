@@ -147,24 +147,24 @@ export function DoctorFilterModal({
                 }`}
               >
                 <VStack space="xs">
-                  <Text size="xs" bold className="text-foreground">
+                  <Text size="sm" bold className="text-foreground">
                     Sedang Online Saja
                   </Text>
-                  <Text size="xs" className="text-muted-foreground text-[11px]">
+                  <Text size="sm" className="text-muted-foreground font-medium text-sm">
                     Hanya tampilkan dokter yang siap sesi instan
                   </Text>
                 </VStack>
                 <Box
                   className={`w-5 h-5 rounded-full border items-center justify-center ${
                     filterOnlineOnly
-                      ? "bg-secondary border-secondary"
+                      ? "bg-primary border-primary"
                       : "border-border"
                   }`}
                 >
                   {filterOnlineOnly && (
                     <CheckCircle2
                       size={14}
-                      className="text-secondary-foreground"
+                      color="#FFFFFF"
                     />
                   )}
                 </Box>
@@ -173,7 +173,7 @@ export function DoctorFilterModal({
 
             {/* BPJS Filter */}
             <VStack space="xs">
-              <Text size="xs" bold className="text-foreground">
+              <Text size="sm" bold className="text-foreground">
                 Penjaminan
               </Text>
               <Pressable
@@ -188,10 +188,10 @@ export function DoctorFilterModal({
                 }`}
               >
                 <VStack space="xs">
-                  <Text size="xs" bold className="text-foreground">
+                  <Text size="sm" bold className="text-foreground">
                     Dukungan BPJS Kesehatan
                   </Text>
-                  <Text size="xs" className="text-muted-foreground text-[11px]">
+                  <Text size="sm" className="text-muted-foreground font-medium text-sm">
                     Konsultasi terhubung dengan rujukan Faskes 1
                   </Text>
                 </VStack>

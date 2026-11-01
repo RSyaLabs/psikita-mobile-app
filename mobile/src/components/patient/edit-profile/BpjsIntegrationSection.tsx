@@ -34,8 +34,8 @@ export function BpjsIntegrationSection({
         <Heading size="xs" bold className="text-foreground">
           Integrasi JKN / BPJS Kesehatan
         </Heading>
-        <Box className="bg-secondary/15 px-2 py-0.5 rounded-full">
-          <Text size="xs" bold className="text-secondary text-[10px]">
+        <Box className="bg-primary/10 px-3 py-1 rounded-full">
+          <Text size="sm" bold className="text-primary text-sm font-bold">
             Aktif — Ditanggung
           </Text>
         </Box>
@@ -43,21 +43,21 @@ export function BpjsIntegrationSection({
       <Card className="bg-card rounded-2xl p-4 border border-border gap-3">
         <FormControl>
           <FormControlLabel>
-            <FormControlLabelText className="text-xs font-bold text-foreground">
+            <FormControlLabelText className="text-sm font-bold text-foreground">
               Nomor Kartu BPJS Kesehatan
             </FormControlLabelText>
           </FormControlLabel>
-          <Input className="rounded-xl border-border bg-background h-11 px-3">
+          <Input className="rounded-xl border-border bg-background h-12 px-3.5">
             <InputField
               value={bpjsNumber}
               onChangeText={onChangeBpjsNumber}
               keyboardType="number-pad"
               placeholder="0000 1234 5678 90"
-              className="text-foreground text-xs"
+              className="text-foreground text-sm"
             />
           </Input>
           <FormControlHelper className="mt-1">
-            <FormControlHelperText className="text-[11px] text-muted-foreground">
+            <FormControlHelperText className="text-sm text-muted-foreground font-medium">
               Digunakan untuk klaim konsultasi gratis Rp0 melalui faskes rujukan
             </FormControlHelperText>
           </FormControlHelper>

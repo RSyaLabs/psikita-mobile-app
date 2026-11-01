@@ -91,37 +91,37 @@ export function PractitionerHelpModal({
 
         <ModalBody className="pt-3 pb-1">
           <VStack space="xs">
-            <Box className="p-3 rounded-2xl bg-muted border border-border flex-row items-center gap-3">
-              <BookOpen size={16} className="text-primary" />
+            <Box className="p-3.5 rounded-2xl bg-muted border border-border flex-row items-center gap-3">
+              <BookOpen size={18} color="#4A3B6B" />
               <VStack className="flex-1">
-                <Text size="xs" bold className="text-foreground">
+                <Text size="sm" bold className="text-foreground font-semibold">
                   Panduan Standar SOAP & ICD-10
                 </Text>
-                <Text size="xs" className="text-muted-foreground text-[11px]">
+                <Text size="sm" className="text-muted-foreground font-medium text-sm">
                   Pedoman klinis rekam medis digital
                 </Text>
               </VStack>
             </Box>
 
-            <Box className="p-3 rounded-2xl bg-muted border border-border flex-row items-center gap-3">
-              <Activity size={16} className="text-secondary" />
+            <Box className="p-3.5 rounded-2xl bg-muted border border-border flex-row items-center gap-3">
+              <Activity size={18} color="#4A3B6B" />
               <VStack className="flex-1">
-                <Text size="xs" bold className="text-foreground">
+                <Text size="sm" bold className="text-foreground font-semibold">
                   Protokol Penanganan Krisis & Darurat
                 </Text>
-                <Text size="xs" className="text-muted-foreground text-[11px]">
+                <Text size="sm" className="text-muted-foreground font-medium text-sm">
                   Eskalasi belum tersedia
                 </Text>
               </VStack>
             </Box>
 
-            <Box className="p-3 rounded-2xl bg-muted border border-border flex-row items-center gap-3">
-              <Phone size={16} className="text-foreground" />
+            <Box className="p-3.5 rounded-2xl bg-muted border border-border flex-row items-center gap-3">
+              <Phone size={18} color="#262130" />
               <VStack className="flex-1">
-                <Text size="xs" bold className="text-foreground">
+                <Text size="sm" bold className="text-foreground font-semibold">
                   Kanal dukungan belum tersedia
                 </Text>
-                <Text size="xs" className="text-muted-foreground text-[11px]">
+                <Text size="sm" className="text-muted-foreground font-medium text-sm leading-relaxed">
                   Belum ada kontak liaison yang tervalidasi dari server.
                 </Text>
               </VStack>
