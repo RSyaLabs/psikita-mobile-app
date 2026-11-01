@@ -17,7 +17,8 @@ export {
 export type { ResponseAdapter } from "./response";
 
 export const API_BASE_URL =
-  process.env.EXPO_PUBLIC_API_BASE_URL || "http://localhost:3000";
+  process.env.EXPO_PUBLIC_API_BASE_URL ||
+  "https://api.staging.seraphany.id/core";
 
 const TOKEN_KEY = "seraphany_access_token";
 let currentAccessToken: string | null = null;
