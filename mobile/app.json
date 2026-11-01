@@ -18,7 +18,8 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#f8f7ee"
       },
-      "package": "id.seraphany.app"
+      "package": "id.seraphany.app",
+      "versionCode": 1
     },
     "web": {
       "bundler": "metro",
