@@ -3,46 +3,46 @@ import { vars } from "nativewind";
 // Raw color values - update these and they sync everywhere
 export const colors = {
   light: {
-    "--primary": "30 51 34", // #1E3322 (Forest Green)
+    "--primary": "107 91 149", // #6b5b95 (Sera Purple)
     "--primary-foreground": "255 255 255",
     "--card": "255 255 255",
-    "--secondary": "228 239 229", // #E4EFE5 (Emerald Light)
-    "--secondary-foreground": "45 107 63", // #2D6B3F (Emerald)
-    "--background": "237 242 237", // #EDF2ED (Sage Background)
+    "--secondary": "94 129 89", // #5e8159 (Sera Sage Deep)
+    "--secondary-foreground": "255 255 255",
+    "--background": "248 247 238", // #f8f7ee (Sera Cream)
     "--popover": "255 255 255",
-    "--popover-foreground": "30 51 34",
-    "--muted": "241 244 241",
-    "--muted-foreground": "107 123 107",
-    "--destructive": "220 38 38",
-    "--foreground": "30 51 34",
-    "--border": "198 214 202", // #C6D6CA
-    "--input": "198 214 202",
-    "--ring": "45 107 63",
-    "--accent": "228 239 229",
-    "--accent-foreground": "30 51 34",
-    "--warning": "217 119 6",
+    "--popover-foreground": "47 42 61", // #2f2a3d (Sera Ink)
+    "--muted": "241 235 250", // #f1ebfa (Sera Lavender Mist)
+    "--muted-foreground": "98 94 110", // #625e6e (Sera Muted)
+    "--destructive": "207 36 36",
+    "--foreground": "47 42 61", // #2f2a3d (Sera Ink)
+    "--border": "221 216 231", // #ddd8e7 (Sera Line)
+    "--input": "221 216 231",
+    "--ring": "107 91 149",
+    "--accent": "216 201 240",
+    "--accent-foreground": "47 42 61",
+    "--warning": "165 90 5",
     "--warning-foreground": "255 255 255",
   },
   dark: {
-    "--primary-foreground": "23 23 23",
-    "--primary": "255 245 245",
-    "--card": "23 23 23",
-    "--secondary": "38 38 38",
-    "--secondary-foreground": "250 250 250",
-    "--background": "10 10 10",
-    "--popover": "23 23 23",
-    "--popover-foreground": "250 250 250",
-    "--muted": "38 38 38",
-    "--muted-foreground": "161 161 161",
+    "--primary-foreground": "255 255 255",
+    "--primary": "130 114 170",
+    "--card": "35 31 46",
+    "--secondary": "94 129 89",
+    "--secondary-foreground": "255 255 255",
+    "--background": "25 22 33",
+    "--popover": "35 31 46",
+    "--popover-foreground": "248 247 238",
+    "--muted": "47 42 61",
+    "--muted-foreground": "180 175 195",
     "--destructive": "255 100 103",
-    "--foreground": "250 250 250",
-    "--border": "46 46 46",
-    "--input": "46 46 46",
-    "--accent": "38 38 38",
-    "--accent-foreground": "250 250 250",
+    "--foreground": "248 247 238",
+    "--border": "58 52 75",
+    "--input": "58 52 75",
+    "--accent": "47 42 61",
+    "--accent-foreground": "248 247 238",
     "--warning": "245 158 11",
     "--warning-foreground": "23 23 23",
-    "--ring": "115 115 115",
+    "--ring": "130 114 170",
   },
 };
 

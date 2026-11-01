@@ -1,48 +1,62 @@
 export const colors = {
+  // SeraPhany Brand Identity Tokens
+  sera: {
+    purple: "#6B5B95",
+    cream: "#F8F7EE",
+    ink: "#2F2A3D",
+    muted: "#625E6E",
+    line: "#DDD8E7",
+    sage: "#A7C4A0",
+    sageDeep: "#5E8159",
+    sageMist: "#E7EFE3",
+    lavender: "#D8C9F0",
+    lavenderMist: "#F1EBFA",
+  },
+  // Backward compatibility mapped cleanly to SeraPhany palette
   forest: {
-    DEFAULT: "#1E3322",
-    light: "#2A4530",
-    dark: "#142317",
-    muted: "rgba(30, 51, 34, 0.5)",
+    DEFAULT: "#6B5B95", // Sera Purple
+    light: "#8272AA",
+    dark: "#2F2A3D", // Sera Ink
+    muted: "rgba(107, 91, 149, 0.5)",
   },
   emerald: {
-    DEFAULT: "#2D6B3F",
-    hover: "#255934",
-    light: "#E8F3EB",
+    DEFAULT: "#5E8159", // Sera Sage Deep
+    hover: "#4E6C4A",
+    light: "#F1EBFA", // Sera Lavender Mist
   },
   sage: {
-    DEFAULT: "#EDF2ED",
-    50: "#F6F8F6",
-    100: "#EDF2ED",
-    200: "#E4EFE5",
-    300: "#CBD5CB",
-    400: "#A9BFAE",
-    500: "#6B7B6B",
-    600: "#505E50",
+    DEFAULT: "#F8F7EE", // Sera Cream
+    50: "#FBFAF5",
+    100: "#F8F7EE",
+    200: "#F1EBFA", // Lavender Mist
+    300: "#DDD8E7", // Line
+    400: "#A7C4A0", // Sage
+    500: "#625E6E", // Muted
+    600: "#2F2A3D", // Ink
   },
   status: {
-    warning: "#F59E0B",
+    warning: "#D97706",
     warningBg: "#FEF3C7",
     warningText: "#92400E",
-    success: "#10B981",
-    successBg: "#E4EFE5",
-    danger: "#EF4444",
+    success: "#5E8159",
+    successBg: "#E7EFE3",
+    danger: "#CF2424",
     dangerBg: "#FEF2F2",
     dangerText: "#B91C1C",
   },
   bpjs: {
-    green: "#2D6B3F",
-    bg: "#E4EFE5",
+    green: "#5E8159",
+    bg: "#E7EFE3",
   },
-  divider: "#E2E8E2",
-  chip: "#F1F4F1",
+  divider: "#DDD8E7",
+  chip: "#F1EBFA",
   card: {
-    warm: "#FEF3C7",
-    cool: "#E4EFE5",
-    mint: "#D1FAE5",
-    rose: "#FFE4E6",
+    warm: "#FDF8EE",
+    cool: "#F1EBFA",
+    mint: "#E7EFE3",
+    rose: "#FAEEF1",
     crisis: "#FEF2F2",
   },
   white: "#FFFFFF",
-  border: "#C6D6CA",
+  border: "#DDD8E7",
 };

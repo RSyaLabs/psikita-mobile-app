@@ -89,7 +89,7 @@ export default function CoursesScreen() {
               value={searchQuery}
               onChangeText={setSearchQuery}
               placeholder="Cari topik atau materi kelas..."
-              placeholderTextColor="#8E9991"
+              placeholderTextColor="#625E6E"
               className="text-xs text-foreground"
             />
           </Input>
