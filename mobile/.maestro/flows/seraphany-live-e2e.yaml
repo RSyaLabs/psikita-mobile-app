@@ -2,36 +2,26 @@ appId: host.exp.exponent
 ---
 - openLink: "exp://192.168.18.107:8081"
 
-# 1. Assert Catalog is loaded
-- extendedWaitUntil:
-    visible: "Katalog Layar SeraPhany"
-    timeout: 15000
-
-# 2. Tap on P-00 card to open Login Screen
-- tapOn: "Buka layar P-00 Masuk & Lupa Sandi (Pop-up Terpadu)"
-
-# 3. Assert SeraPhany Brand Identity
+# 1. Assert SeraPhany Brand Identity and Login Screen loaded directly
 - extendedWaitUntil:
     visible: "SeraPhany"
-    timeout: 10000
+    timeout: 15000
 - assertVisible: "Ruang aman untuk bercerita"
 - assertVisible: "Temukan. Pahami. Sayangi diri."
 
-# 4. Open Login Modal
+# 2. Open Login Modal
 - tapOn: "Masuk dengan Akun"
 - extendedWaitUntil:
     visible: "Masuk ke Akun"
     timeout: 5000
 
-# 5. Form Input Interaction
+# 3. Form Input Interaction
 - tapOn: "Username atau email"
 - inputText: "siti_rahayu"
 - tapOn: "Kata sandi"
 - inputText: "Password123!"
 
-# 6. Hide keyboard and submit
+# 4. Hide keyboard and submit
 - hideKeyboard:
     optional: true
 - tapOn: "Masuk Sekarang"
-
-

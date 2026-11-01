@@ -136,10 +136,6 @@ describe("Expo Router route registry", () => {
       "app/(patient)/patient/history.tsx",
       "src/components/navigation/PatientTabBar.tsx",
       "src/components/navigation/PractitionerTabBar.tsx",
-      // Route values moved out of app/index.tsx when the launcher was
-      // decomposed. They now live in the catalog data module, which is the
-      // single place every catalog link resolves through.
-      "src/data/catalog.tsx",
     ];
     const issues: unknown[] = [];
 
