@@ -156,7 +156,7 @@ export default function AssessmentResultScreen() {
             <Box className="bg-primary rounded-3xl p-5 text-white relative overflow-hidden">
               <HStack space="xs" className="items-center justify-between mb-3">
                 <Box className="bg-primary-foreground/20 px-3.5 py-1.5 rounded-full">
-                  <Text size="xs" bold className="text-primary-foreground text-xs font-bold tracking-wider uppercase">
+                  <Text size="sm" bold className="text-primary-foreground uppercase tracking-wider">
                     {isGuest ? "Skrining Mandiri" : "Asesmen Klinis Awal"}
                   </Text>
                 </Box>
@@ -166,7 +166,7 @@ export default function AssessmentResultScreen() {
               </HStack>
 
               <VStack space="xs" className="my-2">
-                <Text size="3xl" bold className="text-primary-foreground text-3xl font-bold">
+                <Text size="3xl" bold className="text-primary-foreground">
                   10{" "}
                   <Text size="md" className="text-primary-foreground/80 font-normal">
                     / 20
@@ -183,13 +183,13 @@ export default function AssessmentResultScreen() {
                   <ProgressFilledTrack className="bg-warning h-full rounded-full" />
                 </Progress>
                 <HStack space="xs" className="justify-between pt-1.5">
-                  <Text size="xs" className="text-primary-foreground/80 font-medium">
+                  <Text size="sm" className="text-primary-foreground/80 font-medium">
                     Minimal (0-4)
                   </Text>
-                  <Text size="xs" bold className="text-warning font-bold">
+                  <Text size="sm" bold className="text-warning">
                     Sedang (5-14)
                   </Text>
-                  <Text size="xs" className="text-primary-foreground/80 font-medium">
+                  <Text size="sm" className="text-primary-foreground/80 font-medium">
                     Berat (15-20)
                   </Text>
                 </HStack>
@@ -228,7 +228,7 @@ export default function AssessmentResultScreen() {
                     <HeartPulse size={22} color="#FFFFFF" />
                   </Box>
                   <VStack space="xs" className="flex-1">
-                    <Heading size="xs" bold className="text-foreground font-bold">
+                    <Heading size="sm" bold className="text-foreground">
                       Konsultasi 1-on-1 dengan Psikolog
                     </Heading>
                     <Text size="sm" className="text-muted-foreground font-medium">
@@ -242,7 +242,7 @@ export default function AssessmentResultScreen() {
                     <Wind size={22} color="#4A3B6B" />
                   </Box>
                   <VStack space="xs" className="flex-1">
-                    <Heading size="xs" bold className="text-foreground font-bold">
+                    <Heading size="sm" bold className="text-foreground">
                       Latihan Relaksasi Napas 4-7-8
                     </Heading>
                     <Text size="sm" className="text-muted-foreground font-medium">
@@ -256,7 +256,7 @@ export default function AssessmentResultScreen() {
                     <BookOpen size={22} color="#4A3B6B" />
                   </Box>
                   <VStack space="xs" className="flex-1">
-                    <Heading size="xs" bold className="text-foreground font-bold">
+                    <Heading size="sm" bold className="text-foreground">
                       Jurnal Perasaan Berkala
                     </Heading>
                     <Text size="sm" className="text-muted-foreground font-medium">

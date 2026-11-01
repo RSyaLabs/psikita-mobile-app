@@ -330,7 +330,7 @@ export function AuthLoginModal({
                       onOpenRegister();
                     }}
                   >
-                    <Text size="sm" bold className="text-primary underline font-bold">
+                    <Text size="sm" bold className="text-primary underline">
                       Daftar Pasien Baru
                     </Text>
                   </Pressable>

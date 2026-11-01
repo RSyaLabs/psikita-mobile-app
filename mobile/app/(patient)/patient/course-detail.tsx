@@ -167,7 +167,7 @@ export default function CourseDetailScreen() {
           <VStack space="sm">
             {chapters.map((chapter, cIdx) => (
               <Card key={chapter.id} className="bg-card rounded-2xl p-4 border border-border">
-                <Text size="xs" bold className="text-primary uppercase tracking-wider text-xs mb-1 font-bold">
+                <Text size="sm" bold className="text-primary uppercase tracking-wider mb-1">
                   Bab {cIdx + 1}
                 </Text>
                 <Heading size="sm" bold className="text-foreground mb-2">

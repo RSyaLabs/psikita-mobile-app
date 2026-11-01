@@ -158,14 +158,14 @@ export default function VideoCallScreen() {
               <VideoOff size={24} color="#CFC8D8" />
               <Text
                 size="sm"
-                className="text-primary-foreground/80 font-medium text-sm mt-1"
+                className="text-primary-foreground/80 font-medium mt-1"
               >
                 Kamera Mati
               </Text>
             </Box>
           )}
           <Box className="absolute bottom-1.5 left-1.5 bg-primary/80 px-2 py-0.5 rounded">
-            <Text size="sm" bold className="text-primary-foreground text-sm font-bold">
+            <Text size="sm" bold className="text-primary-foreground">
               Anda
             </Text>
           </Box>

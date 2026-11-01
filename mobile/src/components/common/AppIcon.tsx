@@ -30,7 +30,7 @@ const TONE_COLORS: Record<IconTone, string> = {
  * on native Android, preventing transparent or invisible icons caused by
  * CSS className color resolution failure on React Native SVG.
  */
-export function AppIcon({
+export const AppIcon = React.memo(function AppIcon({
   icon: IconComponent,
   color,
   tone = "foreground",
@@ -48,6 +48,6 @@ export function AppIcon({
       {...rest}
     />
   );
-}
+});
 
 export default AppIcon;

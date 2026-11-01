@@ -161,7 +161,7 @@ export default function SessionSummaryScreen() {
 
             {resultDetail?.patientFacingAdvice && (
               <Card className="bg-primary/10 rounded-2xl p-4 border border-primary/20 gap-1.5">
-                <Text size="sm" bold className="text-primary uppercase tracking-wider font-bold">
+                <Text size="sm" bold className="text-primary uppercase tracking-wider">
                   Panduan Pasien dari Dokter
                 </Text>
                 <Text size="sm" className="text-foreground leading-relaxed font-medium">
@@ -174,7 +174,7 @@ export default function SessionSummaryScreen() {
                 key={section.key}
                 className="bg-card rounded-2xl p-4 border border-border gap-2"
               >
-                <Text size="sm" bold className="text-muted-foreground font-semibold">
+                <Text size="sm" bold className="text-muted-foreground">
                   {section.label}
                 </Text>
                 <Text size="sm" className="text-foreground font-medium">
@@ -185,7 +185,7 @@ export default function SessionSummaryScreen() {
 
             {carePlan && (
               <Card className="bg-card rounded-2xl p-4 border border-border gap-2">
-                <Text size="sm" bold className="text-primary uppercase tracking-wider font-bold">
+                <Text size="sm" bold className="text-primary uppercase tracking-wider">
                   Rencana Perawatan (Care Plan)
                 </Text>
                 {carePlan.diagnosisSummary && (

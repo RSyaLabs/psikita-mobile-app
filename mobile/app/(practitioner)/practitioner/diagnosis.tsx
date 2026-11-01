@@ -158,7 +158,7 @@ export default function DiagnosisScreen() {
             <Card className="bg-amber-500/10 rounded-2xl p-4 border border-amber-500/30 gap-1.5">
               <HStack space="xs" className="items-center">
                 <ShieldAlert size={16} color="#D97706" />
-                <Text size="sm" bold className="text-amber-800 uppercase tracking-wider font-bold">
+                <Text size="sm" bold className="text-amber-800 uppercase tracking-wider">
                   Rekomendasi CDSS Klinis
                 </Text>
               </HStack>

@@ -40,6 +40,34 @@ import { ROUTES } from "@/constants/routes";
 
 const SeraPhanyLogo = require("../../../assets/icon.png");
 
+const MOODS = [
+  {
+    id: "Tenang",
+    label: "Tenang",
+    icon: <AppIcon icon={Smile} size={20} tone="primary" />,
+  },
+  {
+    id: "Biasa",
+    label: "Biasa",
+    icon: <AppIcon icon={Meh} size={20} tone="primary" />,
+  },
+  {
+    id: "Lelah",
+    label: "Lelah",
+    icon: <AppIcon icon={Clock} size={20} tone="primary" />,
+  },
+  {
+    id: "Cemas",
+    label: "Cemas",
+    icon: <AppIcon icon={AlertCircle} size={20} tone="primary" />,
+  },
+  {
+    id: "Sedih",
+    label: "Sedih",
+    icon: <AppIcon icon={Frown} size={20} tone="primary" />,
+  },
+] as const;
+
 export default function PatientDashboard() {
   const router = useRouter();
   const toast = useToast();
@@ -48,44 +76,9 @@ export default function PatientDashboard() {
   const { data: patient } = usePatientProfile();
   const { data: practitionersData } = usePractitioners();
 
-  // No borrowed name. `patient?.fullName?.split(" ")[0] || "Siti"` greeted every
-  // patient whose profile had not loaded as one specific person, the same
-  // fabrication the practitioner count below already gave up. An unanswered
-  // profile gets a neutral greeting, not someone's name.
   const patientFirstName = patient?.fullName?.split(" ")[0];
   const practitionersList = practitionersData?.data || [];
-  // No fallback count. The previous `|| 3` displayed a fabricated "3 psikolog
-  // online" whenever the API had not answered, which reads as real data to the
-  // user. An unanswered query is shown as unknown, not invented.
   const onlineCount = practitionersList.length;
-
-  const moods = [
-    {
-      id: "Tenang",
-      label: "Tenang",
-      icon: <Smile size={20} color="#4A3B6B" />,
-    },
-    {
-      id: "Biasa",
-      label: "Biasa",
-      icon: <Meh size={20} color="#4A3B6B" />,
-    },
-    {
-      id: "Lelah",
-      label: "Lelah",
-      icon: <Clock size={20} color="#4A3B6B" />,
-    },
-    {
-      id: "Cemas",
-      label: "Cemas",
-      icon: <AlertCircle size={20} color="#4A3B6B" />,
-    },
-    {
-      id: "Sedih",
-      label: "Sedih",
-      icon: <Frown size={20} color="#4A3B6B" />,
-    },
-  ];
 
   const handleMoodSelect = (moodId: string) => {
     haptics.light();
@@ -175,7 +168,7 @@ export default function PatientDashboard() {
               Check-in hari ini
             </Text>
             <HStack space="xs">
-              {moods.map((mood) => {
+              {MOODS.map((mood) => {
                 const isSelected = selectedMood === mood.id;
                 return (
                   <Pressable
@@ -224,7 +217,7 @@ export default function PatientDashboard() {
                 <AppIcon icon={Video} size={22} color="#4A3B6B" />
               </Box>
               <VStack space="xs" className="flex-1">
-                <Text size="sm" bold className="text-foreground font-bold text-base">
+                <Text size="md" bold className="text-foreground">
                   Konsultasi langsung
                 </Text>
                 <Text size="sm" className="text-muted-foreground font-medium">
@@ -248,7 +241,7 @@ export default function PatientDashboard() {
                 <AppIcon icon={Calendar} size={22} color="#4A3B6B" />
               </Box>
               <VStack space="xs" className="flex-1">
-                <Text size="sm" bold className="text-foreground font-bold text-base">
+                <Text size="md" bold className="text-foreground">
                   Jadwalkan sesi
                 </Text>
                 <Text size="sm" className="text-muted-foreground font-medium">
@@ -275,7 +268,7 @@ export default function PatientDashboard() {
                 <AppIcon icon={ClipboardCheck} size={22} color="#4A3B6B" />
               </Box>
               <VStack space="xs" className="flex-1">
-                <Text size="sm" bold className="text-foreground font-bold text-base">
+                <Text size="md" bold className="text-foreground">
                   Tes mandiri
                 </Text>
                 <Text size="sm" className="text-muted-foreground font-medium">
@@ -299,7 +292,7 @@ export default function PatientDashboard() {
                 <AppIcon icon={MessageSquare} size={22} color="#4A3B6B" />
               </Box>
               <VStack space="xs" className="flex-1">
-                <Text size="sm" bold className="text-foreground font-bold text-base">
+                <Text size="md" bold className="text-foreground">
                   Ruang cerita & komunitas
                 </Text>
                 <Text size="sm" className="text-muted-foreground font-medium">
@@ -323,7 +316,7 @@ export default function PatientDashboard() {
                 <AppIcon icon={CalendarCheck} size={22} color="#4A3B6B" />
               </Box>
               <VStack space="xs" className="flex-1">
-                <Text size="sm" bold className="text-foreground font-bold text-base">
+                <Text size="md" bold className="text-foreground">
                   Sesi kontrol & lanjutan
                 </Text>
                 <Text size="sm" className="text-muted-foreground font-medium">

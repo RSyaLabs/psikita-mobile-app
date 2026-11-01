@@ -156,12 +156,12 @@ export default function PrescriptionScreen() {
                     <AppIcon icon={QrCode} size={36} tone="foreground" />
                   </Box>
                   <VStack space="xs" className="flex-1">
-                    <Text size="sm" bold className="text-primary-foreground font-bold">
+                    <Text size="sm" bold className="text-primary-foreground">
                       Tunjukkan kode QR ini di apotek
                     </Text>
                     <Text
                       size="sm"
-                      className="text-primary-foreground/80 text-sm font-medium"
+                      className="text-primary-foreground/80 font-medium"
                     >
                       Berlaku di RS dan apotek rekanan SeraPhany
                     </Text>
@@ -176,7 +176,7 @@ export default function PrescriptionScreen() {
         <Card className="bg-muted rounded-2xl p-3.5 mb-3.5 border border-border">
           <HStack space="sm" className="items-center">
             <AppIcon icon={AlertTriangle} size={20} tone="foreground" />
-            <Text size="sm" bold className="text-foreground flex-1 font-bold">
+            <Text size="sm" bold className="text-foreground flex-1">
               Jangan ubah dosis tanpa konsultasi dokter
             </Text>
           </HStack>
