@@ -9,8 +9,11 @@ import {
   AlertCircle,
   Frown,
   ChevronRight,
-  MessageSquare,
+  Video,
   Calendar,
+  ClipboardCheck,
+  MessageSquare,
+  CalendarCheck,
 } from "lucide-react-native";
 import {
   Box,
@@ -30,6 +33,7 @@ import {
   ToastDescription,
 } from "@/components/ui";
 import { PatientTabBar } from "@/components/navigation/PatientTabBar";
+import { AppIcon } from "@/components/common/AppIcon";
 import { usePatientProfile, usePractitioners } from "@/hooks/useApiQueries";
 import { haptics } from "@/utils/haptics";
 import { ROUTES } from "@/constants/routes";
@@ -139,12 +143,12 @@ export default function PatientDashboard() {
           />
 
           {/* Overlay Card */}
-          <Card className="bg-card/95 rounded-xl p-2.5 flex-row items-center justify-between border border-border">
+          <Card className="bg-card/95 rounded-2xl p-3 flex-row items-center justify-between border border-border">
             <VStack space="xs">
-              <Text size="xs" className="font-semibold text-muted-foreground">
+              <Text size="sm" className="font-semibold text-muted-foreground">
                 Lanjut sesi • 15 mnt
               </Text>
-              <Text size="xs" bold className="text-foreground">
+              <Text size="sm" bold className="text-foreground font-bold">
                 Ceritamu belum selesai.
               </Text>
             </VStack>
@@ -187,7 +191,7 @@ export default function PatientDashboard() {
                     {mood.icon}
                     <Text
                       size="sm"
-                      className={`text-xs mt-1.5 ${
+                      className={`text-sm mt-1.5 ${
                         isSelected
                           ? "font-bold text-foreground"
                           : "font-semibold text-muted-foreground"
@@ -214,17 +218,20 @@ export default function PatientDashboard() {
                   params: { mode: "consultation" },
                 } as any);
               }}
-              className="bg-card px-4 py-3.5 rounded-2xl flex-row items-center justify-between border border-border active:bg-muted"
+              className="bg-card p-3.5 rounded-2xl flex-row items-center border border-border active:bg-muted"
             >
-              <VStack space="xs">
-                <Text size="sm" bold className="text-foreground font-bold">
+              <Box className="w-11 h-11 rounded-xl bg-primary/10 items-center justify-center mr-3.5">
+                <AppIcon icon={Video} size={22} color="#4A3B6B" />
+              </Box>
+              <VStack space="xs" className="flex-1">
+                <Text size="sm" bold className="text-foreground font-bold text-base">
                   Konsultasi langsung
                 </Text>
                 <Text size="sm" className="text-muted-foreground font-medium">
                   {onlineCount} psikolog online
                 </Text>
               </VStack>
-              <ChevronRight size={18} color="#4B4656" />
+              <AppIcon icon={ChevronRight} size={18} color="#4B4656" />
             </Pressable>
 
             {/* Jadwalkan Sesi */}
@@ -235,17 +242,20 @@ export default function PatientDashboard() {
                 haptics.light();
                 router.push(ROUTES.PATIENT.DOCTORS);
               }}
-              className="bg-card px-4 py-3.5 rounded-2xl flex-row items-center justify-between border border-border active:bg-muted"
+              className="bg-card p-3.5 rounded-2xl flex-row items-center border border-border active:bg-muted"
             >
-              <VStack space="xs">
-                <Text size="sm" bold className="text-foreground font-bold">
+              <Box className="w-11 h-11 rounded-xl bg-primary/10 items-center justify-center mr-3.5">
+                <AppIcon icon={Calendar} size={22} color="#4A3B6B" />
+              </Box>
+              <VStack space="xs" className="flex-1">
+                <Text size="sm" bold className="text-foreground font-bold text-base">
                   Jadwalkan sesi
                 </Text>
                 <Text size="sm" className="text-muted-foreground font-medium">
                   Pilih dokter & jam
                 </Text>
               </VStack>
-              <ChevronRight size={18} color="#4B4656" />
+              <AppIcon icon={ChevronRight} size={18} color="#4B4656" />
             </Pressable>
 
             {/* Tes Mandiri */}
@@ -259,17 +269,20 @@ export default function PatientDashboard() {
                   params: { mode: "assessment", guest: "false" },
                 } as any);
               }}
-              className="bg-card px-4 py-3.5 rounded-2xl flex-row items-center justify-between border border-border active:bg-muted"
+              className="bg-card p-3.5 rounded-2xl flex-row items-center border border-border active:bg-muted"
             >
-              <VStack space="xs">
-                <Text size="sm" bold className="text-foreground font-bold">
+              <Box className="w-11 h-11 rounded-xl bg-primary/10 items-center justify-center mr-3.5">
+                <AppIcon icon={ClipboardCheck} size={22} color="#4A3B6B" />
+              </Box>
+              <VStack space="xs" className="flex-1">
+                <Text size="sm" bold className="text-foreground font-bold text-base">
                   Tes mandiri
                 </Text>
                 <Text size="sm" className="text-muted-foreground font-medium">
                   Cek tingkat stres & kecemasan
                 </Text>
               </VStack>
-              <ChevronRight size={18} color="#4B4656" />
+              <AppIcon icon={ChevronRight} size={18} color="#4B4656" />
             </Pressable>
 
             {/* Ruang Cerita & Komunitas */}
@@ -280,20 +293,20 @@ export default function PatientDashboard() {
                 haptics.light();
                 router.push(ROUTES.PATIENT.COMMUNITY);
               }}
-              className="bg-card px-4 py-3.5 rounded-2xl flex-row items-center justify-between border border-border active:bg-muted"
+              className="bg-card p-3.5 rounded-2xl flex-row items-center border border-border active:bg-muted"
             >
-              <VStack space="xs">
-                <HStack space="xs" className="items-center">
-                  <MessageSquare size={16} color="#4A3B6B" />
-                  <Text size="sm" bold className="text-foreground font-bold">
-                    Ruang cerita & komunitas
-                  </Text>
-                </HStack>
+              <Box className="w-11 h-11 rounded-xl bg-primary/10 items-center justify-center mr-3.5">
+                <AppIcon icon={MessageSquare} size={22} color="#4A3B6B" />
+              </Box>
+              <VStack space="xs" className="flex-1">
+                <Text size="sm" bold className="text-foreground font-bold text-base">
+                  Ruang cerita & komunitas
+                </Text>
                 <Text size="sm" className="text-muted-foreground font-medium">
                   Dukungan sebaya & berbagi cerita aman
                 </Text>
               </VStack>
-              <ChevronRight size={18} color="#4B4656" />
+              <AppIcon icon={ChevronRight} size={18} color="#4B4656" />
             </Pressable>
 
             {/* Sesi Kontrol & Lanjutan */}
@@ -304,20 +317,20 @@ export default function PatientDashboard() {
                 haptics.light();
                 router.push(ROUTES.PATIENT.FOLLOW_UPS);
               }}
-              className="bg-card px-4 py-3.5 rounded-2xl flex-row items-center justify-between border border-border active:bg-muted"
+              className="bg-card p-3.5 rounded-2xl flex-row items-center border border-border active:bg-muted"
             >
-              <VStack space="xs">
-                <HStack space="xs" className="items-center">
-                  <Calendar size={16} color="#4A3B6B" />
-                  <Text size="sm" bold className="text-foreground font-bold">
-                    Sesi kontrol & lanjutan
-                  </Text>
-                </HStack>
+              <Box className="w-11 h-11 rounded-xl bg-primary/10 items-center justify-center mr-3.5">
+                <AppIcon icon={CalendarCheck} size={22} color="#4A3B6B" />
+              </Box>
+              <VStack space="xs" className="flex-1">
+                <Text size="sm" bold className="text-foreground font-bold text-base">
+                  Sesi kontrol & lanjutan
+                </Text>
                 <Text size="sm" className="text-muted-foreground font-medium">
                   Jadwal tindak lanjut dari psikolog
                 </Text>
               </VStack>
-              <ChevronRight size={18} color="#4B4656" />
+              <AppIcon icon={ChevronRight} size={18} color="#4B4656" />
             </Pressable>
           </VStack>
         </VStack>

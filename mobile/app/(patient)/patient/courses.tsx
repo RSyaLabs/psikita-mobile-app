@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useRouter } from "expo-router";
+import { Image as RNImage } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   BookOpen,
@@ -7,7 +8,6 @@ import {
   Award,
   ChevronRight,
   Search,
-  Sparkles,
   CheckCircle2,
 } from "lucide-react-native";
 import {
@@ -25,6 +25,7 @@ import {
   BadgeText,
   Spinner,
 } from "@/components/ui";
+import { AppIcon } from "@/components/common/AppIcon";
 import { PatientTabBar } from "@/components/navigation/PatientTabBar";
 import { useLmsCourses, useLmsProgress } from "@/hooks/useApiQueries";
 import { ROUTES } from "@/constants/routes";
@@ -52,39 +53,40 @@ export default function CoursesScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-background">
-      {/* Header */}
-      <VStack space="xs" className="px-5 pt-3 pb-2 bg-card border-b border-border">
+      {/* Branded Curved Header (Root Tab - Consistent with Riwayat & Akun) */}
+      <Box className="bg-primary px-5 pt-4 pb-5 rounded-b-3xl">
         <HStack space="xs" className="items-center justify-between">
-          <VStack space="xs">
-            <HStack space="xs" className="items-center">
-              <Sparkles size={16} color="#4A3B6B" />
-              <Text size="xs" bold className="text-primary uppercase tracking-widest text-xs font-bold">
-                Psikoedukasi Klinis
-              </Text>
-            </HStack>
-            <Heading size="lg" bold className="text-foreground">
+          <VStack space="xs" className="flex-1 pr-3">
+            <Heading level={1} size="lg" bold className="text-primary-foreground">
               Kelas & Modul Edukasi
             </Heading>
+            <Text size="sm" className="text-primary-foreground/90 font-medium">
+              Modul psikoedukasi berbasis panduan klinis
+            </Text>
           </VStack>
-          {progress && (
-            <Badge variant="solid" action="primary" className="rounded-full px-3 py-1 bg-primary">
-              <HStack space="xs" className="items-center">
-                <CheckCircle2 size={14} color="#FFFFFF" />
-                <BadgeText className="text-xs font-bold text-white">
-                  {progress.totalCoursesCompleted ?? 0} Selesai
-                </BadgeText>
-              </HStack>
-            </Badge>
-          )}
+          <HStack space="xs" className="items-center">
+            {progress && (
+              <Badge variant="solid" action="primary" className="rounded-full px-2.5 py-1 bg-primary-foreground/20 mr-1">
+                <HStack space="xs" className="items-center">
+                  <AppIcon icon={CheckCircle2} size={14} color="#FFFFFF" />
+                  <BadgeText className="text-sm font-bold text-white">
+                    {progress.totalCoursesCompleted ?? 0} Selesai
+                  </BadgeText>
+                </HStack>
+              </Badge>
+            )}
+            <RNImage
+              source={require("@/../assets/icon.png")}
+              style={{ width: 32, height: 32, borderRadius: 8 }}
+              resizeMode="cover"
+            />
+          </HStack>
         </HStack>
-        <Text size="sm" className="text-muted-foreground mt-0.5 font-medium">
-          Pelajari modul kesehatan mental berbasis sains dan panduan klinis dokter.
-        </Text>
 
-        {/* Search Bar */}
-        <Box className="mt-2.5 mb-1">
-          <Input className="h-11 bg-muted rounded-xl border-border px-3.5 flex-row items-center">
-            <Search size={18} color="#4B4656" style={{ marginRight: 8 }} />
+        {/* Search Bar inside Branded Header */}
+        <Box className="mt-4 mb-2">
+          <Input className="h-11 bg-card rounded-xl border-0 px-3.5 flex-row items-center">
+            <AppIcon icon={Search} size={18} color="#4A3B6B" style={{ marginRight: 8 }} />
             <InputField
               value={searchQuery}
               onChangeText={setSearchQuery}
@@ -96,7 +98,7 @@ export default function CoursesScreen() {
         </Box>
 
         {/* Topic Filter Chips */}
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} className="py-2 -mx-1">
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} className="py-1 -mx-1">
           <HStack space="xs" className="px-1">
             {TOPICS.map((topic) => {
               const isSelected = selectedTopic === topic;
@@ -107,17 +109,20 @@ export default function CoursesScreen() {
                     haptics.selection();
                     setSelectedTopic(topic);
                   }}
-                  className={`px-4 py-2 rounded-full border ${
-                    isSelected
-                      ? "bg-primary border-primary"
-                      : "bg-card border-border"
+                  accessibilityRole="button"
+                  accessibilityState={{ selected: isSelected }}
+                  className={`px-3.5 py-1.5 rounded-full ${
+                    isSelected ? "bg-card" : "bg-primary-foreground/15"
                   }`}
                 >
                   <Text
                     size="sm"
-                    className={`text-sm ${
-                      isSelected ? "text-primary-foreground font-bold" : "text-foreground font-semibold"
-                    }`}
+                    bold
+                    className={
+                      isSelected
+                        ? "text-foreground font-bold"
+                        : "text-primary-foreground font-medium"
+                    }
                   >
                     {topic}
                   </Text>
@@ -126,7 +131,7 @@ export default function CoursesScreen() {
             })}
           </HStack>
         </ScrollView>
-      </VStack>
+      </Box>
 
       {/* Main Course List */}
       <ScrollView
@@ -136,7 +141,7 @@ export default function CoursesScreen() {
         {isLoading ? (
           <Box className="py-20 items-center justify-center">
             <Spinner size="large" />
-            <Text size="xs" className="text-muted-foreground mt-3">
+            <Text size="sm" className="text-muted-foreground mt-3 font-medium">
               Memuat kurikulum kelas...
             </Text>
           </Box>
@@ -145,17 +150,17 @@ export default function CoursesScreen() {
             <Text size="sm" bold className="text-foreground text-center">
               Gagal memuat materi kelas
             </Text>
-            <Text size="xs" className="text-muted-foreground text-center mt-1">
+            <Text size="sm" className="text-muted-foreground text-center mt-1 font-medium">
               Periksa koneksi internet Anda atau coba muat ulang.
             </Text>
           </Card>
         ) : filteredCourses.length === 0 ? (
           <Card className="p-8 items-center bg-card rounded-2xl border border-border">
-            <BookOpen size={36} className="text-muted-foreground/60 mb-2" />
+            <AppIcon icon={BookOpen} size={36} color="#757086" className="mb-2" />
             <Text size="sm" bold className="text-foreground text-center">
               Belum ada kelas untuk topik ini
             </Text>
-            <Text size="xs" className="text-muted-foreground text-center mt-1">
+            <Text size="sm" className="text-muted-foreground text-center mt-1 font-medium">
               Materi psikoedukasi sedang disiapkan oleh tim klinis SeraPhany.
             </Text>
           </Card>
@@ -177,7 +182,7 @@ export default function CoursesScreen() {
                   <VStack space="xs" className="flex-1 pr-2">
                     {course.topic && (
                       <Badge variant="outline" action="muted" className="self-start rounded-full px-2.5 py-0.5 mb-1.5 border-primary/30 bg-primary/5">
-                        <BadgeText className="text-xs font-bold text-primary">
+                        <BadgeText className="text-sm font-semibold text-primary">
                           {course.topic}
                         </BadgeText>
                       </Badge>
@@ -190,13 +195,13 @@ export default function CoursesScreen() {
                     </Text>
                     <HStack space="md" className="items-center mt-3 pt-2.5 border-t border-border/50">
                       <HStack space="xs" className="items-center">
-                        <Clock size={15} color="#4B4656" />
+                        <AppIcon icon={Clock} size={16} color="#4B4656" />
                         <Text size="sm" className="text-sm text-muted-foreground font-medium">
                           {course.estimatedMinutes ?? 15} Menit
                         </Text>
                       </HStack>
                       <HStack space="xs" className="items-center">
-                        <Award size={15} color="#4B4656" />
+                        <AppIcon icon={Award} size={16} color="#4B4656" />
                         <Text size="sm" className="text-sm text-muted-foreground font-medium">
                           {course.totalLessons ?? 3} Modul
                         </Text>
@@ -204,7 +209,7 @@ export default function CoursesScreen() {
                     </HStack>
                   </VStack>
                   <Box className="w-8 h-8 rounded-full bg-muted items-center justify-center mt-1">
-                    <ChevronRight size={18} color="#4B4656" />
+                    <AppIcon icon={ChevronRight} size={18} color="#4B4656" />
                   </Box>
                 </HStack>
               </Pressable>
