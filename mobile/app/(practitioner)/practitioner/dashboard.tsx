@@ -13,7 +13,7 @@ import {
 } from "@/components/practitioner/dashboard";
 import {
   usePractitionerProfile,
-  useTriageQueue,
+  useMatchingOffers,
   useChangeAvailability,
 } from "@/hooks/useApiQueries";
 import { haptics } from "@/utils";
@@ -23,7 +23,7 @@ export default function PractitionerDashboardScreen() {
   const router = useRouter();
   const [showNotifModal, setShowNotifModal] = useState(false);
   const { data: profile } = usePractitionerProfile();
-  const queueQuery = useTriageQueue();
+  const offersQuery = useMatchingOffers();
   const changeAvailabilityMutation = useChangeAvailability();
   const isOnline = profile?.availabilityStatus === "AVAILABLE";
 
@@ -46,19 +46,19 @@ export default function PractitionerDashboardScreen() {
       : "Nomor STR/SIPP belum tersedia";
 
   const queueCount =
-    queueQuery.isLoading || queueQuery.isError
+    offersQuery.isLoading || offersQuery.isError
       ? undefined
-      : queueQuery.data?.length;
+      : offersQuery.data?.length;
 
-  const queueMessage = queueQuery.isLoading
-    ? "Memuat status antrian dari server…"
-    : queueQuery.isError
-      ? "Status antrian tidak tersedia dari server."
+  const queueMessage = offersQuery.isLoading
+    ? "Memeriksa tawaran kasus dari server…"
+    : offersQuery.isError
+      ? "Status tawaran tidak tersedia dari server."
       : queueCount === 0
-        ? "Antrian server kosong."
+        ? "Ruang Siaga aktif • Belum ada tawaran kasus."
         : queueCount === undefined
-          ? "Jumlah antrian belum tersedia dari server."
-          : `${queueCount} permintaan triase menunggu respons Anda di Ruang Siaga.`;
+          ? "Jumlah tawaran belum tersedia dari server."
+          : `${queueCount} tawaran kasus matching menunggu respons Anda di Ruang Siaga.`;
 
   const handleToggleOnline = (val: boolean) => {
     if (!profile?.id) {

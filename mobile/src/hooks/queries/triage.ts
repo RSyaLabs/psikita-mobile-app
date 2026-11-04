@@ -75,6 +75,19 @@ export function useSubmitTriage() {
 }
 
 /**
+ * Hook to query live matching offers for practitioners with Smart Jittered Polling
+ */
+export function useMatchingOffers() {
+  return useQuery({
+    queryKey: queryKeys.matching.offers(),
+    queryFn: ({ signal }) =>
+      callWithSignal(matchingService.getMyOffers, signal),
+    refetchInterval: () => getJitteredInterval(10000), // 8-12s polling for fast real-time incoming cases
+    refetchIntervalInBackground: false,
+  });
+}
+
+/**
  * Mutation hook for claiming matching request
  */
 export function useClaimMatching() {
@@ -83,6 +96,7 @@ export function useClaimMatching() {
     mutationFn: (matchingRequestId: string) =>
       matchingService.claimMatchingRequest(matchingRequestId),
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.matching.offers() });
       queryClient.invalidateQueries({ queryKey: queryKeys.triage.queue() });
       queryClient.invalidateQueries({ queryKey: queryKeys.consultations.all });
     },

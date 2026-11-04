@@ -6,6 +6,8 @@ import {
   ActiveConsultationContext,
   WaitingRoomStatusDto,
   MatchingResponseDto,
+  MatchingOfferDto,
+  MatchingOfferBriefDto,
 } from "@/types/api";
 
 const waitingRoomSchema = z.object({
@@ -226,6 +228,34 @@ const matchingResponseAdapter =
     return result;
   };
 
+const matchingOfferSchema = z.object({
+  matchingRequestId: z.string().trim().min(1),
+  deadlineAt: nullableReferenceSchema.optional(),
+  onSchedule: z.boolean().optional(),
+  requiredLevel: z.string().optional(),
+  brief: z.record(z.string(), z.unknown()).optional(),
+});
+
+const matchingOffersAdapter = (value: unknown): MatchingOfferDto[] => {
+  if (!Array.isArray(value)) return [];
+  return value.map((item) => {
+    const parsed = matchingOfferSchema.parse(item);
+    const deadline =
+      typeof parsed.deadlineAt === "string"
+        ? parsed.deadlineAt
+        : parsed.deadlineAt && typeof parsed.deadlineAt.timestamp === "string"
+          ? parsed.deadlineAt.timestamp
+          : null;
+    return {
+      matchingRequestId: parsed.matchingRequestId,
+      deadlineAt: deadline,
+      onSchedule: parsed.onSchedule,
+      requiredLevel: parsed.requiredLevel,
+      brief: parsed.brief as MatchingOfferBriefDto | undefined,
+    };
+  });
+};
+
 export const matchingService = {
   async getMyWaitingRoomStatus(
     signal?: AbortSignal,
@@ -254,5 +284,13 @@ export const matchingService = {
         adapter: matchingResponseAdapter(normalizedId),
       },
     );
+  },
+
+  /** Fetch live matching offers waiting for the authenticated practitioner. */
+  async getMyOffers(signal?: AbortSignal): Promise<MatchingOfferDto[]> {
+    return apiRequest<MatchingOfferDto[]>("/matching-requests/offers/me", {
+      adapter: matchingOffersAdapter,
+      signal,
+    });
   },
 };

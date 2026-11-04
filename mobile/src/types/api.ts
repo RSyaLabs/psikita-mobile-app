@@ -187,8 +187,28 @@ export interface MatchingResponseDto {
   assignedPractitionerId?: string | null;
   deadlineAt?: string | null;
   updatedAt?: string;
+  consultationId?: string;
   /** Present only when the claim response carries a validated consultation. */
   activeConsultation?: ActiveConsultationContext;
+}
+
+export interface MatchingOfferBriefDto {
+  acuity?: string;
+  chiefComplaint?: string;
+  summaryText?: string;
+  triageScore?: number;
+  deadlineAt?: string;
+  waitingSince?: string;
+  onSchedule?: boolean;
+  [key: string]: unknown;
+}
+
+export interface MatchingOfferDto {
+  matchingRequestId: string;
+  deadlineAt?: string | null;
+  onSchedule?: boolean;
+  requiredLevel?: "level_1" | "level_2" | "level_3" | "level_4" | string;
+  brief?: MatchingOfferBriefDto;
 }
 
 // ============================================================================

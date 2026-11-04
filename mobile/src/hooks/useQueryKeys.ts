@@ -113,6 +113,7 @@ export const queryKeys = {
   matching: {
     all: ["matching"] as const,
     waitingRoom: () => [...queryKeys.matching.all, "waitingRoom"] as const,
+    offers: () => [...queryKeys.matching.all, "offers"] as const,
   },
   triage: {
     all: ["triage"] as const,

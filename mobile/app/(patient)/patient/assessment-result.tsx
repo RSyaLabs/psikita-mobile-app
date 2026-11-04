@@ -44,9 +44,10 @@ function formatServerDate(value: string): string {
 
 export default function AssessmentResultScreen() {
   const router = useRouter();
-  const { triageId, guest } = useLocalSearchParams<{
+  const { triageId, guest, mode } = useLocalSearchParams<{
     triageId?: string;
     guest?: string;
+    mode?: string;
   }>();
   const normalizedTriageId = Array.isArray(triageId) ? triageId[0] : triageId;
   const isGuest = guest === "true";
@@ -70,8 +71,16 @@ export default function AssessmentResultScreen() {
     if (isGuest) {
       router.push(ROUTES.AUTH.LOGIN as never);
     } else {
-      router.push(ROUTES.PATIENT.DOCTORS as never);
+      router.push({
+        pathname: ROUTES.PATIENT.MATCHING,
+        params: normalizedTriageId ? { triageId: normalizedTriageId } : undefined,
+      } as never);
     }
+  };
+
+  const handleBrowseDoctors = () => {
+    haptics.light();
+    router.push(ROUTES.PATIENT.DOCTORS as never);
   };
 
   return (
@@ -271,17 +280,29 @@ export default function AssessmentResultScreen() {
       </ScrollView>
 
       {/* Floating CTA */}
-      <Box className="absolute bottom-0 left-0 right-0 bg-card border-t border-border px-5 py-4">
+      <Box className="absolute bottom-0 left-0 right-0 bg-card border-t border-border px-5 py-3">
         <Button
           size="lg"
           onPress={handleAction}
           className="w-full bg-primary h-12 rounded-2xl"
         >
           <ButtonText className="text-base font-bold text-primary-foreground">
-            {isGuest ? "Masuk Akun untuk Simpan & Konsultasi" : "Temukan Psikolog yang Cocok"}
+            {isGuest ? "Masuk Akun untuk Simpan & Konsultasi" : "Mulai Pencarian Psikolog"}
           </ButtonText>
           <ButtonIcon as={ArrowRight} color="#FFFFFF" />
         </Button>
+        {!isGuest && (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Pilih dokter manual"
+            onPress={handleBrowseDoctors}
+            className="mt-2 py-1 items-center justify-center active:opacity-70"
+          >
+            <Text size="sm" className="text-muted-foreground font-semibold">
+              Atau pilih jadwal dokter manual
+            </Text>
+          </Pressable>
+        )}
       </Box>
     </SafeAreaView>
   );

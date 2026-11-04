@@ -78,24 +78,23 @@ export default function TriageScreen() {
       },
       {
         onSuccess: (data) => {
-          if (isAssessment) {
-            router.push({
-              pathname: ROUTES.PATIENT.ASSESSMENT_RESULT,
-              params: { id: data.id, guest: isGuest ? "true" : "false" },
-            } as never);
-          } else {
-            router.push(ROUTES.PATIENT.MATCHING as never);
-          }
+          router.push({
+            pathname: ROUTES.PATIENT.ASSESSMENT_RESULT,
+            params: {
+              triageId: data.id,
+              guest: isGuest ? "true" : "false",
+              mode: isAssessment ? "assessment" : "consultation",
+            },
+          } as never);
         },
         onError: () => {
-          if (isAssessment) {
-            router.push({
-              pathname: ROUTES.PATIENT.ASSESSMENT_RESULT,
-              params: { guest: isGuest ? "true" : "false" },
-            } as never);
-          } else {
-            router.push(ROUTES.PATIENT.MATCHING as never);
-          }
+          router.push({
+            pathname: ROUTES.PATIENT.ASSESSMENT_RESULT,
+            params: {
+              guest: isGuest ? "true" : "false",
+              mode: isAssessment ? "assessment" : "consultation",
+            },
+          } as never);
         },
       },
     );
@@ -212,7 +211,7 @@ export default function TriageScreen() {
             className="flex-1 h-[52px] bg-primary rounded-xl active:opacity-90"
           >
             <ButtonText className="text-white font-bold text-base">
-              {isAssessment ? "Lihat Hasil Evaluasi" : "Cari Psikolog"}
+              {isAssessment ? "Lihat Hasil Evaluasi" : "Lihat Hasil & Cari Psikolog"}
             </ButtonText>
             <ButtonIcon as={ArrowRight} color="#FFFFFF" />
           </Button>
