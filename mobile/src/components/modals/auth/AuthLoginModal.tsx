@@ -30,10 +30,16 @@ import {
   ModalBody,
 } from "@/components/ui";
 import { useLogin } from "@/hooks/useApiQueries";
-import { getHomeRouteForResponse } from "@/hooks/useAuth";
+import { getHomeRouteForResponse, useAuth } from "@/hooks/useAuth";
 import { ROUTES } from "@/constants/routes";
 import { haptics } from "@/utils/haptics";
 import { ForgotPasswordView } from "./ForgotPasswordView";
+
+const DEV_PATIENT_TOKEN =
+  "header.eyJzdWIiOiAiMDFNMzRNUVozMEtOREg0UEFLTVM5UjNESEgiLCAic2lkIjogIjAxTTNETjBOV1RTMlg0MFJNUVhQV00zWlFCIiwgImVtYWlsIjogInNpdGkucmFoYXl1QHNlcmFwaGFueS5pZCIsICJyb2xlIjogIlVTRVIiLCAiaXNBY3RpdmUiOiB0cnVlLCAiaWF0IjogMTcwMDAwMDAwMCwgImV4cCI6IDIwMDAwMDAwMDB9.signature";
+
+const DEV_PRACTITIONER_TOKEN =
+  "header.eyJzdWIiOiAiMDFNMzRNUVozMFA1R0U3NTdEMzE3OFJCNFciLCAic2lkIjogIjAxTTNETjBQMFc0SFpYRUFYU0pEVkc1V0NOIiwgImVtYWlsIjogInJpbmEuYW1lbGlhQHNlcmFwaGFueS5pZCIsICJyb2xlIjogIlBTWUNIT0xPR0lTVCIsICJpc0FjdGl2ZSI6IHRydWUsICJpYXQiOiAxNzAwMDAwMDAwLCAiZXhwIjogMjAwMDAwMDAwMH0.signature";
 
 /**
  * Sign-in modal.
@@ -57,6 +63,7 @@ export function AuthLoginModal({
   onOpenRegister,
 }: AuthLoginModalProps) {
   const router = useRouter();
+  const { acceptSession } = useAuth();
   const [tab, setTab] = useState<"login" | "forgot_request" | "forgot_verify">(
     initialTab,
   );
@@ -118,6 +125,17 @@ export function AuthLoginModal({
     } catch (err: any) {
       haptics.error();
       if (isMountedRef.current) setErrorMsg(err?.message || "Login gagal. Cek username dan sandi.");
+    }
+  };
+
+  const handleDevLogin = (devToken: string, targetRoute: string) => {
+    try {
+      haptics.success();
+      handleClose();
+      acceptSession({ accessToken: devToken, refreshToken: "" });
+      router.replace(targetRoute as any);
+    } catch (e: any) {
+      if (isMountedRef.current) setErrorMsg(e?.message || "Dev login failed");
     }
   };
 
@@ -316,6 +334,43 @@ export function AuthLoginModal({
                     </Text>
                   </Pressable>
                 </HStack>
+              )}
+
+              {__DEV__ && (
+                <VStack space="xs" className="pt-2.5 border-t border-border/40 mt-1.5">
+                  <Text size="sm" className="text-muted-foreground text-sm text-center font-bold tracking-wider uppercase">
+                    Akses Cepat Pengujian (Dev Only)
+                  </Text>
+                  <HStack space="xs" className="w-full">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onPress={() =>
+                        handleDevLogin(DEV_PATIENT_TOKEN, ROUTES.PATIENT.DASHBOARD)
+                      }
+                      className="flex-1 rounded-xl border-primary/50 bg-primary/10 h-10"
+                    >
+                      <ButtonText className="text-primary text-sm font-bold">
+                        Masuk Pasien
+                      </ButtonText>
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onPress={() =>
+                        handleDevLogin(
+                          DEV_PRACTITIONER_TOKEN,
+                          ROUTES.PRACTITIONER.DASHBOARD,
+                        )
+                      }
+                      className="flex-1 rounded-xl border-primary/50 bg-primary/10 h-10"
+                    >
+                      <ButtonText className="text-primary text-sm font-bold">
+                        Masuk Praktisi
+                      </ButtonText>
+                    </Button>
+                  </HStack>
+                </VStack>
               )}
             </VStack>
           ) : (

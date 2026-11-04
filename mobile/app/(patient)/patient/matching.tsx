@@ -166,7 +166,7 @@ export default function MatchingScreen() {
                 variant="outline"
                 className="bg-primary/10 border-primary/30 rounded-full px-3 py-1 mb-1.5"
               >
-                <BadgeText className="text-xs font-bold text-primary">
+                <BadgeText className="text-sm font-bold text-primary">
                   SISTEM RADAR AKTIF
                 </BadgeText>
               </Badge>
@@ -206,7 +206,7 @@ export default function MatchingScreen() {
                   variant="outline"
                   className="bg-muted border-border rounded-full px-2.5 py-0.5"
                 >
-                  <BadgeText className="text-xs font-bold text-foreground">
+                  <BadgeText className="text-sm font-bold text-foreground">
                     #{room?.position ?? 1} Prioritas
                   </BadgeText>
                 </Badge>
@@ -248,7 +248,7 @@ export default function MatchingScreen() {
                 variant="outline"
                 className="bg-emerald-50 border-emerald-200 rounded-full px-3 py-1 mb-1"
               >
-                <BadgeText className="text-xs font-bold text-emerald-700">
+                <BadgeText className="text-sm font-bold text-emerald-700">
                   PSIKOLOG SIAP KONSULTASI
                 </BadgeText>
               </Badge>
@@ -283,7 +283,7 @@ export default function MatchingScreen() {
                     <Text size="sm" bold className="text-foreground font-semibold">
                       {room?.assignedDoctor?.rating?.toFixed(1) || "4.9"}
                     </Text>
-                    <Text size="xs" className="text-muted-foreground">
+                    <Text size="sm" className="text-muted-foreground">
                       • Terverifikasi STR/SIP
                     </Text>
                   </HStack>

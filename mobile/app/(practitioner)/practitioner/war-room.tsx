@@ -146,7 +146,7 @@ export default function WarRoomScreen() {
             variant="outline"
             className="bg-emerald-50 border-emerald-200 rounded-full px-2.5 py-0.5"
           >
-            <BadgeText className="text-xs font-bold text-emerald-700">
+            <BadgeText className="text-sm font-bold text-emerald-700">
               ● SIAGA ON
             </BadgeText>
           </Badge>
@@ -237,7 +237,7 @@ export default function WarRoomScreen() {
                 <Text size="sm" bold className="text-foreground font-bold">
                   Kasus Menunggu Respons ({offers.length})
                 </Text>
-                <Text size="xs" className="text-muted-foreground">
+                <Text size="sm" className="text-muted-foreground">
                   Pembaruan otomatis real-time
                 </Text>
               </HStack>
@@ -259,13 +259,13 @@ export default function WarRoomScreen() {
                         variant="outline"
                         className={`${acuityInfo.bgClass} ${acuityInfo.borderClass} rounded-full px-2.5 py-0.5`}
                       >
-                        <BadgeText className={`text-xs font-bold ${acuityInfo.textClass}`}>
+                        <BadgeText className={`text-sm font-bold ${acuityInfo.textClass}`}>
                           {acuityInfo.label}
                         </BadgeText>
                       </Badge>
                       <HStack space="xs" className="items-center">
-                        <Clock size={13} color="#6B7280" />
-                        <Text size="xs" className="text-muted-foreground">
+                        <Clock size={14} color="#6B7280" />
+                        <Text size="sm" className="text-muted-foreground">
                           {offer.deadlineAt
                             ? `Batas respons: ${new Date(offer.deadlineAt).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })}`
                             : "Respons cepat"}
@@ -281,7 +281,7 @@ export default function WarRoomScreen() {
                           "Pasien memerlukan sesi konsultasi klinis terarah"}
                       </Text>
                       {offer.brief?.triageScore !== undefined && (
-                        <Text size="xs" className="text-muted-foreground">
+                        <Text size="sm" className="text-muted-foreground">
                           Skor Triase Klinis: {offer.brief.triageScore} / 15
                         </Text>
                       )}
@@ -290,7 +290,7 @@ export default function WarRoomScreen() {
                     {/* Metadata Pill */}
                     <HStack space="sm" className="items-center bg-muted/60 p-2.5 rounded-xl">
                       <UserCheck size={16} color="#4A3B6B" />
-                      <Text size="xs" className="text-muted-foreground flex-1 font-medium">
+                      <Text size="sm" className="text-muted-foreground flex-1 font-medium">
                         Kategori Kompetensi: {offer.requiredLevel ? offer.requiredLevel.toUpperCase().replace("_", " ") : "UMUM"}
                       </Text>
                     </HStack>
