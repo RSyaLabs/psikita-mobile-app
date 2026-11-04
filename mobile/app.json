@@ -28,7 +28,8 @@
     },
     "plugins": [
       "expo-router",
-      "expo-asset"
+      "expo-asset",
+      "@didit-protocol/sdk-react-native"
     ],
     "experiments": {
       "typedRoutes": true

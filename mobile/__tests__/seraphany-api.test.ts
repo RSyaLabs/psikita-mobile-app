@@ -274,5 +274,61 @@ describe("SeraPhany API Client Suite", () => {
         }),
       );
     });
+
+    it("should launch Didit Native SDK with sessionToken and handle approved verification", async () => {
+      const { launchDiditVerification } = require("../src/services/didit-kyc");
+      const onApproved = jest.fn();
+
+      const outcome = await launchDiditVerification(
+        {
+          sessionId: "session_01j7xyz",
+          sessionToken: "eyJhbGciOi...short-lived-session-token",
+          url: "https://verification.didit.me/v1/session/session_01j7xyz",
+          status: "Not Started",
+        },
+        { onApproved },
+      );
+
+      expect(outcome.method).toBe("native");
+      expect(outcome.status).toBe("approved");
+      expect(onApproved).toHaveBeenCalled();
+    });
+
+    it("should fallback to Linking.openURL when Didit Native SDK fails or errors", async () => {
+      const { launchDiditVerification } = require("../src/services/didit-kyc");
+      const {
+        startVerification,
+      } = require("@didit-protocol/sdk-react-native");
+      const { Linking } = require("react-native");
+      const openURLSpy = jest
+        .spyOn(Linking, "openURL")
+        .mockResolvedValueOnce(true as any);
+
+      // Simulate native SDK failure
+      (startVerification as jest.Mock).mockResolvedValueOnce({
+        type: "failed",
+        error: { type: "apiError", message: "Device unsupported" },
+      });
+
+      const onFallback = jest.fn();
+      const outcome = await launchDiditVerification(
+        {
+          sessionId: "session_fallback",
+          sessionToken: "faulty_token",
+          url: "https://verification.didit.me/v1/session/session_fallback",
+          status: "Not Started",
+        },
+        { onFallbackUrlLaunched: onFallback },
+      );
+
+      expect(outcome.method).toBe("fallback_url");
+      expect(openURLSpy).toHaveBeenCalledWith(
+        "https://verification.didit.me/v1/session/session_fallback",
+      );
+      expect(onFallback).toHaveBeenCalledWith(
+        "https://verification.didit.me/v1/session/session_fallback",
+      );
+      openURLSpy.mockRestore();
+    });
   });
 });

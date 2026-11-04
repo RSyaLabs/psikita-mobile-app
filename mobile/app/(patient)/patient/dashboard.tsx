@@ -14,6 +14,8 @@ import {
   ClipboardCheck,
   MessageSquare,
   CalendarCheck,
+  ShieldAlert,
+  ShieldCheck,
 } from "lucide-react-native";
 import {
   Box,
@@ -25,16 +27,32 @@ import {
   Pressable,
   Button,
   ButtonText,
+  ButtonSpinner,
+  Badge,
+  BadgeText,
   ScrollView,
   Image,
   useToast,
   Toast,
   ToastTitle,
   ToastDescription,
+  Modal,
+  ModalBackdrop,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  ModalCloseButton,
 } from "@/components/ui";
 import { PatientTabBar } from "@/components/navigation/PatientTabBar";
 import { AppIcon } from "@/components/common/AppIcon";
-import { usePatientProfile, usePractitioners } from "@/hooks/useApiQueries";
+import {
+  usePatientProfile,
+  usePractitioners,
+  useMyVerificationStatus,
+  useStartDiditVerification,
+} from "@/hooks/useApiQueries";
+import { launchDiditVerification } from "@/services/didit-kyc";
 import { haptics } from "@/utils/haptics";
 import { ROUTES } from "@/constants/routes";
 
@@ -72,13 +90,105 @@ export default function PatientDashboard() {
   const router = useRouter();
   const toast = useToast();
   const [selectedMood, setSelectedMood] = useState("Tenang");
+  const [kycModalOpen, setKycModalOpen] = useState(false);
+  const [isKycLaunching, setIsKycLaunching] = useState(false);
 
   const { data: patient } = usePatientProfile();
   const { data: practitionersData } = usePractitioners();
+  const { data: kycStatus, refetch: refetchKyc } = useMyVerificationStatus();
+  const startKycMutation = useStartDiditVerification();
+
+  const isVerified =
+    kycStatus?.status === "VERIFIED" || kycStatus?.status === "APPROVED";
 
   const patientFirstName = patient?.fullName?.split(" ")[0];
   const practitionersList = practitionersData?.data || [];
   const onlineCount = practitionersList.length;
+
+  const handleLaunchDidit = async () => {
+    haptics.selection();
+    setIsKycLaunching(true);
+    try {
+      const session = await startKycMutation.mutateAsync();
+      await launchDiditVerification(session, {
+        onApproved: () => {
+          haptics.success();
+          setKycModalOpen(false);
+          refetchKyc();
+          toast.show({
+            placement: "top",
+            render: ({ id }) => (
+              <Toast nativeID={id} action="success">
+                <ToastTitle>Identitas Terverifikasi</ToastTitle>
+                <ToastDescription>
+                  Akun Anda telah berstatus VERIFIED. Layanan konsultasi dan pencocokan kini aktif penuh!
+                </ToastDescription>
+              </Toast>
+            ),
+          });
+        },
+        onCompleted: () => {
+          refetchKyc();
+        },
+        onCancelled: () => {
+          toast.show({
+            placement: "top",
+            render: ({ id }) => (
+              <Toast nativeID={id} action="info">
+                <ToastTitle>Verifikasi Ditunda</ToastTitle>
+                <ToastDescription>
+                  Selesaikan verifikasi Didit KYC sebelum memulai konsultasi langsung.
+                </ToastDescription>
+              </Toast>
+            ),
+          });
+        },
+        onFallbackUrlLaunched: () => {
+          setKycModalOpen(false);
+          toast.show({
+            placement: "top",
+            render: ({ id }) => (
+              <Toast nativeID={id} action="info">
+                <ToastTitle>Portal Verifikasi Didit</ToastTitle>
+                <ToastDescription>
+                  Membuka portal verifikasi identitas resmi Didit untuk menyelesaikan KYC Anda.
+                </ToastDescription>
+              </Toast>
+            ),
+          });
+        },
+        onError: (err) => {
+          haptics.error();
+          toast.show({
+            placement: "top",
+            render: ({ id }) => (
+              <Toast nativeID={id} action="error">
+                <ToastTitle>Kendala Verifikasi</ToastTitle>
+                <ToastDescription>{err.message}</ToastDescription>
+              </Toast>
+            ),
+          });
+        },
+      });
+    } catch (err: unknown) {
+      haptics.error();
+      const msg =
+        err instanceof Error
+          ? err.message
+          : "Gagal memulai sesi verifikasi Didit.";
+      toast.show({
+        placement: "top",
+        render: ({ id }) => (
+          <Toast nativeID={id} action="error">
+            <ToastTitle>Gagal Memulai</ToastTitle>
+            <ToastDescription>{msg}</ToastDescription>
+          </Toast>
+        ),
+      });
+    } finally {
+      setIsKycLaunching(false);
+    }
+  };
 
   const handleMoodSelect = (moodId: string) => {
     haptics.light();
@@ -123,6 +233,42 @@ export default function PatientDashboard() {
             />
           </HStack>
         </VStack>
+
+        {/* Verification Warning Banner if Not Verified */}
+        {!isVerified && (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Verifikasi identitas Didit KYC"
+            onPress={() => {
+              haptics.selection();
+              setKycModalOpen(true);
+            }}
+            className="mx-5 mt-3.5 p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex-row items-center gap-3 active:opacity-90"
+          >
+            <Box className="w-10 h-10 rounded-xl bg-amber-500/20 items-center justify-center">
+              <ShieldAlert size={20} color="#D97706" />
+            </Box>
+            <VStack className="flex-1" space="xs">
+              <HStack space="xs" className="items-center">
+                <Text size="sm" bold className="text-amber-900 font-bold">
+                  Verifikasi Identitas Diperlukan
+                </Text>
+                <Badge
+                  variant="outline"
+                  className="border-amber-500/40 bg-amber-500/20 rounded-full px-2 py-0.5"
+                >
+                  <BadgeText className="text-xs text-amber-900 font-bold">
+                    Didit KYC
+                  </BadgeText>
+                </Badge>
+              </HStack>
+              <Text size="sm" className="text-amber-800 leading-tight">
+                Selesaikan Didit KYC untuk membuka Konsultasi Langsung & Matching (mencegah 403 Forbidden).
+              </Text>
+            </VStack>
+            <ChevronRight size={18} color="#D97706" />
+          </Pressable>
+        )}
 
         {/* Photo Zone - Single Elegant Hero Banner */}
         <Box className="mx-5 mt-4 rounded-3xl overflow-hidden relative h-44 justify-end p-3.5">
@@ -206,6 +352,10 @@ export default function PatientDashboard() {
               accessibilityLabel="Konsultasi langsung"
               onPress={() => {
                 haptics.medium();
+                if (!isVerified) {
+                  setKycModalOpen(true);
+                  return;
+                }
                 router.push({
                   pathname: ROUTES.PATIENT.TRIAGE,
                   params: { mode: "consultation" },
@@ -331,6 +481,68 @@ export default function PatientDashboard() {
 
       {/* Persistent Bottom Tab Bar */}
       <PatientTabBar activeTab="beranda" />
+
+      {/* Modal Verifikasi Didit KYC */}
+      <Modal isOpen={kycModalOpen} onClose={() => setKycModalOpen(false)}>
+        <ModalBackdrop />
+        <ModalContent className="max-w-[92%] p-5 rounded-3xl bg-card border border-border">
+          <ModalHeader className="pb-3 border-b border-border">
+            <HStack space="sm" className="items-center">
+              <Box className="w-10 h-10 rounded-xl bg-primary/10 items-center justify-center">
+                <ShieldCheck size={22} color="#4A3B6B" />
+              </Box>
+              <VStack className="flex-1">
+                <Heading size="md" bold className="text-foreground">
+                  Verifikasi Identitas
+                </Heading>
+                <Text size="sm" className="text-muted-foreground">
+                  Didit KYC Resmi
+                </Text>
+              </VStack>
+              <ModalCloseButton />
+            </HStack>
+          </ModalHeader>
+          <ModalBody className="py-4">
+            <VStack space="sm">
+              <Text size="sm" className="text-foreground leading-relaxed">
+                Untuk mengakses layanan <Text bold>Konsultasi Langsung</Text> dan <Text bold>Pencocokan Praktisi</Text>, akun Anda wajib terverifikasi melalui Didit KYC.
+              </Text>
+              <Box className="bg-muted p-3.5 rounded-2xl border border-border">
+                <Text size="sm" className="text-muted-foreground leading-relaxed">
+                  Jika akun belum berstatus <Text bold className="text-foreground">VERIFIED</Text>, server akan menolak permintaan triase dan antrean matching dengan status <Text bold className="text-destructive">403 Forbidden</Text>.
+                </Text>
+              </Box>
+              <Text size="sm" className="text-muted-foreground leading-relaxed">
+                Verifikasi berjalan langsung di dalam aplikasi melalui Didit Native SDK tanpa membuka browser external.
+              </Text>
+            </VStack>
+          </ModalBody>
+          <ModalFooter className="flex-col gap-2 pt-3 border-t border-border">
+            <Button
+              onPress={handleLaunchDidit}
+              disabled={isKycLaunching}
+              className="w-full bg-primary rounded-xl py-3"
+            >
+              {isKycLaunching ? (
+                <ButtonSpinner color="#FFFFFF" />
+              ) : (
+                <ButtonText className="text-sm font-bold text-primary-foreground">
+                  Mulai Verifikasi Didit Sekarang
+                </ButtonText>
+              )}
+            </Button>
+            <Button
+              variant="outline"
+              onPress={() => setKycModalOpen(false)}
+              className="w-full border-border rounded-xl"
+            >
+              <ButtonText className="text-sm font-semibold text-foreground">
+                Nanti Saja
+              </ButtonText>
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </SafeAreaView>
   );
 }

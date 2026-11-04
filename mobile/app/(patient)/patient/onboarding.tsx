@@ -50,6 +50,7 @@ import {
   useCreatePatientProfile,
 } from "@/hooks/useApiQueries";
 import { useAuth } from "@/hooks/useAuth";
+import { launchDiditVerification } from "@/services/didit-kyc";
 
 export default function PatientOnboardingScreen() {
   const router = useRouter();
@@ -81,9 +82,64 @@ export default function PatientOnboardingScreen() {
     haptics.selection();
     try {
       const session = await startKycMutation.mutateAsync();
-      if (session?.url) {
-        await Linking.openURL(session.url);
-      }
+      await launchDiditVerification(session, {
+        onApproved: () => {
+          haptics.success();
+          refetchKyc();
+          toast.show({
+            placement: "top",
+            render: ({ id }) => (
+              <Toast nativeID={id} action="success">
+                <ToastTitle>Verifikasi Berhasil</ToastTitle>
+                <ToastDescription>
+                  Identitas resmi Anda telah terverifikasi via Didit KYC. Silakan lengkapi profil di bawah ini.
+                </ToastDescription>
+              </Toast>
+            ),
+          });
+        },
+        onCompleted: () => {
+          refetchKyc();
+        },
+        onCancelled: () => {
+          toast.show({
+            placement: "top",
+            render: ({ id }) => (
+              <Toast nativeID={id} action="info">
+                <ToastTitle>Verifikasi Dibatalkan</ToastTitle>
+                <ToastDescription>
+                  Proses verifikasi belum selesai. Silakan coba kembali kapan saja.
+                </ToastDescription>
+              </Toast>
+            ),
+          });
+        },
+        onFallbackUrlLaunched: () => {
+          toast.show({
+            placement: "top",
+            render: ({ id }) => (
+              <Toast nativeID={id} action="info">
+                <ToastTitle>Portal Verifikasi Didit</ToastTitle>
+                <ToastDescription>
+                  Membuka portal verifikasi identitas resmi Didit untuk menyelesaikan KYC Anda.
+                </ToastDescription>
+              </Toast>
+            ),
+          });
+        },
+        onError: (err) => {
+          haptics.error();
+          toast.show({
+            placement: "top",
+            render: ({ id }) => (
+              <Toast nativeID={id} action="error">
+                <ToastTitle>Kendala Verifikasi</ToastTitle>
+                <ToastDescription>{err.message}</ToastDescription>
+              </Toast>
+            ),
+          });
+        },
+      });
     } catch (err: unknown) {
       haptics.error();
       const message =

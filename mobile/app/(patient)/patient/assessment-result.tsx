@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
@@ -7,6 +7,8 @@ import {
   HeartPulse,
   Wind,
   BookOpen,
+  ShieldCheck,
+  ShieldAlert,
 } from "lucide-react-native";
 import {
   Badge,
@@ -14,6 +16,7 @@ import {
   Box,
   Button,
   ButtonIcon,
+  ButtonSpinner,
   ButtonText,
   Card,
   HStack,
@@ -24,9 +27,25 @@ import {
   ScrollView,
   Text,
   VStack,
+  useToast,
+  Toast,
+  ToastTitle,
+  ToastDescription,
+  Modal,
+  ModalBackdrop,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  ModalCloseButton,
 } from "@/components/ui";
 import { BackendIntegrationBanner } from "@/components/common";
-import { useTriageAssessment } from "@/hooks/useApiQueries";
+import {
+  useTriageAssessment,
+  useMyVerificationStatus,
+  useStartDiditVerification,
+} from "@/hooks/useApiQueries";
+import { launchDiditVerification } from "@/services/didit-kyc";
 import {
   ASSESSMENT_UNAVAILABLE_MESSAGE,
   isAssessmentResult,
@@ -44,6 +63,7 @@ function formatServerDate(value: string): string {
 
 export default function AssessmentResultScreen() {
   const router = useRouter();
+  const toast = useToast();
   const { triageId, guest, mode } = useLocalSearchParams<{
     triageId?: string;
     guest?: string;
@@ -51,6 +71,16 @@ export default function AssessmentResultScreen() {
   }>();
   const normalizedTriageId = Array.isArray(triageId) ? triageId[0] : triageId;
   const isGuest = guest === "true";
+
+  const [kycModalOpen, setKycModalOpen] = useState(false);
+  const [isKycLaunching, setIsKycLaunching] = useState(false);
+
+  const { data: kycStatus, refetch: refetchKyc } = useMyVerificationStatus();
+  const startKycMutation = useStartDiditVerification();
+
+  const isVerified =
+    kycStatus?.status === "VERIFIED" || kycStatus?.status === "APPROVED";
+
   // Route value only. No invented triage id: the hook is disabled without one
   // (it never calls the service with an empty id) and the screen below states
   // the missing id instead of scoring a session that never happened.
@@ -60,6 +90,73 @@ export default function AssessmentResultScreen() {
   const result = isAssessmentResult(assessmentQuery.data)
     ? assessmentQuery.data
     : undefined;
+
+  const handleLaunchDidit = async () => {
+    haptics.selection();
+    setIsKycLaunching(true);
+    try {
+      const session = await startKycMutation.mutateAsync();
+      await launchDiditVerification(session, {
+        onApproved: () => {
+          haptics.success();
+          setKycModalOpen(false);
+          refetchKyc();
+          toast.show({
+            placement: "top",
+            render: ({ id }) => (
+              <Toast nativeID={id} action="success">
+                <ToastTitle>Verifikasi Berhasil</ToastTitle>
+                <ToastDescription>
+                  Identitas resmi Anda telah terverifikasi via Didit KYC. Melanjutkan ke antrean matching...
+                </ToastDescription>
+              </Toast>
+            ),
+          });
+          router.push({
+            pathname: ROUTES.PATIENT.MATCHING,
+            params: normalizedTriageId
+              ? { triageId: normalizedTriageId }
+              : undefined,
+          } as never);
+        },
+        onCompleted: () => {
+          refetchKyc();
+        },
+        onFallbackUrlLaunched: () => {
+          setKycModalOpen(false);
+        },
+        onError: (err) => {
+          haptics.error();
+          toast.show({
+            placement: "top",
+            render: ({ id }) => (
+              <Toast nativeID={id} action="error">
+                <ToastTitle>Kendala Verifikasi</ToastTitle>
+                <ToastDescription>{err.message}</ToastDescription>
+              </Toast>
+            ),
+          });
+        },
+      });
+    } catch (err: unknown) {
+      haptics.error();
+      const msg =
+        err instanceof Error
+          ? err.message
+          : "Gagal memulai sesi verifikasi Didit.";
+      toast.show({
+        placement: "top",
+        render: ({ id }) => (
+          <Toast nativeID={id} action="error">
+            <ToastTitle>Gagal Memulai</ToastTitle>
+            <ToastDescription>{msg}</ToastDescription>
+          </Toast>
+        ),
+      });
+    } finally {
+      setIsKycLaunching(false);
+    }
+  };
 
   const handleBack = () => {
     haptics.light();
@@ -71,9 +168,15 @@ export default function AssessmentResultScreen() {
     if (isGuest) {
       router.push(ROUTES.AUTH.LOGIN as never);
     } else {
+      if (!isVerified) {
+        setKycModalOpen(true);
+        return;
+      }
       router.push({
         pathname: ROUTES.PATIENT.MATCHING,
-        params: normalizedTriageId ? { triageId: normalizedTriageId } : undefined,
+        params: normalizedTriageId
+          ? { triageId: normalizedTriageId }
+          : undefined,
       } as never);
     }
   };
@@ -304,6 +407,68 @@ export default function AssessmentResultScreen() {
           </Pressable>
         )}
       </Box>
+
+      {/* Modal Verifikasi Didit KYC */}
+      <Modal isOpen={kycModalOpen} onClose={() => setKycModalOpen(false)}>
+        <ModalBackdrop />
+        <ModalContent className="max-w-[92%] p-5 rounded-3xl bg-card border border-border">
+          <ModalHeader className="pb-3 border-b border-border">
+            <HStack space="sm" className="items-center">
+              <Box className="w-10 h-10 rounded-xl bg-primary/10 items-center justify-center">
+                <ShieldCheck size={22} color="#4A3B6B" />
+              </Box>
+              <VStack className="flex-1">
+                <Heading size="md" bold className="text-foreground">
+                  Verifikasi Identitas
+                </Heading>
+                <Text size="sm" className="text-muted-foreground">
+                  Didit KYC Resmi
+                </Text>
+              </VStack>
+              <ModalCloseButton />
+            </HStack>
+          </ModalHeader>
+          <ModalBody className="py-4">
+            <VStack space="sm">
+              <Text size="sm" className="text-foreground leading-relaxed">
+                Sebelum memulai pencocokan psikolog di sistem antrean, akun Anda wajib berstatus <Text bold className="text-primary">VERIFIED</Text>.
+              </Text>
+              <Box className="bg-muted p-3.5 rounded-2xl border border-border">
+                <Text size="sm" className="text-muted-foreground leading-relaxed">
+                  Jika belum diverifikasi, server akan menolak permintaan antrean matching dengan status <Text bold className="text-destructive">403 Forbidden</Text>.
+                </Text>
+              </Box>
+              <Text size="sm" className="text-muted-foreground leading-relaxed">
+                Verifikasi berjalan secara native di dalam aplikasi melalui Didit Native SDK tanpa membuka browser external.
+              </Text>
+            </VStack>
+          </ModalBody>
+          <ModalFooter className="flex-col gap-2 pt-3 border-t border-border">
+            <Button
+              onPress={handleLaunchDidit}
+              disabled={isKycLaunching}
+              className="w-full bg-primary rounded-xl py-3"
+            >
+              {isKycLaunching ? (
+                <ButtonSpinner color="#FFFFFF" />
+              ) : (
+                <ButtonText className="text-sm font-bold text-primary-foreground">
+                  Mulai Verifikasi Didit Sekarang
+                </ButtonText>
+              )}
+            </Button>
+            <Button
+              variant="outline"
+              onPress={() => setKycModalOpen(false)}
+              className="w-full border-border rounded-xl"
+            >
+              <ButtonText className="text-sm font-semibold text-foreground">
+                Nanti Saja
+              </ButtonText>
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </SafeAreaView>
   );
 }

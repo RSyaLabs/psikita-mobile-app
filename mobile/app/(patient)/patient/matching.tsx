@@ -26,20 +26,92 @@ import {
   VStack,
   Badge,
   BadgeText,
+  useToast,
+  Toast,
+  ToastTitle,
+  ToastDescription,
 } from "@/components/ui";
 import { activeConsultationContextFromResponse } from "@/clinical/activeConsultation";
 import { ROUTES } from "@/constants/routes";
 import {
   useCreateConsultation,
   useWaitingRoomStatus,
+  useStartDiditVerification,
 } from "@/hooks/useApiQueries";
+import { launchDiditVerification } from "@/services/didit-kyc";
+import { ApiError } from "@/api/client";
 import { haptics } from "@/utils/haptics";
 import { safeNavigateBack } from "@/utils/navigation";
 
 export default function MatchingScreen() {
   const router = useRouter();
+  const toast = useToast();
   const waitingRoom = useWaitingRoomStatus();
   const createConsultation = useCreateConsultation();
+  const startKycMutation = useStartDiditVerification();
+  const [isKycLaunching, setIsKycLaunching] = React.useState(false);
+
+  const is403Forbidden =
+    waitingRoom.error instanceof ApiError &&
+    waitingRoom.error.statusCode === 403;
+
+  const handleLaunchDidit = async () => {
+    haptics.selection();
+    setIsKycLaunching(true);
+    try {
+      const session = await startKycMutation.mutateAsync();
+      await launchDiditVerification(session, {
+        onApproved: () => {
+          haptics.success();
+          waitingRoom.refetch();
+          toast.show({
+            placement: "top",
+            render: ({ id }) => (
+              <Toast nativeID={id} action="success">
+                <ToastTitle>Verifikasi Berhasil</ToastTitle>
+                <ToastDescription>
+                  Identitas Anda telah terverifikasi via Didit KYC. Menghubungkan ulang ke antrean matching...
+                </ToastDescription>
+              </Toast>
+            ),
+          });
+        },
+        onCompleted: () => {
+          waitingRoom.refetch();
+        },
+        onError: (err) => {
+          haptics.error();
+          toast.show({
+            placement: "top",
+            render: ({ id }) => (
+              <Toast nativeID={id} action="error">
+                <ToastTitle>Kendala Verifikasi</ToastTitle>
+                <ToastDescription>{err.message}</ToastDescription>
+              </Toast>
+            ),
+          });
+        },
+      });
+    } catch (err: unknown) {
+      haptics.error();
+      const msg =
+        err instanceof Error
+          ? err.message
+          : "Gagal memulai sesi verifikasi Didit.";
+      toast.show({
+        placement: "top",
+        render: ({ id }) => (
+          <Toast nativeID={id} action="error">
+            <ToastTitle>Gagal Memulai</ToastTitle>
+            <ToastDescription>{msg}</ToastDescription>
+          </Toast>
+        ),
+      });
+    } finally {
+      setIsKycLaunching(false);
+    }
+  };
+
   const room = waitingRoom.data;
   const isMatched = room?.status === "MATCHED";
   const canRequestConsultation = Boolean(
@@ -131,23 +203,43 @@ export default function MatchingScreen() {
             <HStack space="sm" className="items-center">
               <ShieldAlert size={22} color="#DC2626" />
               <Heading size="sm" bold className="text-foreground">
-                Koneksi Antrean Terputus
+                {is403Forbidden
+                  ? "Akses Antrean Ditolak (403 Forbidden)"
+                  : "Koneksi Antrean Terputus"}
               </Heading>
             </HStack>
-            <Text size="sm" className="text-muted-foreground">
-              Tidak dapat memuat status pencocokan dari server saat ini. Silakan
-              coba beberapa saat lagi atau pilih psikolog dari direktori manual.
+            <Text size="sm" className="text-muted-foreground leading-relaxed">
+              {is403Forbidden
+                ? "Server menolak permintaan pencocokan psikolog karena akun Anda belum berstatus VERIFIED pada Didit KYC. Selesaikan verifikasi identitas resmi untuk masuk ke antrean matching."
+                : "Tidak dapat memuat status pencocokan dari server saat ini. Silakan coba beberapa saat lagi atau pilih psikolog dari direktori manual."}
             </Text>
-            <Button
-              variant="outline"
-              size="sm"
-              onPress={() => waitingRoom.refetch()}
-              className="mt-2 rounded-xl border-border"
-            >
-              <ButtonText className="text-foreground font-semibold text-sm">
-                Coba Hubungkan Ulang
-              </ButtonText>
-            </Button>
+            {is403Forbidden ? (
+              <Button
+                size="sm"
+                onPress={handleLaunchDidit}
+                disabled={isKycLaunching}
+                className="mt-2 rounded-xl bg-primary py-2.5"
+              >
+                {isKycLaunching ? (
+                  <ButtonSpinner color="#FFFFFF" />
+                ) : (
+                  <ButtonText className="text-primary-foreground font-bold text-sm">
+                    Mulai Verifikasi Didit Sekarang
+                  </ButtonText>
+                )}
+              </Button>
+            ) : (
+              <Button
+                variant="outline"
+                size="sm"
+                onPress={() => waitingRoom.refetch()}
+                className="mt-2 rounded-xl border-border"
+              >
+                <ButtonText className="text-foreground font-semibold text-sm">
+                  Coba Hubungkan Ulang
+                </ButtonText>
+              </Button>
+            )}
           </Card>
         )}
 

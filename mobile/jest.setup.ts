@@ -45,3 +45,27 @@ jest.mock("expo-router", () => ({
   useSegments: () => [],
   Link: "Link",
 }));
+
+// Mock Didit Native React Native SDK
+jest.mock("@didit-protocol/sdk-react-native", () => ({
+  startVerification: jest.fn(async (sessionToken: string) => {
+    if (!sessionToken) {
+      return {
+        type: "failed",
+        error: { type: "apiError", message: "Missing session token" },
+      };
+    }
+    return {
+      type: "completed",
+      session: {
+        sessionId: "mock_session_id",
+        status: "Approved",
+      },
+    };
+  }),
+  VerificationStatus: {
+    Approved: "Approved",
+    Pending: "Pending",
+    Declined: "Declined",
+  },
+}));
