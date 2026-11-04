@@ -81,11 +81,11 @@ export const patientService = {
   /**
    * Buat Profil Pasien Baru
    */
-  async createProfile(dto: CreatePatientDto): Promise<void> {
-    return apiRequest<void>("/patient", {
+  async createProfile(dto: CreatePatientDto): Promise<PatientResponseDto> {
+    return apiRequest<PatientResponseDto>("/patient", {
       method: "POST",
       body: JSON.stringify(dto),
-      adapter: noContentAdapter,
+      adapter: patientDtoAdapter,
     });
   },
 

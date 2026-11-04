@@ -99,14 +99,19 @@ export interface PatientResponseDto {
 }
 
 export interface CreatePatientDto {
-  fullName: string;
+  firstName?: string;
+  lastName?: string;
+  birthDate?: string;
+  gender: "MALE" | "FEMALE";
   nik?: string;
   phoneNumber: string;
-  birthDate?: string;
-  gender?: "MALE" | "FEMALE";
-  bpjsNumber?: string;
-  healthCoverageType?: string;
+  address?: string;
+  medicalRecordNumber?: string;
+  healthCoverageType?: "BPJS" | string;
   healthInsuranceId?: string;
+  fullName?: string;
+  bpjsNumber?: string;
+  faskes1?: string;
 }
 
 export interface UpdatePatientDto {

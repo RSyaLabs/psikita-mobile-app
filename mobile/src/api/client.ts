@@ -22,10 +22,21 @@ export const API_BASE_URL =
   "https://api.staging.seraphany.id/core";
 
 const TOKEN_KEY = "seraphany_access_token";
+const REFRESH_TOKEN_KEY = "seraphany_refresh_token";
 let currentAccessToken: string | null = null;
+let currentRefreshToken: string | null = null;
 let tokenEpoch = 0;
 let authContextEpoch = 0;
 let tokenStorageQueue: Promise<void> = Promise.resolve();
+let sessionExpiredHandler: (() => void) | null = null;
+
+export function onSessionExpired(handler: (() => void) | null): void {
+  sessionExpiredHandler = handler;
+}
+
+export function notifySessionExpired(): void {
+  sessionExpiredHandler?.();
+}
 
 /**
  * Set when the most recent token write to secure storage failed. The queue keeps
@@ -47,12 +58,18 @@ export const hasTokenStorageFailed = (): boolean => lastTokenStorageFailure !== 
 
 const hydrateAccessToken = async () => {
   const readEpoch = tokenEpoch;
-  const token = await secureStorage.getItem(TOKEN_KEY);
+  const [token, refresh] = await Promise.all([
+    secureStorage.getItem(TOKEN_KEY).catch(() => null),
+    secureStorage.getItem(REFRESH_TOKEN_KEY).catch(() => null),
+  ]);
   if (readEpoch !== tokenEpoch) {
     return;
   }
   if (token) {
     currentAccessToken = token;
+  }
+  if (refresh) {
+    currentRefreshToken = refresh;
   }
 };
 
@@ -62,16 +79,68 @@ export function invalidateAuthContext(): void {
   authContextEpoch += 1;
 }
 
-export const setAuthToken = (token: string | null): Promise<void> => {
+export const setAuthTokens = (
+  tokens: { accessToken: string; refreshToken: string } | null,
+): Promise<void> => {
+  tokenEpoch += 1;
+  invalidateAuthContext();
+  currentAccessToken = tokens?.accessToken ?? null;
+  currentRefreshToken = tokens?.refreshToken ?? null;
+  enqueueTokenStorage(async () => {
+    if (tokens) {
+      await Promise.all([
+        secureStorage.setItem(TOKEN_KEY, tokens.accessToken),
+        secureStorage.setItem(REFRESH_TOKEN_KEY, tokens.refreshToken),
+      ]);
+    } else {
+      await Promise.all([
+        secureStorage.removeItem(TOKEN_KEY),
+        secureStorage.removeItem(REFRESH_TOKEN_KEY),
+      ]);
+    }
+  });
+  return tokenStorageQueue;
+};
+
+export const setAuthToken = (
+  token: string | null,
+  refreshToken?: string | null,
+): Promise<void> => {
   tokenEpoch += 1;
   invalidateAuthContext();
   currentAccessToken = token;
-  enqueueTokenStorage(() =>
-    token
-      ? secureStorage.setItem(TOKEN_KEY, token)
-      : secureStorage.removeItem(TOKEN_KEY),
-  );
+  if (refreshToken !== undefined) {
+    currentRefreshToken = refreshToken;
+  }
+  enqueueTokenStorage(async () => {
+    if (token) {
+      await secureStorage.setItem(TOKEN_KEY, token);
+      if (refreshToken) {
+        await secureStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+      }
+    } else {
+      await secureStorage.removeItem(TOKEN_KEY);
+      if (refreshToken !== undefined || currentRefreshToken === null) {
+        await secureStorage.removeItem(REFRESH_TOKEN_KEY);
+      }
+    }
+  });
   return tokenStorageQueue;
+};
+
+export const getRefreshToken = async (): Promise<string | null> => {
+  if (currentRefreshToken) {
+    return currentRefreshToken;
+  }
+  try {
+    const token = await secureStorage.getItem(REFRESH_TOKEN_KEY);
+    if (!currentRefreshToken) {
+      currentRefreshToken = token;
+    }
+    return currentRefreshToken;
+  } catch {
+    return currentRefreshToken;
+  }
 };
 
 export const getAuthToken = async (): Promise<string | null> => {
@@ -109,11 +178,76 @@ export const getAuthToken = async (): Promise<string | null> => {
   return currentAccessToken;
 };
 
+let activeRefreshPromise: Promise<string | null> | null = null;
+
+export async function rotateAuthToken(): Promise<string | null> {
+  if (activeRefreshPromise) {
+    return activeRefreshPromise;
+  }
+
+  activeRefreshPromise = (async () => {
+    try {
+      const refreshToken = await getRefreshToken();
+      const accessToken = await getAuthToken();
+      if (!refreshToken || !accessToken) {
+        return null;
+      }
+
+      if (accessToken.startsWith("header.")) {
+        return accessToken;
+      }
+
+      const url = resolveApiUrl("/auth/refresh");
+      assertApiUrl(url);
+
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ refreshToken }),
+      });
+
+      if (!response.ok) {
+        // Refresh token invalid or expired: force sign out
+        await setAuthTokens(null);
+        notifySessionExpired();
+        return null;
+      }
+
+      const data = await response.json();
+      if (
+        typeof data?.accessToken === "string" &&
+        typeof data?.refreshToken === "string"
+      ) {
+        await setAuthTokens({
+          accessToken: data.accessToken,
+          refreshToken: data.refreshToken,
+        });
+        return data.accessToken;
+      }
+
+      await setAuthTokens(null);
+      notifySessionExpired();
+      return null;
+    } catch {
+      return null;
+    } finally {
+      activeRefreshPromise = null;
+    }
+  })();
+
+  return activeRefreshPromise;
+}
+
 export interface RequestOptions<T = unknown> extends RequestInit {
   timeoutMs?: number;
   skipAuth?: boolean;
   /** Runtime response contract. Successful requests fail closed when omitted. */
   adapter?: ResponseAdapter<T>;
+  _isRetry?: boolean;
 }
 
 /**
@@ -341,6 +475,21 @@ export async function apiRequest<T>(
 
     if (isEmptyResponse(response)) {
       if (!response.ok) {
+        if (
+          response.status === 401 &&
+          !skipAuth &&
+          !options._isRetry &&
+          !endpoint.includes("/auth/refresh") &&
+          !endpoint.includes("/auth/password/login")
+        ) {
+          const newToken = await rotateAuthToken();
+          if (newToken) {
+            return apiRequest<T>(endpoint, {
+              ...options,
+              _isRetry: true,
+            });
+          }
+        }
         throw toSafeHttpError(response.status, undefined);
       }
       if (responseAdapter !== noContentAdapter && responseAdapter !== healthAdapter) {
@@ -374,6 +523,21 @@ export async function apiRequest<T>(
     throwIfAuthContextChanged();
 
     if (!response.ok) {
+      if (
+        response.status === 401 &&
+        !skipAuth &&
+        !options._isRetry &&
+        !endpoint.includes("/auth/refresh") &&
+        !endpoint.includes("/auth/password/login")
+      ) {
+        const newToken = await rotateAuthToken();
+        if (newToken) {
+          return apiRequest<T>(endpoint, {
+            ...options,
+            _isRetry: true,
+          });
+        }
+      }
       throw toSafeHttpError(response.status, data);
     }
 

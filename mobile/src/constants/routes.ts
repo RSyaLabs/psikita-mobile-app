@@ -6,6 +6,7 @@ export const ROUTES = {
     REGISTER: "/register",
   },
   PATIENT: {
+    ONBOARDING: "/patient/onboarding",
     DASHBOARD: "/patient/dashboard",
     TRIAGE: "/patient/triage",
     MATCHING: "/patient/matching",

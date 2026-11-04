@@ -15,6 +15,9 @@ import {
   getAuthToken,
   invalidateAuthContext,
   setAuthToken,
+  setAuthTokens,
+  rotateAuthToken,
+  onSessionExpired,
 } from "@/api/client";
 import { secureStorage } from "@/utils/storage";
 import {
@@ -112,7 +115,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const clearLocalSession = useCallback(() => {
     queryClient.clear();
-    tokenCleanupRef.current = Promise.resolve(setAuthToken(null));
+    tokenCleanupRef.current = Promise.resolve(setAuthTokens(null));
     enqueueStorage(() => secureStorage.removeItem(AUTH_USER_STORAGE_KEY));
     setState((prev) => {
       if (prev.status === "unauthenticated" && prev.user === null) return prev;
@@ -183,7 +186,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // previous user's data is gone before any screen can read it, which is
       // what these tests require, and the running mutation is untouched.
       queryClient.getQueryCache().clear();
-      setAuthToken(session.accessToken);
+      setAuthTokens({
+        accessToken: session.accessToken,
+        refreshToken: response.refreshToken,
+      });
       enqueueStorage(() =>
         secureStorage.setItem(
           AUTH_USER_STORAGE_KEY,
@@ -217,6 +223,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [clearLocalSession, invalidateAuthAttempts, queryClient]);
 
   useEffect(() => {
+    onSessionExpired(() => {
+      clearSession();
+    });
+    return () => {
+      onSessionExpired(null);
+    };
+  }, [clearSession]);
+
+  useEffect(() => {
     let active = true;
 
     if (explicitMutationRef.current) {
@@ -246,16 +261,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           return;
         }
 
-        // The stored access token has to still be usable. Staging issues a one
-        // hour token and its /auth/refresh cannot renew one, so an expired
-        // session can only be abandoned. Reading only the token's presence
-        // meant an hour after signing in, a cold start restored a full
-        // authenticated state: the dashboard rendered, every panel requested,
-        // and every request came back 401 with nothing able to act on it.
         const claims = decodeAccessToken(token);
         if (!claims || isTokenExpired(claims)) {
-          clearSession();
-          return;
+          // Stored access token expired: attempt renewal with ULID refresh token
+          const refreshedToken = await rotateAuthToken();
+          if (!refreshedToken) {
+            clearSession();
+            return;
+          }
+          const renewedClaims = decodeAccessToken(refreshedToken);
+          if (!renewedClaims || isTokenExpired(renewedClaims)) {
+            clearSession();
+            return;
+          }
         }
 
         const user = readPersistedUser(storedUser);

@@ -3,7 +3,10 @@ import {
   API_BASE_URL,
   apiRequest,
   setAuthToken,
+  setAuthTokens,
   getAuthToken,
+  getRefreshToken,
+  rotateAuthToken,
   checkBackendHealth,
   ApiError,
   noContentAdapter,
@@ -40,6 +43,27 @@ describe("SeraPhany API Client Suite", () => {
       await setAuthToken(sampleToken);
       const retrieved = await getAuthToken();
       expect(retrieved).toBe(sampleToken);
+    });
+
+    it("should set and retrieve dual tokens (JWT access + ULID refresh token)", async () => {
+      const sampleAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.sample";
+      const sampleRefreshToken = "01HM34MQZ30KNDH4PAKMS9R3DH";
+      await setAuthTokens({
+        accessToken: sampleAccessToken,
+        refreshToken: sampleRefreshToken,
+      });
+      const retrievedAccess = await getAuthToken();
+      const retrievedRefresh = await getRefreshToken();
+      expect(retrievedAccess).toBe(sampleAccessToken);
+      expect(retrievedRefresh).toBe(sampleRefreshToken);
+    });
+
+    it("should clear both tokens when null is passed", async () => {
+      await setAuthTokens(null);
+      const retrievedAccess = await getAuthToken();
+      const retrievedRefresh = await getRefreshToken();
+      expect(retrievedAccess).toBeNull();
+      expect(retrievedRefresh).toBeNull();
     });
 
     it("should return null if no token is stored", async () => {

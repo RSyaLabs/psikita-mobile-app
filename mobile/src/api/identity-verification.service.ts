@@ -13,12 +13,26 @@ export type IdentityVerificationSessionDto = z.infer<
   typeof identityVerificationSessionSchema
 >;
 
-export const identityVerificationStatusSchema = z.object({
-  status: z.string().optional().default("NOT_STARTED"),
-  verifiedAt: z.string().nullable().optional(),
-  sessionId: z.string().nullable().optional(),
-  vendor: z.string().optional(),
-}).passthrough();
+export const verifiedIdentitySchema = z.object({
+  nik: z.string().nullable().optional(),
+  fullName: z.string().nullable().optional(),
+  firstName: z.string().nullable().optional(),
+  lastName: z.string().nullable().optional(),
+  birthDate: z.string().nullable().optional(),
+});
+
+export type VerifiedIdentityDto = z.infer<typeof verifiedIdentitySchema>;
+
+export const identityVerificationStatusSchema = z
+  .object({
+    status: z.string().optional().default("NOT_STARTED"),
+    sessionId: z.string().nullable().optional(),
+    reasonCode: z.string().nullable().optional(),
+    identity: verifiedIdentitySchema.optional(),
+    verifiedAt: z.string().nullable().optional(),
+    vendor: z.string().optional(),
+  })
+  .passthrough();
 
 export type IdentityVerificationStatusDto = z.infer<
   typeof identityVerificationStatusSchema

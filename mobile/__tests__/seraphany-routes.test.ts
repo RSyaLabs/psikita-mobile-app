@@ -52,6 +52,6 @@ describe("SeraPhany Navigation Routes & Screen Parity", () => {
     ];
     const uniqueRoutes = new Set(allRoutes);
     expect(uniqueRoutes.size).toBe(allRoutes.length);
-    expect(allRoutes.length).toBe(35); // 1 root + 3 auth + 24 patient + 7 practitioner
+    expect(allRoutes.length).toBe(36); // 1 root + 3 auth + 25 patient + 7 practitioner
   });
 });

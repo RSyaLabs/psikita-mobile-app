@@ -141,7 +141,7 @@ export default function LoginScreen() {
                 }`}
               >
                 <Text
-                  size="xs"
+                  size="sm"
                   className={`font-medium flex-1 ${
                     authFeedback.type === "error"
                       ? "text-destructive"
@@ -156,7 +156,7 @@ export default function LoginScreen() {
                   className="ml-2 p-1"
                 >
                   <Text
-                    size="xs"
+                    size="sm"
                     className={`font-bold ${
                       authFeedback.type === "error"
                         ? "text-destructive"
@@ -207,24 +207,7 @@ export default function LoginScreen() {
                   hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 >
                   <Text className="text-sm font-bold text-primary underline">
-                    Daftar Pasien Baru
-                  </Text>
-                </Pressable>
-              </HStack>
-
-              <HStack space="xs" className="items-center pt-1.5">
-                <Text className="text-sm text-muted-foreground font-medium">
-                  Tertarik praktik di SeraPhany?
-                </Text>
-                <Pressable
-                  onPress={() => {
-                    haptics.light();
-                    router.push(ROUTES.PRACTITIONER.REGISTER);
-                  }}
-                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                >
-                  <Text className="text-sm font-bold text-primary underline">
-                    Daftar Mitra Praktisi
+                    Daftar Akun Baru
                   </Text>
                 </Pressable>
               </HStack>

@@ -124,7 +124,21 @@ export function AuthLoginModal({
       router.replace(homeRoute as any);
     } catch (err: any) {
       haptics.error();
-      if (isMountedRef.current) setErrorMsg(err?.message || "Login gagal. Cek username dan sandi.");
+      const message = String(err?.message || "");
+      if (
+        message.toLowerCase().includes("inactive") ||
+        message.toLowerCase().includes("belum aktif") ||
+        message.toLowerCase().includes("activate") ||
+        message.toLowerCase().includes("user must be active")
+      ) {
+        if (isMountedRef.current) {
+          setErrorMsg(
+            "Akun Anda belum aktif. Silakan buka inbox email terdaftar Anda untuk mengklik tautan aktivasi.",
+          );
+        }
+      } else {
+        if (isMountedRef.current) setErrorMsg(err?.message || "Login gagal. Cek username dan sandi.");
+      }
     }
   };
 
@@ -132,7 +146,10 @@ export function AuthLoginModal({
     try {
       haptics.success();
       handleClose();
-      acceptSession({ accessToken: devToken, refreshToken: "" });
+      acceptSession({
+        accessToken: devToken,
+        refreshToken: "01HM34MQZ30KNDH4PAKMS9R3DH",
+      });
       router.replace(targetRoute as any);
     } catch (e: any) {
       if (isMountedRef.current) setErrorMsg(e?.message || "Dev login failed");
@@ -330,7 +347,7 @@ export function AuthLoginModal({
                     }}
                   >
                     <Text size="sm" bold className="text-primary underline">
-                      Daftar Pasien Baru
+                      Daftar Akun Baru
                     </Text>
                   </Pressable>
                 </HStack>

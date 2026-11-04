@@ -5,8 +5,11 @@ import {
   Stethoscope,
   CheckCircle2,
   ArrowRight,
+  ShieldCheck,
+  Lock,
 } from "lucide-react-native";
 import {
+  Box,
   VStack,
   HStack,
   Heading,
@@ -37,6 +40,7 @@ export interface RegisterStepRoleProps {
   selectedSpecialty: string;
   onSelectSpecialty: (val: string) => void;
   onNext: () => void;
+  isVerifiedDidit?: boolean;
 }
 
 const SPECIALTIES = [
@@ -61,6 +65,7 @@ export function RegisterStepRole({
   selectedSpecialty,
   onSelectSpecialty,
   onNext,
+  isVerifiedDidit,
 }: RegisterStepRoleProps) {
   const isNikValid = nik.trim().length === 16;
 
@@ -71,7 +76,7 @@ export function RegisterStepRole({
         <Heading size="lg" className="font-bold text-foreground">
           Pilih Jenis Praktik
         </Heading>
-        <Text size="xs" className="text-muted-foreground">
+        <Text size="sm" className="text-muted-foreground">
           Kredensial diverifikasi secara ketat sesuai regulasi Kemenkes RI.
         </Text>
       </VStack>
@@ -102,7 +107,7 @@ export function RegisterStepRole({
             )}
           </HStack>
           <Text
-            size="xs"
+            size="sm"
             className={`font-bold ${
               practitionerType === "PSYCHOLOGIST"
                 ? "text-primary"
@@ -156,10 +161,19 @@ export function RegisterStepRole({
         space="md"
         className="bg-card p-4 rounded-3xl border border-border"
       >
+        {isVerifiedDidit && (
+          <Box className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-3 flex-row items-center">
+            <ShieldCheck size={18} color="#10B981" />
+            <Text size="sm" className="font-semibold text-emerald-700 ml-2 flex-1">
+              Data identitas NIK & Nama terverifikasi Didit KYC
+            </Text>
+          </Box>
+        )}
+
         {/* Nama Lengkap & Gelar */}
         <FormControl>
           <FormControlLabel>
-            <FormControlLabelText className="text-xs font-semibold text-foreground">
+            <FormControlLabelText className="text-sm font-semibold text-foreground">
               Nama Lengkap & Gelar Profesi
             </FormControlLabelText>
           </FormControlLabel>
@@ -180,9 +194,12 @@ export function RegisterStepRole({
         {/* NIK KTP (16 Digit) */}
         <FormControl>
           <HStack space="xs" className="items-center justify-between mb-1">
-            <FormControlLabelText className="text-sm font-semibold text-foreground">
-              Nomor Induk Kependudukan (NIK)
-            </FormControlLabelText>
+            <HStack space="xs" className="items-center">
+              <FormControlLabelText className="text-sm font-semibold text-foreground">
+                Nomor Induk Kependudukan (NIK)
+              </FormControlLabelText>
+              {isVerifiedDidit && <Lock size={14} color="#6B7280" />}
+            </HStack>
             <Text
               size="sm"
               className={`text-sm font-bold ${
@@ -193,7 +210,9 @@ export function RegisterStepRole({
             </Text>
           </HStack>
           <Input
-            className={`bg-background rounded-xl px-3.5 h-12 ${isNikValid ? "border-primary" : "border-border"}`}
+            className={`bg-background rounded-xl px-3.5 h-12 ${
+              isVerifiedDidit ? "bg-muted/40 border-border" : isNikValid ? "border-primary" : "border-border"
+            }`}
           >
             <InputField
               placeholder="3171xxxxxxxxxxxx (16 digit sesuai e-KTP)"
@@ -201,6 +220,7 @@ export function RegisterStepRole({
               maxLength={16}
               value={nik}
               onChangeText={onChangeNik}
+              editable={!isVerifiedDidit}
               className="text-sm text-foreground placeholder:text-muted-foreground"
             />
           </Input>

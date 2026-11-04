@@ -8,6 +8,7 @@ import {
 } from "@/api";
 import {
   UpdatePatientDto,
+  CreatePatientDto,
 } from "@/types/api";
 import {
   queryKeys,
@@ -31,6 +32,19 @@ export function usePatientProfile() {
     queryKey: queryKeys.patient.me(),
     queryFn: ({ signal }) =>
       callWithSignal(patientService.getMyProfile, signal),
+  });
+}
+
+/**
+ * Mutation hook for creating a new patient profile
+ */
+export function useCreatePatientProfile() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (dto: CreatePatientDto) => patientService.createProfile(dto),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.patient.me() });
+    },
   });
 }
 

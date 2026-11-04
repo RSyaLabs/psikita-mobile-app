@@ -9,6 +9,8 @@ import { colors } from "@/theme/colors";
 import { AuthLoadingState } from "@/providers/AuthProvider";
 import { useAuth } from "@/hooks/useAuth";
 import { ROUTES } from "@/constants/routes";
+import { usePatientProfile } from "@/hooks/useApiQueries";
+import { ApiError } from "@/api/client";
 
 export default function PatientLayout() {
   const router = useRouter();
@@ -19,7 +21,19 @@ export default function PatientLayout() {
   const isPublicGuestRoute =
     guest === "true" &&
     (leafSegment === "triage" || leafSegment === "assessment-result");
-  const redirectRoute = isPublicGuestRoute
+
+  const {
+    data: patientProfile,
+    isError: isProfileError,
+    error: profileError,
+  } = usePatientProfile();
+
+  const isProfileNotFound =
+    isProfileError &&
+    profileError instanceof ApiError &&
+    profileError.statusCode === 404;
+
+  const authRedirectRoute = isPublicGuestRoute
     ? null
     : status === "loading"
       ? null
@@ -28,6 +42,17 @@ export default function PatientLayout() {
         : !hasRole("patient")
           ? (homeRoute ?? ROUTES.AUTH.LOGIN)
           : null;
+
+  const onboardingRedirectRoute =
+    !isPublicGuestRoute && status === "authenticated" && hasRole("patient")
+      ? isProfileNotFound && leafSegment !== "onboarding"
+        ? ROUTES.PATIENT.ONBOARDING
+        : patientProfile && leafSegment === "onboarding"
+          ? ROUTES.PATIENT.DASHBOARD
+          : null
+      : null;
+
+  const redirectRoute = authRedirectRoute ?? onboardingRedirectRoute;
 
   useEffect(() => {
     if (redirectRoute) {
@@ -47,6 +72,7 @@ export default function PatientLayout() {
         animation: "slide_from_right",
       }}
     >
+      <Stack.Screen name="patient/onboarding" />
       <Stack.Screen name="patient/dashboard" />
       <Stack.Screen name="patient/triage" />
       <Stack.Screen name="patient/matching" />

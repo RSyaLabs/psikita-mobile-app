@@ -251,7 +251,6 @@ export const authService = {
     return apiRequest<TokenResponseDto>("/auth/refresh", {
       method: "POST",
       body: JSON.stringify({ refreshToken }),
-      skipAuth: true,
       adapter: tokenResponseAdapter,
     });
   },

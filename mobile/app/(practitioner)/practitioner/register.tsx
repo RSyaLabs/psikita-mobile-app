@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import type { PractitionerType } from "@/constants/enums";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -24,7 +24,10 @@ import {
   RegisterStepLegal,
 } from "@/components/practitioner/register";
 import { ROUTES } from "@/constants";
-import { useRegisterPractitioner } from "@/hooks/useApiQueries";
+import {
+  useRegisterPractitioner,
+  useMyVerificationStatus,
+} from "@/hooks/useApiQueries";
 import { haptics } from "@/utils/haptics";
 import { practitionerRegisterSchema } from "@/utils/validation";
 
@@ -32,6 +35,11 @@ export default function PractitionerRegisterScreen() {
   const router = useRouter();
   const toast = useToast();
   const registerMutation = useRegisterPractitioner();
+
+  const { data: kycStatus } = useMyVerificationStatus();
+  const isVerified =
+    kycStatus?.status === "VERIFIED" || kycStatus?.status === "APPROVED";
+  const verifiedIdentity = kycStatus?.identity;
 
   // Wizard Step: 1 = Identitas & Profesi, 2 = Legalitas Kemenkes
   const [step, setStep] = useState<1 | 2>(1);
@@ -48,6 +56,15 @@ export default function PractitionerRegisterScreen() {
   const [selectedSpecialty, setSelectedSpecialty] = useState(
     "Psikologi Klinis Dewasa",
   );
+
+  useEffect(() => {
+    if (verifiedIdentity?.nik && !nik) {
+      setNik(verifiedIdentity.nik);
+    }
+    if (verifiedIdentity?.fullName && !fullName) {
+      setFullName(verifiedIdentity.fullName);
+    }
+  }, [verifiedIdentity, nik, fullName]);
 
   // Step 2 Fields
   const [strNumber, setStrNumber] = useState("");
@@ -188,7 +205,7 @@ export default function PractitionerRegisterScreen() {
           <HStack space="xs" className="items-center justify-between">
             <Text
               size="sm"
-              className="font-bold text-foreground tracking-wide uppercase text-xs"
+              className="font-bold text-foreground tracking-wide uppercase text-sm"
             >
               {step === 1
                 ? "Langkah 1/2 • Identitas & Profesi"
@@ -198,7 +215,7 @@ export default function PractitionerRegisterScreen() {
               variant="outline"
               className="border-primary/30 bg-primary/5 px-2.5 py-0.5 rounded-full"
             >
-              <BadgeText className="text-xs font-bold text-primary">
+              <BadgeText className="text-sm font-bold text-primary">
                 {practitionerType === "PSYCHOLOGIST"
                   ? "Psikolog Klinis"
                   : "Dokter Psikiater"}
@@ -233,6 +250,7 @@ export default function PractitionerRegisterScreen() {
             selectedSpecialty={selectedSpecialty}
             onSelectSpecialty={setSelectedSpecialty}
             onNext={handleNextStep1}
+            isVerifiedDidit={isVerified}
           />
         )}
 

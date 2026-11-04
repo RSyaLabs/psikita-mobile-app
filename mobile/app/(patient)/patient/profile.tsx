@@ -14,6 +14,7 @@ import {
   ExternalLink,
   LogOut,
   ChevronRight,
+  Stethoscope,
 } from "lucide-react-native";
 import { getInitials } from "@/utils/format";
 import { haptics } from "@/utils/haptics";
@@ -261,6 +262,38 @@ export default function ProfileScreen() {
                 <Text size="sm" className="font-semibold text-foreground">
                   Rujukan rumah sakit
                 </Text>
+              </HStack>
+              <AppIcon icon={ChevronRight} size={18} tone="muted" />
+            </Pressable>
+          </VStack>
+        </Card>
+
+        {/* Group Kemitraan Praktisi */}
+        <Card className="bg-card rounded-2xl p-4 border border-border mb-4">
+          <VStack space="xs">
+            <Text
+              size="sm"
+              className="font-bold text-muted-foreground uppercase tracking-wider mb-2"
+            >
+              Kemitraan Profesional
+            </Text>
+            <Pressable
+              onPress={() => {
+                haptics.selection();
+                router.push(ROUTES.PRACTITIONER.REGISTER);
+              }}
+              className="py-3 flex-row items-center justify-between active:opacity-80"
+            >
+              <HStack space="md" className="items-center flex-1 pr-2">
+                <AppIcon icon={Stethoscope} size={20} tone="primary" />
+                <VStack space="xs" className="flex-1">
+                  <Text size="sm" className="font-semibold text-foreground">
+                    Daftar Sebagai Mitra Praktisi
+                  </Text>
+                  <Text size="sm" className="text-muted-foreground">
+                    Bergabung sebagai Psikolog Klinis atau Psikiater
+                  </Text>
+                </VStack>
               </HStack>
               <AppIcon icon={ChevronRight} size={18} tone="muted" />
             </Pressable>

@@ -8,6 +8,7 @@ import {
   ArrowLeft,
   Eye,
   EyeOff,
+  MailCheck,
 } from "lucide-react-native";
 import {
   Box,
@@ -73,9 +74,11 @@ export function RegisterPatientModal({
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [registeredEmail, setRegisteredEmail] = useState<string | null>(null);
 
   const handleClose = () => {
     setErrorMsg(null);
+    setRegisteredEmail(null);
     onClose();
   };
 
@@ -113,19 +116,18 @@ export function RegisterPatientModal({
       {
         onSuccess: () => {
           haptics.success();
-          handleClose();
+          setRegisteredEmail(cleanEmail);
           toast.show({
             placement: "top",
             render: ({ id }) => (
               <Toast nativeID={id} action="success">
                 <ToastTitle>Registrasi Berhasil</ToastTitle>
                 <ToastDescription>
-                  Akun Anda berhasil dibuat. Selamat datang di SeraPhany!
+                  Tautan aktivasi telah dikirim ke email Anda.
                 </ToastDescription>
               </Toast>
             ),
           });
-          router.replace(ROUTES.AUTH.LOGIN);
         },
         onError: (err: any) => {
           haptics.error();
@@ -170,155 +172,206 @@ export function RegisterPatientModal({
         </ModalHeader>
 
         <ModalBody className="pt-3 pb-1">
-          <VStack space="md" className="w-full">
-            <FormControl
-              id="register-name-field"
-              isRequired
-              isInvalid={Boolean(errorMsg)}
-            >
-              <FormControlLabel htmlFor="register-name-input">
-                <FormControlLabelText className="text-xs font-bold text-foreground">
-                  Nama Lengkap
-                </FormControlLabelText>
-              </FormControlLabel>
-              <Input className="rounded-xl border-border bg-background h-11">
-                <InputField
-                  id="register-name-input"
-                  name="fullName"
-                  accessibilityLabel="Nama lengkap"
-                  accessibilityHint={errorMsg ?? undefined}
-                  value={fullName}
-                  onChangeText={setFullName}
-                  placeholder="Contoh: Sinta Maharani"
-                />
-              </Input>
-              {errorMsg && (
-                <FormControlError>
-                  <FormControlErrorText>{errorMsg}</FormControlErrorText>
-                </FormControlError>
-              )}
-            </FormControl>
-
-            <FormControl
-              id="register-email-field"
-              isRequired
-              isInvalid={Boolean(errorMsg)}
-            >
-              <FormControlLabel htmlFor="register-email-input">
-                <FormControlLabelText className="text-xs font-bold text-foreground">
-                  Email
-                </FormControlLabelText>
-              </FormControlLabel>
-              <Input className="rounded-xl border-border bg-background h-11">
-                <InputField
-                  id="register-email-input"
-                  name="email"
-                  accessibilityLabel="Email"
-                  accessibilityHint={errorMsg ?? undefined}
-                  value={email}
-                  onChangeText={setEmail}
-                  placeholder="nama@email.com"
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                />
-              </Input>
-              {errorMsg && (
-                <FormControlError
-                  className="sr-only"
-                  accessibilityLabel={errorMsg}
-                >
-                  <FormControlErrorText />
-                </FormControlError>
-              )}
-            </FormControl>
-
-            <FormControl
-              id="register-password-field"
-              isRequired
-              isInvalid={Boolean(errorMsg)}
-            >
-              <FormControlLabel htmlFor="register-password-input">
-                <FormControlLabelText className="text-xs font-bold text-foreground">
-                  Kata Sandi
-                </FormControlLabelText>
-              </FormControlLabel>
-              <Input className="rounded-xl border-border bg-background h-11">
-                <InputField
-                  id="register-password-input"
-                  name="password"
-                  accessibilityLabel="Kata sandi"
-                  accessibilityHint={errorMsg ?? undefined}
-                  value={password}
-                  onChangeText={setPassword}
-                  placeholder="Minimal 6 karakter"
-                  secureTextEntry={!showPassword}
-                  className="flex-1"
-                />
-                <InputSlot
-                  onPress={() => setShowPassword(!showPassword)}
-                  className="pr-3"
-                >
-                  <InputIcon
-                    as={showPassword ? EyeOff : Eye}
-                    className="text-muted-foreground"
-                  />
-                </InputSlot>
-              </Input>
-              {errorMsg && (
-                <FormControlError
-                  className="sr-only"
-                  accessibilityLabel={errorMsg}
-                >
-                  <FormControlErrorText />
-                </FormControlError>
-              )}
-            </FormControl>
-
-            <Button
-              size="lg"
-              isDisabled={registerMutation.isPending}
-              onPress={handleRegister}
-              className="w-full h-12 rounded-xl bg-primary active:opacity-90 mt-1"
-            >
-              {registerMutation.isPending ? (
-                <ButtonSpinner className="text-primary-foreground" />
-              ) : (
-                <ButtonText className="text-primary-foreground font-bold text-sm">
-                  Daftar Sekarang
-                </ButtonText>
-              )}
-            </Button>
-
-            <Text
-              size="sm"
-              className="text-center text-muted-foreground font-medium text-sm leading-relaxed px-1"
-            >
-              Dengan mendaftar, Anda menyetujui Syarat & Ketentuan serta
-              Kebijakan Privasi SeraPhany.
-            </Text>
-
-            {onOpenLogin && (
-              <HStack
-                space="xs"
-                className="items-center justify-center pt-2 border-t border-border/40 mt-1"
-              >
-                <Text size="xs" className="text-muted-foreground text-xs">
-                  Sudah punya akun?
+          {registeredEmail ? (
+            <VStack space="lg" className="items-center py-2 text-center w-full">
+              <Box className="w-16 h-16 rounded-full bg-primary/10 items-center justify-center">
+                <MailCheck size={36} className="text-primary" />
+              </Box>
+              <VStack space="xs" className="items-center w-full">
+                <Heading level={2} size="lg" bold className="text-foreground text-center">
+                  Aktivasi Akun Anda
+                </Heading>
+                <Text size="sm" className="text-muted-foreground text-center leading-relaxed px-2">
+                  Tautan aktivasi telah dikirimkan ke:
                 </Text>
-                <Pressable
-                  onPress={() => {
-                    haptics.light();
-                    handleClose();
-                    onOpenLogin();
-                  }}
-                >
-                  <Text size="xs" bold className="text-primary underline">
-                    Masuk Sekarang
+                <Text size="sm" className="font-bold text-foreground text-center">
+                  {registeredEmail}
+                </Text>
+                <Box className="bg-primary/5 border border-primary/20 rounded-2xl p-3.5 mt-2 w-full">
+                  <Text size="sm" className="text-foreground text-center leading-relaxed">
+                    Sesuai standar keamanan, akun Anda baru dapat digunakan setelah mengklik tautan aktivasi di inbox email atau folder spam Anda.
                   </Text>
-                </Pressable>
-              </HStack>
-            )}
-          </VStack>
+                </Box>
+              </VStack>
+
+              <VStack space="sm" className="w-full pt-1">
+                {onOpenLogin && (
+                  <Button
+                    size="lg"
+                    onPress={() => {
+                      haptics.medium();
+                      handleClose();
+                      onOpenLogin();
+                    }}
+                    className="w-full h-12 rounded-xl bg-primary active:opacity-90 flex-row items-center justify-center"
+                  >
+                    <ButtonText className="text-primary-foreground font-bold text-sm">
+                      Sudah Aktivasi? Masuk Sekarang
+                    </ButtonText>
+                  </Button>
+                )}
+                <Button
+                  variant="outline"
+                  onPress={handleClose}
+                  className="w-full h-11 rounded-xl border border-border bg-card"
+                >
+                  <ButtonText className="text-foreground font-semibold text-sm">
+                    Tutup
+                  </ButtonText>
+                </Button>
+              </VStack>
+            </VStack>
+          ) : (
+            <VStack space="md" className="w-full">
+              <FormControl
+                id="register-name-field"
+                isRequired
+                isInvalid={Boolean(errorMsg)}
+              >
+                <FormControlLabel htmlFor="register-name-input">
+                  <FormControlLabelText className="text-sm font-bold text-foreground">
+                    Nama Lengkap
+                  </FormControlLabelText>
+                </FormControlLabel>
+                <Input className="rounded-xl border-border bg-background h-11">
+                  <InputField
+                    id="register-name-input"
+                    name="fullName"
+                    accessibilityLabel="Nama lengkap"
+                    accessibilityHint={errorMsg ?? undefined}
+                    value={fullName}
+                    onChangeText={setFullName}
+                    placeholder="Contoh: Sinta Maharani"
+                  />
+                </Input>
+                {errorMsg && (
+                  <FormControlError>
+                    <FormControlErrorText>{errorMsg}</FormControlErrorText>
+                  </FormControlError>
+                )}
+              </FormControl>
+
+              <FormControl
+                id="register-email-field"
+                isRequired
+                isInvalid={Boolean(errorMsg)}
+              >
+                <FormControlLabel htmlFor="register-email-input">
+                  <FormControlLabelText className="text-sm font-bold text-foreground">
+                    Email
+                  </FormControlLabelText>
+                </FormControlLabel>
+                <Input className="rounded-xl border-border bg-background h-11">
+                  <InputField
+                    id="register-email-input"
+                    name="email"
+                    accessibilityLabel="Email"
+                    accessibilityHint={errorMsg ?? undefined}
+                    value={email}
+                    onChangeText={setEmail}
+                    placeholder="nama@email.com"
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                  />
+                </Input>
+                {errorMsg && (
+                  <FormControlError
+                    className="sr-only"
+                    accessibilityLabel={errorMsg}
+                  >
+                    <FormControlErrorText />
+                  </FormControlError>
+                )}
+              </FormControl>
+
+              <FormControl
+                id="register-password-field"
+                isRequired
+                isInvalid={Boolean(errorMsg)}
+              >
+                <FormControlLabel htmlFor="register-password-input">
+                  <FormControlLabelText className="text-sm font-bold text-foreground">
+                    Kata Sandi
+                  </FormControlLabelText>
+                </FormControlLabel>
+                <Input className="rounded-xl border-border bg-background h-11">
+                  <InputField
+                    id="register-password-input"
+                    name="password"
+                    accessibilityLabel="Kata sandi"
+                    accessibilityHint={errorMsg ?? undefined}
+                    value={password}
+                    onChangeText={setPassword}
+                    placeholder="Minimal 6 karakter"
+                    secureTextEntry={!showPassword}
+                    className="flex-1"
+                  />
+                  <InputSlot
+                    onPress={() => setShowPassword(!showPassword)}
+                    className="pr-3"
+                  >
+                    <InputIcon
+                      as={showPassword ? EyeOff : Eye}
+                      className="text-muted-foreground"
+                    />
+                  </InputSlot>
+                </Input>
+                {errorMsg && (
+                  <FormControlError
+                    className="sr-only"
+                    accessibilityLabel={errorMsg}
+                  >
+                    <FormControlErrorText />
+                  </FormControlError>
+                )}
+              </FormControl>
+
+              <Button
+                size="lg"
+                isDisabled={registerMutation.isPending}
+                onPress={handleRegister}
+                className="w-full h-12 rounded-xl bg-primary active:opacity-90 mt-1"
+              >
+                {registerMutation.isPending ? (
+                  <ButtonSpinner className="text-primary-foreground" />
+                ) : (
+                  <ButtonText className="text-primary-foreground font-bold text-sm">
+                    Daftar Sekarang
+                  </ButtonText>
+                )}
+              </Button>
+
+              <Text
+                size="sm"
+                className="text-center text-muted-foreground font-medium text-sm leading-relaxed px-1"
+              >
+                Dengan mendaftar, Anda menyetujui Syarat & Ketentuan serta
+                Kebijakan Privasi SeraPhany.
+              </Text>
+
+              {onOpenLogin && (
+                <HStack
+                  space="xs"
+                  className="items-center justify-center pt-2 border-t border-border/40 mt-1"
+                >
+                  <Text size="sm" className="text-muted-foreground text-sm">
+                    Sudah punya akun?
+                  </Text>
+                  <Pressable
+                    onPress={() => {
+                      haptics.light();
+                      handleClose();
+                      onOpenLogin();
+                    }}
+                  >
+                    <Text size="sm" bold className="text-primary underline">
+                      Masuk Sekarang
+                    </Text>
+                  </Pressable>
+                </HStack>
+              )}
+            </VStack>
+          )}
         </ModalBody>
       </ModalContent>
     </Modal>
