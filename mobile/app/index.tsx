@@ -33,7 +33,7 @@ export default function IndexGatewayScreen() {
           </VStack>
           <Box className="mt-4 flex-row items-center gap-2">
             <ActivityIndicator size="small" color={colors.sera.purple} />
-            <Text size="xs" className="text-muted-foreground">
+            <Text size="sm" className="text-muted-foreground">
               Menyiapkan ruang aman...
             </Text>
           </Box>

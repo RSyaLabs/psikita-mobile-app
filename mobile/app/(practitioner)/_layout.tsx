@@ -37,6 +37,7 @@ export default function PractitionerLayout() {
         headerShown: false,
         contentStyle: { backgroundColor: colors.sage.DEFAULT },
         animation: "slide_from_right",
+        freezeOnBlur: false,
       }}
     >
       <Stack.Screen name="practitioner/register" />

@@ -19,6 +19,7 @@ export default function AuthLayout() {
         headerShown: false,
         contentStyle: { backgroundColor: colors.sage.DEFAULT },
         animation: "slide_from_right",
+        freezeOnBlur: false,
       }}
     >
       <Stack.Screen name="login" />

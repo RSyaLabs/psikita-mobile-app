@@ -28,7 +28,9 @@ export default function RootLayout() {
             ? Math.min(height - 40, 920)
             : ("92%" as unknown as number),
       }
-    : styles.mobileContainer;
+    : Platform.OS === "web"
+      ? styles.mobileContainer
+      : styles.nativeMobileContainer;
 
   return (
     <AppErrorBoundary>
@@ -81,7 +83,9 @@ export default function RootLayout() {
                     screenOptions={{
                       headerShown: false,
                       contentStyle: { backgroundColor: colors.sage.DEFAULT },
-                      animation: "fade_from_bottom",
+                      // Root group uses "none" to prevent double nested fragment animations on Android Fabric
+                      animation: "none",
+                      freezeOnBlur: false,
                     }}
                   >
                     <Stack.Screen
@@ -119,6 +123,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingVertical: 20,
     paddingHorizontal: 16,
+  },
+  // Dedicated native container: eliminates offscreen clip buffer & maxWidth overhead on Android
+  nativeMobileContainer: {
+    flex: 1,
+    backgroundColor: colors.sage.DEFAULT,
   },
   mobileContainer: {
     width: "100%",

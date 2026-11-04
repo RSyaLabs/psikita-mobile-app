@@ -70,6 +70,7 @@ export default function PatientLayout() {
         headerShown: false,
         contentStyle: { backgroundColor: colors.sage.DEFAULT },
         animation: "slide_from_right",
+        freezeOnBlur: false,
       }}
     >
       <Stack.Screen name="patient/onboarding" />
