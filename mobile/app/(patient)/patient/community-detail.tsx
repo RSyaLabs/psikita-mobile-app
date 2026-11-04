@@ -203,7 +203,7 @@ export default function CommunityDetailScreen() {
               value={replyText}
               onChangeText={setReplyText}
               placeholder="Tulis pesan penyemangat..."
-              className="text-xs text-foreground"
+              className="text-sm text-foreground"
             />
           </Input>
           <Button

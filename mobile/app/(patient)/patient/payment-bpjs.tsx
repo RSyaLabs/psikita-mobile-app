@@ -276,7 +276,7 @@ export default function PaymentBpjsScreen() {
                   onPress={handleRetry}
                   className="border-border bg-card"
                 >
-                  <ButtonText className="text-xs font-bold text-foreground">
+                  <ButtonText className="text-sm font-bold text-foreground">
                     Coba lagi
                   </ButtonText>
                 </Button>

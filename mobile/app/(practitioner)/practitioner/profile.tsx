@@ -152,16 +152,16 @@ export default function PractitionerProfileScreen() {
             <Heading size="md" className="font-bold text-primary-foreground">
               {fullName}
             </Heading>
-            <Text size="xs" className="text-primary-foreground/70">
+            <Text size="sm" className="text-primary-foreground/70">
               {title}
             </Text>
 
             <Badge className="bg-primary-foreground/20 px-3 py-1 rounded-full flex-row items-center gap-1 mt-1 border-0">
               <Star
-                size={12}
+                size={14}
                 className="text-primary-foreground fill-primary-foreground"
               />
-              <BadgeText className="text-xs font-bold text-primary-foreground">
+              <BadgeText className="text-sm font-bold text-primary-foreground">
                 Level 2 • Praktisi Senior
               </BadgeText>
             </Badge>

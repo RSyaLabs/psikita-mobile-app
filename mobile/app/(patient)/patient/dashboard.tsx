@@ -257,7 +257,7 @@ export default function PatientDashboard() {
                   variant="outline"
                   className="border-amber-500/40 bg-amber-500/20 rounded-full px-2 py-0.5"
                 >
-                  <BadgeText className="text-xs text-amber-900 font-bold">
+                  <BadgeText className="text-sm text-amber-900 font-bold">
                     Didit KYC
                   </BadgeText>
                 </Badge>

@@ -231,7 +231,7 @@ export default function DoctorsDirectoryScreen() {
               }}
               className="mt-4 border-border rounded-xl bg-muted"
             >
-              <ButtonText className="text-xs text-foreground font-semibold">
+              <ButtonText className="text-sm text-foreground font-semibold">
                 Reset Filter & Pencarian
               </ButtonText>
             </Button>

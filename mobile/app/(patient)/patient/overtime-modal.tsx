@@ -49,7 +49,7 @@ export default function OvertimeModalScreen() {
       render: ({ id }) => (
         <Toast nativeID={`toast-${id}`} action="warning" className="bg-card border border-warning">
           <ToastTitle className="text-foreground font-bold">Pratinjau QA Aktif</ToastTitle>
-          <ToastDescription className="text-muted-foreground text-xs">
+          <ToastDescription className="text-muted-foreground text-sm">
             Permintaan perpanjangan +{selectedOpt} menit disiapkan untuk POST /consultations/:id/extend saat endpoint backend aktif.
           </ToastDescription>
         </Toast>

@@ -234,8 +234,8 @@ export default function PaymentRegularScreen() {
               variant="outline"
               className="bg-muted px-2.5 py-1 rounded-full flex-row items-center border border-border"
             >
-              <Clock size={12} className="text-foreground mr-1" />
-              <BadgeText className="text-xs font-bold text-foreground">
+              <Clock size={14} className="text-foreground mr-1" />
+              <BadgeText className="text-sm font-bold text-foreground">
                 {paymentState === "pending"
                   ? "Menunggu server"
                   : "Status server"}

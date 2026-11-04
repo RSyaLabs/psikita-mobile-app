@@ -97,7 +97,7 @@ export default function CommunityFeedScreen() {
           </Heading>
           <HStack space="xs" className="items-center">
             <Shield size={14} color="#4A3B6B" />
-            <Text size="xs" className="text-xs text-primary font-bold">
+            <Text size="sm" className="text-sm text-primary font-bold">
               Ruang Aman & Terjaga
             </Text>
           </HStack>
@@ -182,7 +182,7 @@ export default function CommunityFeedScreen() {
               onPress={() => setShowCreateModal(true)}
               className="mt-4 bg-secondary rounded-xl"
             >
-              <ButtonText className="text-xs font-bold text-white">Mulai Berbagi</ButtonText>
+              <ButtonText className="text-sm font-bold text-white">Mulai Berbagi</ButtonText>
             </Button>
           </Card>
         ) : (
