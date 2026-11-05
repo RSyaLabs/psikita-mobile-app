@@ -5,6 +5,7 @@
 
 import { secureStorage } from "../utils/storage";
 import { ApiError, healthAdapter, noContentAdapter, parseApiData } from "./response";
+import { sanitizeNetworkError } from "../config/security";
 
 import type { ResponseAdapter } from "./response";
 
@@ -571,6 +572,19 @@ export async function apiRequest<T>(
       if (abortReason === "caller" || callerSignal?.aborted) {
         throw error;
       }
+    }
+    if (error instanceof ApiError) {
+      throw error;
+    }
+    const rawMsg =
+      error instanceof Error ? error.message : typeof error === "string" ? error : "";
+    const isSslFailure =
+      /cert|certificate|ssl|tls|handshake|peerunverified|trustanchor|spki|pinning/i.test(
+        rawMsg,
+      );
+    if (isSslFailure) {
+      const safeMsg = sanitizeNetworkError(error, url);
+      throw new ApiError(safeMsg, 0, "SSL_PINNING_FAILED");
     }
     throw error;
   } finally {

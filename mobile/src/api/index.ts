@@ -18,3 +18,4 @@ export * from "./avatar.service";
 export * from "./psychometrics.service";
 export * from "./diagnosis-codes.service";
 export * from "./identity-verification.service";
+export * from "../config/security";

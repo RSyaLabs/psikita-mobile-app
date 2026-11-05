@@ -21,6 +21,54 @@
       "package": "id.seraphany.app",
       "versionCode": 1
     },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "id.seraphany.app",
+      "infoPlist": {
+        "NSAppTransportSecurity": {
+          "NSPinnedDomains": {
+            "api.staging.seraphany.id": {
+              "NSIncludesSubdomains": false,
+              "NSPinnedLeafIdentities": [
+                {
+                  "SPKI-SHA256-BASE64": "P9iVMQF9vLKRGFBRcT/77fQmruQ5q+zmQOKlXhzhK2E="
+                }
+              ],
+              "NSPinnedCAIdentities": [
+                {
+                  "SPKI-SHA256-BASE64": "LoMHBotttiDko50Gi13uXW71eIy7LAttI+rYT8wXF4w="
+                },
+                {
+                  "SPKI-SHA256-BASE64": "fk6IOKit1ild5647BH06ujSIq5XbCgqlbYl6ANhhi88="
+                },
+                {
+                  "SPKI-SHA256-BASE64": "C5+lpZ7tcVwmwQIMcRtPbsQtWLABXhQzejna0wHFr8M="
+                }
+              ]
+            },
+            "api.seraphany.id": {
+              "NSIncludesSubdomains": false,
+              "NSPinnedLeafIdentities": [
+                {
+                  "SPKI-SHA256-BASE64": "1HoIDzRO5kbuc/rwwT7/7X1oO690J66kUARG1O4J1Ns="
+                }
+              ],
+              "NSPinnedCAIdentities": [
+                {
+                  "SPKI-SHA256-BASE64": "nWN7PSep5XDQdge5zK24CnCRXHr3KvzhKEGxsdqCX9E="
+                },
+                {
+                  "SPKI-SHA256-BASE64": "fk6IOKit1ild5647BH06ujSIq5XbCgqlbYl6ANhhi88="
+                },
+                {
+                  "SPKI-SHA256-BASE64": "C5+lpZ7tcVwmwQIMcRtPbsQtWLABXhQzejna0wHFr8M="
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
     "web": {
       "bundler": "metro",
       "output": "static",
@@ -29,7 +77,8 @@
     "plugins": [
       "expo-router",
       "expo-asset",
-      "@didit-protocol/sdk-react-native"
+      "@didit-protocol/sdk-react-native",
+      "./plugins/withSslPinning.js"
     ],
     "experiments": {
       "typedRoutes": true

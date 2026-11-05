@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  SeraPhany Mobile - Native Android Network Security Configuration
+  Enforces strict SPKI SHA-256 Public Key Pinning on first-party medical API traffic.
+  Protects against MITM attacks with unauthorized/rogue Certificate Authorities.
+-->
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="false">
+        <!-- First-Party Staging Core API -->
+        <domain includeSubdomains="false">api.staging.seraphany.id</domain>
+        <!-- First-Party Production Core API -->
+        <domain includeSubdomains="false">api.seraphany.id</domain>
+
+        <!-- Pin set with fail-safe expiration boundary per Android Network Security Config spec -->
+        <pin-set expiration="2027-01-01">
+            <!-- Active Key: api.staging.seraphany.id (Leaf) -->
+            <pin digest="SHA-256">P9iVMQF9vLKRGFBRcT/77fQmruQ5q+zmQOKlXhzhK2E=</pin>
+
+            <!-- Active Key: api.seraphany.id (Leaf) -->
+            <pin digest="SHA-256">1HoIDzRO5kbuc/rwwT7/7X1oO690J66kUARG1O4J1Ns=</pin>
+
+            <!-- Backup Key 1: Let's Encrypt Intermediate YR1 (Staging Issuer) -->
+            <pin digest="SHA-256">LoMHBotttiDko50Gi13uXW71eIy7LAttI+rYT8wXF4w=</pin>
+
+            <!-- Backup Key 2: Let's Encrypt Intermediate YR2 (Production Issuer) -->
+            <pin digest="SHA-256">nWN7PSep5XDQdge5zK24CnCRXHr3KvzhKEGxsdqCX9E=</pin>
+
+            <!-- Disaster Recovery Key: ISRG Root YR Cross-Sign -->
+            <pin digest="SHA-256">fk6IOKit1ild5647BH06ujSIq5XbCgqlbYl6ANhhi88=</pin>
+
+            <!-- Global Root Anchor: ISRG Root X1 (Let's Encrypt) -->
+            <pin digest="SHA-256">C5+lpZ7tcVwmwQIMcRtPbsQtWLABXhQzejna0wHFr8M=</pin>
+        </pin-set>
+    </domain-config>
+
+    <!-- Base config: Cleartext traffic is strictly forbidden across the entire application -->
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>
