@@ -43,6 +43,7 @@ import {
   useStartPractitionerVerification,
   useStartDiditVerification,
 } from "@/hooks/useApiQueries";
+import { launchDiditVerification } from "@/services/didit-kyc";
 import { getInitials } from "@/utils/format";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -86,9 +87,22 @@ export default function PractitionerProfileScreen() {
       } else {
         session = await startAccountVerificationMutation.mutateAsync();
       }
-      if (session?.url) {
-        await Linking.openURL(session.url);
-      }
+      await launchDiditVerification(session, {
+        onApproved: () => {
+          haptics.success();
+          Alert.alert(
+            "Verifikasi Berhasil",
+            "Identitas praktisi Anda telah terverifikasi via Didit KYC.",
+          );
+        },
+        onCompleted: () => {
+          // completed
+        },
+        onError: (err) => {
+          haptics.error();
+          Alert.alert("Kendala Verifikasi", err.message);
+        },
+      });
     } catch (err: unknown) {
       const message =
         err instanceof Error
@@ -246,9 +260,8 @@ export default function PractitionerProfileScreen() {
                     <HStack space="xs" className="items-center">
                       <ShieldCheck size={16} color="#FFFFFF" />
                       <Text size="sm" className="font-bold text-white">
-                        Mulai Verifikasi Identitas (KYC)
+                        Mulai Verifikasi Native (Didit KYC)
                       </Text>
-                      <ExternalLink size={14} color="#FFFFFF" />
                     </HStack>
                   )}
                 </Pressable>

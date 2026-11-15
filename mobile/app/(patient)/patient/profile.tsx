@@ -45,13 +45,14 @@ import {
   useMyVerificationStatus,
   useStartDiditVerification,
 } from "@/hooks/useApiQueries";
+import { launchDiditVerification } from "@/services/didit-kyc";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function ProfileScreen() {
   const router = useRouter();
   const { data: patient } = usePatientProfile();
   const { data: avatarData } = useMyAvatar();
-  const { data: kycStatus } = useMyVerificationStatus();
+  const { data: kycStatus, refetch: refetchKyc } = useMyVerificationStatus();
   const startKycMutation = useStartDiditVerification();
   const isKycStarting = startKycMutation.isPending;
   const isKycVerified =
@@ -62,9 +63,26 @@ export default function ProfileScreen() {
     haptics.selection();
     try {
       const session = await startKycMutation.mutateAsync();
-      if (session?.url) {
-        await Linking.openURL(session.url);
-      }
+      await launchDiditVerification(session, {
+        onApproved: () => {
+          haptics.success();
+          refetchKyc();
+          Alert.alert(
+            "Verifikasi Berhasil",
+            "Identitas Anda telah terverifikasi via Didit KYC. Layanan konsultasi kini aktif penuh.",
+          );
+        },
+        onCompleted: () => {
+          refetchKyc();
+        },
+        onCancelled: () => {
+          // user cancelled verification
+        },
+        onError: (err) => {
+          haptics.error();
+          Alert.alert("Kendala Verifikasi", err.message);
+        },
+      });
     } catch (err: unknown) {
       const message =
         err instanceof Error
@@ -189,7 +207,7 @@ export default function ProfileScreen() {
                 <Text size="sm" className="text-muted-foreground font-medium leading-relaxed">
                   {isKycVerified
                     ? "Identitas terhubung dengan validasi KTP & Satu Sehat."
-                    : "Verifikasi KTP melalui Didit KYC untuk perlindungan rekam medis."}
+                    : "Verifikasi KTP native via Didit KYC untuk akses layanan klinis (Triase & Matching)."}
                 </Text>
               </VStack>
             </HStack>
@@ -208,9 +226,8 @@ export default function ProfileScreen() {
                   <HStack space="xs" className="items-center">
                     <AppIcon icon={ShieldCheck} size={16} color="#FFFFFF" />
                     <Text size="sm" className="font-bold text-white">
-                      Verifikasi Sekarang (Didit KYC)
+                      Verifikasi Identitas (Didit Native SDK)
                     </Text>
-                    <ExternalLink size={14} color="#FFFFFF" />
                   </HStack>
                 )}
               </Pressable>

@@ -12,6 +12,8 @@ export type DiditVerificationOutcome =
   | { method: "failed"; error: string };
 
 export interface LaunchDiditOptions {
+  /** Optional custom configuration for Didit Native SDK */
+  config?: any;
   /** Callback fired when identity is approved by Didit native SDK */
   onApproved?: (sessionId?: string) => void;
   /** Callback fired when verification is completed (may be pending or approved) */
@@ -72,7 +74,10 @@ export async function launchDiditVerification(
 
     if (diditSdk) {
       try {
-        const result = await diditSdk.startVerification(token);
+        console.info("[DiditKYC] Meluncurkan Didit Native SDK dengan session token...");
+        const result = options?.config
+          ? await diditSdk.startVerification(token, options.config)
+          : await diditSdk.startVerification(token);
 
         switch (result?.type) {
           case "completed": {
@@ -121,19 +126,23 @@ export async function launchDiditVerification(
               result.error?.message,
             );
 
-            // Sesuai requirement: URL digunakan ketika terjadi masalah terhadap SDK
+            // Sesuai requirement: URL digunakan HANYA ketika terjadi masalah terhadap SDK
             if (fallbackUrl) {
               console.info(
                 "[DiditKYC] Mengalihkan ke URL fallback Didit:",
                 fallbackUrl,
               );
-              await Linking.openURL(fallbackUrl);
-              options?.onFallbackUrlLaunched?.(fallbackUrl);
-              return {
-                method: "fallback_url",
-                status: "opened",
-                url: fallbackUrl,
-              };
+              try {
+                await Linking.openURL(fallbackUrl);
+                options?.onFallbackUrlLaunched?.(fallbackUrl);
+                return {
+                  method: "fallback_url",
+                  status: "opened",
+                  url: fallbackUrl,
+                };
+              } catch (linkError) {
+                console.error("[DiditKYC] Gagal membuka URL fallback:", linkError);
+              }
             }
 
             const errMsg =
@@ -150,7 +159,41 @@ export async function launchDiditVerification(
           "[DiditKYC] Exception saat memanggil Native Didit SDK:",
           sdkException,
         );
-        // Fallback ke URL jika SDK melempar exception
+        // Fallback ke URL HANYA jika SDK melempar exception atau mengalami kendala
+        if (fallbackUrl) {
+          console.info(
+            "[DiditKYC] Mengalihkan ke URL fallback Didit karena kendala SDK:",
+            fallbackUrl,
+          );
+          try {
+            await Linking.openURL(fallbackUrl);
+            options?.onFallbackUrlLaunched?.(fallbackUrl);
+            return {
+              method: "fallback_url",
+              status: "opened",
+              url: fallbackUrl,
+            };
+          } catch (linkError) {
+            console.error("[DiditKYC] Gagal membuka URL fallback:", linkError);
+          }
+        }
+      }
+    } else {
+      console.warn(
+        "[DiditKYC] Didit Native SDK tidak tersedia pada binary saat ini. Mengalihkan ke URL fallback.",
+      );
+      if (fallbackUrl) {
+        try {
+          await Linking.openURL(fallbackUrl);
+          options?.onFallbackUrlLaunched?.(fallbackUrl);
+          return {
+            method: "fallback_url",
+            status: "opened",
+            url: fallbackUrl,
+          };
+        } catch (linkError) {
+          console.error("[DiditKYC] Gagal membuka URL fallback:", linkError);
+        }
       }
     }
   }

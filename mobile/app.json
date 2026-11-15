@@ -19,12 +19,14 @@
         "backgroundColor": "#f8f7ee"
       },
       "package": "id.seraphany.app",
-      "versionCode": 1
+      "versionCode": 1,
+      "permissions": ["CAMERA"]
     },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "id.seraphany.app",
       "infoPlist": {
+        "NSCameraUsageDescription": "SeraPhany memerlukan akses kamera untuk verifikasi identitas resmi (Didit KYC).",
         "NSAppTransportSecurity": {
           "NSPinnedDomains": {
             "api.staging.seraphany.id": {

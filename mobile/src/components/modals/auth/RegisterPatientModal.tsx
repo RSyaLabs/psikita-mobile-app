@@ -76,9 +76,22 @@ export function RegisterPatientModal({
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [registeredEmail, setRegisteredEmail] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (!isOpen) {
+      setFullName("");
+      setEmail("");
+      setPassword("");
+      setErrorMsg(null);
+      setRegisteredEmail(null);
+    }
+  }, [isOpen]);
+
   const handleClose = () => {
     setErrorMsg(null);
     setRegisteredEmail(null);
+    setFullName("");
+    setEmail("");
+    setPassword("");
     onClose();
   };
 
