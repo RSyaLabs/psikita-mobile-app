@@ -16,6 +16,8 @@ import {
   CalendarCheck,
   ShieldAlert,
   ShieldCheck,
+  Sparkles,
+  ArrowRight,
 } from "lucide-react-native";
 import {
   Box,
@@ -270,40 +272,101 @@ export default function PatientDashboard() {
           </Pressable>
         )}
 
-        {/* Photo Zone - Single Elegant Hero Banner */}
-        <Box className="mx-5 mt-4 rounded-3xl overflow-hidden relative h-44 justify-end p-3.5">
-          <Image
-            source={{
-              uri: "https://images.unsplash.com/photo-1769307347488-b874a53c19cf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3ODkwNzEwODB8&ixlib=rb-4.1.0&q=80&w=1080",
-            }}
-            alt="Dashboard Banner"
-            className="absolute inset-0 w-full h-full"
-            resizeMode="cover"
-          />
+        {/* Golden Flow Hero Card - Tujuan Utama Aplikasi */}
+        <Box className="mx-5 mt-4 rounded-3xl overflow-hidden bg-card border border-primary/25 shadow-sm p-4">
+          <VStack space="sm">
+            {/* Top Tag & Live Status */}
+            <HStack className="justify-between items-center">
+              <Badge
+                variant="default"
+                className="bg-primary/10 border border-primary/30 rounded-full px-2.5 py-1 flex-row items-center gap-1.5"
+              >
+                <AppIcon icon={Sparkles} size={14} color="#6b5b95" />
+                <BadgeText className="text-sm font-bold text-primary">
+                  ALUR UTAMA
+                </BadgeText>
+              </Badge>
+              <HStack className="items-center gap-1.5 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
+                <Box className="w-2 h-2 rounded-full bg-emerald-500" />
+                <Text size="sm" className="text-emerald-700 font-semibold">
+                  {onlineCount > 0 ? `${onlineCount} Praktisi Siaga` : "Praktisi Siaga"}
+                </Text>
+              </HStack>
+            </HStack>
 
-          {/* Overlay Card */}
-          <Card className="bg-card/95 rounded-2xl p-3 flex-row items-center justify-between border border-border">
-            <VStack space="xs">
-              <Text size="sm" className="font-semibold text-muted-foreground">
-                Lanjut sesi • 15 mnt
-              </Text>
-              <Text size="sm" bold className="text-foreground font-bold">
-                Ceritamu belum selesai.
+            {/* Title & Core Purpose */}
+            <VStack space="xs" className="mt-0.5">
+              <Heading size="lg" bold className="text-foreground tracking-tight text-xl font-bold">
+                Konsultasi Langsung & Triase Cepat
+              </Heading>
+              <Text size="sm" className="text-muted-foreground leading-relaxed">
+                Temukan psikolog tepat dalam hitungan menit melalui asesmen mandiri terarah dan radar pencocokan otomatis.
               </Text>
             </VStack>
+
+            {/* 3-Step Visual Process Bar */}
+            <Box className="bg-muted/70 p-2.5 rounded-2xl border border-border my-0.5">
+              <HStack className="justify-between items-center">
+                <HStack space="xs" className="items-center flex-1">
+                  <Box className="w-6 h-6 rounded-full bg-primary/20 items-center justify-center">
+                    <Text size="sm" bold className="text-primary font-bold">
+                      1
+                    </Text>
+                  </Box>
+                  <Text size="sm" className="font-semibold text-foreground">
+                    Triase
+                  </Text>
+                </HStack>
+                <AppIcon icon={ChevronRight} size={14} color="#6b5b95" />
+                <HStack space="xs" className="items-center flex-1 justify-center">
+                  <Box className="w-6 h-6 rounded-full bg-primary/20 items-center justify-center">
+                    <Text size="sm" bold className="text-primary font-bold">
+                      2
+                    </Text>
+                  </Box>
+                  <Text size="sm" className="font-semibold text-foreground">
+                    Matching
+                  </Text>
+                </HStack>
+                <AppIcon icon={ChevronRight} size={14} color="#6b5b95" />
+                <HStack space="xs" className="items-center flex-1 justify-end">
+                  <Box className="w-6 h-6 rounded-full bg-primary/20 items-center justify-center">
+                    <Text size="sm" bold className="text-primary font-bold">
+                      3
+                    </Text>
+                  </Box>
+                  <Text size="sm" className="font-semibold text-foreground">
+                    War Room
+                  </Text>
+                </HStack>
+              </HStack>
+            </Box>
+
+            {/* Primary Action Button */}
             <Button
-              size="sm"
+              size="default"
+              accessibilityRole="button"
+              accessibilityLabel="Mulai Triase dan Konsultasi Langsung"
               onPress={() => {
                 haptics.medium();
-                router.push(ROUTES.PATIENT.CHAT_ROOM);
+                if (!isVerified) {
+                  setKycModalOpen(true);
+                  return;
+                }
+                router.push({
+                  pathname: ROUTES.PATIENT.TRIAGE,
+                  params: { mode: "consultation" },
+                } as any);
               }}
-              className="bg-primary px-4 py-2 rounded-full h-auto min-h-0"
+              className="bg-primary py-3 rounded-2xl flex-row items-center justify-center gap-2 active:opacity-90 shadow-sm mt-0.5"
             >
+              <AppIcon icon={Video} size={18} color="#FFFFFF" />
               <ButtonText className="text-sm font-bold text-primary-foreground">
-                Lanjut
+                Mulai Konsultasi (Triase Mandiri)
               </ButtonText>
+              <AppIcon icon={ArrowRight} size={16} color="#FFFFFF" />
             </Button>
-          </Card>
+          </VStack>
         </Box>
 
         {/* Sections */}
@@ -367,11 +430,21 @@ export default function PatientDashboard() {
                 <AppIcon icon={Video} size={22} color="#4A3B6B" />
               </Box>
               <VStack space="xs" className="flex-1">
-                <Text size="md" bold className="text-foreground">
-                  Konsultasi langsung
-                </Text>
+                <HStack space="xs" className="items-center">
+                  <Text size="md" bold className="text-foreground">
+                    Konsultasi langsung
+                  </Text>
+                  <Badge
+                    variant="default"
+                    className="bg-primary/10 rounded-full px-2 py-0.5"
+                  >
+                    <BadgeText className="text-sm text-primary font-bold">
+                      Utama
+                    </BadgeText>
+                  </Badge>
+                </HStack>
                 <Text size="sm" className="text-muted-foreground font-medium">
-                  {onlineCount} psikolog online
+                  {onlineCount} psikolog online • Triase & Pencocokan
                 </Text>
               </VStack>
               <AppIcon icon={ChevronRight} size={18} color="#4B4656" />
