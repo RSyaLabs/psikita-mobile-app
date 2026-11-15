@@ -149,6 +149,22 @@ describe("01. SeraPhany API Contracts & Network Engine Suite", () => {
   });
 
   describe("Backend Live Health Probe", () => {
+    it("should return true when health check endpoint responds with 200 OK and JSON { status: 'ok' }", async () => {
+      global.fetch = jest.fn().mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        headers: {
+          get: (header: string) =>
+            header.toLowerCase() === "content-type"
+              ? "application/json"
+              : "15",
+        },
+        json: async () => ({ status: "ok" }),
+      });
+
+      expect(await checkBackendHealth()).toBe(true);
+    });
+
     it("should return true when health check endpoint responds with 204 No Content", async () => {
       global.fetch = jest.fn().mockResolvedValueOnce({
         ok: true,
@@ -158,6 +174,94 @@ describe("01. SeraPhany API Contracts & Network Engine Suite", () => {
       });
 
       expect(await checkBackendHealth()).toBe(true);
+    });
+
+    it("should return false when server returns an HTML gateway error page with HTTP 200", async () => {
+      global.fetch = jest.fn().mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        headers: {
+          get: (header: string) =>
+            header.toLowerCase() === "content-type" ? "text/html" : "120",
+        },
+        text: async () => "<html><body>502 Bad Gateway Cloudflare</body></html>",
+      });
+
+      expect(await checkBackendHealth()).toBe(false);
+    });
+
+    it("should return false on malformed JSON payload", async () => {
+      global.fetch = jest.fn().mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        headers: {
+          get: (header: string) =>
+            header.toLowerCase() === "content-type"
+              ? "application/json"
+              : "15",
+        },
+        json: async () => {
+          throw new SyntaxError("Unexpected token in JSON");
+        },
+      });
+
+      expect(await checkBackendHealth()).toBe(false);
+    });
+
+    it("should return false when payload contains invalid status value (e.g. status !== 'ok')", async () => {
+      global.fetch = jest.fn().mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        headers: {
+          get: (header: string) =>
+            header.toLowerCase() === "content-type"
+              ? "application/json"
+              : "25",
+        },
+        json: async () => ({ status: "degraded", error: "DB down" }),
+      });
+
+      expect(await checkBackendHealth()).toBe(false);
+    });
+
+    it("should return false when payload is unexpected shape (e.g. array, number, empty object)", async () => {
+      global.fetch = jest.fn().mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        headers: {
+          get: (header: string) =>
+            header.toLowerCase() === "content-type"
+              ? "application/json"
+              : "10",
+        },
+        json: async () => ({}),
+      });
+
+      expect(await checkBackendHealth()).toBe(false);
+    });
+
+    it("should return false when server responds with HTTP 503 Service Unavailable", async () => {
+      global.fetch = jest.fn().mockResolvedValueOnce({
+        ok: false,
+        status: 503,
+        headers: {
+          get: (header: string) =>
+            header.toLowerCase() === "content-type"
+              ? "application/json"
+              : "30",
+        },
+        json: async () => ({ message: "Service Unavailable" }),
+      });
+
+      expect(await checkBackendHealth()).toBe(false);
+    });
+
+    it("should return false on request timeout", async () => {
+      const abortError = new Error("The operation was aborted");
+      abortError.name = "AbortError";
+      global.fetch = jest.fn().mockRejectedValueOnce(abortError);
+
+      expect(await checkBackendHealth()).toBe(false);
     });
 
     it("should return false when server connection fails (ECONNREFUSED)", async () => {

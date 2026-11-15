@@ -51,16 +51,6 @@ export function noContentAdapter(value: unknown): void {
   }
 }
 
-export function healthAdapter(value: unknown): { status: string } {
-  if (value === undefined) {
-    return { status: "ok" };
-  }
-  if (typeof value === "object" && value !== null) {
-    return value as { status: string };
-  }
-  return { status: "ok" };
-}
-
 /**
  * The one object guard for the whole client boundary.
  *
@@ -86,6 +76,20 @@ export function asRecordOrUndefined(
   value: unknown,
 ): Record<string, unknown> | undefined {
   return isRecord(value) ? value : undefined;
+}
+
+export function healthAdapter(value: unknown): { status: string } {
+  if (value === undefined) {
+    return { status: "ok" };
+  }
+  if (
+    isRecord(value) &&
+    typeof value.status === "string" &&
+    value.status.trim().toLowerCase() === "ok"
+  ) {
+    return { status: "ok" };
+  }
+  throw new Error("Expected valid health probe status");
 }
 
 export function arrayAdapter<T>(
