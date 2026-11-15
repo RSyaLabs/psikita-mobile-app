@@ -21,9 +21,9 @@ describe("03. SeraPhany Route Parity & File Existence Suite", () => {
 
   const allRoutes = extractRoutes(ROUTES);
 
-  it("should have exactly 36 canonical routes defined in ROUTES contract", () => {
-    // 1 index + 3 auth + 25 patient + 7 practitioner = 36 total
-    expect(allRoutes).toHaveLength(36);
+  it("should have exactly 37 canonical routes defined in ROUTES contract", () => {
+    // 1 index + 3 auth + 26 patient + 7 practitioner = 37 total
+    expect(allRoutes).toHaveLength(37);
   });
 
   it("should have zero duplicate routes in the contract", () => {
@@ -57,8 +57,8 @@ describe("03. SeraPhany Route Parity & File Existence Suite", () => {
       routeToFileMap[val] = `(practitioner)/practitioner/${screenName}.tsx`;
     }
 
-    // Verify all 36 mappings exist on disk
-    expect(Object.keys(routeToFileMap)).toHaveLength(36);
+    // Verify all 37 mappings exist on disk
+    expect(Object.keys(routeToFileMap)).toHaveLength(37);
 
     for (const [routePath, relativeFilePath] of Object.entries(routeToFileMap)) {
       const fullPath = path.join(appRoot, relativeFilePath);

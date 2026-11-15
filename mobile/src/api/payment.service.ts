@@ -1,19 +1,73 @@
 import { z } from "zod";
 import { ApiError, apiRequest } from "./client";
-import { isRecord, noContentAdapter } from "./response";
+import { isRecord, noContentAdapter, zodAdapter } from "./response";
 import { assertCapabilityLive } from "@/config/capabilities";
 import { PRACTITIONER_TYPES } from "@/constants/enums";
 import {
+  BillingOrderResponseDto,
   ConsultationFeedbackDto,
   ConsultationFeedbackResponseDto,
   CreateBillingOrderDto,
   BpjsEligibilityDto,
   CreatePaymentDto,
   CreatePaymentInput,
+  PaymentMethodsDto,
   PaymentResponseDto,
   PaymentTransactionStatus,
   ServerPaymentContext,
 } from "@/types/api";
+
+export const paymentMethodMoneySchema = z.object({
+  amount: z.number().int().nonnegative(),
+  currency: z.literal("IDR"),
+});
+
+export const paymentMethodItemSchema = z.object({
+  key: z.string().min(1),
+  name: z.string().min(1),
+  methodType: z.string().min(1),
+  channelCode: z.string().min(1),
+  available: z.boolean(),
+  providerVerified: z.boolean(),
+  fee: paymentMethodMoneySchema,
+  feeBearer: z.enum(["PATIENT", "MERCHANT"]),
+  totalPayable: paymentMethodMoneySchema,
+  disabledReason: z.string().nullable().optional(),
+});
+
+export const paymentMethodGroupSchema = z.object({
+  groupName: z.string().min(1),
+  methodType: z.string().min(1),
+  methods: z.array(paymentMethodItemSchema),
+});
+
+export const paymentMethodsSchema = z.object({
+  schemaVersion: z.literal(1),
+  currency: z.literal("IDR"),
+  baseAmount: paymentMethodMoneySchema,
+  generatedAt: z.string(),
+  estimate: z.boolean(),
+  groups: z.array(paymentMethodGroupSchema),
+});
+
+export const billingOrderResponseSchema = z.object({
+  id: z.string().min(1),
+  consultationId: z.string().min(1),
+  patientId: z.string().min(1),
+  payerType: z.string(),
+  orderType: z.string(),
+  durationMinutes: z.number(),
+  grossAmount: z.number(),
+  discountAmount: z.number(),
+  totalAmount: z.number(),
+  currency: z.literal("IDR"),
+  paymentStatus: z.string(),
+  claimStatus: z.string().optional(),
+  paymentId: z.string().optional(),
+  expiresAt: z.string().optional(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+});
 
 const serverPaymentContextSchema = z
   .object({
@@ -28,7 +82,7 @@ const validatedServerPaymentContexts = new WeakSet<object>();
  * API-adapter-only minter for a server-issued payment context.
  * Screens and route parameters must never call this directly.
  */
-function mintServerPaymentContext(value: unknown): ServerPaymentContext {
+export function mintServerPaymentContext(value: unknown): ServerPaymentContext {
   const context = serverPaymentContextSchema.parse(value);
   const brandedContext = Object.freeze({ ...context });
   validatedServerPaymentContexts.add(brandedContext);
@@ -216,12 +270,12 @@ export function createBillingOrderIdempotencyKey(
     intent.orderType,
     String(intent.durationMinutes),
     intent.payerType,
-    intent.practitionerType,
+    intent.practitionerType ?? "",
     stableSerialize(intent.level),
     intent.discountCode ?? "",
   ];
 
-  return `billing-order:${parts.map((part) => encodeURIComponent(part)).join("|")}`;
+  return `billing-order:${parts.map((part) => encodeURIComponent(part ?? "")).join("|")}`;
 }
 
 function parseRequest<T>(schema: z.ZodType<T>, value: unknown): T {
@@ -362,28 +416,50 @@ export const paymentService = {
   serverPaymentContextFromApiResponse,
 
   /**
-   * Create a billing order. The checked-in contract intentionally returns no
-   * content, so this method never manufactures an order ID or amount.
+   * Mengambil katalog metode pembayaran Duitku dan kalkulasi biaya resmi dari server.
+   */
+  async getPaymentMethods(
+    amount: number,
+    currency = "IDR",
+  ): Promise<PaymentMethodsDto> {
+    assertCapabilityLive("payment");
+    const intAmount = Math.max(0, Math.floor(amount));
+    const endpoint = `/payments/methods?amount=${encodeURIComponent(intAmount)}&currency=${encodeURIComponent(currency)}`;
+    return apiRequest<PaymentMethodsDto>(endpoint, {
+      method: "GET",
+      adapter: zodAdapter(paymentMethodsSchema),
+    });
+  },
+
+  /**
+   * Create a billing order. Returns the server-issued BillingOrderResponseDto
+   * and mints a validated ServerPaymentContext.
    */
   async createBillingOrder(
     consultationId: string,
     dto: CreateBillingOrderDto,
-  ): Promise<void> {
+  ): Promise<BillingOrderResponseDto> {
     assertCapabilityLive("payment");
     const normalizedConsultationId = requireContextValue(
       consultationId,
       "consultationId",
     );
-    const payload = dto;
 
-    return apiRequest<void>(
+    const response = await apiRequest<BillingOrderResponseDto>(
       `/consultations/${encodeURIComponent(normalizedConsultationId)}/billing-orders`,
       {
         method: "POST",
-        body: JSON.stringify(payload),
-        adapter: noContentAdapter,
+        body: JSON.stringify(dto),
+        adapter: zodAdapter(billingOrderResponseSchema),
       },
     );
+
+    mintServerPaymentContext({
+      consultationId: response.consultationId,
+      billingOrderId: response.id,
+    });
+
+    return response;
   },
 
   /**

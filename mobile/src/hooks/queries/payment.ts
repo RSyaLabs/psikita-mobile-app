@@ -1,5 +1,6 @@
 import { useCallback, useRef } from "react";
 import {
+  useQuery,
   useMutation,
   type MutateOptions,
 } from "@tanstack/react-query";
@@ -12,13 +13,42 @@ import {
   paymentService,
 } from "@/api";
 import {
+  CreateBillingOrderDto,
+  BillingOrderResponseDto,
   CreatePaymentInput,
   BpjsEligibilityDto,
   BpjsEligibilityInput,
+  PaymentMethodsDto,
   PaymentResponseDto,
 } from "@/types/api";
 
 import { useConsultation } from "./consultation";
+
+/**
+ * Mengambil katalog metode pembayaran Duitku dengan estimasi biaya resmi server.
+ */
+export function usePaymentMethods(amount?: number, currency = "IDR") {
+  return useQuery<PaymentMethodsDto>({
+    queryKey: ["paymentMethods", amount, currency],
+    queryFn: () => paymentService.getPaymentMethods(amount ?? 50000, currency),
+    enabled: typeof amount === "number" && amount > 0,
+    staleTime: 60 * 1000,
+  });
+}
+
+/**
+ * Mutation hook untuk membuat billing order resmi dari server.
+ */
+export function useCreateBillingOrder() {
+  return useMutation<
+    BillingOrderResponseDto,
+    Error,
+    { consultationId: string; dto: CreateBillingOrderDto }
+  >({
+    mutationFn: ({ consultationId, dto }) =>
+      paymentService.createBillingOrder(consultationId, dto),
+  });
+}
 
 /**
  * The current consultation contract has no payment-context field. This hook

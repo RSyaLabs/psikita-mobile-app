@@ -13,6 +13,7 @@ export const ROUTES = {
     CHECKOUT: "/patient/checkout",
     PAYMENT_REGULAR: "/patient/payment-regular",
     PAYMENT_BPJS: "/patient/payment-bpjs",
+    REFUNDS: "/patient/refunds",
     CHAT_ROOM: "/patient/chat-room",
     OVERTIME_MODAL: "/patient/overtime-modal",
     RATING: "/patient/rating",

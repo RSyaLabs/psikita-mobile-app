@@ -387,10 +387,136 @@ export interface CreateBillingOrderDto {
   orderType: "INITIAL" | "EXTENSION";
   durationMinutes: number;
   payerType: "SELF_PAY" | "BPJS";
-  practitionerType: PractitionerType;
-  level: Record<string, unknown>;
+  practitionerType?: PractitionerType;
+  level?: Record<string, unknown>;
   discountCode?: string;
+  gatewayChannel?: string;
   idempotencyKey: string;
+}
+
+export interface BillingOrderResponseDto {
+  id: string;
+  consultationId: string;
+  patientId: string;
+  payerType: string;
+  orderType: string;
+  durationMinutes: number;
+  grossAmount: number;
+  discountAmount: number;
+  totalAmount: number;
+  currency: string;
+  paymentStatus: string;
+  claimStatus?: string;
+  paymentId?: string;
+  expiresAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PaymentMethodMoneyDto {
+  amount: number;
+  currency: string;
+}
+
+export interface PaymentMethodItemDto {
+  key: string;
+  name: string;
+  methodType: "VIRTUAL_ACCOUNT" | "QRIS" | "E_WALLET" | "RETAIL" | "CREDIT_CARD" | "OTHER" | string;
+  channelCode: string;
+  available: boolean;
+  providerVerified: boolean;
+  fee: PaymentMethodMoneyDto;
+  feeBearer: "PATIENT" | "MERCHANT";
+  totalPayable: PaymentMethodMoneyDto;
+  disabledReason?: string | null;
+}
+
+export interface PaymentMethodGroupDto {
+  groupName: string;
+  methodType: string;
+  methods: PaymentMethodItemDto[];
+}
+
+export interface PaymentMethodsDto {
+  schemaVersion: number;
+  currency: string;
+  baseAmount: PaymentMethodMoneyDto;
+  generatedAt: string;
+  estimate: boolean;
+  groups: PaymentMethodGroupDto[];
+}
+
+export interface RequestRefundCaseDto {
+  paymentId: string;
+  idempotencyKey: string;
+}
+
+export interface RefundQuoteDto {
+  amount: number;
+  currency: string;
+  deductions?: number;
+  netRefund: number;
+}
+
+export interface RefundCaseViewDto {
+  schemaVersion: number;
+  id: string;
+  paymentId: string;
+  status:
+    | "REQUESTED"
+    | "UNDER_REVIEW"
+    | "APPROVED"
+    | "QUEUED"
+    | "PROCESSING"
+    | "DELIVERED"
+    | "COMPLETED"
+    | "FAILED"
+    | "RETURNED"
+    | "DISPUTED"
+    | "CANCELLED"
+    | string;
+  beneficiaryVerified: boolean;
+  earningHold: boolean;
+  transferAvailable: boolean;
+  disabledReason?: "REFUND_DISABLED" | "REFUND_TRANSFER_UNVERIFIED" | string | null;
+  deliveryStatus?: string;
+  actualTransferFee?: number;
+  deliveryConfirmedAt?: string;
+  quote: RefundQuoteDto;
+  createdAt: string;
+  updatedAt: string;
+  audit?: unknown[];
+}
+
+export interface RefundCaseListDto {
+  schemaVersion: number;
+  items: RefundCaseViewDto[];
+  limit: number;
+}
+
+export interface RefundDestinationItemDto {
+  type: "BANK" | "E_WALLET";
+  code: string;
+  name: string;
+}
+
+export interface RefundDestinationsDto {
+  schemaVersion: number;
+  items: RefundDestinationItemDto[];
+}
+
+export interface PayoutBankAccountStatusDto {
+  status: "NOT_CONFIGURED" | "PENDING" | "VERIFIED" | "BLOCKED";
+  bankCode?: string;
+  accountNumber?: string;
+  accountName?: string;
+  updatedAt?: string;
+}
+
+export interface SavePayoutBankAccountDto {
+  bankCode: string;
+  accountNumber: string;
+  accountName: string;
 }
 
 export interface CreatePaymentDto {

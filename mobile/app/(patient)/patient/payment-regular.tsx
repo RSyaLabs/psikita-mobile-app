@@ -35,8 +35,10 @@ import {
 import { isPaymentSettled } from "@/api/payment.service";
 import {
   useCreatePayment,
+  usePaymentMethods,
   useValidatedServerPaymentContext,
 } from "@/hooks/useApiQueries";
+import { PaymentMethodItemDto, PaymentResponseDto } from "@/types/api";
 
 type PaymentViewState =
   | "idle"
@@ -76,9 +78,16 @@ export default function PaymentRegularScreen() {
   const isContextError = paymentContextQuery?.isError ?? false;
   const refetchContext = paymentContextQuery?.refetch;
 
-  const [selectedMethod, setSelectedMethod] = useState<"gopay" | "qris">(
+  const [selectedMethod, setSelectedMethod] = useState<string>(
     "gopay",
   );
+  const [selectedItem, setSelectedItem] = useState<PaymentMethodItemDto | null>(
+    null,
+  );
+  const [paymentResult, setPaymentResult] = useState<PaymentResponseDto | null>(
+    null,
+  );
+  const paymentMethodsQuery = usePaymentMethods(50000, "IDR");
   const [paymentState, setPaymentState] = useState<PaymentViewState>("idle");
   const submitInFlight = useRef(false);
   const isMountedRef = useRef(true);
@@ -124,11 +133,19 @@ export default function PaymentRegularScreen() {
 
     try {
       isMountedRef.current = true;
+      const methodType =
+        (selectedItem?.methodType as any) ??
+        (selectedMethod === "qris" ? "QRIS" : "E_WALLET");
+      const channelCode =
+        selectedItem?.channelCode ??
+        (selectedMethod === "qris" ? "QRIS" : "GOPAY");
+
       const payment = await createPaymentMutation.mutateAsync({
-        methodType: selectedMethod === "qris" ? "QRIS" : "E_WALLET",
-        channelCode: selectedMethod === "qris" ? "QRIS" : "GOPAY",
+        methodType,
+        channelCode,
         context: serverContext,
       });
+      setPaymentResult(payment);
 
       if (!isPaymentSettled(payment, serverContext.billingOrderId)) {
         if (!isMountedRef.current) return;
@@ -245,9 +262,13 @@ export default function PaymentRegularScreen() {
 
           {/* Payment Method Selector */}
           <PaymentMethodSelector
+            groups={paymentMethodsQuery.data?.groups}
+            selectedKey={selectedItem?.key || selectedMethod}
             selectedMethod={selectedMethod}
             onSelectMethod={setSelectedMethod}
+            onSelectKey={setSelectedItem}
             paymentEnabled={paymentEnabled}
+            isLoading={paymentMethodsQuery.isLoading}
           />
 
           {paymentCapability === "unavailable" ? (

@@ -9,6 +9,8 @@ export * from "./queries/triage";
 export * from "./queries/consultation";
 export * from "./queries/auth";
 export * from "./queries/payment";
+export * from "./queries/refund";
+export * from "./queries/payout";
 export * from "./queries/notes";
 export * from "./queries/prescription";
 export * from "./queries/chat";
