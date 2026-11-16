@@ -259,15 +259,14 @@ export default function MatchingScreen() {
                 className="bg-primary/10 border-primary/30 rounded-full px-3 py-1 mb-1.5"
               >
                 <BadgeText className="text-sm font-bold text-primary">
-                  SISTEM RADAR AKTIF
+                  PENCARIAN BERJALAN
                 </BadgeText>
               </Badge>
               <Heading size="xl" bold className="text-foreground text-center">
                 Mencari Psikolog Siaga
               </Heading>
               <Text size="sm" className="text-muted-foreground text-center mt-1 leading-relaxed">
-                Algoritma klinis kami sedang memetakan hasil triasemu ke psikolog
-                yang memiliki keahlian paling tepat dan siap melayani saat ini.
+                Memeriksa praktisi yang tersedia.
               </Text>
             </VStack>
 
@@ -283,7 +282,7 @@ export default function MatchingScreen() {
                 <Text size="sm" bold className="text-primary font-bold">
                   {room?.estimatedWaitSeconds !== undefined
                     ? `~${Math.max(1, Math.ceil(room.estimatedWaitSeconds / 60))} menit`
-                    : "~1-3 menit"}
+                    : "Belum tersedia"}
                 </Text>
               </HStack>
 
@@ -299,7 +298,7 @@ export default function MatchingScreen() {
                   className="bg-muted border-border rounded-full px-2.5 py-0.5"
                 >
                   <BadgeText className="text-sm font-bold text-foreground">
-                    #{room?.position ?? 1} Prioritas
+                    {room?.position !== undefined ? `#${room.position}` : "Belum tersedia"}
                   </BadgeText>
                 </Badge>
               </HStack>
@@ -365,20 +364,17 @@ export default function MatchingScreen() {
                 </Box>
                 <VStack space="xs" className="flex-1">
                   <Heading size="md" bold className="text-foreground">
-                    {room?.assignedDoctor?.name || "Psikolog Mitra"}
+                    {room?.assignedDoctor?.name || "Praktisi"}
                   </Heading>
                   <Text size="sm" className="text-muted-foreground font-medium">
-                    {room?.assignedDoctor?.title || "Psikolog Klinis Dewasa"}
+                    {room?.assignedDoctor?.title || "Informasi praktisi belum tersedia"}
                   </Text>
-                  <HStack space="xs" className="items-center mt-0.5">
-                    <Star size={14} color="#EAB308" fill="#EAB308" />
-                    <Text size="sm" bold className="text-foreground font-semibold">
-                      {room?.assignedDoctor?.rating?.toFixed(1) || "4.9"}
-                    </Text>
-                    <Text size="sm" className="text-muted-foreground">
-                      • Terverifikasi STR/SIP
-                    </Text>
-                  </HStack>
+                  {typeof room?.assignedDoctor?.rating === "number" ? (
+                    <HStack space="xs" className="items-center mt-0.5">
+                      <Star size={14} color="#EAB308" fill="#EAB308" />
+                      <Text size="sm" className="text-foreground">{room.assignedDoctor.rating.toFixed(1)}</Text>
+                    </HStack>
+                  ) : null}
                 </VStack>
               </HStack>
             </Card>
