@@ -86,6 +86,8 @@ export default function PatientLayout() {
       <Stack.Screen name="patient/rating" />
       <Stack.Screen name="patient/history" />
       <Stack.Screen name="patient/assessment-result" />
+      <Stack.Screen name="patient/my-assessments" />
+      <Stack.Screen name="patient/fill-assessment" />
       <Stack.Screen name="patient/doctors" />
       <Stack.Screen name="patient/doctor-detail" />
       <Stack.Screen name="patient/edit-profile" />
