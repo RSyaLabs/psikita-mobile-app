@@ -133,12 +133,12 @@ export default function TriageScreen() {
               <ArrowLeft size={22} className="text-foreground" />
             </Pressable>
             <Heading size="xl" bold className="text-foreground">
-              {isConsultation ? "Triase" : "Asesmen"}
+              Skrining Awal
             </Heading>
           </HStack>
           {isGuest ? (
             <VStack space="lg" className="flex-1 justify-center">
-              <Heading size="xl" bold className="text-foreground">Masuk untuk memulai</Heading>
+              <Heading size="xl" bold className="text-foreground">Masuk untuk skrining</Heading>
               <Text className="text-muted-foreground">Jawaban kesehatanmu hanya dikirim melalui akunmu.</Text>
               <Button onPress={() => router.replace(ROUTES.AUTH.SIGN_IN as never)} className="h-12 rounded-xl">
                 <ButtonText>Masuk</ButtonText>
@@ -146,7 +146,7 @@ export default function TriageScreen() {
             </VStack>
           ) : stage === "selection" ? (
             <VStack space="md" className="flex-1">
-              <Heading size="lg" className="text-foreground">Pilih kuesioner</Heading>
+              <Heading size="lg" className="text-foreground">Kuesioner skrining</Heading>
               {instruments.isLoading ? (
                 <Text className="text-muted-foreground">Memuat kuesioner...</Text>
               ) : instruments.isError ? (
@@ -157,8 +157,8 @@ export default function TriageScreen() {
               ) : available.length === 0 ? (
                 <Text className="text-muted-foreground">Belum ada kuesioner yang tersedia.</Text>
               ) : (
-                available.map(instrument => {
-                  const enabled = instrument.code === TRIAGE_CODE;
+                available.filter(instrument => instrument.code === TRIAGE_CODE).map(instrument => {
+                  const enabled = true;
                   return (
                     <Pressable
                       key={`${instrument.code}:${instrument.version}`}
@@ -172,7 +172,7 @@ export default function TriageScreen() {
                         <VStack space="xs" className="flex-1">
                           <Heading size="sm" className="text-foreground">{instrument.name}</Heading>
                           <Text size="xs" className="text-muted-foreground">
-                            {enabled ? `Versi ${instrument.version}` : "Belum dapat dikirim sebagai triase"}
+                            {`Versi ${instrument.version}`}
                           </Text>
                         </VStack>
                         {enabled ? <ArrowRight size={18} className="text-primary" /> : null}
