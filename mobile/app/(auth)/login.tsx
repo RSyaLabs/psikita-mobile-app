@@ -78,19 +78,7 @@ export default function LoginScreen() {
           >
             <ButtonText className="font-semibold text-base text-foreground">Buat Akun</ButtonText>
           </Button>
-          <Pressable
-            accessibilityRole="button"
-            onPress={() => {
-              haptics.light();
-              router.push({
-                pathname: ROUTES.PATIENT.TRIAGE,
-                params: { guest: "true" },
-              } as any);
-            }}
-            className="py-3 items-center"
-          >
-            <Text className="font-semibold text-primary">Cek kondisi tanpa masuk</Text>
-          </Pressable>
+
         </VStack>
       </ScrollView>
     </SafeAreaView>
