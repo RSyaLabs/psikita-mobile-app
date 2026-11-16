@@ -168,6 +168,8 @@ export const queryKeys = {
             "messages",
             privacyParams(params),
           ] as const),
+    patientAssessmentEvidence: (consultationId: string) =>
+      [...queryKeys.consultations.all, "patient-assessment-evidence", privacyToken(consultationId)] as const,
     assessments: (consultationId: string) =>
       [...queryKeys.consultations.all, "assessments", privacyToken(consultationId)] as const,
     notes: (consultationId: string) =>
