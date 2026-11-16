@@ -63,7 +63,15 @@ export default function FillAssessmentScreen() {
             <VStack space="md" className="items-center pt-10">
               <CheckCircle2 size={42} className="text-primary" />
               <Heading size="lg" className="text-foreground">Selesai</Heading>
-              <Text className="text-muted-foreground">Jawaban tersimpan. Informasi risiko akan ditinjau secara klinis.</Text>
+              <Text className="text-muted-foreground">
+                Hasil tersimpan sebagai riwayat dan dapat digunakan psikolog saat konsultasi.
+                Asesmen mandiri bukan pengganti Triage maupun konsultasi.
+              </Text>
+              {record.result?.hasRedFlags ? (
+                <Text className="text-destructive text-center">
+                  Jika Anda merasa tidak aman atau berada dalam bahaya, segera hubungi layanan darurat atau bantuan profesional setempat. Pengisian ini tidak memulai penanganan darurat otomatis.
+                </Text>
+              ) : null}
               <Button onPress={back}><ButtonText>Ke Riwayat</ButtonText></Button>
             </VStack>
           ) : record?.status === "CANCELLED" ? <Text className="text-muted-foreground">Asesmen dibatalkan.</Text>
