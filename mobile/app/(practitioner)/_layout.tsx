@@ -44,6 +44,7 @@ export default function PractitionerLayout() {
       <Stack.Screen name="practitioner/dashboard" />
       <Stack.Screen name="practitioner/war-room" />
       <Stack.Screen name="practitioner/chat" />
+      <Stack.Screen name="practitioner/send-assessment" />
       <Stack.Screen name="practitioner/diagnosis" />
       <Stack.Screen name="practitioner/history" />
       <Stack.Screen name="practitioner/profile" />
