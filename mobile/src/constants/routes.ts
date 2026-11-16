@@ -28,6 +28,8 @@ export const ROUTES = {
     DOCTORS: "/patient/doctors",
     DOCTOR_DETAIL: "/patient/doctor-detail",
     ASSESSMENT_RESULT: "/patient/assessment-result",
+    MY_ASSESSMENTS: "/patient/my-assessments",
+    FILL_ASSESSMENT: "/patient/fill-assessment",
     SESSION_SUMMARY: "/patient/session-summary",
     VIDEO_CALL: "/patient/video-call",
     EDIT_PROFILE: "/patient/edit-profile",
