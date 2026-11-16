@@ -1,10 +1,10 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ArrowLeft, Check, CheckCircle2 } from "lucide-react-native";
 import { Box, Button, ButtonText, Heading, HStack, Pressable, Progress, ProgressFilledTrack, ScrollView, Text, VStack } from "@/components/ui";
 import { ROUTES } from "@/constants/routes";
-import { usePatientAssessment, usePsychometricForm, useSubmitPatientAssessment, useCancelPatientAssessment } from "@/hooks/useApiQueries";
+import { usePatientAssessment, usePsychometricForm, useSubmitPatientAssessment, useSavePatientAssessmentDraft, useCancelPatientAssessment } from "@/hooks/useApiQueries";
 
 export default function FillAssessmentScreen() {
   const router = useRouter();
@@ -14,10 +14,14 @@ export default function FillAssessmentScreen() {
   const record = assessment.data;
   const form = usePsychometricForm(record?.status === "DRAFT" ? record.typeCode : "", record?.typeVersion);
   const submit = useSubmitPatientAssessment();
+  const saveDraft = useSavePatientAssessmentDraft();
   const cancel = useCancelPatientAssessment();
   const [index, setIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [error, setError] = useState("");
+  useEffect(() => {
+    if (record?.status === "DRAFT") setAnswers(record.draftAnswers);
+  }, [record?.id, record?.status]);
   const questions = useMemo(() => [...(form.data?.questions ?? [])].sort((a, b) => a.order - b.order), [form.data?.questions]);
   const question = questions[index];
   const selected = question ? answers[question.code] : undefined;
@@ -25,6 +29,16 @@ export default function FillAssessmentScreen() {
   const back = () => index > 0 && record?.status === "DRAFT"
     ? setIndex(n => n - 1)
     : router.replace(ROUTES.PATIENT.MY_ASSESSMENTS as never);
+  const next = async () => {
+    if (!record || !question || selected === undefined || saveDraft.isPending) return;
+    setError("");
+    try {
+      await saveDraft.mutateAsync({ id: record.id, answers });
+      setIndex(value => value + 1);
+    } catch {
+      setError("Jawaban belum tersimpan. Coba lagi.");
+    }
+  };
   const send = async () => {
     if (record?.status !== "DRAFT" || !canSubmit || submit.isPending || !form.data) return;
     setError("");
@@ -87,10 +101,10 @@ export default function FillAssessmentScreen() {
               <Box className="flex-1" />
               <Button
                 className="h-12 rounded-xl"
-                isDisabled={selected === undefined || submit.isPending || (index === questions.length - 1 && !canSubmit)}
-                onPress={() => index < questions.length - 1 ? setIndex(n => n + 1) : void send()}
+                isDisabled={selected === undefined || submit.isPending || saveDraft.isPending || (index === questions.length - 1 && !canSubmit)}
+                onPress={() => index < questions.length - 1 ? void next() : void send()}
               >
-                <ButtonText>{submit.isPending ? "Mengirim..." : index < questions.length - 1 ? "Lanjut" : "Selesaikan"}</ButtonText>
+                <ButtonText>{submit.isPending || saveDraft.isPending ? "Menyimpan..." : index < questions.length - 1 ? "Lanjut" : "Selesaikan"}</ButtonText>
               </Button>
               <Pressable
                 accessibilityRole="button"
