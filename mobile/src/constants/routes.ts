@@ -3,6 +3,7 @@ export const ROUTES = {
   AUTH: {
     LOGIN: "/login",
     SIGN_IN: "/sign-in",
+    OTP: "/otp",
     FORGOT_PASSWORD: "/forgot-password",
     REGISTER: "/register",
   },
