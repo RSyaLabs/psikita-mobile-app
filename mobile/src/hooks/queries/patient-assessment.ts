@@ -24,6 +24,16 @@ export function useStartPatientAssessment() {
     onSuccess: () => { void qc.invalidateQueries({ queryKey: queryKeys.assessments.all }); },
   });
 }
+export function useSavePatientAssessmentDraft() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, answers }: { id: string; answers: Record<string, number> }) =>
+      patientAssessmentService.saveDraft(id, answers),
+    onSuccess: (_data, variables) => {
+      void qc.invalidateQueries({ queryKey: queryKeys.assessments.detail(variables.id) });
+    },
+  });
+}
 export function useSubmitPatientAssessment() {
   const qc = useQueryClient();
   return useMutation({
