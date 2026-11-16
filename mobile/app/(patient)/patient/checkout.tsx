@@ -250,7 +250,7 @@ export default function CheckoutScreen() {
               <Wallet size={18} className="text-secondary" />
               <Box className="flex-1">
                 <Text size="xs" bold className="text-foreground">
-                  E-WALLET • metode dari server
+                  Pilih kanal resmi
                 </Text>
                 <Text size="xs" className="text-muted-foreground">
                   Nominal dan metode akhir dikonfirmasi server.
@@ -307,8 +307,8 @@ export default function CheckoutScreen() {
           size="sm"
           className="text-center text-muted-foreground font-medium text-sm leading-relaxed"
         >
-          Konteks tagihan harus berasal dari server sebelum pembayaran dapat
-          diproses.
+          Order dibuat setelah Anda memilih kanal pembayaran. Nominal akhir dan
+          instruksi pembayaran hanya berasal dari server.
         </Text>
       </Box>
     </SafeAreaView>

@@ -569,6 +569,9 @@ export interface PaymentResponseDto {
   paymentType?: string;
   grossAmount: number;
   qrCodeUrl?: string;
+  qrString?: string;
+  bankCode?: string;
+  accountNumber?: string;
   paymentUrl?: string;
   expiryTime?: string;
   createdAt?: string;

@@ -214,6 +214,7 @@ const paymentInstructionSchema = z.discriminatedUnion("methodType", [
   z.object({
     methodType: z.literal("QRIS"),
     qrUrl: z.string().optional(),
+    qrString: z.string().optional(),
   }),
 ]);
 
@@ -398,6 +399,12 @@ const paymentAdapter = (
         : undefined,
     qrCodeUrl:
       instruction && "qrUrl" in instruction ? instruction.qrUrl : undefined,
+    qrString:
+      instruction && "qrString" in instruction ? instruction.qrString : undefined,
+    bankCode:
+      instruction && "bankCode" in instruction ? instruction.bankCode : undefined,
+    accountNumber:
+      instruction && "accountNumber" in instruction ? instruction.accountNumber : undefined,
   };
 };
 
