@@ -5,9 +5,9 @@ export default function SettingsScreen() {
     title="Pengaturan Praktisi"
     description="Ringkasan pengaturan akun. Status integrasi ditampilkan hanya jika tersedia dari server."
     items={[
-      { title: "Notifikasi konsultasi", description: "Periksa izin notifikasi pada pengaturan perangkat untuk menerima pemberitahuan yang didukung aplikasi." },
-      { title: "Integrasi layanan", description: "Status sinkronisasi SATUSEHAT dan penyimpanan rekam medis belum ditampilkan tanpa konfirmasi server." },
-      { title: "Keamanan akun", description: "Jaga kerahasiaan kredensial dan keluarlah dari akun pada perangkat bersama." },
+      { title: "Notifikasi konsultasi", description: "Atur izin melalui pengaturan perangkat." },
+      { title: "Integrasi layanan", description: "Status sinkronisasi belum tersedia." },
+      { title: "Keamanan akun", description: "Lindungi kredensial akun." },
     ]}
   />;
 }
