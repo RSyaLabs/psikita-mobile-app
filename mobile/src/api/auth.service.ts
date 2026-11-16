@@ -135,7 +135,7 @@ export const authService = {
   ): Promise<RegisterResponseDto> {
     return apiRequest<RegisterResponseDto>("/auth/password/register", {
       method: "POST",
-      body: JSON.stringify(dto),
+      body: JSON.stringify({ username: dto.username, email: dto.email, password: dto.password }),
       skipAuth: true,
       adapter: registerResponseAdapter,
     });
