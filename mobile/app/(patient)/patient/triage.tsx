@@ -150,10 +150,6 @@ export default function TriageScreen() {
 
   const handleContinue = () => {
     haptics.medium();
-    if (!isGuest && !isVerified) {
-      setKycModalOpen(true);
-      return;
-    }
 
     const scoreMap: Record<string, number> = {
       "Tidak pernah": 0,

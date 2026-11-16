@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Image, Linking, KeyboardAvoidingView, Platform } from "react-native";
+import { KeyboardAvoidingView, Platform, Linking } from "react-native";
 import { useRouter } from "expo-router";
 import { ROUTES } from "@/constants/routes";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -8,6 +8,7 @@ import {
   Mail,
   KeyRound,
   CheckCircle2,
+  ArrowRight,
 } from "lucide-react-native";
 import {
   Box,
@@ -21,48 +22,57 @@ import {
   ButtonSpinner,
   Input,
   InputField,
+  InputSlot,
+  InputIcon,
   FormControl,
   FormControlLabel,
   FormControlLabelText,
   ScrollView,
 } from "@/components/ui";
 import { haptics } from "@/utils/haptics";
-import { useRequestOtp } from "@/hooks/useApiQueries";
+import { useForgotPassword } from "@/hooks/useApiQueries";
 import { ApiError } from "@/api/client";
 
 export default function ForgotPasswordScreen() {
   const router = useRouter();
-  const requestOtpMutation = useRequestOtp();
+  const forgotPasswordMutation = useForgotPassword();
 
   const [email, setEmail] = useState("");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [successEmail, setSuccessEmail] = useState<string | null>(null);
+  const [submittedEmail, setSubmittedEmail] = useState<string | null>(null);
 
-  const isLoading = requestOtpMutation.isPending;
+  const isLoading = forgotPasswordMutation.isPending;
 
   const handleRequestReset = async () => {
     haptics.medium();
     setErrorMsg(null);
 
-    const trimmedEmail = email.trim();
-    if (!trimmedEmail || !trimmedEmail.includes("@")) {
-      setErrorMsg("Alamat email tidak valid.");
+    const trimmedEmail = email.trim().toLowerCase();
+    if (!trimmedEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      setErrorMsg("Masukkan alamat email yang valid.");
       haptics.error();
       return;
     }
 
     try {
-      await requestOtpMutation.mutateAsync({
-        email: trimmedEmail,
-      });
-
+      await forgotPasswordMutation.mutateAsync(trimmedEmail);
       haptics.success();
-      setSuccessEmail(trimmedEmail);
+      setSubmittedEmail(trimmedEmail);
     } catch (err: unknown) {
-      // Even if server returns 404/400, for privacy we show email dispatched
-      haptics.success();
-      setSuccessEmail(trimmedEmail);
+      haptics.error();
+      if (err instanceof ApiError) {
+        setErrorMsg(
+          err.message || "Gagal mengirimkan instruksi reset kata sandi.",
+        );
+      } else {
+        setErrorMsg("Terjadi kendala jaringan saat menghubungi server.");
+      }
     }
+  };
+
+  const openUrl = (url: string) => {
+    haptics.light();
+    Linking.openURL(url).catch(() => {});
   };
 
   return (
@@ -73,8 +83,8 @@ export default function ForgotPasswordScreen() {
       >
         <ScrollView
           contentContainerStyle={{
-            paddingHorizontal: 24,
-            paddingTop: 12,
+            paddingHorizontal: 20,
+            paddingTop: 16,
             paddingBottom: 40,
             flexGrow: 1,
             justifyContent: "space-between",
@@ -82,168 +92,214 @@ export default function ForgotPasswordScreen() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <VStack space="lg" className="w-full max-w-[440px] self-center">
-            {/* Top Navigation Bar */}
-            <HStack space="sm" className="items-center justify-between pt-1 pb-2">
+          <Box className="w-full max-w-[440px] self-center">
+            {/* Header with Back button */}
+            <HStack className="items-center justify-between pb-6">
               <Pressable
-                onPress={() =>
-                  router.replace({
-                    pathname: ROUTES.AUTH.LOGIN,
-                    params: { mode: "login" },
-                  } as any)
-                }
+                onPress={() => {
+                  haptics.light();
+                  if (router.canGoBack()) {
+                    router.back();
+                  } else {
+                    router.replace(ROUTES.AUTH.LOGIN as any);
+                  }
+                }}
                 accessibilityRole="button"
-                accessibilityLabel="Kembali ke halaman masuk"
-                className="w-10 h-10 rounded-full border border-border bg-card items-center justify-center active:bg-muted"
+                accessibilityLabel="Kembali"
+                className="w-10 h-10 rounded-full bg-card border border-border items-center justify-center active:bg-muted"
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               >
                 <ArrowLeft size={20} className="text-foreground" />
               </Pressable>
-              <HStack space="xs" className="items-center">
-                <Image
-                  source={require("../../assets/icon.png")}
-                  style={{ width: 28, height: 28, borderRadius: 8 }}
-                  resizeMode="contain"
-                />
-                <Text className="text-sm font-bold text-foreground">
-                  SeraPhany
-                </Text>
-              </HStack>
+              <Text className="text-base font-bold text-foreground">
+                Lupa Kata Sandi
+              </Text>
               <Box className="w-10" />
             </HStack>
 
-            {successEmail ? (
-              /* Success confirmation view */
-              <VStack space="lg" className="py-6 items-center">
-                <Box className="w-20 h-20 rounded-3xl bg-secondary/15 items-center justify-center mb-2">
-                  <CheckCircle2 size={44} color="#0D9488" />
+            {submittedEmail ? (
+              /* Success confirmation state */
+              <VStack
+                space="lg"
+                className="pt-10 items-center bg-card border border-border p-6 rounded-3xl"
+              >
+                <Box className="w-16 h-16 rounded-full bg-primary/10 items-center justify-center">
+                  <CheckCircle2 size={36} className="text-primary" />
                 </Box>
-                <Heading
-                  level={1}
-                  size="2xl"
-                  bold
-                  className="text-foreground text-center tracking-tight"
-                >
-                  Instruksi Terkirim
-                </Heading>
-                <Text className="text-sm text-muted-foreground text-center font-medium leading-relaxed px-4">
-                  Jika alamat email{" "}
-                  <Text className="text-sm font-bold text-primary">
-                    {successEmail}
-                  </Text>{" "}
-                  terdaftar di sistem SeraPhany, kami telah mengirimkan instruksi
-                  pemulihan kata sandi. Silakan periksa kotak masuk atau folder spam Anda.
-                </Text>
+                <VStack space="xs" className="items-center">
+                  <Heading
+                    level={1}
+                    size="2xl"
+                    bold
+                    className="text-foreground text-center"
+                  >
+                    Instruksi Terkirim
+                  </Heading>
+                  <Text className="text-sm text-muted-foreground text-center leading-relaxed mt-1">
+                    Jika akun terdaftar, token pemulihan kata sandi telah dikirim ke{" "}
+                    <Text className="text-sm font-bold text-foreground">
+                      {submittedEmail}
+                    </Text>
+                    . Periksa inbox atau folder spam email Anda.
+                  </Text>
+                </VStack>
 
-                <Button
-                  size="lg"
-                  onPress={() =>
-                    router.replace({
-                      pathname: ROUTES.AUTH.LOGIN,
-                      params: { mode: "login" },
-                    } as any)
-                  }
-                  className="w-full h-12 rounded-2xl bg-primary active:opacity-90 flex-row items-center justify-center mt-6"
-                >
-                  <ButtonText className="text-primary-foreground font-bold text-base">
-                    Kembali ke Halaman Masuk
-                  </ButtonText>
-                </Button>
+                <VStack space="sm" className="w-full pt-4">
+                  <Button
+                    size="lg"
+                    onPress={() =>
+                      router.push({
+                        pathname: ROUTES.AUTH.RESET_PASSWORD,
+                        params: { email: submittedEmail },
+                      } as any)
+                    }
+                    className="w-full h-12 rounded-2xl bg-primary flex-row items-center justify-center"
+                  >
+                    <HStack space="xs" className="items-center">
+                      <ButtonText className="text-primary-foreground font-bold text-base">
+                        Masukkan Token & Atur Sandi Baru
+                      </ButtonText>
+                      <ArrowRight size={18} className="text-primary-foreground" />
+                    </HStack>
+                  </Button>
+
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    onPress={() => router.replace(ROUTES.AUTH.LOGIN as any)}
+                    className="w-full h-12 rounded-2xl border-border bg-card mt-1"
+                  >
+                    <ButtonText className="text-foreground font-semibold text-sm">
+                      Kembali ke Halaman Masuk
+                    </ButtonText>
+                  </Button>
+                </VStack>
               </VStack>
             ) : (
-              /* Form view */
+              /* Form State */
               <VStack space="md">
-                <VStack space="xs" className="pt-2">
+                <VStack space="xs" className="pb-3">
                   <Heading
                     level={1}
                     size="2xl"
                     bold
                     className="text-foreground tracking-tight"
                   >
-                    Lupa Kata Sandi
+                    Pulihkan Kata Sandi
                   </Heading>
-                  <Text className="text-sm text-muted-foreground font-medium leading-relaxed">
-                    Masukkan email terdaftar Anda. Kami akan mengirimkan instruksi pemulihan kata sandi.
+                  <Text className="text-sm text-muted-foreground leading-relaxed">
+                    Masukkan alamat email akun Anda. Kami akan mengirimkan token untuk mereset kata sandi Anda.
                   </Text>
                 </VStack>
 
                 {errorMsg && (
-                  <Box className="p-3.5 rounded-2xl bg-destructive/10 border border-destructive/20 flex-row items-center gap-2.5">
-                    <Text className="text-sm text-destructive font-semibold flex-1 leading-relaxed">
+                  <Box className="bg-destructive/10 border border-destructive/20 p-3.5 rounded-2xl mb-2">
+                    <Text className="text-sm text-destructive font-medium leading-relaxed">
                       {errorMsg}
                     </Text>
                   </Box>
                 )}
 
-                <VStack space="md" className="pt-1">
-                  <FormControl>
-                    <FormControlLabel className="mb-1.5">
-                      <FormControlLabelText className="text-sm font-bold text-foreground">
-                        Alamat Email Terdaftar
-                      </FormControlLabelText>
-                    </FormControlLabel>
-                    <Input className="h-12 rounded-2xl border-border bg-card px-3">
-                      <InputField
-                        placeholder="nama@email.com"
-                        placeholderTextColor="#8C829D"
-                        value={email}
-                        onChangeText={(val) => {
-                          setEmail(val);
-                          if (errorMsg) setErrorMsg(null);
-                        }}
-                        autoCapitalize="none"
-                        autoCorrect={false}
-                        keyboardType="email-address"
-                        returnKeyType="done"
-                        onSubmitEditing={handleRequestReset}
-                        className="text-sm text-foreground"
-                      />
-                    </Input>
-                  </FormControl>
+                <FormControl isRequired>
+                  <FormControlLabel>
+                    <FormControlLabelText className="text-sm font-bold text-foreground">
+                      Alamat Email
+                    </FormControlLabelText>
+                  </FormControlLabel>
+                  <Input className="h-12 rounded-2xl border-border bg-card px-3">
+                    <InputField
+                      placeholder="nama@email.com"
+                      placeholderTextColor="#8C829D"
+                      value={email}
+                      onChangeText={(val) => {
+                        setEmail(val);
+                        if (errorMsg) setErrorMsg(null);
+                      }}
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                      keyboardType="email-address"
+                      returnKeyType="done"
+                      onSubmitEditing={handleRequestReset}
+                      className="text-sm text-foreground flex-1"
+                    />
+                    <InputSlot className="pr-2">
+                      <InputIcon as={Mail} className="text-muted-foreground" />
+                    </InputSlot>
+                  </Input>
+                </FormControl>
 
-                  <Button
-                    size="lg"
-                    disabled={isLoading}
-                    onPress={handleRequestReset}
-                    className="w-full h-12 rounded-2xl bg-primary active:opacity-90 flex-row items-center justify-center mt-3"
-                  >
-                    {isLoading ? (
-                      <ButtonSpinner className="text-primary-foreground" />
-                    ) : (
-                      <ButtonText className="text-primary-foreground font-bold text-base">
-                        Kirim Instruksi Pemulihan
-                      </ButtonText>
-                    )}
-                  </Button>
-                </VStack>
+                <Button
+                  size="lg"
+                  disabled={isLoading}
+                  onPress={handleRequestReset}
+                  className="w-full h-12 rounded-2xl bg-primary active:opacity-90 flex-row items-center justify-center mt-3"
+                >
+                  {isLoading ? (
+                    <ButtonSpinner className="text-primary-foreground" />
+                  ) : (
+                    <ButtonText className="text-primary-foreground font-bold text-base">
+                      Kirim Token Pemulihan
+                    </ButtonText>
+                  )}
+                </Button>
 
-                <VStack space="xs" className="items-center pt-2">
+                <HStack space="xs" className="justify-center items-center pt-4">
+                  <Text className="text-sm text-muted-foreground font-medium">
+                    Ingat kata sandi Anda?
+                  </Text>
                   <Pressable
-                    onPress={() => {
-                      haptics.light();
-                      router.replace({
-                        pathname: ROUTES.AUTH.LOGIN,
-                        params: { mode: "login" },
-                      } as any);
-                    }}
+                    onPress={() => router.replace(ROUTES.AUTH.LOGIN as any)}
                     hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                   >
                     <Text className="text-sm font-bold text-primary underline">
-                      Kembali ke Halaman Masuk
+                      Masuk ke Akun
                     </Text>
                   </Pressable>
-                </VStack>
+                </HStack>
+
+                <HStack space="xs" className="justify-center items-center pt-1">
+                  <Text className="text-sm text-muted-foreground font-medium">
+                    Sudah memiliki token reset?
+                  </Text>
+                  <Pressable
+                    onPress={() =>
+                      router.push(ROUTES.AUTH.RESET_PASSWORD as any)
+                    }
+                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                  >
+                    <Text className="text-sm font-bold text-primary underline">
+                      Atur Sandi Baru
+                    </Text>
+                  </Pressable>
+                </HStack>
               </VStack>
             )}
-          </VStack>
+          </Box>
 
-          {/* Legal link */}
-          <VStack space="xs" className="w-full max-w-[440px] self-center items-center pt-8">
-            <Text className="text-sm text-muted-foreground text-center">
-              Pusat Dukungan & Bantuan:{" "}
-              <Text className="text-sm text-primary font-bold">
-                support@psikitacare.id
+          {/* Legal Footer */}
+          <VStack
+            space="xs"
+            className="w-full max-w-[440px] self-center items-center pt-8"
+          >
+            <HStack space="xs" className="items-center">
+              <Text
+                onPress={() =>
+                  openUrl("https://staging.seraphany.id/syarat-layanan")
+                }
+                className="text-sm text-muted-foreground underline"
+              >
+                Syarat Layanan
               </Text>
-            </Text>
+              <Text className="text-sm text-muted-foreground">•</Text>
+              <Text
+                onPress={() =>
+                  openUrl("https://staging.seraphany.id/kebijakan-privasi")
+                }
+                className="text-sm text-muted-foreground underline"
+              >
+                Kebijakan Privasi
+              </Text>
+            </HStack>
           </VStack>
         </ScrollView>
       </KeyboardAvoidingView>

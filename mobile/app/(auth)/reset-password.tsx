@@ -1,0 +1,363 @@
+import React, { useState } from "react";
+import { KeyboardAvoidingView, Platform, Linking } from "react-native";
+import { useRouter, useLocalSearchParams } from "expo-router";
+import { ROUTES } from "@/constants/routes";
+import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  ArrowLeft,
+  KeyRound,
+  Lock,
+  Eye,
+  EyeOff,
+  CheckCircle2,
+} from "lucide-react-native";
+import {
+  Box,
+  Text,
+  Heading,
+  VStack,
+  HStack,
+  Pressable,
+  Button,
+  ButtonText,
+  ButtonSpinner,
+  Input,
+  InputField,
+  InputSlot,
+  InputIcon,
+  FormControl,
+  FormControlLabel,
+  FormControlLabelText,
+  ScrollView,
+} from "@/components/ui";
+import { haptics } from "@/utils/haptics";
+import { useResetPassword } from "@/hooks/useApiQueries";
+import { ApiError } from "@/api/client";
+
+export default function ResetPasswordScreen() {
+  const router = useRouter();
+  const { email: initialEmail } = useLocalSearchParams<{ email?: string }>();
+  const resetPasswordMutation = useResetPassword();
+
+  const [token, setToken] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [isSuccess, setIsSuccess] = useState(false);
+
+  const isLoading = resetPasswordMutation.isPending;
+
+  const handleResetPassword = async () => {
+    haptics.medium();
+    setErrorMsg(null);
+
+    const trimmedToken = token.trim();
+    if (!trimmedToken) {
+      setErrorMsg("Masukkan token reset yang diterima di email Anda.");
+      haptics.error();
+      return;
+    }
+
+    if (newPassword.length < 8) {
+      setErrorMsg("Kata sandi baru wajib memiliki minimal 8 karakter.");
+      haptics.error();
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setErrorMsg("Konfirmasi kata sandi tidak cocok dengan kata sandi baru.");
+      haptics.error();
+      return;
+    }
+
+    try {
+      await resetPasswordMutation.mutateAsync({
+        token: trimmedToken,
+        newPassword,
+      });
+
+      haptics.success();
+      setIsSuccess(true);
+    } catch (err: unknown) {
+      haptics.error();
+      if (err instanceof ApiError) {
+        if (err.statusCode === 400 || err.statusCode === 401) {
+          setErrorMsg(
+            "Token reset tidak valid atau telah kedaluwarsa. Silakan ajukan permohonan reset ulang.",
+          );
+        } else {
+          setErrorMsg(err.message || "Gagal mereset kata sandi.");
+        }
+      } else {
+        setErrorMsg("Terjadi kendala jaringan saat menghubungi server.");
+      }
+    }
+  };
+
+  const openUrl = (url: string) => {
+    haptics.light();
+    Linking.openURL(url).catch(() => {});
+  };
+
+  return (
+    <SafeAreaView className="flex-1 bg-background">
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        className="flex-1"
+      >
+        <ScrollView
+          contentContainerStyle={{
+            paddingHorizontal: 20,
+            paddingTop: 16,
+            paddingBottom: 40,
+            flexGrow: 1,
+            justifyContent: "space-between",
+          }}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <Box className="w-full max-w-[440px] self-center">
+            {/* Header with Back button */}
+            <HStack className="items-center justify-between pb-6">
+              <Pressable
+                onPress={() => {
+                  haptics.light();
+                  if (router.canGoBack()) {
+                    router.back();
+                  } else {
+                    router.replace(ROUTES.AUTH.LOGIN as any);
+                  }
+                }}
+                accessibilityRole="button"
+                accessibilityLabel="Kembali"
+                className="w-10 h-10 rounded-full bg-card border border-border items-center justify-center active:bg-muted"
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              >
+                <ArrowLeft size={20} className="text-foreground" />
+              </Pressable>
+              <Text className="text-base font-bold text-foreground">
+                Atur Sandi Baru
+              </Text>
+              <Box className="w-10" />
+            </HStack>
+
+            {isSuccess ? (
+              /* Success confirmation state */
+              <VStack
+                space="lg"
+                className="pt-10 items-center bg-card border border-border p-6 rounded-3xl"
+              >
+                <Box className="w-16 h-16 rounded-full bg-primary/10 items-center justify-center">
+                  <CheckCircle2 size={36} className="text-primary" />
+                </Box>
+                <VStack space="xs" className="items-center">
+                  <Heading
+                    level={1}
+                    size="2xl"
+                    bold
+                    className="text-foreground text-center"
+                  >
+                    Kata Sandi Berhasil Diperbarui
+                  </Heading>
+                  <Text className="text-sm text-muted-foreground text-center leading-relaxed mt-1">
+                    Kata sandi akun Anda telah berhasil diubah. Silakan masuk menggunakan kata sandi baru Anda.
+                  </Text>
+                </VStack>
+
+                <VStack space="sm" className="w-full pt-4">
+                  <Button
+                    size="lg"
+                    onPress={() => router.replace(ROUTES.AUTH.LOGIN as any)}
+                    className="w-full h-12 rounded-2xl bg-primary flex-row items-center justify-center"
+                  >
+                    <ButtonText className="text-primary-foreground font-bold text-base">
+                      Masuk ke Akun Sekarang
+                    </ButtonText>
+                  </Button>
+                </VStack>
+              </VStack>
+            ) : (
+              /* Reset Form */
+              <VStack space="md">
+                <VStack space="xs" className="pb-3">
+                  <Heading
+                    level={1}
+                    size="2xl"
+                    bold
+                    className="text-foreground tracking-tight"
+                  >
+                    Masukkan Token & Sandi Baru
+                  </Heading>
+                  <Text className="text-sm text-muted-foreground leading-relaxed">
+                    Salin token reset dari email Anda lalu buat kata sandi baru minimal 8 karakter.
+                  </Text>
+                </VStack>
+
+                {errorMsg && (
+                  <Box className="bg-destructive/10 border border-destructive/20 p-3.5 rounded-2xl mb-2">
+                    <Text className="text-sm text-destructive font-medium leading-relaxed">
+                      {errorMsg}
+                    </Text>
+                  </Box>
+                )}
+
+                {/* Token */}
+                <FormControl isRequired>
+                  <FormControlLabel>
+                    <FormControlLabelText className="text-sm font-bold text-foreground">
+                      Token Reset Password
+                    </FormControlLabelText>
+                  </FormControlLabel>
+                  <Input className="h-12 rounded-2xl border-border bg-card px-3">
+                    <InputField
+                      placeholder="Masukkan kode token dari email"
+                      placeholderTextColor="#8C829D"
+                      value={token}
+                      onChangeText={(val) => {
+                        setToken(val);
+                        if (errorMsg) setErrorMsg(null);
+                      }}
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                      returnKeyType="next"
+                      className="text-sm text-foreground flex-1"
+                    />
+                    <InputSlot className="pr-2">
+                      <InputIcon as={KeyRound} className="text-muted-foreground" />
+                    </InputSlot>
+                  </Input>
+                </FormControl>
+
+                {/* Kata Sandi Baru */}
+                <FormControl isRequired>
+                  <FormControlLabel>
+                    <FormControlLabelText className="text-sm font-bold text-foreground">
+                      Kata Sandi Baru
+                    </FormControlLabelText>
+                  </FormControlLabel>
+                  <Input className="h-12 rounded-2xl border-border bg-card px-3">
+                    <InputField
+                      placeholder="Minimal 8 karakter"
+                      placeholderTextColor="#8C829D"
+                      value={newPassword}
+                      onChangeText={(val) => {
+                        setNewPassword(val);
+                        if (errorMsg) setErrorMsg(null);
+                      }}
+                      secureTextEntry={!showPassword}
+                      returnKeyType="next"
+                      className="text-sm text-foreground flex-1"
+                    />
+                    <InputSlot
+                      onPress={() => setShowPassword(!showPassword)}
+                      className="pr-2"
+                    >
+                      <InputIcon
+                        as={showPassword ? EyeOff : Eye}
+                        className="text-muted-foreground"
+                      />
+                    </InputSlot>
+                  </Input>
+                </FormControl>
+
+                {/* Konfirmasi Kata Sandi Baru */}
+                <FormControl isRequired>
+                  <FormControlLabel>
+                    <FormControlLabelText className="text-sm font-bold text-foreground">
+                      Konfirmasi Kata Sandi Baru
+                    </FormControlLabelText>
+                  </FormControlLabel>
+                  <Input className="h-12 rounded-2xl border-border bg-card px-3">
+                    <InputField
+                      placeholder="Ulangi kata sandi baru"
+                      placeholderTextColor="#8C829D"
+                      value={confirmPassword}
+                      onChangeText={(val) => {
+                        setConfirmPassword(val);
+                        if (errorMsg) setErrorMsg(null);
+                      }}
+                      secureTextEntry={!showConfirmPassword}
+                      returnKeyType="done"
+                      onSubmitEditing={handleResetPassword}
+                      className="text-sm text-foreground flex-1"
+                    />
+                    <InputSlot
+                      onPress={() =>
+                        setShowConfirmPassword(!showConfirmPassword)
+                      }
+                      className="pr-2"
+                    >
+                      <InputIcon
+                        as={showConfirmPassword ? EyeOff : Eye}
+                        className="text-muted-foreground"
+                      />
+                    </InputSlot>
+                  </Input>
+                </FormControl>
+
+                {/* Submit button */}
+                <Button
+                  size="lg"
+                  disabled={isLoading}
+                  onPress={handleResetPassword}
+                  className="w-full h-12 rounded-2xl bg-primary active:opacity-90 flex-row items-center justify-center mt-3"
+                >
+                  {isLoading ? (
+                    <ButtonSpinner className="text-primary-foreground" />
+                  ) : (
+                    <ButtonText className="text-primary-foreground font-bold text-base">
+                      Simpan Kata Sandi Baru
+                    </ButtonText>
+                  )}
+                </Button>
+
+                <HStack space="xs" className="justify-center items-center pt-4">
+                  <Text className="text-sm text-muted-foreground font-medium">
+                    Kembali ke halaman masuk?
+                  </Text>
+                  <Pressable
+                    onPress={() => router.replace(ROUTES.AUTH.LOGIN as any)}
+                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                  >
+                    <Text className="text-sm font-bold text-primary underline">
+                      Masuk ke Akun
+                    </Text>
+                  </Pressable>
+                </HStack>
+              </VStack>
+            )}
+          </Box>
+
+          {/* Legal Footer */}
+          <VStack
+            space="xs"
+            className="w-full max-w-[440px] self-center items-center pt-8"
+          >
+            <HStack space="xs" className="items-center">
+              <Text
+                onPress={() =>
+                  openUrl("https://staging.seraphany.id/syarat-layanan")
+                }
+                className="text-sm text-muted-foreground underline"
+              >
+                Syarat Layanan
+              </Text>
+              <Text className="text-sm text-muted-foreground">•</Text>
+              <Text
+                onPress={() =>
+                  openUrl("https://staging.seraphany.id/kebijakan-privasi")
+                }
+                className="text-sm text-muted-foreground underline"
+              >
+                Kebijakan Privasi
+              </Text>
+            </HStack>
+          </VStack>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
+  );
+}

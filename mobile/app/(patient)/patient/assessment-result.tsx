@@ -166,7 +166,12 @@ export default function AssessmentResultScreen() {
   const handleAction = () => {
     haptics.medium();
     if (isGuest) {
-      router.push(ROUTES.AUTH.LOGIN as never);
+      router.push({
+        pathname: ROUTES.AUTH.LOGIN,
+        params: normalizedTriageId
+          ? { triageId: normalizedTriageId, redirect: ROUTES.PATIENT.MATCHING }
+          : { redirect: ROUTES.PATIENT.MATCHING },
+      } as never);
     } else {
       if (!isVerified) {
         setKycModalOpen(true);
