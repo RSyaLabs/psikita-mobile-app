@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { apiRequest } from "./client";
-import { requireServerId, zodAdapter } from "./response";
+import { requireServerId } from "./response";
 
 const diagnosisSchema = z.object({
   id: z.string().min(1),

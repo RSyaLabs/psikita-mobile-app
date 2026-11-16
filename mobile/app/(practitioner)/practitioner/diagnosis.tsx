@@ -42,6 +42,22 @@ function DecisionField(props: {
   );
 }
 
+function ClinicalTextField(props: {
+  title: string;
+  value: string;
+  update: (s: string) => void;
+  editable: boolean;
+}) {
+  return (
+    <VStack space="xs">
+      <Text className="font-semibold text-foreground">{props.title}</Text>
+      <Textarea className="rounded-xl bg-muted border border-border">
+        <TextareaInput value={props.value} onChangeText={props.update} editable={props.editable} />
+      </Textarea>
+    </VStack>
+  );
+}
+
 /** A clinician-owned sequence; no diagnosis, care, or follow-up decision is automated. */
 export default function DiagnosisScreen() {
   const router = useRouter();
@@ -218,14 +234,6 @@ export default function DiagnosisScreen() {
     }
   };
 
-  const TextField = ({ title, value, update }: {title: string; value: string; update: (s: string) => void}) => (
-    <VStack space="xs">
-      <Text className="font-semibold text-foreground">{title}</Text>
-      <Textarea className="rounded-xl bg-muted border border-border">
-        <TextareaInput value={value} onChangeText={update} editable={!isFinished && !busy} />
-      </Textarea>
-    </VStack>
-  );
 
   return (
     <SafeAreaView className="flex-1 bg-background">
@@ -294,10 +302,10 @@ export default function DiagnosisScreen() {
               {hasFinalSoap ? <Text className="text-foreground">SOAP telah difinalisasi di server.</Text> : null}
               {!isFinished && !hasFinalSoap ? (
                 <>
-                  <TextField title="Subjective" value={subjective} update={setSubjective} />
-                  <TextField title="Objective" value={objective} update={setObjective} />
-                  <TextField title="Assessment" value={assessment} update={setAssessment} />
-                  <TextField title="Plan" value={plan} update={setPlan} />
+                  <ClinicalTextField title="Subjective" value={subjective} update={setSubjective} editable={!isFinished && !busy} />
+                  <ClinicalTextField title="Objective" value={objective} update={setObjective} editable={!isFinished && !busy} />
+                  <ClinicalTextField title="Assessment" value={assessment} update={setAssessment} editable={!isFinished && !busy} />
+                  <ClinicalTextField title="Plan" value={plan} update={setPlan} editable={!isFinished && !busy} />
                   <Button isDisabled={!canWrite || !soapReady} onPress={() => void storeSoap()}>
                     <ButtonText>{createSoap.isPending ? "Menyimpan..." : "Simpan draft SOAP"}</ButtonText>
                   </Button>
@@ -339,7 +347,7 @@ export default function DiagnosisScreen() {
                   </HStack>
                 ) : (
                   <>
-                    <TextField title="Nasihat yang boleh dibaca pasien" value={advice} update={setAdvice} />
+                    <ClinicalTextField title="Nasihat yang boleh dibaca pasien" value={advice} update={setAdvice} editable={!busy && !resultSubmitted} />
                     <DecisionField label="Apakah follow-up diperlukan?" value={followUp} onChange={setFollowUp} />
                     {followUp === true ? (
                       <>
@@ -358,7 +366,7 @@ export default function DiagnosisScreen() {
                         <DecisionField label="Durasi tindak lanjut 60 menit?" value={followUpMinutes === 60} onChange={(value) => setFollowUpMinutes(value ? 60 : 30)} />
                       </>
                     ) : null}
-                    <TextField title={followUp === false ? "Alasan tidak memerlukan follow-up (minimal 10 karakter)" : "Alasan klinis (opsional, minimal 10 karakter jika diisi)"} value={followUpReason} update={setFollowUpReason} />
+                    <ClinicalTextField title={followUp === false ? "Alasan tidak memerlukan follow-up (minimal 10 karakter)" : "Alasan klinis (opsional, minimal 10 karakter jika diisi)"} value={followUpReason} update={setFollowUpReason} editable={!busy && !resultSubmitted} />
                     <HStack space="sm" className="items-center">
                       <ShieldAlert size={18} color="#B45309" />
                       <Text size="xs" className="text-muted-foreground flex-1">
