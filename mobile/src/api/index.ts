@@ -19,6 +19,7 @@ export * from "./cdss.service";
 export * from "./avatar.service";
 export * from "./psychometrics.service";
 export * from "./consultation-assessment.service";
+export * from "./patient-assessment.service";
 export * from "./diagnosis-codes.service";
 export * from "./identity-verification.service";
 export * from "../config/security";
