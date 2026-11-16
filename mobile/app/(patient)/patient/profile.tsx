@@ -160,10 +160,10 @@ export default function ProfileScreen() {
             </Box>
             <VStack space="xs" className="flex-1">
               <Text size="sm" bold className="text-foreground">
-                Ringkasan perawatan belum tersedia
+                Perawatan
               </Text>
               <Text size="sm" className="text-muted-foreground font-medium leading-relaxed">
-                Resep dan rujukan hanya ditampilkan setelah dimuat dari server.
+                Belum ada ringkasan.
               </Text>
             </VStack>
           </HStack>
@@ -198,8 +198,8 @@ export default function ProfileScreen() {
                 </HStack>
                 <Text size="sm" className="text-muted-foreground font-medium leading-relaxed">
                   {isKycVerified
-                    ? "Identitas terhubung dengan validasi KTP & Satu Sehat."
-                    : "Verifikasi KTP native via Didit KYC untuk akses layanan klinis (Triase & Matching)."}
+                    ? "Identitas terverifikasi."
+                    : "Verifikasi identitas untuk layanan konsultasi."}
                 </Text>
               </VStack>
             </HStack>
@@ -218,7 +218,7 @@ export default function ProfileScreen() {
                   <HStack space="xs" className="items-center">
                     <AppIcon icon={ShieldCheck} size={16} color="#FFFFFF" />
                     <Text size="sm" className="font-bold text-white">
-                      Verifikasi Identitas (Didit Native SDK)
+                      Verifikasi Sekarang
                     </Text>
                   </HStack>
                 )}
@@ -300,7 +300,7 @@ export default function ProfileScreen() {
                     Daftar Sebagai Mitra Praktisi
                   </Text>
                   <Text size="sm" className="text-muted-foreground">
-                    Bergabung sebagai Psikolog Klinis atau Psikiater
+                    Pendaftaran praktisi
                   </Text>
                 </VStack>
               </HStack>
