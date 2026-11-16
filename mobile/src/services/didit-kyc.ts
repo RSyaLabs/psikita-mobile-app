@@ -50,6 +50,18 @@ function getDiditNativeSdk(): {
   }
 }
 
+/** Only open HTTPS verification links served by the trusted Didit domain. */
+export function isTrustedDiditUrl(value: string): boolean {
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" &&
+      !url.username && !url.password &&
+      (url.hostname === "didit.me" || url.hostname.endsWith(".didit.me"));
+  } catch {
+    return false;
+  }
+}
+
 /**
  * Launch Didit KYC Identity Verification.
  *
@@ -66,7 +78,8 @@ export async function launchDiditVerification(
   options?: LaunchDiditOptions,
 ): Promise<DiditVerificationOutcome> {
   const token = session.sessionToken?.trim();
-  const fallbackUrl = session.url?.trim();
+  const candidateUrl = session.url?.trim();
+  const fallbackUrl = candidateUrl && isTrustedDiditUrl(candidateUrl) ? candidateUrl : null;
 
   // 1. Coba Didit Native React Native SDK terlebih dahulu jika token tersedia
   if (token) {
