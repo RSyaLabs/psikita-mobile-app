@@ -21,46 +21,55 @@ jobs:
       run:
         working-directory: mobile
 
+    env:
+      CI: "1"
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+      EAS_LOCAL_BUILD_SKIP_CLEANUP: "0"
+
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Java
+      - name: Setup Java 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: "17"
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
           cache: npm
           cache-dependency-path: mobile/package-lock.json
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
 
-      - name: Run tests
+      - name: Install dependencies
+        run: npm ci --include=dev
+
+      - name: Validate Expo configuration
+        run: npx --no-install expo config --json > /dev/null
+
+      - name: Validate EAS project
+        run: npx --no-install eas project:info
+
+      - name: Run unit tests
         run: npm run test:ci
 
-      - name: Install EAS CLI
-        run: npm install --global eas-cli
-
-      - name: Build staging APK
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-          CI: '1'
+      - name: Build Android staging APK
         run: |
           mkdir -p "$RUNNER_TEMP/android-build"
-          eas build \
+
+          npx --no-install eas build \
             --platform android \
             --profile staging \
             --local \
             --non-interactive \
             --output "$RUNNER_TEMP/android-build/staging.apk"
 
-      - name: Upload APK
+      - name: Upload staging APK
         uses: actions/upload-artifact@v4
         with:
           name: seraphany-android-staging
