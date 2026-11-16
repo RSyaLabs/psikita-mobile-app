@@ -22,6 +22,7 @@ import {
   useActiveConsultation,
   useRoomMessages,
   useTriageAssessment,
+  useConsultationAssessments,
 } from "@/hooks/useApiQueries";
 import { haptics, safeNavigateBack, formatMessageTime } from "@/utils";
 
@@ -38,6 +39,7 @@ export default function PractitionerChatScreen() {
   const consultation = useActiveConsultation(consultationId);
   const context = consultation.context;
   const messagesQuery = useRoomMessages(context?.roomId, context?.status);
+  const assessments = useConsultationAssessments(context?.consultationId, context?.status === "ACTIVE");
   // The consultation context carries no triage id, so nothing is fetched rather
   // than guessing one. The summary card falls back to honest copy.
   const { data: triage } = useTriageAssessment();
@@ -115,6 +117,44 @@ export default function PractitionerChatScreen() {
               </Text>
             </Card>
 
+            <VStack space="sm">
+              <HStack className="items-center justify-between">
+                <Heading size="sm" className="text-foreground">Asesmen konsultasi</Heading>
+                {context.status === "ACTIVE" ? (
+                  <Button
+                    size="sm"
+                    onPress={() => router.push({
+                      pathname: ROUTES.PRACTITIONER.SEND_ASSESSMENT,
+                      params: { consultationId: context.consultationId },
+                    } as never)}
+                    className="rounded-xl"
+                  >
+                    <ButtonText>Kirim Asesmen</ButtonText>
+                  </Button>
+                ) : null}
+              </HStack>
+              {assessments.isError ? (
+                <Text className="text-sm text-destructive">Daftar asesmen belum tersedia.</Text>
+              ) : null}
+              {assessments.data?.map(item => (
+                <Card key={item.id} className="rounded-xl bg-card border border-border p-4">
+                  <HStack className="items-center justify-between">
+                    <VStack space="xs" className="flex-1">
+                      <Text className="font-semibold text-foreground">{item.typeCode} · v{item.typeVersion}</Text>
+                      <Text size="xs" className="text-muted-foreground">
+                        {item.status === "COMPLETED" ? "Selesai" : "Menunggu jawaban pasien"}
+                      </Text>
+                    </VStack>
+                    {item.status === "COMPLETED" && item.totalScore !== null ? (
+                      <Text className="font-bold text-foreground">Skor {item.totalScore}</Text>
+                    ) : null}
+                  </HStack>
+                  {item.status === "COMPLETED" && item.hasRedFlags === true ? (
+                    <Text className="text-sm font-semibold text-destructive">Perlu peninjauan keselamatan klinis</Text>
+                  ) : null}
+                </Card>
+              ))}
+            </VStack>
             {messagesQuery.isLoading && (
               <Text size="sm" className="text-muted-foreground text-center">
                 Memuat riwayat…
