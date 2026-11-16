@@ -35,3 +35,20 @@ export function useAnswerConsultationAssessment() {
     },
   });
 }
+
+export function useCloseConsultationAssessment() {
+  const cache = useQueryClient();
+  return useMutation({
+    mutationFn: (input: {
+      consultationId: string;
+      assessmentId: string;
+      reason: string;
+      action: "cancel" | "decline";
+    }) => input.action === "cancel"
+      ? consultationAssessmentService.cancel(input.consultationId, input.assessmentId, input.reason)
+      : consultationAssessmentService.decline(input.consultationId, input.assessmentId, input.reason),
+    onSuccess: (_data, input) => {
+      void cache.invalidateQueries({ queryKey: queryKeys.consultations.assessments(input.consultationId) });
+    },
+  });
+}
