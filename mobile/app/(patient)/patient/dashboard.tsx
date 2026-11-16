@@ -369,6 +369,22 @@ export default function PatientDashboard() {
           </VStack>
         </Box>
 
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Buka asesmen mandiri"
+          onPress={() => router.push(ROUTES.PATIENT.MY_ASSESSMENTS as never)}
+          className="mx-5 mt-4 bg-card rounded-2xl border border-border p-4"
+        >
+          <HStack className="items-center gap-3">
+            <ClipboardCheck size={23} className="text-primary" />
+            <VStack className="flex-1" space="xs">
+              <Text className="font-semibold text-foreground">Asesmen Mandiri</Text>
+              <Text size="xs" className="text-muted-foreground">Mulai atau lanjutkan kuesioner</Text>
+            </VStack>
+            <ChevronRight size={18} className="text-primary" />
+          </HStack>
+        </Pressable>
+
         {/* Sections */}
         <VStack space="sm" className="px-5 mt-3">
           {/* Vibe Section */}
