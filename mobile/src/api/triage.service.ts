@@ -22,7 +22,7 @@ function parseRequest(value: SubmitTriageDto) {
   try {
     return triageRequestSchema.parse({
       questionnaireType: value.questionnaireType ?? "PHQ_9",
-      assessmentType: value.assessmentType,
+      assessmentType: value.assessmentType ?? "SELF_ASSESSMENT",
       answers: value.answers,
       ...(value.notes === undefined ? {} : { notes: value.notes }),
       ...(value.complaintContextTags === undefined ? {} : { complaintContextTags: value.complaintContextTags }),
@@ -82,7 +82,7 @@ export const triageService = {
 
   /** List the server-confirmed triage queue. */
   async getTriageQueue(signal?: AbortSignal): Promise<import("./response").PaginatedResult<TriageResponseDto>> {
-    return apiRequest<TriageResponseDto[]>("/triage/queue", {
+    return apiRequest<import("./response").PaginatedResult<TriageResponseDto>>("/triage/queue", {
       adapter: paginatedAdapter(triageAdapter()),
       signal,
     });
