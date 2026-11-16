@@ -252,7 +252,7 @@ export default function PractitionerProfileScreen() {
                     <HStack space="xs" className="items-center">
                       <ShieldCheck size={16} color="#FFFFFF" />
                       <Text size="sm" className="font-bold text-white">
-                        Mulai Verifikasi Native (Didit KYC)
+                        Verifikasi Identitas
                       </Text>
                     </HStack>
                   )}
