@@ -47,6 +47,9 @@ export default function PractitionerLayout() {
       <Stack.Screen name="practitioner/diagnosis" />
       <Stack.Screen name="practitioner/history" />
       <Stack.Screen name="practitioner/profile" />
+      <Stack.Screen name="practitioner/settings" />
+      <Stack.Screen name="practitioner/schedule" />
+      <Stack.Screen name="practitioner/help" />
     </Stack>
   );
 }
