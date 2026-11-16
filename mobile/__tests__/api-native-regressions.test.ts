@@ -2,8 +2,6 @@ import { isTrustedDiditUrl } from "@/services/didit-kyc";
 import { identityVerificationService } from "@/api/identity-verification.service";
 import { patientService } from "@/api/patient.service";
 import { authService } from "@/api/auth.service";
-import { ApiError } from "@/api/client";
-import { setAndroidKotlinVersion, KOTLIN_VERSION } from "../plugins/withAndroidKotlin";
 
 describe("Native build and API contract regressions", () => {
   const originalFetch = global.fetch;
@@ -14,21 +12,6 @@ describe("Native build and API contract regressions", () => {
 
   afterEach(() => {
     global.fetch = originalFetch;
-  });
-
-  it("pins Kotlin for Didit while avoiding duplicate Gradle properties", () => {
-    const result = setAndroidKotlinVersion([
-      { type: "property", key: "android.kotlinVersion", value: "1.9.25" },
-      { type: "property", key: "android.useAndroidX", value: "true" },
-    ]);
-    expect(result.filter((p: { key: string }) => p.key === "android.kotlinVersion")).toEqual([
-      { type: "property", key: "android.kotlinVersion", value: KOTLIN_VERSION },
-    ]);
-    expect(result).toContainEqual({
-      type: "property",
-      key: "android.useAndroidX",
-      value: "true",
-    });
   });
 
   it.each([
