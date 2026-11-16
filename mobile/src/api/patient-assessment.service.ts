@@ -20,6 +20,7 @@ const assessmentSchema = z.object({
   typeVersion: z.number().int().positive(),
   status: z.enum(["DRAFT", "COMPLETED", "CANCELLED"]),
   result: resultSchema.nullable(),
+  draftAnswers: z.record(z.string(), z.number()).default({}),
   createdAt: z.string(),
   completedAt: z.string().nullable(),
 });
@@ -35,6 +36,10 @@ export const patientAssessmentService = {
   start: (typeCode: string, version: number) =>
     apiRequest<PatientAssessmentDto>(base, {
       method: "POST", body: JSON.stringify({ typeCode, version }), adapter: zodAdapter(assessmentSchema),
+    }),
+  saveDraft: (id: string, answers: Record<string, number>) =>
+    apiRequest<PatientAssessmentDto>(`${path(id)}/draft`, {
+      method: "POST", body: JSON.stringify({ answers }), adapter: zodAdapter(assessmentSchema),
     }),
   submit: (id: string, answers: Record<string, number>) =>
     apiRequest<PatientAssessmentDto>(`${path(id)}/answers`, {
