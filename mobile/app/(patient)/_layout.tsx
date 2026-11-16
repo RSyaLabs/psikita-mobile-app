@@ -26,7 +26,7 @@ export default function PatientLayout() {
     data: patientProfile,
     isError: isProfileError,
     error: profileError,
-  } = usePatientProfile();
+  } = usePatientProfile(!isPublicGuestRoute);
 
   const isProfileNotFound =
     isProfileError &&
