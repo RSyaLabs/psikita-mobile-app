@@ -2,6 +2,7 @@ export const ROUTES = {
   INDEX: "/",
   AUTH: {
     LOGIN: "/login",
+    SIGN_IN: "/sign-in",
     FORGOT_PASSWORD: "/forgot-password",
     REGISTER: "/register",
   },
