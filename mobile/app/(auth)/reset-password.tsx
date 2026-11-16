@@ -7,8 +7,9 @@ import { useResetPassword } from "@/hooks/queries/auth";
 import { ROUTES } from "@/constants/routes";
 
 /**
- * Only the link issued by the backend may enter this screen.
- * Do not log, persist, or display the single-use token.
+ * The backend issues a single-use reset token; this route only accepts it as
+ * an opaque parameter and sends it to the reset endpoint.
+ * Do not log, persist, or display the token.
  */
 export default function ResetPasswordScreen() {
   const router = useRouter();
