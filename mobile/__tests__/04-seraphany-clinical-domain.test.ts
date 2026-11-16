@@ -119,6 +119,7 @@ describe("04. SeraPhany Clinical Domain & Capability Engine Suite", () => {
       patientId: "pat_001",
       assessedBy: "usr_001",
       assessmentType: "SELF_ASSESSMENT",
+      questionnaireType: "PHQ_9",
       score: 14,
       hasRedFlags: false,
       level: "YELLOW",
