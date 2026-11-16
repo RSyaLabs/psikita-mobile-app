@@ -13,6 +13,7 @@ import {
 } from "@/hooks/useApiQueries";
 import { launchDiditVerification } from "@/services/didit-kyc";
 import { haptics } from "@/utils/haptics";
+import { safeNavigateBack } from "@/utils/navigation";
 import type { PsychometricInstrumentDto } from "@/api/psychometrics.service";
 
 const TRIAGE_CODE = "PHQ9";
@@ -37,7 +38,6 @@ export default function TriageScreen() {
 
   const instruments = usePsychometricInstruments("TRIAGE", !isGuest);
   const available = instruments.data ?? [];
-  const selected = available.find((item) => item.code === selectedCode && item.version === selectedVersion);
   const formQuery = usePsychometricForm(stage === "questions" ? selectedCode : "", selectedVersion);
   const submit = useSubmitTriage();
   const { data: identity, refetch: refreshIdentity, isLoading: identityLoading } = useMyVerificationStatus(!isGuest);
@@ -60,7 +60,7 @@ export default function TriageScreen() {
       if (questionIndex > 0) setQuestionIndex(index => index - 1);
       else setStage("selection");
     } else {
-      router.back();
+      safeNavigateBack(router, ROUTES.PATIENT.DASHBOARD);
     }
   };
 
