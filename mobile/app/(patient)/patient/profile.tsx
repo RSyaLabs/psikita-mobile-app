@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { useRouter } from "expo-router";
 import { Image as RNImage, Alert, ActivityIndicator, Linking } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -32,11 +32,6 @@ import {
   AvatarFallbackText,
   ScrollView,
 } from "@/components/ui";
-import {
-  PatientFaqModal,
-  PatientSupportModal,
-  PatientPrivacyModal,
-} from "@/components/modals";
 import { AppIcon } from "@/components/common/AppIcon";
 import { PatientTabBar } from "@/components/navigation/PatientTabBar";
 import {
@@ -92,9 +87,6 @@ export default function ProfileScreen() {
     }
   };
 
-  const [showHelpModal, setShowHelpModal] = useState(false);
-  const [showCsModal, setShowCsModal] = useState(false);
-  const [showPrivacyModal, setShowPrivacyModal] = useState(false);
 
   const patientName = patient?.fullName || "Pasien";
   const rmNumber = patient?.medicalRecordNumber || "Belum tersedia";
@@ -168,10 +160,10 @@ export default function ProfileScreen() {
             </Box>
             <VStack space="xs" className="flex-1">
               <Text size="sm" bold className="text-foreground">
-                Ringkasan perawatan belum tersedia
+                Perawatan
               </Text>
               <Text size="sm" className="text-muted-foreground font-medium leading-relaxed">
-                Resep dan rujukan hanya ditampilkan setelah dimuat dari server.
+                Belum ada ringkasan.
               </Text>
             </VStack>
           </HStack>
@@ -206,8 +198,8 @@ export default function ProfileScreen() {
                 </HStack>
                 <Text size="sm" className="text-muted-foreground font-medium leading-relaxed">
                   {isKycVerified
-                    ? "Identitas terhubung dengan validasi KTP & Satu Sehat."
-                    : "Verifikasi KTP native via Didit KYC untuk akses layanan klinis (Triase & Matching)."}
+                    ? "Identitas terverifikasi."
+                    : "Verifikasi identitas untuk layanan konsultasi."}
                 </Text>
               </VStack>
             </HStack>
@@ -226,7 +218,7 @@ export default function ProfileScreen() {
                   <HStack space="xs" className="items-center">
                     <AppIcon icon={ShieldCheck} size={16} color="#FFFFFF" />
                     <Text size="sm" className="font-bold text-white">
-                      Verifikasi Identitas (Didit Native SDK)
+                      Verifikasi Sekarang
                     </Text>
                   </HStack>
                 )}
@@ -308,7 +300,7 @@ export default function ProfileScreen() {
                     Daftar Sebagai Mitra Praktisi
                   </Text>
                   <Text size="sm" className="text-muted-foreground">
-                    Bergabung sebagai Psikolog Klinis atau Psikiater
+                    Pendaftaran praktisi
                   </Text>
                 </VStack>
               </HStack>
@@ -329,7 +321,7 @@ export default function ProfileScreen() {
             <Pressable
               onPress={() => {
                 haptics.light();
-                setShowHelpModal(true);
+                router.push(ROUTES.PATIENT.HELP);
               }}
               className="py-3 flex-row items-center justify-between active:opacity-80"
             >
@@ -345,7 +337,7 @@ export default function ProfileScreen() {
             <Pressable
               onPress={() => {
                 haptics.light();
-                setShowCsModal(true);
+                router.push(ROUTES.PATIENT.SUPPORT);
               }}
               className="py-3 flex-row items-center justify-between border-t border-border active:opacity-80"
             >
@@ -361,7 +353,7 @@ export default function ProfileScreen() {
             <Pressable
               onPress={() => {
                 haptics.light();
-                setShowPrivacyModal(true);
+                router.push(ROUTES.PATIENT.PRIVACY);
               }}
               className="py-3 flex-row items-center justify-between border-t border-border active:opacity-80"
             >
@@ -374,6 +366,21 @@ export default function ProfileScreen() {
               <AppIcon icon={ChevronRight} size={18} tone="muted" />
             </Pressable>
           </VStack>
+        </Card>
+
+        <Card className="bg-card rounded-2xl p-4 border border-border mb-4">
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Buka ulang tutorial aplikasi"
+            onPress={() => router.push(ROUTES.TUTORIAL as never)}
+            className="py-2 flex-row items-center justify-between"
+          >
+            <HStack space="md" className="items-center">
+              <AppIcon icon={HelpCircle} size={20} tone="primary" />
+              <Text size="sm" className="font-semibold text-foreground">Lihat panduan aplikasi</Text>
+            </HStack>
+            <AppIcon icon={ChevronRight} size={18} tone="muted" />
+          </Pressable>
         </Card>
 
         {/* Logout */}
@@ -393,21 +400,6 @@ export default function ProfileScreen() {
       {/* Persistent Bottom Tab Bar */}
       <PatientTabBar activeTab="akun" />
 
-      {/* Modals */}
-      <PatientFaqModal
-        isOpen={showHelpModal}
-        onClose={() => setShowHelpModal(false)}
-      />
-
-      <PatientSupportModal
-        isOpen={showCsModal}
-        onClose={() => setShowCsModal(false)}
-      />
-
-      <PatientPrivacyModal
-        isOpen={showPrivacyModal}
-        onClose={() => setShowPrivacyModal(false)}
-      />
     </SafeAreaView>
   );
 }

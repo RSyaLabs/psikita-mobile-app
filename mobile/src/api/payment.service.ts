@@ -24,20 +24,20 @@ export const paymentMethodMoneySchema = z.object({
 
 export const paymentMethodItemSchema = z.object({
   key: z.string().min(1),
-  name: z.string().min(1),
-  methodType: z.string().min(1),
-  channelCode: z.string().min(1),
+  label: z.string().min(1),
+  iconUrl: z.string().nullable(),
   available: z.boolean(),
   providerVerified: z.boolean(),
   fee: paymentMethodMoneySchema,
-  feeBearer: z.enum(["PATIENT", "MERCHANT"]),
+  feeLabel: z.string(),
+  feeBearer: z.enum(["PATIENT", "INCLUDED"]),
   totalPayable: paymentMethodMoneySchema,
-  disabledReason: z.string().nullable().optional(),
+  disabledReason: z.string().nullable(),
 });
 
 export const paymentMethodGroupSchema = z.object({
-  groupName: z.string().min(1),
-  methodType: z.string().min(1),
+  label: z.string().min(1),
+  methodType: z.enum(["VIRTUAL_ACCOUNT", "QRIS", "E_WALLET"]),
   methods: z.array(paymentMethodItemSchema),
 });
 
@@ -49,6 +49,40 @@ export const paymentMethodsSchema = z.object({
   estimate: z.boolean(),
   groups: z.array(paymentMethodGroupSchema),
 });
+
+/** The Core API catalog publishes canonical keys, not provider method codes. */
+function channelCodeFromCanonicalKey(
+  key: string,
+  methodType: "VIRTUAL_ACCOUNT" | "QRIS" | "E_WALLET",
+): string {
+  if (methodType === "VIRTUAL_ACCOUNT" && key.startsWith("VA_")) {
+    return key.slice(3);
+  }
+  if (methodType === "QRIS" && key.startsWith("QRIS_")) {
+    return key;
+  }
+  if (methodType === "E_WALLET" && key.startsWith("EWALLET_")) {
+    return key.slice("EWALLET_".length);
+  }
+  throw new Error("Unexpected canonical payment channel");
+}
+
+function adaptPaymentMethods(value: unknown): PaymentMethodsDto {
+  const catalog = paymentMethodsSchema.parse(value);
+  return {
+    ...catalog,
+    groups: catalog.groups.map((group) => ({
+      groupName: group.label,
+      methodType: group.methodType,
+      methods: group.methods.map((item) => ({
+        ...item,
+        name: item.label,
+        methodType: group.methodType,
+        channelCode: channelCodeFromCanonicalKey(item.key, group.methodType),
+      })),
+    })),
+  };
+}
 
 export const billingOrderResponseSchema = z.object({
   id: z.string().min(1),
@@ -62,12 +96,32 @@ export const billingOrderResponseSchema = z.object({
   totalAmount: z.number(),
   currency: z.literal("IDR"),
   paymentStatus: z.string(),
+  gatewayChannel: z.string().nullable().optional(),
   claimStatus: z.string().optional(),
-  paymentId: z.string().optional(),
-  expiresAt: z.string().optional(),
+  paymentId: z.string().nullable().optional(),
+  expiresAt: z.string().nullable().optional(),
   createdAt: z.string(),
   updatedAt: z.string(),
 });
+
+export const billingOrderPreviewSchema = z.object({
+  consultationId: z.string().min(1),
+  orderType: z.string(),
+  durationMinutes: z.number(),
+  payerType: z.enum(["SELF_PAY", "BPJS"]),
+  currency: z.literal("IDR"),
+  baseAmount: z.number().nonnegative(),
+  discountAmount: z.number().nonnegative(),
+  netAmount: z.number().nonnegative(),
+  estimate: z.boolean(),
+  estimateExpiresAt: z.string(),
+  gatewayChannel: z.string().optional(),
+  estimatedGatewayFee: z.number().optional(),
+  estimatedTotalPayable: z.number().optional(),
+});
+
+export type BillingOrderPreviewDto = z.infer<typeof billingOrderPreviewSchema>;
+const validatedBillingOrders = new WeakSet<object>();
 
 const serverPaymentContextSchema = z
   .object({
@@ -160,6 +214,7 @@ const paymentInstructionSchema = z.discriminatedUnion("methodType", [
   z.object({
     methodType: z.literal("QRIS"),
     qrUrl: z.string().optional(),
+    qrString: z.string().optional(),
   }),
 ]);
 
@@ -181,7 +236,7 @@ const paymentSchema = z
     contextId: z.string().trim().min(1),
     instruction: paymentInstructionSchema.nullable().optional(),
   })
-  .strict();
+  .strip();
 
 const billingOrderSchema = z
   .object({
@@ -258,6 +313,8 @@ export type BillingOrderIntent = Omit<
   "idempotencyKey"
 > & {
   idempotencyKey?: string;
+  /** Only for idempotency fingerprinting after an expired/failed server order. */
+  retryAfterOrderId?: string;
 };
 
 export function createBillingOrderIdempotencyKey(
@@ -273,6 +330,8 @@ export function createBillingOrderIdempotencyKey(
     intent.practitionerType ?? "",
     stableSerialize(intent.level),
     intent.discountCode ?? "",
+    intent.gatewayChannel ?? "",
+    intent.retryAfterOrderId ?? "",
   ];
 
   return `billing-order:${parts.map((part) => encodeURIComponent(part ?? "")).join("|")}`;
@@ -343,6 +402,12 @@ const paymentAdapter = (
         : undefined,
     qrCodeUrl:
       instruction && "qrUrl" in instruction ? instruction.qrUrl : undefined,
+    qrString:
+      instruction && "qrString" in instruction ? instruction.qrString : undefined,
+    bankCode:
+      instruction && "bankCode" in instruction ? instruction.bankCode : undefined,
+    accountNumber:
+      instruction && "accountNumber" in instruction ? instruction.accountNumber : undefined,
   };
 };
 
@@ -427,7 +492,69 @@ export const paymentService = {
     const endpoint = `/payments/methods?amount=${encodeURIComponent(intAmount)}&currency=${encodeURIComponent(currency)}`;
     return apiRequest<PaymentMethodsDto>(endpoint, {
       method: "GET",
-      adapter: zodAdapter(paymentMethodsSchema),
+      adapter: adaptPaymentMethods,
+    });
+  },
+
+  /** Quote is read-only; it does not reserve a billing order. */
+  async previewBillingOrder(
+    consultationId: string,
+    gatewayChannel?: string,
+  ): Promise<BillingOrderPreviewDto> {
+    const id = requireContextValue(consultationId, "consultationId");
+    return apiRequest<BillingOrderPreviewDto>(
+      `/consultations/${encodeURIComponent(id)}/billing-orders/preview`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          orderType: "INITIAL",
+          durationMinutes: 60,
+          payerType: "SELF_PAY",
+          ...(gatewayChannel ? { gatewayChannel } : {}),
+        }),
+        adapter: zodAdapter(billingOrderPreviewSchema),
+      },
+    );
+  },
+
+  /** Restore an initial order from the authenticated patient's consultation. */
+  async getCurrentBillingOrder(
+    consultationId: string,
+  ): Promise<BillingOrderResponseDto | null> {
+    const id = requireContextValue(consultationId, "consultationId");
+    return apiRequest<BillingOrderResponseDto | null>(
+      `/consultations/${encodeURIComponent(id)}/billing-orders/current`,
+      {
+        method: "GET",
+        adapter: (value) => {
+          if (value == null) return null;
+          const order = billingOrderResponseSchema.parse(value);
+          if (order.consultationId !== id || order.orderType !== "INITIAL") {
+            throw new Error("Billing order does not belong to this consultation");
+          }
+          validatedBillingOrders.add(order);
+          return order;
+        },
+      },
+    );
+  },
+
+  /** Status is authoritative; only server responses can unlock consultation. */
+  async getPayment(paymentId: string, expectedBillingOrderId: string): Promise<PaymentResponseDto> {
+    const id = requireContextValue(paymentId, "paymentId");
+    const contextId = requireContextValue(expectedBillingOrderId, "billingOrderId");
+    return apiRequest<PaymentResponseDto>(`/payments/${encodeURIComponent(id)}`, {
+      method: "GET",
+      adapter: (value) => parsePaymentResponse(value, contextId),
+    });
+  },
+
+  serverPaymentContextFromBillingOrder(order: BillingOrderResponseDto | null | undefined) {
+    if (!order || !validatedBillingOrders.has(order)) return undefined;
+    if (order.payerType !== "SELF_PAY" || order.orderType !== "INITIAL") return undefined;
+    return mintServerPaymentContext({
+      consultationId: order.consultationId,
+      billingOrderId: order.id,
     });
   },
 
@@ -454,11 +581,11 @@ export const paymentService = {
       },
     );
 
-    mintServerPaymentContext({
-      consultationId: response.consultationId,
-      billingOrderId: response.id,
-    });
-
+    // Revalidate consultation provenance before minting payment context.
+    if (response.consultationId !== normalizedConsultationId) {
+      throw new Error("Billing order consultation does not match the request");
+    }
+    validatedBillingOrders.add(response);
     return response;
   },
 

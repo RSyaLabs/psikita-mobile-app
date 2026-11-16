@@ -143,6 +143,8 @@ const practitionerAdapter = (value: unknown): PractitionerResponseDto => {
 };
 
 const practitionerListAdapter = paginatedAdapter(practitionerAdapter);
+const competencyAdapter = (value: unknown): Record<string, unknown> =>
+  z.record(z.string(), z.unknown()).parse(value);
 
 export const practitionerService = {
   /**
@@ -263,6 +265,7 @@ export const practitionerService = {
       `/practitioners/${encodeURIComponent(id)}/competency-profile`,
       {
         signal,
+        adapter: competencyAdapter,
       },
     );
   },
@@ -280,6 +283,7 @@ export const practitionerService = {
       {
         method: "PUT",
         body: JSON.stringify(dto),
+        adapter: competencyAdapter,
       },
     );
   },

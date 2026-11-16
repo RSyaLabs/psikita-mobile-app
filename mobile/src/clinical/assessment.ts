@@ -1,13 +1,14 @@
 import { z } from "zod";
 
 export const ASSESSMENT_UNAVAILABLE_MESSAGE =
-  "Asesmen tidak tersedia. Hasil hanya dapat ditampilkan setelah server mengonfirmasi data assessment.";
+  "Hasil skrining belum tersedia. Silakan coba lagi.";
 
 export const assessmentResultSchema = z.object({
   id: z.string().trim().min(1),
   patientId: z.string().trim().min(1),
   assessedBy: z.string().trim().min(1),
   assessmentType: z.enum(["SELF_ASSESSMENT", "PRACTITIONER_ASSESSMENT"]),
+  questionnaireType: z.literal("PHQ_9"),
   score: z.number().finite(),
   hasRedFlags: z.boolean(),
   level: z.enum(["GREEN", "YELLOW", "RED"]),

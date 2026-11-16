@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
@@ -15,7 +15,6 @@ import {
   BadgeText,
   Box,
   Button,
-  ButtonSpinner,
   ButtonText,
   Card,
   HStack,
@@ -28,8 +27,8 @@ import {
 import { ROUTES } from "@/constants/routes";
 import {
   useActiveConsultation,
-  useFinishConsultation,
   useRoomMessages,
+  useConsultationAssessments,
 } from "@/hooks/useApiQueries";
 import { haptics, safeNavigateBack, formatMessageTime } from "@/utils";
 
@@ -48,11 +47,7 @@ export default function ChatRoomScreen() {
   const consultation = useActiveConsultation(consultationId);
   const context = consultation.context;
   const messagesQuery = useRoomMessages(context?.roomId, context?.status);
-  const finishMutation = useFinishConsultation();
-  const [showFinishDialog, setShowFinishDialog] = useState(false);
-  // Latch for the finish action, so a double tap cannot post twice.
-  const finishInFlightRef = useRef(false);
-  const [isFinishing, setIsFinishing] = useState(false);
+  const assessments = useConsultationAssessments(context?.consultationId, context?.status === "ACTIVE");
 
   const handleBack = () => {
     haptics.light();
@@ -62,31 +57,6 @@ export default function ChatRoomScreen() {
     );
   };
 
-  const handleFinish = () => {
-    if (!context) {
-      haptics.error();
-      return;
-    }
-    // Latch the submit so a second tap cannot fire a second request. The other
-    // guarded writes in this app use the same shape (see payment-regular.tsx).
-    if (finishInFlightRef.current) return;
-    finishInFlightRef.current = true;
-    setIsFinishing(true);
-    finishMutation.mutate(context, {
-      onSuccess: () => {
-        setShowFinishDialog(false);
-        router.push({
-          pathname: ROUTES.PATIENT.RATING,
-          params: { consultationId: context.consultationId },
-        } as never);
-      },
-      onSettled: () => {
-        finishInFlightRef.current = false;
-        setIsFinishing(false);
-      },
-      onError: () => haptics.error(),
-    });
-  };
 
   return (
     <SafeAreaView className="flex-1 bg-background">
@@ -165,6 +135,38 @@ export default function ChatRoomScreen() {
                 Riwayat terenkripsi • mode hanya baca
               </Text>
             </HStack>
+            {assessments.data && assessments.data.length > 0 ? (
+              <VStack space="sm">
+                <Heading size="sm" className="text-foreground">Asesmen dari Praktisi</Heading>
+                {assessments.data.map(item => (
+                  <Card key={item.id} className="bg-card border border-border rounded-xl p-4">
+                    <HStack className="items-center justify-between">
+                      <VStack space="xs" className="flex-1">
+                        <Text className="text-foreground font-semibold">{item.typeCode}</Text>
+                        <Text size="xs" className="text-muted-foreground">
+                          {item.status === "COMPLETED" ? "Sudah dijawab" : item.status === "DECLINED" ? "Ditolak pasien" : item.status === "CANCELLED" ? "Dibatalkan praktisi" : "Menunggu jawaban"}
+                        </Text>
+                      </VStack>
+                      {item.status === "ASSIGNED" && context.status === "ACTIVE" ? (
+                        <Button
+                          size="sm"
+                          className="rounded-xl"
+                          onPress={() => router.push({
+                            pathname: ROUTES.PATIENT.CONSULTATION_ASSESSMENT,
+                            params: { consultationId: context.consultationId, assessmentId: item.id },
+                          } as never)}
+                        >
+                          <ButtonText>Jawab</ButtonText>
+                        </Button>
+                      ) : null}
+                    </HStack>
+                  </Card>
+                ))}
+              </VStack>
+            ) : null}
+            {assessments.isError ? (
+              <Text className="text-sm text-muted-foreground">Asesmen belum dapat dimuat.</Text>
+            ) : null}
             {messagesQuery.isLoading && (
               <Text size="sm" className="text-muted-foreground text-center">
                 Memuat riwayat…
@@ -245,52 +247,16 @@ export default function ChatRoomScreen() {
 
       {context &&
         (context.status === "WAITING" || context.status === "ACTIVE") && (
-          <Box className="p-4 border-t border-border bg-card">
-            <Button
-              size="lg"
-              isDisabled={finishMutation.isPending}
-              onPress={() => setShowFinishDialog(true)}
-              className="w-full rounded-xl"
-            >
-              {finishMutation.isPending ? (
-                <ButtonSpinner />
-              ) : (
-                <ButtonText>Akhiri sesi</ButtonText>
-              )}
+          <Box className="p-4 border-t border-border bg-card gap-2">
+            <Text size="xs" className="text-muted-foreground text-center">
+              Sesi hanya dapat diakhiri oleh praktisi yang ditugaskan.
+              Keluar dari layar tidak mengakhiri konsultasi atau menutup riwayat klinis.
+            </Text>
+            <Button variant="outline" onPress={() => router.replace(ROUTES.PATIENT.DASHBOARD as never)}>
+              <ButtonText>Kembali ke beranda</ButtonText>
             </Button>
           </Box>
         )}
-
-      {showFinishDialog && context && (
-        <Box className="absolute inset-0 bg-black/40 items-center justify-center p-5">
-          <Card className="bg-card rounded-3xl p-5 border border-border w-full">
-            <Heading size="md" bold className="text-foreground">
-              Akhiri sesi?
-            </Heading>
-            <Text size="sm" className="text-muted-foreground mt-2">
-              Sesi hanya ditandai selesai setelah server mengonfirmasi respons.
-            </Text>
-            <HStack space="sm" className="mt-4">
-              <Button
-                variant="outline"
-                onPress={() => setShowFinishDialog(false)}
-                className="flex-1 rounded-xl"
-              >
-                <ButtonText>Batal</ButtonText>
-              </Button>
-              <Button
-                onPress={handleFinish}
-                isDisabled={isFinishing}
-                className="flex-1 rounded-xl"
-              >
-                <ButtonText>
-                  {isFinishing ? "Menyelesaikan..." : "Konfirmasi"}
-                </ButtonText>
-              </Button>
-            </HStack>
-          </Card>
-        </Box>
-      )}
 
       {!context && (
         <Box className="p-4 border-t border-border bg-card">

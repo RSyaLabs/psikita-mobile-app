@@ -92,6 +92,7 @@ export default function RootLayout() {
                       name="index"
                       options={{ title: "SeraPhany" }}
                     />
+                    <Stack.Screen name="tutorial" />
                     <Stack.Screen name="(auth)" />
                     <Stack.Screen name="(patient)" />
                     <Stack.Screen name="(practitioner)" />

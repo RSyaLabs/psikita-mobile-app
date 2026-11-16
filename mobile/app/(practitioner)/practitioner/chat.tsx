@@ -22,6 +22,8 @@ import {
   useActiveConsultation,
   useRoomMessages,
   useTriageAssessment,
+  useConsultationAssessments,
+  useConsultationPatientAssessments,
 } from "@/hooks/useApiQueries";
 import { haptics, safeNavigateBack, formatMessageTime } from "@/utils";
 
@@ -38,6 +40,8 @@ export default function PractitionerChatScreen() {
   const consultation = useActiveConsultation(consultationId);
   const context = consultation.context;
   const messagesQuery = useRoomMessages(context?.roomId, context?.status);
+  const assessments = useConsultationAssessments(context?.consultationId, context?.status === "ACTIVE");
+  const patientEvidence = useConsultationPatientAssessments(context?.consultationId);
   // The consultation context carries no triage id, so nothing is fetched rather
   // than guessing one. The summary card falls back to honest copy.
   const { data: triage } = useTriageAssessment();
@@ -115,6 +119,78 @@ export default function PractitionerChatScreen() {
               </Text>
             </Card>
 
+            <VStack space="sm">
+              <HStack className="items-center justify-between">
+                <Heading size="sm" className="text-foreground">Asesmen konsultasi</Heading>
+                {context.status === "ACTIVE" ? (
+                  <Button
+                    size="sm"
+                    onPress={() => router.push({
+                      pathname: ROUTES.PRACTITIONER.SEND_ASSESSMENT,
+                      params: { consultationId: context.consultationId },
+                    } as never)}
+                    className="rounded-xl"
+                  >
+                    <ButtonText>Kirim Asesmen</ButtonText>
+                  </Button>
+                ) : null}
+              </HStack>
+              {assessments.isError ? (
+                <Text className="text-sm text-destructive">Daftar asesmen belum tersedia.</Text>
+              ) : null}
+              {assessments.data?.map(item => (
+                <Card key={item.id} className="rounded-xl bg-card border border-border p-4">
+                  <HStack className="items-center justify-between">
+                    <VStack space="xs" className="flex-1">
+                      <Text className="font-semibold text-foreground">{item.typeCode} · v{item.typeVersion}</Text>
+                      <Text size="xs" className="text-muted-foreground">
+                        {item.status === "COMPLETED" ? "Selesai" : item.status === "DECLINED" ? "Ditolak pasien" : item.status === "CANCELLED" ? "Dibatalkan" : "Menunggu jawaban pasien"}
+                      </Text>
+                    </VStack>
+                    {item.status === "COMPLETED" && item.totalScore !== null ? (
+                      <Text className="font-bold text-foreground">Skor {item.totalScore}</Text>
+                    ) : null}
+                  </HStack>
+                  {item.status === "COMPLETED" && item.hasRedFlags === true ? (
+                    <Text className="text-sm font-semibold text-destructive">Perlu peninjauan keselamatan klinis</Text>
+                  ) : null}
+                </Card>
+              ))}
+            </VStack>
+            <VStack space="sm">
+              <Heading size="sm" className="text-foreground">Riwayat asesmen mandiri pasien</Heading>
+              <Text size="xs" className="text-muted-foreground">
+                Data pendukung untuk penilaian klinis; tidak menentukan Triage atau diagnosis secara otomatis.
+              </Text>
+              {patientEvidence.isError ? (
+                <Text size="xs" className="text-muted-foreground">
+                  Riwayat asesmen tidak tersedia untuk konsultasi ini.
+                </Text>
+              ) : null}
+              {patientEvidence.data?.map(item => (
+                <Card key={item.id} className="rounded-xl bg-card border border-border p-3">
+                  <HStack className="items-center justify-between">
+                    <VStack space="xs" className="flex-1">
+                      <Text className="font-semibold text-foreground">{item.typeCode} · v{item.typeVersion}</Text>
+                      <Text size="xs" className="text-muted-foreground">
+                        {item.completedAt ? new Date(item.completedAt).toLocaleDateString("id-ID") : "Tanggal belum tersedia"}
+                      </Text>
+                    </VStack>
+                    <Text className="text-foreground font-semibold">
+                      {item.totalScore === null ? "Tanpa skor total" : `Skor ${item.totalScore}`}
+                    </Text>
+                  </HStack>
+                  {item.hasRedFlags ? (
+                    <Text className="text-destructive text-sm font-semibold mt-2">
+                      Indikator risiko perlu ditinjau oleh praktisi sesuai protokol keselamatan.
+                    </Text>
+                  ) : null}
+                </Card>
+              ))}
+              {!patientEvidence.isLoading && !patientEvidence.isError && patientEvidence.data?.length === 0 ? (
+                <Text size="xs" className="text-muted-foreground">Belum ada asesmen mandiri yang selesai.</Text>
+              ) : null}
+            </VStack>
             {messagesQuery.isLoading && (
               <Text size="sm" className="text-muted-foreground text-center">
                 Memuat riwayat…

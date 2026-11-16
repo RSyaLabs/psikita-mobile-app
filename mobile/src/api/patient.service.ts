@@ -67,6 +67,23 @@ export interface PatientConsultationResultDto {
   prescriptionExpiresAt?: string | null;
 }
 
+const consultationResultSchema = z.object({
+  consultationId: z.string(),
+  sessionDate: z.string(),
+  practitionerName: z.string(),
+  patientFacingAdvice: z.string(),
+  referral: z.record(z.string(), z.unknown()).nullable().optional(),
+  referrals: z.array(z.record(z.string(), z.unknown())).optional(),
+  prescriptionCode: z.string().nullable().optional(),
+  prescriptionStatus: z.enum(["ACTIVE", "CLAIMED", "USED", "EXPIRED", "REVOKED"]).nullable().optional(),
+  prescriptionExpiresAt: z.string().nullable().optional(),
+});
+const consultationResultsAdapter = (value: unknown): PatientConsultationResultDto[] => {
+  if (Array.isArray(value)) return z.array(consultationResultSchema).parse(value);
+  return z.array(consultationResultSchema).parse(z.object({ data: z.array(consultationResultSchema) }).parse(value).data);
+};
+const consultationResultAdapter = (value: unknown): PatientConsultationResultDto => consultationResultSchema.parse(value);
+
 export const patientService = {
   /**
    * Profil Pasien saat ini (me)
@@ -128,12 +145,10 @@ export const patientService = {
   async getMyResults(
     signal?: AbortSignal,
   ): Promise<PatientConsultationResultDto[]> {
-    const res = await apiRequest<unknown>("/patient/me/results", { signal });
-    if (Array.isArray(res)) return res as PatientConsultationResultDto[];
-    if (res && Array.isArray((res as any).data)) {
-      return (res as any).data as PatientConsultationResultDto[];
-    }
-    return [];
+    return apiRequest<PatientConsultationResultDto[]>("/patient/me/results", {
+      signal,
+      adapter: consultationResultsAdapter,
+    });
   },
 
   /**
@@ -146,7 +161,7 @@ export const patientService = {
     const id = requireServerId(consultationId, "consultationId");
     return apiRequest<PatientConsultationResultDto>(
       `/patient/me/results/${encodeURIComponent(id)}`,
-      { signal },
+      { signal, adapter: consultationResultAdapter },
     );
   },
 };

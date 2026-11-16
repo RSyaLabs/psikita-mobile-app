@@ -47,46 +47,8 @@ export function PaymentMethodSelector({
 }: PaymentMethodSelectorProps) {
   const currentKey = selectedKey || selectedMethod;
 
-  // Fallback default mock/static groups if server catalog is loading or empty
-  const activeGroups: PaymentMethodGroupDto[] =
-    groups && groups.length > 0
-      ? groups
-      : [
-          {
-            groupName: "E-Wallet",
-            methodType: "E_WALLET",
-            methods: [
-              {
-                key: "gopay",
-                name: "GoPay / E-Wallet",
-                methodType: "E_WALLET",
-                channelCode: "GOPAY",
-                available: true,
-                providerVerified: true,
-                fee: { amount: 0, currency: "IDR" },
-                feeBearer: "PATIENT",
-                totalPayable: { amount: 50000, currency: "IDR" },
-              },
-            ],
-          },
-          {
-            groupName: "QRIS",
-            methodType: "QRIS",
-            methods: [
-              {
-                key: "qris",
-                name: "QRIS (Semua Pembayaran)",
-                methodType: "QRIS",
-                channelCode: "QRIS",
-                available: true,
-                providerVerified: true,
-                fee: { amount: 0, currency: "IDR" },
-                feeBearer: "PATIENT",
-                totalPayable: { amount: 50000, currency: "IDR" },
-              },
-            ],
-          },
-        ];
+  // Never invent a payment method, provider verification or payable amount.
+  const activeGroups: PaymentMethodGroupDto[] = groups ?? [];
 
   return (
     <VStack space="sm">
@@ -107,6 +69,8 @@ export function PaymentMethodSelector({
             Memuat katalog metode pembayaran resmi...
           </Text>
         </Box>
+      ) : activeGroups.length === 0 ? (
+        <Text size="sm" className="text-muted-foreground">Metode pembayaran belum tersedia. Coba lagi nanti.</Text>
       ) : (
         activeGroups.map((group) => (
           <VStack key={group.groupName} space="xs" className="mb-2">

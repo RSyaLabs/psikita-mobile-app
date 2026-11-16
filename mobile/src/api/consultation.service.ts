@@ -2,7 +2,6 @@ import { z } from "zod";
 import { CONSULTATION_STATUSES } from "@/constants/enums";
 import { ApiError, apiRequest } from "./client";
 import {
-  noContentAdapter,
   paginatedAdapter,
   requireServerId,
   withQueryParams,
@@ -51,6 +50,9 @@ const consultationSchema = z.object({
   patientAvatar: z.string().optional(),
   icdCode: z.string().optional(),
   note: z.string().optional(),
+  resultStatus: z.enum(["PENDING_RESULT", "RESULT_SUBMITTED"]).nullable().optional(),
+  patientFacingAdvice: z.string().nullable().optional(),
+  resultSubmittedAt: z.string().nullable().optional(),
 });
 
 let trustedConsultationContexts = new WeakSet<object>();
@@ -139,6 +141,9 @@ const consultationAdapter =
       patientAvatar: consultation.patientAvatar,
       icdCode: consultation.icdCode,
       note: consultation.note,
+      resultStatus: consultation.resultStatus,
+      patientFacingAdvice: consultation.patientFacingAdvice,
+      resultSubmittedAt: consultation.resultSubmittedAt,
     };
 
     // No server payment context is minted from a consultation response. The
@@ -228,14 +233,20 @@ export const consultationService = {
     return this.create(dto);
   },
 
-  /** Finish is confirmed only by the documented no-content success response. */
-  async finish(consultationId: string): Promise<void> {
+  /** Core API responds 200 with the updated consultation, not 204. */
+  async finish(consultationId: string): Promise<ConsultationResponseDto> {
     const normalizedId = requireServerId(consultationId, "consultationId");
-    return apiRequest<void>(
+    return apiRequest<ConsultationResponseDto>(
       `/consultations/${encodeURIComponent(normalizedId)}/finish`,
       {
         method: "POST",
-        adapter: noContentAdapter,
+        adapter: (value) => {
+          const response = consultationAdapter(normalizedId)(value);
+          if (response.status !== "FINISHED") {
+            throw new Error("Consultation finish was not confirmed by the server");
+          }
+          return response;
+        },
       },
     );
   },

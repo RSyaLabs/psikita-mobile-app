@@ -129,11 +129,15 @@ export interface UpdatePatientDto {
 // ============================================================================
 
 export interface SubmitTriageDto {
-  score?: number;
-  hasRedFlags?: boolean;
+  /** Answer codes and numeric values supplied by the active psychometric form. */
+  answers: Record<string, number>;
+  questionnaireType?: "PHQ_9";
   assessmentType?: "SELF_ASSESSMENT" | "PRACTITIONER_ASSESSMENT";
-  answers: Record<string, unknown>;
   notes?: string;
+  complaintContextTags?: Array<"WORK" | "STUDY" | "FAMILY" | "RELATIONSHIP" | "HEALTH" | "FINANCIAL" | "OTHER">;
+  functionalImpact?: "NONE" | "MILD" | "MODERATE" | "SEVERE";
+  symptomDurationBand?: "LT_2_WEEKS" | "W2_TO_3_MONTHS" | "GT_3_MONTHS";
+  urgencySelfRating?: number;
 }
 
 export type TriageAssessmentType =
@@ -147,6 +151,7 @@ export interface TriageResponseDto {
   patientId: string;
   assessedBy: string;
   assessmentType: TriageAssessmentType;
+  questionnaireType: "PHQ_9";
   score: number;
   hasRedFlags: boolean;
   level: TriageLevel;
@@ -267,6 +272,9 @@ export interface ConsultationResponseDto {
   patientAvatar?: string;
   icdCode?: string;
   note?: string;
+  resultStatus?: "PENDING_RESULT" | "RESULT_SUBMITTED" | null;
+  patientFacingAdvice?: string | null;
+  resultSubmittedAt?: string | null;
 }
 
 export interface MessageResponseDto {
@@ -329,6 +337,8 @@ export interface NoteResponseDto {
     severity?: string;
   };
   isFinalized?: boolean;
+  status?: "DRAFT" | "COMPLETED";
+  version?: number;
 }
 
 // ============================================================================
@@ -384,7 +394,7 @@ export interface ReferralResponseDto {
 // ============================================================================
 
 export interface CreateBillingOrderDto {
-  orderType: "INITIAL" | "EXTENSION";
+  orderType: "INITIAL" | "EXTENSION" | "FOLLOW_UP";
   durationMinutes: number;
   payerType: "SELF_PAY" | "BPJS";
   practitionerType?: PractitionerType;
@@ -406,9 +416,10 @@ export interface BillingOrderResponseDto {
   totalAmount: number;
   currency: string;
   paymentStatus: string;
+  gatewayChannel?: string | null;
   claimStatus?: string;
-  paymentId?: string;
-  expiresAt?: string;
+  paymentId?: string | null;
+  expiresAt?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -426,7 +437,7 @@ export interface PaymentMethodItemDto {
   available: boolean;
   providerVerified: boolean;
   fee: PaymentMethodMoneyDto;
-  feeBearer: "PATIENT" | "MERCHANT";
+  feeBearer: "PATIENT" | "INCLUDED";
   totalPayable: PaymentMethodMoneyDto;
   disabledReason?: string | null;
 }
@@ -563,6 +574,9 @@ export interface PaymentResponseDto {
   paymentType?: string;
   grossAmount: number;
   qrCodeUrl?: string;
+  qrString?: string;
+  bankCode?: string;
+  accountNumber?: string;
   paymentUrl?: string;
   expiryTime?: string;
   createdAt?: string;

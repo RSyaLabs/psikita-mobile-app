@@ -31,7 +31,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
           cache: npm
           cache-dependency-path: mobile/package-lock.json
 
@@ -44,13 +44,39 @@ jobs:
       - name: Validate EAS project
         run: npx --no-install eas project:info
 
+      - name: Typecheck
+        run: npx --no-install tsc --noEmit
+
       - name: Run unit tests
         run: npm run test:ci
 
-      - name: Build Android staging APK with EAS
+      - name: Audit API contracts and routes
+        run: npm run audit
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Build Android staging APK locally
         run: |
+          mkdir -p "$RUNNER_TEMP/android-build"
           npx --no-install eas build \
             --platform android \
             --profile staging \
-            --non-interactive
+            --local \
+            --non-interactive \
+            --output "$RUNNER_TEMP/android-build/staging.apk"
+
+      - name: Upload staging APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: seraphany-android-staging
+          path: ${{ runner.temp }}/android-build/staging.apk
+          if-no-files-found: error
+          retention-days: 7
 

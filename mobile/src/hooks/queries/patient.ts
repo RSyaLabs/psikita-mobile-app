@@ -27,11 +27,12 @@ import {
 /**
  * Hook to retrieve current logged-in patient profile
  */
-export function usePatientProfile() {
+export function usePatientProfile(enabled = true) {
   return useQuery({
     queryKey: queryKeys.patient.me(),
     queryFn: ({ signal }) =>
       callWithSignal(patientService.getMyProfile, signal),
+    enabled,
   });
 }
 

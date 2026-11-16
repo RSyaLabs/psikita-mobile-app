@@ -97,6 +97,17 @@ const otpResponseSchema = z.object({ message: z.string() });
 const tokenResponseAdapter = zodAdapter(tokenResponseSchema);
 const registerResponseAdapter = zodAdapter(registerResponseSchema);
 const otpResponseAdapter = zodAdapter(otpResponseSchema);
+const deleteAccountAdapter = zodAdapter(z.object({
+  message: z.string(),
+  scheduledDeletionAt: z.string().optional(),
+}));
+const identityListAdapter = zodAdapter(z.object({
+  identities: z.array(z.object({
+    provider: z.string(),
+    identifier: z.string().optional(),
+    linkedAt: z.string().optional(),
+  })),
+}));
 
 export const authService = {
   /**
@@ -124,7 +135,7 @@ export const authService = {
   ): Promise<RegisterResponseDto> {
     return apiRequest<RegisterResponseDto>("/auth/password/register", {
       method: "POST",
-      body: JSON.stringify(dto),
+      body: JSON.stringify({ username: dto.username, email: dto.email, password: dto.password }),
       skipAuth: true,
       adapter: registerResponseAdapter,
     });
@@ -197,6 +208,7 @@ export const authService = {
       "/user/me",
       {
         method: "DELETE",
+        adapter: deleteAccountAdapter,
       },
     );
   },
@@ -217,7 +229,7 @@ export const authService = {
         identifier?: string;
         linkedAt?: string;
       }>;
-    }>("/user/identities");
+    }>("/user/identities", { adapter: identityListAdapter });
   },
 
   /**
@@ -238,7 +250,7 @@ export const authService = {
   async resetPassword(token: string, newPassword: string): Promise<void> {
     await apiRequest<void>("/auth/password/reset", {
       method: "POST",
-      body: JSON.stringify({ token, newPassword }),
+      body: JSON.stringify({ token, password: newPassword }),
       skipAuth: true,
       adapter: noContentAdapter,
     });

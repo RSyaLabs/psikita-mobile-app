@@ -39,12 +39,7 @@ export type IdentityVerificationStatusDto = z.infer<
 >;
 
 const sessionAdapter = zodAdapter(identityVerificationSessionSchema);
-const statusAdapter = (val: unknown): IdentityVerificationStatusDto => {
-  if (typeof val === "object" && val !== null) {
-    return val as IdentityVerificationStatusDto;
-  }
-  return { status: "NOT_STARTED" };
-};
+const statusAdapter = zodAdapter(identityVerificationStatusSchema);
 
 export const identityVerificationService = {
   /**

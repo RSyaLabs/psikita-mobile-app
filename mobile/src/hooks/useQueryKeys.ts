@@ -168,6 +168,10 @@ export const queryKeys = {
             "messages",
             privacyParams(params),
           ] as const),
+    patientAssessmentEvidence: (consultationId: string) =>
+      [...queryKeys.consultations.all, "patient-assessment-evidence", privacyToken(consultationId)] as const,
+    assessments: (consultationId: string) =>
+      [...queryKeys.consultations.all, "assessments", privacyToken(consultationId)] as const,
     notes: (consultationId: string) =>
       [
         ...queryKeys.consultations.all,
@@ -228,11 +232,16 @@ export const queryKeys = {
     byUser: (userId: string) =>
       [...queryKeys.avatar.all, "user", privacyToken(userId)] as const,
   },
+  assessments: {
+    all: ["assessments"] as const,
+    mine: () => [...queryKeys.assessments.all, "mine"] as const,
+    detail: (id: string) => [...queryKeys.assessments.all, "detail", privacyToken(id)] as const,
+  },
   psychometrics: {
     all: ["psychometrics"] as const,
-    instruments: () => [...queryKeys.psychometrics.all, "instruments"] as const,
-    form: (code: string) =>
-      [...queryKeys.psychometrics.all, "form", privacyToken(code)] as const,
+    instruments: (context: "TRIAGE" | "ASSESSMENT" | "CONSULTATION" = "TRIAGE") => [...queryKeys.psychometrics.all, "instruments", context] as const,
+    form: (code: string, version?: number) =>
+      [...queryKeys.psychometrics.all, "form", privacyToken(code), version ?? "latest"] as const,
   },
   diagnosisCodes: {
     all: ["diagnosisCodes"] as const,

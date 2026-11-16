@@ -1,7 +1,7 @@
+import { psychometricsService } from "../src/api/psychometrics.service";
 import {
   authService,
   patientService,
-  triageService,
   matchingService,
   consultationService,
   notesService,
@@ -125,18 +125,19 @@ async function runServiceTestSuite() {
     });
   });
 
-  // 7. Triage: Submit Triage Assessment
-  await testCase("Triage: Submit Assessment (/triage)", async () => {
-    const triageRes = await triageService.submitTriage({
-      score: 7,
-      hasRedFlags: false,
-      assessmentType: "SELF_ASSESSMENT",
-      answers: { frequency: "Hampir setiap hari" },
-    });
-    // TriageResponseDto (staging-openapi.json) carries patientId and level.
-    // Asserting the contract fields, not ones the API never declared.
-    if (!triageRes.id || !triageRes.patientId || !triageRes.level) {
-      throw new Error("Triage response invalid");
+  // 7. Psychometrics: Validate available triage form without creating clinical data
+  await testCase("Psychometrics: Triage Questionnaire", async () => {
+    const instruments = await psychometricsService.getInstruments("TRIAGE");
+    const instrument = instruments.find((item) => item.code === "PHQ9");
+    if (!instrument) {
+      throw new Error("PHQ-9 is unavailable for triage");
+    }
+    const form = await psychometricsService.getInstrumentForm(
+      instrument.code,
+      instrument.version,
+    );
+    if (form.questions.length === 0 || form.responseOptions.length === 0) {
+      throw new Error("Triage questionnaire has no questions or options");
     }
   });
 

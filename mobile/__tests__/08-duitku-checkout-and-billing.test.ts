@@ -34,55 +34,52 @@ describe("08. Duitku Payment Catalog, Server Checkout & Billing Suite (RLN-20 & 
     const mockPaymentMethods = {
       schemaVersion: 1,
       currency: "IDR",
-      baseAmount: {
-        amount: 150000,
-        currency: "IDR",
-      },
+      baseAmount: { amount: 150000, currency: "IDR" },
       generatedAt: "2026-11-15T12:00:00Z",
-      estimate: false,
+      estimate: true,
       groups: [
         {
-          groupName: "Virtual Account",
+          label: "Virtual Account",
           methodType: "VIRTUAL_ACCOUNT",
           methods: [
             {
-              key: "va-bca",
-              name: "BCA Virtual Account",
-              methodType: "VIRTUAL_ACCOUNT",
-              channelCode: "VA_BCA",
+              key: "VA_BCA",
+              label: "BCA Virtual Account",
+              iconUrl: null,
               available: true,
               providerVerified: true,
               fee: { amount: 4000, currency: "IDR" },
+              feeLabel: "Biaya layanan",
               feeBearer: "PATIENT",
               totalPayable: { amount: 154000, currency: "IDR" },
               disabledReason: null,
             },
             {
-              key: "va-mandiri",
-              name: "Mandiri Virtual Account",
-              methodType: "VIRTUAL_ACCOUNT",
-              channelCode: "VA_MANDIRI",
+              key: "VA_MANDIRI",
+              label: "Mandiri Virtual Account",
+              iconUrl: null,
               available: false,
               providerVerified: true,
               fee: { amount: 4000, currency: "IDR" },
+              feeLabel: "Biaya layanan",
               feeBearer: "PATIENT",
               totalPayable: { amount: 154000, currency: "IDR" },
-              disabledReason: "Gangguan integrasi bank sementara",
+              disabledReason: "CHANNEL_UNAVAILABLE",
             },
           ],
         },
         {
-          groupName: "E-Wallet & QRIS",
-          methodType: "E_WALLET",
+          label: "QRIS",
+          methodType: "QRIS",
           methods: [
             {
-              key: "qris",
-              name: "QRIS (Semua Pembayaran)",
-              methodType: "QRIS",
-              channelCode: "QRIS",
+              key: "QRIS_NOBU",
+              label: "QRIS",
+              iconUrl: null,
               available: true,
               providerVerified: true,
               fee: { amount: 1050, currency: "IDR" },
+              feeLabel: "Biaya layanan",
               feeBearer: "PATIENT",
               totalPayable: { amount: 151050, currency: "IDR" },
               disabledReason: null,
@@ -111,7 +108,9 @@ describe("08. Duitku Payment Catalog, Server Checkout & Billing Suite (RLN-20 & 
       expect(result.groups).toHaveLength(2);
       expect(result.groups[0].methods[0].name).toBe("BCA Virtual Account");
       expect(result.groups[0].methods[0].totalPayable.amount).toBe(154000);
-      expect(result.groups[0].methods[1].disabledReason).toBe("Gangguan integrasi bank sementara");
+      expect(result.groups[0].methods[1].disabledReason).toBe("CHANNEL_UNAVAILABLE");
+      expect(result.groups[0].methods[0].channelCode).toBe("BCA");
+      expect(result.groups[1].methods[0].channelCode).toBe("QRIS_NOBU");
     });
 
     it("should strictly reject non-integer or invalid schema version", () => {
@@ -139,13 +138,14 @@ describe("08. Duitku Payment Catalog, Server Checkout & Billing Suite (RLN-20 & 
       consultationId: "01J7XYZCONSULTATION00000001",
       patientId: "01J7XYZPATIENT0000000000001",
       payerType: "SELF_PAY",
-      orderType: "INITIAL_ASSESSMENT",
+      orderType: "INITIAL",
       durationMinutes: 60,
       grossAmount: 150000,
       discountAmount: 0,
       totalAmount: 150000,
       currency: "IDR",
-      paymentStatus: "UNPAID",
+      paymentStatus: "PENDING",
+      gatewayChannel: "VA_BCA",
       createdAt: "2026-11-15T12:00:00Z",
       updatedAt: "2026-11-15T12:00:00Z",
     };
@@ -171,7 +171,7 @@ describe("08. Duitku Payment Catalog, Server Checkout & Billing Suite (RLN-20 & 
           orderType: "INITIAL",
           durationMinutes: 60,
           payerType: "SELF_PAY",
-          practitionerType: "PSYCHOLOGIST",
+          gatewayChannel: "VA_BCA",
           idempotencyKey: "billing-order:test-key",
         },
       );
@@ -183,12 +183,55 @@ describe("08. Duitku Payment Catalog, Server Checkout & Billing Suite (RLN-20 & 
         orderType: "INITIAL",
         durationMinutes: 60,
         payerType: "SELF_PAY",
-        practitionerType: "PSYCHOLOGIST",
+        gatewayChannel: "VA_BCA",
         idempotencyKey: "billing-order:test-key",
       });
       expect(response.id).toBe("01J7XYZORDER000000000000001");
       expect(response.totalAmount).toBe(150000);
       expect(response.currency).toBe("IDR");
+    });
+
+    it("should restore a server-owned billing order without client-supplied order IDs", async () => {
+      global.fetch = jest.fn().mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        headers: new Headers({ "content-type": "application/json" }),
+        json: () => Promise.resolve(mockBillingOrderResponse),
+      });
+      const restored = await paymentService.getCurrentBillingOrder("01J7XYZCONSULTATION00000001");
+      expect(restored?.id).toBe(mockBillingOrderResponse.id);
+      const context = paymentService.serverPaymentContextFromBillingOrder(restored);
+      expect(isServerPaymentContext(context)).toBe(true);
+      expect(isServerPaymentContext({
+        consultationId: mockBillingOrderResponse.consultationId,
+        billingOrderId: mockBillingOrderResponse.id,
+      })).toBe(false);
+    });
+
+    it("must reject a billing order from a different consultation", async () => {
+      global.fetch = jest.fn().mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        headers: new Headers({ "content-type": "application/json" }),
+        json: () => Promise.resolve({
+          ...mockBillingOrderResponse, consultationId: "some-other-consultation",
+        }),
+      });
+      await expect(paymentService.getCurrentBillingOrder("01J7XYZCONSULTATION00000001")).rejects.toThrow();
+    });
+
+    it("changes the idempotency key when a previous order expired", () => {
+      const intent = {orderType: "INITIAL" as const, durationMinutes: 60, payerType: "SELF_PAY" as const, gatewayChannel: "QRIS_NOBU"};
+      expect(createBillingOrderIdempotencyKey("consult-1", intent))
+        .not.toEqual(createBillingOrderIdempotencyKey("consult-1", {...intent, retryAfterOrderId: "expired-order-1"}));
+      expect(createBillingOrderIdempotencyKey("consult-1", {...intent, retryAfterOrderId: "expired-order-1"}))
+        .toEqual(createBillingOrderIdempotencyKey("consult-1", {...intent, retryAfterOrderId: "expired-order-1"}));
+    });
+
+    it("keeps payment method selection in the idempotency fingerprint", () => {
+      const intent = {orderType: "INITIAL" as const, durationMinutes: 60, payerType: "SELF_PAY" as const, gatewayChannel: "VA_BCA"};
+      expect(createBillingOrderIdempotencyKey("consult-1", intent))
+        .not.toEqual(createBillingOrderIdempotencyKey("consult-1", {...intent, gatewayChannel: "QRIS_NOBU"}));
     });
 
     it("should mint and validate server payment context correctly", () => {
@@ -254,7 +297,7 @@ describe("08. Duitku Payment Catalog, Server Checkout & Billing Suite (RLN-20 & 
       const paymentResult = await paymentService.createPayment({
         context: validContext,
         methodType: "VIRTUAL_ACCOUNT",
-        channelCode: "VA_BCA",
+        channelCode: "BCA",
       });
 
       const parsedPayload = JSON.parse(sentPaymentPayload);

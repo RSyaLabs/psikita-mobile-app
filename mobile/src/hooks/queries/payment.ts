@@ -2,6 +2,7 @@ import { useCallback, useRef } from "react";
 import {
   useQuery,
   useMutation,
+  useQueryClient,
   type MutateOptions,
 } from "@tanstack/react-query";
 import { ApiError } from "@/api/client";
@@ -22,7 +23,6 @@ import {
   PaymentResponseDto,
 } from "@/types/api";
 
-import { useConsultation } from "./consultation";
 
 /**
  * Mengambil katalog metode pembayaran Duitku dengan estimasi biaya resmi server.
@@ -30,7 +30,7 @@ import { useConsultation } from "./consultation";
 export function usePaymentMethods(amount?: number, currency = "IDR") {
   return useQuery<PaymentMethodsDto>({
     queryKey: ["paymentMethods", amount, currency],
-    queryFn: () => paymentService.getPaymentMethods(amount ?? 50000, currency),
+    queryFn: () => paymentService.getPaymentMethods(amount!, currency),
     enabled: typeof amount === "number" && amount > 0,
     staleTime: 60 * 1000,
   });
@@ -40,6 +40,7 @@ export function usePaymentMethods(amount?: number, currency = "IDR") {
  * Mutation hook untuk membuat billing order resmi dari server.
  */
 export function useCreateBillingOrder() {
+  const queryClient = useQueryClient();
   return useMutation<
     BillingOrderResponseDto,
     Error,
@@ -47,22 +48,34 @@ export function useCreateBillingOrder() {
   >({
     mutationFn: ({ consultationId, dto }) =>
       paymentService.createBillingOrder(consultationId, dto),
+    onSuccess: (order) => {
+      void queryClient.invalidateQueries({queryKey: ["billingOrderCurrent", order.consultationId]});
+    },
   });
 }
 
-/**
- * The current consultation contract has no payment-context field. This hook
- * returns only a context already branded by the API adapter, plus its query
- * state; route values are never promoted to server provenance.
- */
-export function useValidatedServerPaymentContext(consultationId?: string) {
-  const query = useConsultation(consultationId ?? "");
-  const context = paymentService.serverPaymentContextFromApiResponse(
-    query.data,
-  );
+/** Server-side practitioner rate preview; no client amount is trusted. */
+export function useInitialBillingPreview(consultationId?: string, gatewayChannel?: string) {
+  return useQuery({
+    queryKey: ["initialBillingPreview", consultationId, gatewayChannel],
+    queryFn: () => paymentService.previewBillingOrder(consultationId!, gatewayChannel),
+    enabled: Boolean(consultationId),
+    staleTime: 30 * 1000,
+  });
+}
 
+/** Restore checkout using the new authenticated billing-order endpoint. */
+export function useValidatedServerPaymentContext(consultationId?: string) {
+  const query = useQuery({
+    queryKey: ["billingOrderCurrent", consultationId],
+    queryFn: () => paymentService.getCurrentBillingOrder(consultationId!),
+    enabled: Boolean(consultationId),
+    refetchOnMount: "always" as const,
+  });
+  const context = paymentService.serverPaymentContextFromBillingOrder(query.data);
   return {
     context,
+    order: query.data,
     isLoading: query.isLoading,
     isFetching: query.isFetching,
     isSuccess: query.isSuccess,
@@ -71,6 +84,16 @@ export function useValidatedServerPaymentContext(consultationId?: string) {
     error: query.error,
     refetch: query.refetch,
   };
+}
+
+export function useServerPaymentStatus(paymentId?: string, billingOrderId?: string) {
+  return useQuery({
+    queryKey: ["paymentStatus", paymentId, billingOrderId],
+    queryFn: () => paymentService.getPayment(paymentId!, billingOrderId!),
+    enabled: Boolean(paymentId && billingOrderId),
+    refetchInterval: (query) =>
+      !query.state.data || query.state.data.status === "PENDING" ? 4000 : false,
+  });
 }
 
 /**

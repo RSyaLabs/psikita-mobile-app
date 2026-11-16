@@ -92,8 +92,8 @@ export default function CheckoutScreen() {
   const bpjsCapability = getCapability("bpjsEligibility");
   const paymentEnabled =
     paymentCapability === "live" &&
-    contextReady &&
-    Boolean(serverContext);
+    Boolean(consultationId) &&
+    contextReady;
   const bpjsEnabled =
     bpjsCapability === "live" &&
     contextReady &&
@@ -106,14 +106,14 @@ export default function CheckoutScreen() {
       !contextReady);
 
   const openPayment = (pathname: string, enabled = paymentEnabled) => {
-    if (!enabled || !serverContext) {
+    if (!enabled || !consultationId) {
       haptics.error();
       return;
     }
 
     router.push({
       pathname,
-      params: { consultationId: serverContext.consultationId },
+      params: { consultationId },
     } as any);
   };
 
@@ -208,7 +208,7 @@ export default function CheckoutScreen() {
               Rincian tagihan
             </Text>
             <Text size="xs" className="text-muted-foreground">
-              Nominal tagihan belum tersedia dari server.
+              Pilih metode pembayaran untuk melihat estimasi tarif resmi dari server.
             </Text>
             <Text size="xs" className="text-muted-foreground">
               Besaran, diskon, dan biaya akhir akan ditentukan server.
@@ -250,7 +250,7 @@ export default function CheckoutScreen() {
               <Wallet size={18} className="text-secondary" />
               <Box className="flex-1">
                 <Text size="xs" bold className="text-foreground">
-                  E-WALLET • metode dari server
+                  Pilih kanal resmi
                 </Text>
                 <Text size="xs" className="text-muted-foreground">
                   Nominal dan metode akhir dikonfirmasi server.
@@ -307,8 +307,8 @@ export default function CheckoutScreen() {
           size="sm"
           className="text-center text-muted-foreground font-medium text-sm leading-relaxed"
         >
-          Konteks tagihan harus berasal dari server sebelum pembayaran dapat
-          diproses.
+          Order dibuat setelah Anda memilih kanal pembayaran. Nominal akhir dan
+          instruksi pembayaran hanya berasal dari server.
         </Text>
       </Box>
     </SafeAreaView>

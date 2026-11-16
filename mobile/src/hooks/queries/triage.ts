@@ -65,8 +65,10 @@ export function useTriageAssessment(id?: string) {
 export function useSubmitTriage() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (dto: import("@/types/api").SubmitTriageDto) =>
-      triageService.submitTriage(dto),
+    mutationFn: (request: {
+      dto: import("@/types/api").SubmitTriageDto;
+      idempotencyKey: string;
+    }) => triageService.submitTriage(request.dto, request.idempotencyKey),
     onSuccess: (data) => {
       queryClient.setQueryData(queryKeys.triage.detail(data.id), data);
       queryClient.invalidateQueries({ queryKey: queryKeys.triage.queue() });

@@ -1,15 +1,25 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { View, Image, ActivityIndicator } from "react-native";
 import { Redirect } from "expo-router";
 import { Text, Heading, VStack, Box } from "@/components/ui";
 import { useAuth, getHomeRouteForRole } from "@/hooks/useAuth";
 import { ROUTES } from "@/constants/routes";
 import { colors } from "@/theme/colors";
+import { shouldShowFirstLaunchTutorial } from "@/utils/tutorial";
 
 export default function IndexGatewayScreen() {
   const { status, user, isAuthenticated } = useAuth();
+  const [showTutorial, setShowTutorial] = useState<boolean | null>(null);
 
-  if (status === "loading") {
+  useEffect(() => {
+    let mounted = true;
+    void shouldShowFirstLaunchTutorial().then((value) => {
+      if (mounted) setShowTutorial(value);
+    });
+    return () => { mounted = false; };
+  }, []);
+
+  if (status === "loading" || showTutorial === null) {
     return (
       <View
         className="flex-1 items-center justify-center bg-background px-6"
@@ -41,6 +51,8 @@ export default function IndexGatewayScreen() {
       </View>
     );
   }
+
+  if (showTutorial) return <Redirect href={ROUTES.TUTORIAL as any} />;
 
   if (isAuthenticated && user) {
     const targetRoute = getHomeRouteForRole(user.role);

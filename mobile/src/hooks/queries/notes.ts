@@ -64,3 +64,17 @@ export function useCreateSoapNote() {
     },
   });
 }
+
+/** Explicitly finalize a saved note; the server verifies the note's permissions and state. */
+export function useFinalizeConsultationNote() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (input: {noteId: string; consultationId: string; version?: number}) =>
+      notesService.finalizeNote(input.noteId, input.consultationId, input.version),
+    onSuccess: (_note, input) => {
+      void queryClient.invalidateQueries({
+        queryKey: queryKeys.consultations.notes(input.consultationId),
+      });
+    },
+  });
+}
