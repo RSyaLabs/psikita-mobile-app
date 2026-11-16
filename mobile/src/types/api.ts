@@ -129,11 +129,15 @@ export interface UpdatePatientDto {
 // ============================================================================
 
 export interface SubmitTriageDto {
-  score?: number;
-  hasRedFlags?: boolean;
+  /** Answer codes and numeric values supplied by the active psychometric form. */
+  answers: Record<string, number>;
+  questionnaireType?: "PHQ_9";
   assessmentType?: "SELF_ASSESSMENT" | "PRACTITIONER_ASSESSMENT";
-  answers: Record<string, unknown>;
   notes?: string;
+  complaintContextTags?: Array<"WORK" | "STUDY" | "FAMILY" | "RELATIONSHIP" | "HEALTH" | "FINANCIAL" | "OTHER">;
+  functionalImpact?: "NONE" | "MILD" | "MODERATE" | "SEVERE";
+  symptomDurationBand?: "LT_2_WEEKS" | "W2_TO_3_MONTHS" | "GT_3_MONTHS";
+  urgencySelfRating?: number;
 }
 
 export type TriageAssessmentType =
@@ -147,6 +151,7 @@ export interface TriageResponseDto {
   patientId: string;
   assessedBy: string;
   assessmentType: TriageAssessmentType;
+  questionnaireType: "PHQ_9";
   score: number;
   hasRedFlags: boolean;
   level: TriageLevel;
