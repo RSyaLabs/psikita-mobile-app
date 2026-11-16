@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "SeraPhany",
-    "slug": "seraphany-mobile",
+    "slug": "seraphany",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -20,7 +20,9 @@
       },
       "package": "id.seraphany.app",
       "versionCode": 1,
-      "permissions": ["CAMERA"]
+      "permissions": [
+        "CAMERA"
+      ]
     },
     "ios": {
       "supportsTablet": true,
@@ -90,9 +92,9 @@
         "origin": false
       },
       "eas": {
-        "projectId": "b1cc2157-193a-4bbc-b119-640aaebffe49"
+        "projectId": "2f394780-9e67-4429-9b79-a79dbf4b119e"
       }
     },
-    "owner": "tarisrizkis-team"
+    "owner": "rlabs_nexus"
   }
 }

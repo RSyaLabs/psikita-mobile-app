@@ -1,0 +1,70 @@
+
+name: Android Staging APK
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-staging
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build Android Staging
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    defaults:
+      run:
+        working-directory: mobile
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm run test:ci
+
+      - name: Install EAS CLI
+        run: npm install --global eas-cli
+
+      - name: Build staging APK
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          CI: '1'
+        run: |
+          mkdir -p "$RUNNER_TEMP/android-build"
+          eas build \
+            --platform android \
+            --profile staging \
+            --local \
+            --non-interactive \
+            --output "$RUNNER_TEMP/android-build/staging.apk"
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: seraphany-android-staging
+          path: ${{ runner.temp }}/android-build/staging.apk
+          if-no-files-found: error
+          retention-days: 7
+
