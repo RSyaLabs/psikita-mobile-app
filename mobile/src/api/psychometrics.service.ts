@@ -3,7 +3,7 @@ import { apiRequest } from "./client";
 import { zodAdapter, withQueryParams } from "./response";
 
 /** Psychometrics owns instrument definitions; callers select a context. */
-export type PsychometricContext = "TRIAGE" | "CONSULTATION";
+export type PsychometricContext = "TRIAGE" | "ASSESSMENT" | "CONSULTATION";
 
 const optionSchema = z.object({
   value: z.number().finite(),
@@ -14,7 +14,7 @@ const instrumentSchema = z.object({
   name: z.string().trim().min(1),
   version: z.number().int().positive(),
   description: z.string().optional(),
-  contexts: z.array(z.enum(["TRIAGE", "CONSULTATION"])),
+  contexts: z.array(z.enum(["TRIAGE", "ASSESSMENT", "CONSULTATION"])),
   supportedDimensions: z.array(z.enum(["stress", "anxiety", "depression"])),
 });
 const questionSchema = z.object({
