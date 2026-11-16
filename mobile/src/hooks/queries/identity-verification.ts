@@ -9,12 +9,13 @@ import {
 /**
  * Hook to retrieve the current user's Didit KYC verification status
  */
-export function useMyVerificationStatus() {
+export function useMyVerificationStatus(enabled = true) {
   return useQuery<IdentityVerificationStatusDto>({
     queryKey: queryKeys.identityVerification.my(),
     queryFn: ({ signal }) =>
       identityVerificationService.getMyVerificationStatus(signal),
     staleTime: 60 * 1000,
+    enabled,
   });
 }
 
