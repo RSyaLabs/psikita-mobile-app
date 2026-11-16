@@ -230,9 +230,9 @@ export const queryKeys = {
   },
   psychometrics: {
     all: ["psychometrics"] as const,
-    instruments: () => [...queryKeys.psychometrics.all, "instruments"] as const,
-    form: (code: string) =>
-      [...queryKeys.psychometrics.all, "form", privacyToken(code)] as const,
+    instruments: (context: "TRIAGE" | "CONSULTATION" = "TRIAGE") => [...queryKeys.psychometrics.all, "instruments", context] as const,
+    form: (code: string, version?: number) =>
+      [...queryKeys.psychometrics.all, "form", privacyToken(code), version ?? "latest"] as const,
   },
   diagnosisCodes: {
     all: ["diagnosisCodes"] as const,
