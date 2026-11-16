@@ -18,8 +18,8 @@ export default function RegisterScreen() {
 
   const submit = async () => {
     const cleanEmail = email.trim().toLowerCase();
-    if (!fullName.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail) || password.length < 6) {
-      setError("Isi nama lengkap, email valid, dan kata sandi minimal 6 karakter.");
+    if (!fullName.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail) || password.length < 8) {
+      setError("Isi nama lengkap, email valid, dan kata sandi minimal 8 karakter.");
       return;
     }
     setError(null);
@@ -56,7 +56,6 @@ export default function RegisterScreen() {
             <VStack space="lg" className="pt-10">
               <VStack space="sm" className="pb-3">
                 <Heading level={1} size="2xl" bold className="text-foreground">Buat akun SeraPhany</Heading>
-                <Text className="text-muted-foreground">Isi data akun untuk memulai.</Text>
               </VStack>
               <VStack space="xs">
                 <Text className="text-sm font-semibold text-foreground">Nama lengkap</Text>
@@ -73,16 +72,14 @@ export default function RegisterScreen() {
               <VStack space="xs">
                 <Text className="text-sm font-semibold text-foreground">Kata sandi</Text>
                 <Input className="h-12 rounded-xl border-border bg-card">
-                  <InputField value={password} onChangeText={setPassword} accessibilityLabel="Kata sandi" placeholder="Minimal 6 karakter" secureTextEntry autoComplete="new-password" />
+                  <InputField value={password} onChangeText={setPassword} accessibilityLabel="Kata sandi" placeholder="Minimal 8 karakter" secureTextEntry autoComplete="new-password" />
                 </Input>
               </VStack>
               {error ? <Text className="text-sm text-destructive" accessibilityRole="alert">{error}</Text> : null}
               <Button onPress={submit} isDisabled={mutation.isPending} className="h-12 rounded-xl bg-primary">
                 <ButtonText className="font-bold text-primary-foreground">{mutation.isPending ? "Memproses..." : "Daftar"}</ButtonText>
               </Button>
-              <Text className="text-xs text-muted-foreground leading-relaxed text-center">
-                Dengan mendaftar, kamu menyetujui syarat layanan dan kebijakan privasi SeraPhany.
-              </Text>
+              <Text className="text-xs text-muted-foreground text-center">Lanjutkan untuk menyetujui ketentuan layanan.</Text>
               <HStack space="xs" className="justify-center">
                 <Text className="text-sm text-muted-foreground">Sudah punya akun?</Text>
                 <Pressable onPress={() => router.replace(ROUTES.AUTH.SIGN_IN as any)}>
