@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { useRouter } from "expo-router";
 import { Image as RNImage, Alert, ActivityIndicator, Linking } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -32,11 +32,6 @@ import {
   AvatarFallbackText,
   ScrollView,
 } from "@/components/ui";
-import {
-  PatientFaqModal,
-  PatientSupportModal,
-  PatientPrivacyModal,
-} from "@/components/modals";
 import { AppIcon } from "@/components/common/AppIcon";
 import { PatientTabBar } from "@/components/navigation/PatientTabBar";
 import {
@@ -92,9 +87,6 @@ export default function ProfileScreen() {
     }
   };
 
-  const [showHelpModal, setShowHelpModal] = useState(false);
-  const [showCsModal, setShowCsModal] = useState(false);
-  const [showPrivacyModal, setShowPrivacyModal] = useState(false);
 
   const patientName = patient?.fullName || "Pasien";
   const rmNumber = patient?.medicalRecordNumber || "Belum tersedia";
@@ -329,7 +321,7 @@ export default function ProfileScreen() {
             <Pressable
               onPress={() => {
                 haptics.light();
-                setShowHelpModal(true);
+                router.push(ROUTES.PATIENT.HELP);
               }}
               className="py-3 flex-row items-center justify-between active:opacity-80"
             >
@@ -345,7 +337,7 @@ export default function ProfileScreen() {
             <Pressable
               onPress={() => {
                 haptics.light();
-                setShowCsModal(true);
+                router.push(ROUTES.PATIENT.SUPPORT);
               }}
               className="py-3 flex-row items-center justify-between border-t border-border active:opacity-80"
             >
@@ -361,7 +353,7 @@ export default function ProfileScreen() {
             <Pressable
               onPress={() => {
                 haptics.light();
-                setShowPrivacyModal(true);
+                router.push(ROUTES.PATIENT.PRIVACY);
               }}
               className="py-3 flex-row items-center justify-between border-t border-border active:opacity-80"
             >
@@ -393,21 +385,6 @@ export default function ProfileScreen() {
       {/* Persistent Bottom Tab Bar */}
       <PatientTabBar activeTab="akun" />
 
-      {/* Modals */}
-      <PatientFaqModal
-        isOpen={showHelpModal}
-        onClose={() => setShowHelpModal(false)}
-      />
-
-      <PatientSupportModal
-        isOpen={showCsModal}
-        onClose={() => setShowCsModal(false)}
-      />
-
-      <PatientPrivacyModal
-        isOpen={showPrivacyModal}
-        onClose={() => setShowPrivacyModal(false)}
-      />
     </SafeAreaView>
   );
 }
