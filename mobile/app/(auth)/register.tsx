@@ -10,23 +10,25 @@ import { haptics } from "@/utils/haptics";
 export default function RegisterScreen() {
   const router = useRouter();
   const mutation = useRegisterPatient();
-  const [fullName, setFullName] = useState("");
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [registeredEmail, setRegisteredEmail] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const submit = async () => {
     const cleanEmail = email.trim().toLowerCase();
-    if (!fullName.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail) || password.length < 8) {
-      setError("Isi nama lengkap, email valid, dan kata sandi minimal 8 karakter.");
+    if (!/^[a-zA-Z0-9_]{3,30}$/.test(username.trim()) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail) || cleanEmail.length > 254 || password.length < 8 || password.length > 128 || password !== confirmPassword) {
+      setError("Periksa username, email, dan konfirmasi kata sandi.");
       return;
     }
     setError(null);
-    const username = cleanEmail.split("@")[0].replace(/[^a-zA-Z0-9_]/g, "_");
     try {
-      await mutation.mutateAsync({ username, fullName: fullName.trim(), email: cleanEmail, password });
+      await mutation.mutateAsync({ username: username.trim(), email: cleanEmail, password });
       haptics.success();
+      setPassword("");
+      setConfirmPassword("");
       setRegisteredEmail(cleanEmail);
     } catch (cause) {
       haptics.error();
@@ -46,7 +48,7 @@ export default function RegisterScreen() {
               <MailCheck size={48} className="text-primary" />
               <Heading level={1} size="2xl" bold className="text-foreground text-center">Periksa emailmu</Heading>
               <Text className="text-center text-muted-foreground leading-relaxed">
-                Tautan aktivasi telah dikirim ke {registeredEmail}. Aktifkan akun melalui email sebelum masuk.
+                Jika aktivasi diperlukan, ikuti instruksi yang dikirim ke {registeredEmail}.
               </Text>
               <Button onPress={() => router.replace(ROUTES.AUTH.SIGN_IN as any)} className="w-full h-12 rounded-xl bg-primary">
                 <ButtonText className="font-bold text-primary-foreground">Ke Halaman Masuk</ButtonText>
@@ -58,9 +60,9 @@ export default function RegisterScreen() {
                 <Heading level={1} size="2xl" bold className="text-foreground">Buat akun SeraPhany</Heading>
               </VStack>
               <VStack space="xs">
-                <Text className="text-sm font-semibold text-foreground">Nama lengkap</Text>
+                <Text className="text-sm font-semibold text-foreground">Username</Text>
                 <Input className="h-12 rounded-xl border-border bg-card">
-                  <InputField value={fullName} onChangeText={setFullName} accessibilityLabel="Nama lengkap" placeholder="Nama sesuai identitas" autoComplete="name" />
+                  <InputField value={username} onChangeText={setUsername} accessibilityLabel="Username" placeholder="Username" autoCapitalize="none" autoComplete="username" />
                 </Input>
               </VStack>
               <VStack space="xs">
@@ -75,11 +77,16 @@ export default function RegisterScreen() {
                   <InputField value={password} onChangeText={setPassword} accessibilityLabel="Kata sandi" placeholder="Minimal 8 karakter" secureTextEntry autoComplete="new-password" />
                 </Input>
               </VStack>
+              <VStack space="xs">
+                <Text className="text-sm font-semibold text-foreground">Konfirmasi kata sandi</Text>
+                <Input className="h-12 rounded-xl border-border bg-card">
+                  <InputField value={confirmPassword} onChangeText={setConfirmPassword} accessibilityLabel="Konfirmasi kata sandi" placeholder="Ulangi kata sandi" secureTextEntry autoComplete="new-password" />
+                </Input>
+              </VStack>
               {error ? <Text className="text-sm text-destructive" accessibilityRole="alert">{error}</Text> : null}
               <Button onPress={submit} isDisabled={mutation.isPending} className="h-12 rounded-xl bg-primary">
                 <ButtonText className="font-bold text-primary-foreground">{mutation.isPending ? "Memproses..." : "Daftar"}</ButtonText>
               </Button>
-              <Text className="text-xs text-muted-foreground text-center">Lanjutkan untuk menyetujui ketentuan layanan.</Text>
               <HStack space="xs" className="justify-center">
                 <Text className="text-sm text-muted-foreground">Sudah punya akun?</Text>
                 <Pressable onPress={() => router.replace(ROUTES.AUTH.SIGN_IN as any)}>
