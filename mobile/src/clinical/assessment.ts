@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const ASSESSMENT_UNAVAILABLE_MESSAGE =
-  "Asesmen tidak tersedia. Hasil hanya dapat ditampilkan setelah server mengonfirmasi data assessment.";
+  "Hasil skrining belum tersedia. Silakan coba lagi.";
 
 export const assessmentResultSchema = z.object({
   id: z.string().trim().min(1),
