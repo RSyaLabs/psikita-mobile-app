@@ -24,6 +24,7 @@ export * from "./queries/avatar";
 export * from "./queries/psychometrics";
 export * from "./queries/consultation-assessment";
 export * from "./queries/patient-assessment";
+export * from "./queries/clinical-assessment-evidence";
 export * from "./queries/diagnosis-codes";
 export * from "./queries/identity-verification";
 export * from "./queries/prefetch";
