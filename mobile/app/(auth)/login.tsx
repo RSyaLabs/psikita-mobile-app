@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { Image } from "react-native";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ArrowRight, ShieldCheck, HeartHandshake, LockKeyhole } from "lucide-react-native";
+import { ArrowRight } from "lucide-react-native";
 import { Box, Text, Heading, VStack, HStack, Pressable, Button, ButtonText, ScrollView } from "@/components/ui";
 import { ROUTES } from "@/constants/routes";
 import { haptics } from "@/utils/haptics";
@@ -41,32 +41,17 @@ export default function LoginScreen() {
               <Heading level={1} size="xl" bold className="text-foreground">
                 SeraPhany
               </Heading>
-              <Text className="text-sm text-muted-foreground">Temukan dirimu, satu cerita setiap kali.</Text>
+              
             </VStack>
           </HStack>
 
-          <VStack space="md" className="pt-8 pb-4">
+          <VStack space="sm" className="pt-16 pb-6">
             <Heading level={2} size="3xl" bold className="text-foreground leading-tight">
-              Ruang aman untuk kesehatan mentalmu.
+              Temukan ruang untuk dirimu.
             </Heading>
-            <Text className="text-base text-muted-foreground leading-relaxed">
-              Mulai dengan memahami kondisimu, lalu pilih dukungan yang sesuai dengan kebutuhanmu.
+            <Text className="text-base text-muted-foreground">
+              Mulai dari langkah yang paling nyaman.
             </Text>
-          </VStack>
-
-          <VStack space="md" className="border-t border-border pt-6">
-            <HStack space="md" className="items-center">
-              <ShieldCheck size={22} className="text-primary" />
-              <Text className="flex-1 text-sm text-foreground">Privasi dan data kesehatanmu menjadi prioritas.</Text>
-            </HStack>
-            <HStack space="md" className="items-center">
-              <HeartHandshake size={22} className="text-primary" />
-              <Text className="flex-1 text-sm text-foreground">Dukungan dari praktisi sesuai kebutuhanmu.</Text>
-            </HStack>
-            <HStack space="md" className="items-center">
-              <LockKeyhole size={22} className="text-primary" />
-              <Text className="flex-1 text-sm text-foreground">Masuk untuk melanjutkan layanan dengan aman.</Text>
-            </HStack>
           </VStack>
         </VStack>
 
