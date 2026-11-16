@@ -97,6 +97,17 @@ const otpResponseSchema = z.object({ message: z.string() });
 const tokenResponseAdapter = zodAdapter(tokenResponseSchema);
 const registerResponseAdapter = zodAdapter(registerResponseSchema);
 const otpResponseAdapter = zodAdapter(otpResponseSchema);
+const deleteAccountAdapter = zodAdapter(z.object({
+  message: z.string(),
+  scheduledDeletionAt: z.string().optional(),
+}));
+const identityListAdapter = zodAdapter(z.object({
+  identities: z.array(z.object({
+    provider: z.string(),
+    identifier: z.string().optional(),
+    linkedAt: z.string().optional(),
+  })),
+}));
 
 export const authService = {
   /**
@@ -197,6 +208,7 @@ export const authService = {
       "/user/me",
       {
         method: "DELETE",
+        adapter: deleteAccountAdapter,
       },
     );
   },
@@ -217,7 +229,7 @@ export const authService = {
         identifier?: string;
         linkedAt?: string;
       }>;
-    }>("/user/identities");
+    }>("/user/identities", { adapter: identityListAdapter });
   },
 
   /**
