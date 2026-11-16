@@ -8,6 +8,7 @@ import { safeNavigateBack } from "@/utils/navigation";
 import { getCapability } from "@/config/capabilities";
 import { ROUTES } from "@/constants/routes";
 import { PaymentMethodSelector } from "@/components/patient/payment";
+import { QrisPayloadCode } from "@/components/patient/payment/QrisPayloadCode";
 import {
   useCreateBillingOrder,
   useCreatePayment,
@@ -239,9 +240,10 @@ export default function PaymentRegularScreen() {
             </Card>
           ) : null}
           {payment?.qrString && !payment.qrCodeUrl ? (
-            <Text className="text-muted-foreground">
-              Gateway mengembalikan payload QRIS tanpa gambar. Jangan bayar sebelum kode dapat ditampilkan dengan aman.
-            </Text>
+            <Card className="p-4 border border-border bg-card rounded-2xl items-center">
+              <Text className="font-semibold mb-2">Pindai QRIS untuk membayar</Text>
+              <QrisPayloadCode payload={payment.qrString} />
+            </Card>
           ) : null}
           {payment?.accountNumber ? (
             <Card className="p-4 border border-border bg-card rounded-2xl">
