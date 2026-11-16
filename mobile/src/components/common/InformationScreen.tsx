@@ -12,7 +12,7 @@ export function InformationScreen({
   items,
 }: {
   title: string;
-  description: string;
+  description?: string;
   items: readonly InformationItem[];
 }) {
   const router = useRouter();
