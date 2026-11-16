@@ -50,7 +50,6 @@ export default function SignInScreen() {
           </Pressable>
           <VStack space="sm" className="pt-10 pb-8">
             <Heading level={1} size="2xl" bold className="text-foreground">Selamat datang kembali</Heading>
-            <Text className="text-muted-foreground leading-relaxed">Masuk menggunakan akun SeraPhany.</Text>
           </VStack>
           <VStack space="lg">
             <VStack space="xs">
@@ -77,6 +76,9 @@ export default function SignInScreen() {
             <Button className="h-12 rounded-xl bg-primary" isDisabled={loginMutation.isPending} onPress={submit}>
               <ButtonText className="font-bold text-primary-foreground">{loginMutation.isPending ? "Memverifikasi..." : "Masuk"}</ButtonText>
             </Button>
+            <Pressable accessibilityRole="button" onPress={() => router.push(ROUTES.AUTH.OTP as any)} className="py-3 items-center">
+              <Text className="font-semibold text-primary">Masuk dengan kode OTP</Text>
+            </Pressable>
             <HStack space="xs" className="justify-center pt-3">
               <Text className="text-sm text-muted-foreground">Belum punya akun?</Text>
               <Pressable accessibilityRole="button" onPress={() => router.push(ROUTES.AUTH.REGISTER as any)}>
