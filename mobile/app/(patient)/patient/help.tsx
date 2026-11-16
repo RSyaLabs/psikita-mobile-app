@@ -3,7 +3,6 @@ import { InformationScreen } from "@/components/common/InformationScreen";
 export default function HelpScreen() {
   return <InformationScreen
     title="Pusat Bantuan"
-    description="Panduan singkat menggunakan layanan SeraPhany."
     items={[
       { title: "Memulai konsultasi", description: "Pilih praktisi dan jadwal yang tersedia." },
       { title: "Pembayaran dan BPJS", description: "Periksa opsi dan ketentuan di checkout." },
