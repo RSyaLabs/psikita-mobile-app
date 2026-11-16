@@ -1,0 +1,56 @@
+name: Android Staging APK
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-staging
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build Android Staging
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    defaults:
+      run:
+        working-directory: mobile
+
+    env:
+      CI: "1"
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci --include=dev
+
+      - name: Validate Expo configuration
+        run: npx --no-install expo config --json > /dev/null
+
+      - name: Validate EAS project
+        run: npx --no-install eas project:info
+
+      - name: Run unit tests
+        run: npm run test:ci
+
+      - name: Build Android staging APK with EAS
+        run: |
+          npx --no-install eas build \
+            --platform android \
+            --profile staging \
+            --non-interactive
+
