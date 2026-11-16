@@ -230,9 +230,14 @@ export const queryKeys = {
     byUser: (userId: string) =>
       [...queryKeys.avatar.all, "user", privacyToken(userId)] as const,
   },
+  assessments: {
+    all: ["assessments"] as const,
+    mine: () => [...queryKeys.assessments.all, "mine"] as const,
+    detail: (id: string) => [...queryKeys.assessments.all, "detail", privacyToken(id)] as const,
+  },
   psychometrics: {
     all: ["psychometrics"] as const,
-    instruments: (context: "TRIAGE" | "CONSULTATION" = "TRIAGE") => [...queryKeys.psychometrics.all, "instruments", context] as const,
+    instruments: (context: "TRIAGE" | "ASSESSMENT" | "CONSULTATION" = "TRIAGE") => [...queryKeys.psychometrics.all, "instruments", context] as const,
     form: (code: string, version?: number) =>
       [...queryKeys.psychometrics.all, "form", privacyToken(code), version ?? "latest"] as const,
   },
