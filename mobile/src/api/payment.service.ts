@@ -313,6 +313,8 @@ export type BillingOrderIntent = Omit<
   "idempotencyKey"
 > & {
   idempotencyKey?: string;
+  /** Only for idempotency fingerprinting after an expired/failed server order. */
+  retryAfterOrderId?: string;
 };
 
 export function createBillingOrderIdempotencyKey(
@@ -329,6 +331,7 @@ export function createBillingOrderIdempotencyKey(
     stableSerialize(intent.level),
     intent.discountCode ?? "",
     intent.gatewayChannel ?? "",
+    intent.retryAfterOrderId ?? "",
   ];
 
   return `billing-order:${parts.map((part) => encodeURIComponent(part ?? "")).join("|")}`;

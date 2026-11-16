@@ -220,6 +220,14 @@ describe("08. Duitku Payment Catalog, Server Checkout & Billing Suite (RLN-20 & 
       await expect(paymentService.getCurrentBillingOrder("01J7XYZCONSULTATION00000001")).rejects.toThrow();
     });
 
+    it("changes the idempotency key when a previous order expired", () => {
+      const intent = {orderType: "INITIAL" as const, durationMinutes: 60, payerType: "SELF_PAY" as const, gatewayChannel: "QRIS_NOBU"};
+      expect(createBillingOrderIdempotencyKey("consult-1", intent))
+        .not.toEqual(createBillingOrderIdempotencyKey("consult-1", {...intent, retryAfterOrderId: "expired-order-1"}));
+      expect(createBillingOrderIdempotencyKey("consult-1", {...intent, retryAfterOrderId: "expired-order-1"}))
+        .toEqual(createBillingOrderIdempotencyKey("consult-1", {...intent, retryAfterOrderId: "expired-order-1"}));
+    });
+
     it("keeps payment method selection in the idempotency fingerprint", () => {
       const intent = {orderType: "INITIAL" as const, durationMinutes: 60, payerType: "SELF_PAY" as const, gatewayChannel: "VA_BCA"};
       expect(createBillingOrderIdempotencyKey("consult-1", intent))

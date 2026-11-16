@@ -106,6 +106,7 @@ export default function PaymentRegularScreen() {
             idempotencyKey: createBillingOrderIdempotencyKey(consultationId, {
               orderType: "INITIAL", durationMinutes: 60,
               payerType: "SELF_PAY", gatewayChannel: choice.key,
+              retryAfterOrderId: order?.id,
             }),
           },
         });
