@@ -57,7 +57,7 @@ const triageAdapter = (expectedId?: string) => {
 };
 
 export const triageService = {
-  /** Submit a complete, explicitly supplied assessment to the server. */
+  /** Submit a complete triage intake; scoring and disposition are server-owned. */
   async submitTriage(dto: SubmitTriageDto): Promise<TriageResponseDto> {
     const payload = parseRequest(dto);
 
@@ -68,7 +68,7 @@ export const triageService = {
     });
   },
 
-  /** Read a server-confirmed assessment by its server-issued ID. */
+  /** Read a server-confirmed triage decision by its server-issued ID. */
   async getById(id: string, signal?: AbortSignal): Promise<TriageResponseDto> {
     const normalizedId = requireServerId(id, "triageId");
     return apiRequest<TriageResponseDto>(
