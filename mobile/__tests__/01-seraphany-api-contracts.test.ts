@@ -416,7 +416,8 @@ describe("01. SeraPhany API Contracts & Network Engine Suite", () => {
         level: "RED",
         disposition: "PENDING",
         assessmentType: "SELF_ASSESSMENT",
-        answers: { question_1: "Hampir setiap hari" },
+        questionnaireType: "PHQ_9",
+        answers: { q1: 3 },
         createdAt: "2026-11-05T01:00:00Z",
         updatedAt: "2026-11-05T01:00:00Z",
       };
@@ -432,10 +433,9 @@ describe("01. SeraPhany API Contracts & Network Engine Suite", () => {
       });
 
       const result = await triageService.submitTriage({
-        score: 3,
-        hasRedFlags: true,
         assessmentType: "SELF_ASSESSMENT",
-        answers: { question_1: "Hampir setiap hari" },
+        questionnaireType: "PHQ_9",
+        answers: { q1: 3 },
       });
 
       expect(result.id).toBe("trg_001");
@@ -455,7 +455,9 @@ describe("01. SeraPhany API Contracts & Network Engine Suite", () => {
           level: "RED",
           disposition: "PENDING",
           assessmentType: "SELF_ASSESSMENT",
-          answers: {},
+          questionnaireType: "PHQ_9",
+        questionnaireType: "PHQ_9",
+          answers: { q1: 3 },
           createdAt: "2026-11-05T01:00:00Z",
           updatedAt: "2026-11-05T01:00:00Z",
         },
@@ -468,13 +470,13 @@ describe("01. SeraPhany API Contracts & Network Engine Suite", () => {
           get: (header: string) =>
             header === "content-type" ? "application/json" : "200",
         },
-        json: async () => mockQueue,
+        json: async () => ({ data: mockQueue, meta: { itemCount: 1, totalItems: 1, itemsPerPage: 10, totalPages: 1, currentPage: 1 } }),
       });
 
       const queue = await triageService.getTriageQueue();
-      expect(queue).toHaveLength(1);
-      expect(queue[0].id).toBe("trg_001");
-      expect(queue[0].level).toBe("RED");
+      expect(queue.data).toHaveLength(1);
+      expect(queue.data[0].id).toBe("trg_001");
+      expect(queue.data[0].level).toBe("RED");
     });
   });
 });
