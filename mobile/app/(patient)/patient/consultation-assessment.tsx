@@ -76,6 +76,10 @@ export default function ConsultationAssessmentScreen() {
               <Text className="text-muted-foreground text-center">Hasil akan ditinjau oleh praktisi.</Text>
               <Button onPress={goBack} className="w-full h-12 rounded-xl"><ButtonText>Kembali ke Chat</ButtonText></Button>
             </VStack>
+          ) : assignment?.status === "CANCELLED" || assignment?.status === "DECLINED" ? (
+            <Text className="text-muted-foreground">
+              {assignment.status === "DECLINED" ? "Asesmen ini telah Anda tolak." : "Asesmen ini sudah dibatalkan."}
+            </Text>
           ) : list.isLoading || form.isLoading ? (
             <Text className="text-muted-foreground">Memuat asesmen...</Text>
           ) : list.isError || !assignment ? (
