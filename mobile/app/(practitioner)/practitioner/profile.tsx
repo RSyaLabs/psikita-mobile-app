@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Alert, ActivityIndicator, Linking } from "react-native";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -28,11 +28,6 @@ import {
   AvatarFallbackText,
   ScrollView,
 } from "@/components/ui";
-import {
-  PractitionerSettingsModal,
-  PractitionerScheduleModal,
-  PractitionerHelpModal,
-} from "@/components/modals";
 import { AppHeader } from "@/components/common";
 import { PractitionerTabBar } from "@/components/navigation";
 import { ROUTES } from "@/constants";
@@ -52,9 +47,6 @@ export default function PractitionerProfileScreen() {
   const { data: profile } = usePractitionerProfile();
   const { data: avatarData } = useMyAvatar();
   const { signOut } = useAuth();
-  const [showSettingsModal, setShowSettingsModal] = useState(false);
-  const [showScheduleModal, setShowScheduleModal] = useState(false);
-  const [showHelpModal, setShowHelpModal] = useState(false);
 
   const fullName = profile?.fullName;
   const title = profile?.title;
@@ -131,7 +123,7 @@ export default function PractitionerProfileScreen() {
           <Pressable
             onPress={() => {
               haptics.selection();
-              setShowSettingsModal(true);
+              router.push(ROUTES.PRACTITIONER.SETTINGS);
             }}
             accessibilityRole="button"
             accessibilityLabel="Pengaturan Akun"
@@ -276,7 +268,7 @@ export default function PractitionerProfileScreen() {
             <Pressable
               onPress={() => {
                 haptics.selection();
-                setShowScheduleModal(true);
+                router.push(ROUTES.PRACTITIONER.SCHEDULE);
               }}
               accessibilityRole="button"
               accessibilityLabel="Atur jadwal praktik"
@@ -291,7 +283,7 @@ export default function PractitionerProfileScreen() {
                     Atur jadwal praktik
                   </Text>
                   <Text size="sm" className="text-muted-foreground font-medium">
-                    Senin–Jumat • 09:00–17:00
+                    Lihat jadwal dan ketersediaan
                   </Text>
                 </VStack>
               </HStack>
@@ -301,7 +293,7 @@ export default function PractitionerProfileScreen() {
             <Pressable
               onPress={() => {
                 haptics.selection();
-                setShowHelpModal(true);
+                router.push(ROUTES.PRACTITIONER.HELP);
               }}
               accessibilityRole="button"
               accessibilityLabel="Pusat bantuan praktisi"
@@ -341,21 +333,6 @@ export default function PractitionerProfileScreen() {
       {/* Persistent Bottom Tab Bar */}
       <PractitionerTabBar activeTab="profil" />
 
-      {/* Pop-up Modals */}
-      <PractitionerSettingsModal
-        isOpen={showSettingsModal}
-        onClose={() => setShowSettingsModal(false)}
-      />
-
-      <PractitionerScheduleModal
-        isOpen={showScheduleModal}
-        onClose={() => setShowScheduleModal(false)}
-      />
-
-      <PractitionerHelpModal
-        isOpen={showHelpModal}
-        onClose={() => setShowHelpModal(false)}
-      />
     </SafeAreaView>
   );
 }
