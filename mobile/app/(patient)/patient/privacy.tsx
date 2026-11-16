@@ -5,9 +5,9 @@ export default function PrivacyScreen() {
     title="Privasi & Data Pribadi"
     description="Informasi ringkas terkait akses dan perlindungan data pada aplikasi."
     items={[
-      { title: "Akses akun", description: "Gunakan kata sandi yang kuat dan jangan membagikan kode autentikasi. Keluar dari akun pada perangkat yang tidak digunakan." },
-      { title: "Data konsultasi", description: "Data kesehatan dan riwayat konsultasi termasuk informasi sensitif. Hak akses dan masa retensi mengikuti kebijakan resmi serta ketentuan yang berlaku." },
-      { title: "Kebijakan lengkap", description: "Untuk ketentuan hukum, hak subjek data, retensi, dan pemrosesan data, rujuk dokumen kebijakan privasi resmi SeraPhany. Ringkasan ini bukan pengganti dokumen hukum." },
+      { title: "Akses akun", description: "Jaga kata sandi dan OTP tetap pribadi." },
+      { title: "Data konsultasi", description: "Data kesehatan bersifat sensitif." },
+      { title: "Kebijakan lengkap", description: "Lihat dokumen kebijakan resmi untuk ketentuan lengkap." },
     ]}
   />;
 }
