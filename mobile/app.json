@@ -90,7 +90,8 @@
             "kotlinVersion": "2.1.20"
           }
         }
-      ]
+      ],
+      "./plugins/withAndroidKotlin.js"
     ],
     "experiments": {
       "typedRoutes": true
