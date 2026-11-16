@@ -272,6 +272,9 @@ export interface ConsultationResponseDto {
   patientAvatar?: string;
   icdCode?: string;
   note?: string;
+  resultStatus?: "PENDING_RESULT" | "RESULT_SUBMITTED" | null;
+  patientFacingAdvice?: string | null;
+  resultSubmittedAt?: string | null;
 }
 
 export interface MessageResponseDto {
@@ -334,6 +337,8 @@ export interface NoteResponseDto {
     severity?: string;
   };
   isFinalized?: boolean;
+  status?: "DRAFT" | "COMPLETED";
+  version?: number;
 }
 
 // ============================================================================

@@ -20,6 +20,8 @@ const noteSchema = z
       .optional(),
     createdAt: z.string().min(1),
     updatedAt: z.string().min(1),
+    status: z.enum(["DRAFT", "COMPLETED"]).optional(),
+    version: z.number().int().positive().optional(),
   })
   .superRefine((note, ctx) => {
     if (note.contentType === "soap" && !note.soap) {
@@ -55,6 +57,9 @@ function noteAdapter(expectedConsultationId: string) {
       soap: note.soap,
       createdAt: note.createdAt,
       updatedAt: note.updatedAt,
+      status: note.status,
+      version: note.version,
+      isFinalized: note.status === "COMPLETED",
       // Compatibility projections are derived only from validated response data.
       type,
       content: note.text,
@@ -99,6 +104,30 @@ export const notesService = {
         method: "POST",
         body: JSON.stringify(payload),
         adapter: noteAdapter(normalizedId),
+      },
+    );
+  },
+
+  /** Explicit clinical sign-off of a previously saved SOAP/note draft. */
+  async finalizeNote(
+    noteId: string,
+    consultationId: string,
+    version?: number,
+  ): Promise<NoteResponseDto> {
+    const id = requireServerId(noteId, "noteId");
+    const expectedConsultation = requireServerId(consultationId, "consultationId");
+    return apiRequest<NoteResponseDto>(
+      `/consultation/note/${encodeURIComponent(id)}/finalize`,
+      {
+        method: "POST",
+        body: JSON.stringify(version ? { version } : {}),
+        adapter: (value) => {
+          const note = noteAdapter(expectedConsultation)(value);
+          if (note.id !== id || note.status !== "COMPLETED") {
+            throw new Error("Note finalization not confirmed by server");
+          }
+          return note;
+        },
       },
     );
   },

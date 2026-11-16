@@ -12,6 +12,7 @@ export * from "./queries/payment";
 export * from "./queries/refund";
 export * from "./queries/payout";
 export * from "./queries/notes";
+export * from "./queries/clinical-result";
 export * from "./queries/prescription";
 export * from "./queries/chat";
 export * from "./queries/engagement";
