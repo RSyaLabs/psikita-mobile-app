@@ -250,7 +250,7 @@ export const authService = {
   async resetPassword(token: string, newPassword: string): Promise<void> {
     await apiRequest<void>("/auth/password/reset", {
       method: "POST",
-      body: JSON.stringify({ token, newPassword }),
+      body: JSON.stringify({ token, password: newPassword }),
       skipAuth: true,
       adapter: noContentAdapter,
     });
