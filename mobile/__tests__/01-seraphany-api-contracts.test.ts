@@ -456,7 +456,6 @@ describe("01. SeraPhany API Contracts & Network Engine Suite", () => {
           disposition: "PENDING",
           assessmentType: "SELF_ASSESSMENT",
           questionnaireType: "PHQ_9",
-        questionnaireType: "PHQ_9",
           answers: { q1: 3 },
           createdAt: "2026-11-05T01:00:00Z",
           updatedAt: "2026-11-05T01:00:00Z",
