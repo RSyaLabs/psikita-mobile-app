@@ -40,7 +40,7 @@ export default function TriageScreen() {
   const selected = available.find((item) => item.code === selectedCode && item.version === selectedVersion);
   const formQuery = usePsychometricForm(stage === "questions" ? selectedCode : "", selectedVersion);
   const submit = useSubmitTriage();
-  const { data: identity, refetch: refreshIdentity, isLoading: identityLoading } = useMyVerificationStatus();
+  const { data: identity, refetch: refreshIdentity, isLoading: identityLoading } = useMyVerificationStatus(!isGuest);
   const startVerification = useStartDiditVerification();
   const verified = identity?.status === "VERIFIED" || identity?.status === "APPROVED";
   const questions = useMemo(
