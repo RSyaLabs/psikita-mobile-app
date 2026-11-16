@@ -368,6 +368,21 @@ export default function ProfileScreen() {
           </VStack>
         </Card>
 
+        <Card className="bg-card rounded-2xl p-4 border border-border mb-4">
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Buka ulang tutorial aplikasi"
+            onPress={() => router.push(ROUTES.TUTORIAL as never)}
+            className="py-2 flex-row items-center justify-between"
+          >
+            <HStack space="md" className="items-center">
+              <AppIcon icon={HelpCircle} size={20} tone="primary" />
+              <Text size="sm" className="font-semibold text-foreground">Lihat panduan aplikasi</Text>
+            </HStack>
+            <AppIcon icon={ChevronRight} size={18} tone="muted" />
+          </Pressable>
+        </Card>
+
         {/* Logout */}
         <Card className="bg-card rounded-2xl p-4 border border-border mb-4">
           <Pressable

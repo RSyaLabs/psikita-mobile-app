@@ -109,6 +109,7 @@ if (apiFindings.length > 0) {
 // ---------------------------------------------------------------------------
 const allRoutes: string[] = [
   ROUTES.INDEX,
+  ROUTES.TUTORIAL,
   ...Object.values(ROUTES.AUTH),
   ...Object.values(ROUTES.PATIENT),
   ...Object.values(ROUTES.PRACTITIONER),

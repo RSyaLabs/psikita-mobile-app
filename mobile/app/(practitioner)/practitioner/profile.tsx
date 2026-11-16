@@ -311,6 +311,21 @@ export default function PractitionerProfileScreen() {
             </Pressable>
 
             <Pressable
+              onPress={() => router.push(ROUTES.TUTORIAL as never)}
+              accessibilityRole="button"
+              accessibilityLabel="Buka ulang tutorial aplikasi"
+              className="py-2.5 flex-row items-center justify-between border-t border-border active:opacity-80"
+            >
+              <HStack space="sm" className="items-center">
+                <Box className="w-8 h-8 rounded-xl bg-muted items-center justify-center">
+                  <HelpCircle size={16} className="text-foreground" />
+                </Box>
+                <Text size="xs" className="font-bold text-foreground">Panduan aplikasi</Text>
+              </HStack>
+              <ChevronRight size={16} className="text-muted-foreground" />
+            </Pressable>
+
+            <Pressable
               onPress={handleSignOut}
               accessibilityRole="button"
               accessibilityLabel="Keluar akun"

@@ -39,6 +39,7 @@ describe("03. SeraPhany Route Parity & File Existence Suite", () => {
   it("should map every single route 1:1 to a physical screen file in app/", () => {
     const routeToFileMap: Record<string, string> = {
       [ROUTES.INDEX]: "index.tsx",
+      [ROUTES.TUTORIAL]: "tutorial.tsx",
       [ROUTES.AUTH.LOGIN]: "(auth)/login.tsx",
       [ROUTES.AUTH.SIGN_IN]: "(auth)/sign-in.tsx",
       [ROUTES.AUTH.OTP]: "(auth)/otp.tsx",
