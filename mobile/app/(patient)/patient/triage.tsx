@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ArrowLeft, ArrowRight, Check, ShieldCheck } from "lucide-react-native";
@@ -15,6 +15,7 @@ import { launchDiditVerification } from "@/services/didit-kyc";
 import { haptics } from "@/utils/haptics";
 import { safeNavigateBack } from "@/utils/navigation";
 import type { PsychometricInstrumentDto } from "@/api/psychometrics.service";
+import { createTriageSubmissionKey } from "@/clinical/triageIdempotency";
 
 const TRIAGE_CODE = "PHQ9";
 type Stage = "selection" | "questions";
@@ -33,6 +34,8 @@ export default function TriageScreen() {
   const [selectedVersion, setSelectedVersion] = useState<number | undefined>();
   const [questionIndex, setQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, number>>({});
+  // Preserve the key across network retries; changed answers mean a new intent.
+  const pendingSubmission = useRef<{ fingerprint: string; key: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isVerifying, setIsVerifying] = useState(false);
 
@@ -69,6 +72,7 @@ export default function TriageScreen() {
     setSelectedCode(instrument.code);
     setSelectedVersion(instrument.version);
     setAnswers({});
+    pendingSubmission.current = null;
     setQuestionIndex(0);
     setError(null);
     setStage("questions");
@@ -100,11 +104,24 @@ export default function TriageScreen() {
       setError("Verifikasi identitas diperlukan untuk menyimpan hasil.");
       return;
     }
+    const fingerprint = JSON.stringify(
+      Object.entries(answers).sort(([a], [b]) => a.localeCompare(b)),
+    );
+    if (pendingSubmission.current?.fingerprint !== fingerprint) {
+      pendingSubmission.current = {
+        fingerprint,
+        key: createTriageSubmissionKey(),
+      };
+    }
+    const idempotencyKey = pendingSubmission.current.key;
     try {
       const response = await submit.mutateAsync({
-        questionnaireType: "PHQ_9",
-        assessmentType: "SELF_ASSESSMENT",
-        answers,
+        idempotencyKey,
+        dto: {
+          questionnaireType: "PHQ_9",
+          assessmentType: "SELF_ASSESSMENT",
+          answers,
+        },
       });
       haptics.success();
       router.replace({

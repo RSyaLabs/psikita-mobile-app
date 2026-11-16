@@ -58,11 +58,18 @@ const triageAdapter = (expectedId?: string) => {
 
 export const triageService = {
   /** Submit a complete triage intake; scoring and disposition are server-owned. */
-  async submitTriage(dto: SubmitTriageDto): Promise<TriageResponseDto> {
+  async submitTriage(
+    dto: SubmitTriageDto,
+    idempotencyKey: string,
+  ): Promise<TriageResponseDto> {
+    if (!/^[A-Za-z0-9][A-Za-z0-9._:-]{15,127}$/.test(idempotencyKey)) {
+      throw new ApiError("Invalid triage submission key", 400, "INVALID_REQUEST");
+    }
     const payload = parseRequest(dto);
 
     return apiRequest<TriageResponseDto>("/triage", {
       method: "POST",
+      headers: { "Idempotency-Key": idempotencyKey },
       body: JSON.stringify(payload),
       adapter: triageAdapter(),
     });
