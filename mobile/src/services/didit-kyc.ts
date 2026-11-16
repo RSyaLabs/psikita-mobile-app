@@ -141,10 +141,7 @@ export async function launchDiditVerification(
 
             // Sesuai requirement: URL digunakan HANYA ketika terjadi masalah terhadap SDK
             if (fallbackUrl) {
-              console.info(
-                "[DiditKYC] Mengalihkan ke URL fallback Didit:",
-                fallbackUrl,
-              );
+              console.info("[DiditKYC] Mengalihkan ke verifikasi web Didit.");
               try {
                 await Linking.openURL(fallbackUrl);
                 options?.onFallbackUrlLaunched?.(fallbackUrl);
@@ -154,7 +151,7 @@ export async function launchDiditVerification(
                   url: fallbackUrl,
                 };
               } catch (linkError) {
-                console.error("[DiditKYC] Gagal membuka URL fallback:", linkError);
+                console.error("[DiditKYC] Gagal membuka URL verifikasi web.");
               }
             }
 
@@ -174,10 +171,7 @@ export async function launchDiditVerification(
         );
         // Fallback ke URL HANYA jika SDK melempar exception atau mengalami kendala
         if (fallbackUrl) {
-          console.info(
-            "[DiditKYC] Mengalihkan ke URL fallback Didit karena kendala SDK:",
-            fallbackUrl,
-          );
+          console.info("[DiditKYC] Mengalihkan ke verifikasi web karena kendala SDK.");
           try {
             await Linking.openURL(fallbackUrl);
             options?.onFallbackUrlLaunched?.(fallbackUrl);
@@ -187,7 +181,7 @@ export async function launchDiditVerification(
               url: fallbackUrl,
             };
           } catch (linkError) {
-            console.error("[DiditKYC] Gagal membuka URL fallback:", linkError);
+            console.error("[DiditKYC] Gagal membuka URL verifikasi web.");
           }
         }
       }
@@ -205,7 +199,7 @@ export async function launchDiditVerification(
             url: fallbackUrl,
           };
         } catch (linkError) {
-          console.error("[DiditKYC] Gagal membuka URL fallback:", linkError);
+          console.error("[DiditKYC] Gagal membuka URL verifikasi web.");
         }
       }
     }
@@ -213,10 +207,7 @@ export async function launchDiditVerification(
 
   // 2. Fallback: jika SDK tidak tersedia, gagal, atau sessionToken kosong, gunakan URL
   if (fallbackUrl) {
-    console.info(
-      "[DiditKYC] Menggunakan URL fallback verifikasi Didit:",
-      fallbackUrl,
-    );
+    console.info("[DiditKYC] Menggunakan verifikasi web Didit.");
     try {
       await Linking.openURL(fallbackUrl);
       options?.onFallbackUrlLaunched?.(fallbackUrl);
@@ -226,7 +217,7 @@ export async function launchDiditVerification(
         url: fallbackUrl,
       };
     } catch (linkError) {
-      console.error("[DiditKYC] Gagal membuka URL fallback:", linkError);
+      console.error("[DiditKYC] Gagal membuka URL verifikasi web.");
     }
   }
 
