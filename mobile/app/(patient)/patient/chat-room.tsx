@@ -30,6 +30,7 @@ import {
   useActiveConsultation,
   useFinishConsultation,
   useRoomMessages,
+  useConsultationAssessments,
 } from "@/hooks/useApiQueries";
 import { haptics, safeNavigateBack, formatMessageTime } from "@/utils";
 
@@ -48,6 +49,7 @@ export default function ChatRoomScreen() {
   const consultation = useActiveConsultation(consultationId);
   const context = consultation.context;
   const messagesQuery = useRoomMessages(context?.roomId, context?.status);
+  const assessments = useConsultationAssessments(context?.consultationId, context?.status === "ACTIVE");
   const finishMutation = useFinishConsultation();
   const [showFinishDialog, setShowFinishDialog] = useState(false);
   // Latch for the finish action, so a double tap cannot post twice.
@@ -165,6 +167,38 @@ export default function ChatRoomScreen() {
                 Riwayat terenkripsi • mode hanya baca
               </Text>
             </HStack>
+            {assessments.data && assessments.data.length > 0 ? (
+              <VStack space="sm">
+                <Heading size="sm" className="text-foreground">Asesmen dari Praktisi</Heading>
+                {assessments.data.map(item => (
+                  <Card key={item.id} className="bg-card border border-border rounded-xl p-4">
+                    <HStack className="items-center justify-between">
+                      <VStack space="xs" className="flex-1">
+                        <Text className="text-foreground font-semibold">{item.typeCode}</Text>
+                        <Text size="xs" className="text-muted-foreground">
+                          {item.status === "COMPLETED" ? "Sudah dijawab" : "Menunggu jawaban"}
+                        </Text>
+                      </VStack>
+                      {item.status === "ASSIGNED" && context.status === "ACTIVE" ? (
+                        <Button
+                          size="sm"
+                          className="rounded-xl"
+                          onPress={() => router.push({
+                            pathname: ROUTES.PATIENT.CONSULTATION_ASSESSMENT,
+                            params: { consultationId: context.consultationId, assessmentId: item.id },
+                          } as never)}
+                        >
+                          <ButtonText>Jawab</ButtonText>
+                        </Button>
+                      ) : null}
+                    </HStack>
+                  </Card>
+                ))}
+              </VStack>
+            ) : null}
+            {assessments.isError ? (
+              <Text className="text-sm text-muted-foreground">Asesmen belum dapat dimuat.</Text>
+            ) : null}
             {messagesQuery.isLoading && (
               <Text size="sm" className="text-muted-foreground text-center">
                 Memuat riwayat…
