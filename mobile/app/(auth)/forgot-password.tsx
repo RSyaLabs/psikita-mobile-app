@@ -34,8 +34,8 @@ export default function ForgotPasswordScreen() {
   };
 
   const submitReset = async () => {
-    if (!hasResetToken || password.length < 6) {
-      setError("Masukkan token pemulihan dan kata sandi minimal 6 karakter.");
+    if (!hasResetToken || password.length < 8) {
+      setError("Masukkan token pemulihan dan kata sandi minimal 8 karakter.");
       return;
     }
     setError(null);
@@ -70,7 +70,7 @@ export default function ForgotPasswordScreen() {
             ) : (
               <>
                 <Text className="text-muted-foreground leading-relaxed">
-                  Minta tautan pemulihan ke email terdaftar. Gunakan token dari tautan tersebut untuk membuat kata sandi baru.
+                  Gunakan email terdaftar untuk memulihkan akun.
                 </Text>
                 <VStack space="xs">
                   <Text className="text-sm font-semibold text-foreground">Email</Text>
@@ -91,7 +91,7 @@ export default function ForgotPasswordScreen() {
                 <VStack space="xs">
                   <Text className="text-sm font-semibold text-foreground">Kata sandi baru</Text>
                   <Input className="h-12 rounded-xl border-border bg-card">
-                    <InputField value={password} onChangeText={setPassword} secureTextEntry autoComplete="new-password" placeholder="Minimal 6 karakter" accessibilityLabel="Kata sandi baru" />
+                    <InputField value={password} onChangeText={setPassword} secureTextEntry autoComplete="new-password" placeholder="Minimal 8 karakter" accessibilityLabel="Kata sandi baru" />
                   </Input>
                 </VStack>
                 {error ? <Text className="text-sm text-destructive" accessibilityRole="alert">{error}</Text> : null}
