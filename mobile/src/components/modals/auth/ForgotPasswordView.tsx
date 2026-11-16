@@ -68,7 +68,7 @@ export function ForgotPasswordView({
               <Toast nativeID={id} action="success">
                 <ToastTitle>Kode OTP Terkirim</ToastTitle>
                 <ToastDescription>
-                  {res?.message || "Kode 4-digit verifikasi telah dikirim."}
+                  {res?.message || "Kode OTP telah dikirim."}
                 </ToastDescription>
               </Toast>
             ),
@@ -86,9 +86,9 @@ export function ForgotPasswordView({
 
   const handleVerifyForgotOtp = () => {
     setForgotErrorMsg(null);
-    if (!forgotOtp.trim()) {
+    if (!/^\d{6}$/.test(forgotOtp)) {
       haptics.error();
-      setForgotErrorMsg("Masukkan 4 digit kode OTP verifikasi.");
+      setForgotErrorMsg("Masukkan kode OTP 6 digit.");
       return;
     }
     if (forgotNewPassword.length < 6) {
@@ -220,7 +220,7 @@ export function ForgotPasswordView({
         size="xs"
         className="text-muted-foreground text-xs leading-relaxed"
       >
-        Kode 4-digit OTP telah dikirim. Masukkan kode verifikasi dan tentukan sandi baru:
+        Masukkan kode OTP 6 digit dan kata sandi baru.
       </Text>
 
       <FormControl
@@ -231,13 +231,13 @@ export function ForgotPasswordView({
         <FormControlLabel htmlFor="forgot-otp-input">
           <HStack space="xs" className="w-full items-center justify-between">
             <FormControlLabelText className="text-sm font-bold text-foreground">
-              Kode OTP (4 Digit)
+              Kode OTP
             </FormControlLabelText>
             <Text
               size="sm"
               className="text-sm text-muted-foreground font-semibold"
             >
-              {forgotOtp.length}/4
+              {forgotOtp.length}/6
             </Text>
           </HStack>
         </FormControlLabel>
@@ -250,12 +250,12 @@ export function ForgotPasswordView({
             value={forgotOtp}
             onChangeText={(t) => {
               setForgotErrorMsg(null);
-              setForgotOtp(t.replace(/[^0-9]/g, "").slice(0, 4));
+              setForgotOtp(t.replace(/[^0-9]/g, "").slice(0, 6));
             }}
-            placeholder="0 0 0 0"
+            placeholder="000000"
             keyboardType="number-pad"
-            maxLength={4}
-            className="text-center font-mono font-bold text-xl tracking-[16px] text-foreground"
+            maxLength={6}
+            className="text-center font-mono font-bold text-xl tracking-[8px] text-foreground"
           />
         </Input>
         {forgotErrorMsg && (
