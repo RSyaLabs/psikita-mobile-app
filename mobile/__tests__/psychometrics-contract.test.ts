@@ -80,7 +80,7 @@ describe("Psychometrics-backed triage contracts", () => {
       questionnaireType: "PHQ_9",
       assessmentType: "SELF_ASSESSMENT",
       answers: { q1: 1 },
-    });
+    }, "01234567-89ab-4cde-a012-123456789abc");
     expect(result.score).toBe(8);
     const fetchOptions = (global.fetch as jest.Mock).mock.calls[0][1];
     const sent = JSON.parse(fetchOptions.body);
@@ -93,7 +93,7 @@ describe("Psychometrics-backed triage contracts", () => {
     global.fetch = jest.fn();
     await expect(triageService.submitTriage({
       answers: { q1: "fake" } as unknown as Record<string, number>,
-    })).rejects.toMatchObject({ error: "INVALID_REQUEST" });
+    }, "01234567-89ab-4cde-a012-123456789abc")).rejects.toMatchObject({ error: "INVALID_REQUEST" });
     expect(global.fetch).not.toHaveBeenCalled();
   });
 });

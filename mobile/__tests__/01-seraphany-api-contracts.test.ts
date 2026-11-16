@@ -436,7 +436,7 @@ describe("01. SeraPhany API Contracts & Network Engine Suite", () => {
         assessmentType: "SELF_ASSESSMENT",
         questionnaireType: "PHQ_9",
         answers: { q1: 3 },
-      });
+      }, "01234567-89ab-4cde-a012-123456789abc");
 
       expect(result.id).toBe("trg_001");
       expect(result.score).toBe(3);
