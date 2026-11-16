@@ -176,7 +176,7 @@ export default function ChatRoomScreen() {
                       <VStack space="xs" className="flex-1">
                         <Text className="text-foreground font-semibold">{item.typeCode}</Text>
                         <Text size="xs" className="text-muted-foreground">
-                          {item.status === "COMPLETED" ? "Sudah dijawab" : "Menunggu jawaban"}
+                          {item.status === "COMPLETED" ? "Sudah dijawab" : item.status === "DECLINED" ? "Ditolak pasien" : item.status === "CANCELLED" ? "Dibatalkan praktisi" : "Menunggu jawaban"}
                         </Text>
                       </VStack>
                       {item.status === "ASSIGNED" && context.status === "ACTIVE" ? (
