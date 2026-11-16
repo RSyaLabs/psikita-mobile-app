@@ -389,7 +389,7 @@ export interface ReferralResponseDto {
 // ============================================================================
 
 export interface CreateBillingOrderDto {
-  orderType: "INITIAL" | "EXTENSION";
+  orderType: "INITIAL" | "EXTENSION" | "FOLLOW_UP";
   durationMinutes: number;
   payerType: "SELF_PAY" | "BPJS";
   practitionerType?: PractitionerType;
@@ -411,9 +411,10 @@ export interface BillingOrderResponseDto {
   totalAmount: number;
   currency: string;
   paymentStatus: string;
+  gatewayChannel?: string | null;
   claimStatus?: string;
-  paymentId?: string;
-  expiresAt?: string;
+  paymentId?: string | null;
+  expiresAt?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -431,7 +432,7 @@ export interface PaymentMethodItemDto {
   available: boolean;
   providerVerified: boolean;
   fee: PaymentMethodMoneyDto;
-  feeBearer: "PATIENT" | "MERCHANT";
+  feeBearer: "PATIENT" | "INCLUDED";
   totalPayable: PaymentMethodMoneyDto;
   disabledReason?: string | null;
 }

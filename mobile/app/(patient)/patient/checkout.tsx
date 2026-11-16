@@ -92,8 +92,8 @@ export default function CheckoutScreen() {
   const bpjsCapability = getCapability("bpjsEligibility");
   const paymentEnabled =
     paymentCapability === "live" &&
-    contextReady &&
-    Boolean(serverContext);
+    Boolean(consultationId) &&
+    contextReady;
   const bpjsEnabled =
     bpjsCapability === "live" &&
     contextReady &&
@@ -106,14 +106,14 @@ export default function CheckoutScreen() {
       !contextReady);
 
   const openPayment = (pathname: string, enabled = paymentEnabled) => {
-    if (!enabled || !serverContext) {
+    if (!enabled || !consultationId) {
       haptics.error();
       return;
     }
 
     router.push({
       pathname,
-      params: { consultationId: serverContext.consultationId },
+      params: { consultationId },
     } as any);
   };
 
@@ -208,7 +208,7 @@ export default function CheckoutScreen() {
               Rincian tagihan
             </Text>
             <Text size="xs" className="text-muted-foreground">
-              Nominal tagihan belum tersedia dari server.
+              Pilih metode pembayaran untuk melihat estimasi tarif resmi dari server.
             </Text>
             <Text size="xs" className="text-muted-foreground">
               Besaran, diskon, dan biaya akhir akan ditentukan server.
