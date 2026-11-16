@@ -5,8 +5,8 @@ export default function ScheduleScreen() {
     title="Jadwal Praktik"
     description="Pengaturan jadwal harus berasal dari data dan kemampuan backend."
     items={[
-      { title: "Jadwal aktif", description: "Jadwal tersimpan belum tersedia pada layar ini. Jangan menganggap jam contoh sebagai jadwal yang telah diterapkan." },
-      { title: "Mengubah ketersediaan", description: "Status tersedia atau tidak tersedia dapat diubah dari beranda praktisi. Pengaturan slot dan kuota belum tersedia pada aplikasi." },
+      { title: "Jadwal aktif", description: "Belum tersedia." },
+      { title: "Mengubah ketersediaan", description: "Ubah status tersedia dari Beranda." },
     ]}
   />;
 }
