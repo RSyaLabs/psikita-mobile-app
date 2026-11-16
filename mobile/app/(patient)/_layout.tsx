@@ -98,6 +98,9 @@ export default function PatientLayout() {
       <Stack.Screen name="patient/community" />
       <Stack.Screen name="patient/community-detail" />
       <Stack.Screen name="patient/follow-ups" />
+      <Stack.Screen name="patient/help" />
+      <Stack.Screen name="patient/support" />
+      <Stack.Screen name="patient/privacy" />
     </Stack>
   );
 }
