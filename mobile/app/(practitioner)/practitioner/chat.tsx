@@ -181,7 +181,7 @@ export default function PractitionerChatScreen() {
                     </Text>
                   </HStack>
                   {item.hasRedFlags ? (
-                    <Text className="text-destructive text-xs font-semibold mt-2">
+                    <Text className="text-destructive text-sm font-semibold mt-2">
                       Indikator risiko perlu ditinjau oleh praktisi sesuai protokol keselamatan.
                     </Text>
                   ) : null}
