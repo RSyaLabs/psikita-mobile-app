@@ -93,7 +93,7 @@ export function ForgotPasswordView({
     }
     if (forgotNewPassword.length < 6) {
       haptics.error();
-      setForgotErrorMsg("Kata sandi baru minimal 6 karakter.");
+      setForgotErrorMsg("Kata sandi baru minimal 8 karakter.");
       return;
     }
 
@@ -141,7 +141,7 @@ export function ForgotPasswordView({
           size="xs"
           className="text-muted-foreground text-xs leading-relaxed"
         >
-          Masukkan email atau nomor WhatsApp terdaftar untuk menerima 4 digit kode verifikasi OTP:
+          Masukkan email atau nomor WhatsApp terdaftar untuk menerima kode OTP:
         </Text>
 
         <FormControl
@@ -286,7 +286,7 @@ export function ForgotPasswordView({
               setForgotErrorMsg(null);
               setForgotNewPassword(t);
             }}
-            placeholder="Minimal 6 karakter"
+            placeholder="Minimal 8 karakter"
             secureTextEntry={!showForgotNewPassword}
             className="flex-1 text-sm text-foreground placeholder:text-muted-foreground"
           />
