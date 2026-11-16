@@ -80,6 +80,21 @@ export const triageService = {
     );
   },
 
+  /** Patient-scoped triage intake history. */
+  async getMyHistory(page = 1, limit = 10, signal?: AbortSignal) {
+    return apiRequest<import("./response").PaginatedResult<TriageResponseDto>>(
+      `/triage/me/history?page=${Math.max(1, Math.floor(page))}&limit=${Math.min(100, Math.max(1, Math.floor(limit)))}`,
+      { signal, adapter: paginatedAdapter(triageAdapter()) },
+    );
+  },
+
+  /** Patient's most recent triage intake, not necessarily their current care episode. */
+  async getMyLatest(signal?: AbortSignal): Promise<TriageResponseDto> {
+    return apiRequest<TriageResponseDto>("/triage/me/latest", {
+      signal, adapter: triageAdapter(),
+    });
+  },
+
   /** List the server-confirmed triage queue. */
   async getTriageQueue(signal?: AbortSignal): Promise<import("./response").PaginatedResult<TriageResponseDto>> {
     return apiRequest<import("./response").PaginatedResult<TriageResponseDto>>("/triage/queue", {
