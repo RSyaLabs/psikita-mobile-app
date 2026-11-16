@@ -144,7 +144,7 @@ export default function PractitionerChatScreen() {
                     <VStack space="xs" className="flex-1">
                       <Text className="font-semibold text-foreground">{item.typeCode} · v{item.typeVersion}</Text>
                       <Text size="xs" className="text-muted-foreground">
-                        {item.status === "COMPLETED" ? "Selesai" : "Menunggu jawaban pasien"}
+                        {item.status === "COMPLETED" ? "Selesai" : item.status === "DECLINED" ? "Ditolak pasien" : item.status === "CANCELLED" ? "Dibatalkan" : "Menunggu jawaban pasien"}
                       </Text>
                     </VStack>
                     {item.status === "COMPLETED" && item.totalScore !== null ? (
