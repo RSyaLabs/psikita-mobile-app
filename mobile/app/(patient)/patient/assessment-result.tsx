@@ -44,7 +44,7 @@ export default function AssessmentResultScreen() {
             <Pressable accessibilityRole="button" accessibilityLabel="Kembali" onPress={goBack} className="p-2 -ml-2">
               <ArrowLeft size={22} className="text-foreground" />
             </Pressable>
-            <Heading size="xl" bold className="text-foreground">Hasil Asesmen</Heading>
+            <Heading size="xl" bold className="text-foreground">Hasil Skrining Awal</Heading>
           </HStack>
           {!id || resultQuery.isError ? (
             <VStack space="lg">
@@ -63,7 +63,7 @@ export default function AssessmentResultScreen() {
                     {urgent ? <ShieldAlert size={22} className="text-destructive" /> :
                       <CheckCircle2 size={22} className="text-primary" />}
                     <Text className="text-foreground font-semibold">
-                      {urgent ? "Perlu tindak lanjut segera" : "Asesmen tersimpan"}
+                      {urgent ? "Perlu tindak lanjut segera" : "Skrining tersimpan"}
                     </Text>
                   </HStack>
                   <Heading size="3xl" bold className="text-foreground">{result.score}</Heading>
