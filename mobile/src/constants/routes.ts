@@ -5,6 +5,7 @@ export const ROUTES = {
     SIGN_IN: "/sign-in",
     OTP: "/otp",
     FORGOT_PASSWORD: "/forgot-password",
+    RESET_PASSWORD: "/reset-password",
     REGISTER: "/register",
   },
   PATIENT: {
