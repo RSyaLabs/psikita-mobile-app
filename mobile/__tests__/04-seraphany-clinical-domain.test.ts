@@ -18,6 +18,18 @@ import {
 import { ApiError } from "@/api/response";
 
 describe("04. SeraPhany Clinical Domain & Capability Engine Suite", () => {
+  it("keeps independent self-assessment entry separate from the triage gateway", () => {
+    const fs = require("fs") as typeof import("fs");
+    const path = require("path") as typeof import("path");
+    const dashboard = fs.readFileSync(
+      path.resolve(__dirname, "../app/(patient)/patient/dashboard.tsx"),
+      "utf8",
+    );
+    expect(dashboard).toContain("accessibilityLabel=\"Tes mandiri\"");
+    expect(dashboard).toContain("router.push(ROUTES.PATIENT.MY_ASSESSMENTS as never)");
+    expect(dashboard).not.toContain('mode: "assessment"');
+  });
+
   describe("Capability Gates & Live/Fail-Closed Boundaries", () => {
     const liveCapabilities: CapabilityKey[] = [
       "patientProfile",

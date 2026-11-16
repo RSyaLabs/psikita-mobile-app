@@ -496,10 +496,7 @@ export default function PatientDashboard() {
               accessibilityLabel="Tes mandiri"
               onPress={() => {
                 haptics.light();
-                router.push({
-                  pathname: ROUTES.PATIENT.TRIAGE,
-                  params: { mode: "assessment", guest: "false" },
-                } as any);
+                router.push(ROUTES.PATIENT.MY_ASSESSMENTS as never);
               }}
               className="bg-card p-3.5 rounded-2xl flex-row items-center border border-border active:bg-muted"
             >
