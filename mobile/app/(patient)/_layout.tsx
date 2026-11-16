@@ -81,6 +81,7 @@ export default function PatientLayout() {
       <Stack.Screen name="patient/payment-regular" />
       <Stack.Screen name="patient/payment-bpjs" />
       <Stack.Screen name="patient/chat-room" />
+      <Stack.Screen name="patient/consultation-assessment" />
       <Stack.Screen name="patient/overtime-modal" />
       <Stack.Screen name="patient/rating" />
       <Stack.Screen name="patient/history" />
