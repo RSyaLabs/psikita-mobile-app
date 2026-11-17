@@ -104,9 +104,15 @@ export const patientService = {
     dto: UpdatePatientDto,
   ): Promise<PatientResponseDto> {
     const id = requireServerId(patientId, "patientId");
+    const payload: UpdatePatientDto = { ...dto };
+    if (dto.fullName && (!payload.firstName || !payload.lastName)) {
+      const parts = dto.fullName.trim().split(/\s+/);
+      payload.firstName = parts[0] || "Pasien";
+      payload.lastName = parts.slice(1).join(" ") || parts[0] || "SeraPhany";
+    }
     return apiRequest<PatientResponseDto>(`/patient/${encodeURIComponent(id)}`, {
       method: "PUT",
-      body: JSON.stringify(dto),
+      body: JSON.stringify(payload),
       adapter: patientDtoAdapter,
     });
   },

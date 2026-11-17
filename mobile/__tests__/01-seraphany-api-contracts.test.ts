@@ -405,6 +405,50 @@ describe("01. SeraPhany API Contracts & Network Engine Suite", () => {
         }),
       );
     });
+
+    it("should update patient profile via PUT /patient/:id and derive firstName/lastName from fullName", async () => {
+      const mockPatient = {
+        patientId: "pat_core_001",
+        status: "ACTIVE",
+        fullName: "Siti Rahma",
+        birthDate: "1995-08-17",
+        gender: "FEMALE",
+        phoneNumber: "081234567890",
+        address: "Jl. Thamrin No. 5, Jakarta",
+        medicalRecordNumber: "MRN-2026-0001",
+        createdAt: "2026-11-05T00:00:00.000Z",
+        updatedAt: "2026-11-05T00:00:00.000Z",
+      };
+
+      global.fetch = jest.fn().mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        headers: {
+          get: (header: string) =>
+            header === "content-type" ? "application/json" : "200",
+        },
+        json: async () => mockPatient,
+      });
+
+      const updated = await patientService.updateProfile("pat_core_001", {
+        fullName: "Siti Rahma",
+        phoneNumber: "081234567890",
+      });
+
+      expect(updated.patientId).toBe("pat_core_001");
+      expect(global.fetch).toHaveBeenCalledWith(
+        "https://api.staging.seraphany.id/core/patient/pat_core_001",
+        expect.objectContaining({
+          method: "PUT",
+          body: JSON.stringify({
+            fullName: "Siti Rahma",
+            phoneNumber: "081234567890",
+            firstName: "Siti",
+            lastName: "Rahma",
+          }),
+        }),
+      );
+    });
   });
 
   describe("Triage Assessment Service (POST /triage & GET /triage/queue)", () => {

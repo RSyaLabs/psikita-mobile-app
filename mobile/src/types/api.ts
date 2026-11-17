@@ -116,6 +116,8 @@ export interface CreatePatientDto {
 
 export interface UpdatePatientDto {
   fullName?: string;
+  firstName?: string;
+  lastName?: string;
   phoneNumber?: string;
   nik?: string;
   bpjsNumber?: string;
