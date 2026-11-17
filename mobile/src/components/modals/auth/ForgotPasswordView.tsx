@@ -68,7 +68,7 @@ export function ForgotPasswordView({
               <Toast nativeID={id} action="success">
                 <ToastTitle>Kode OTP Terkirim</ToastTitle>
                 <ToastDescription>
-                  {res?.message || "Kode 4-digit verifikasi telah dikirim."}
+                  {res?.message || "Kode 6-digit verifikasi telah dikirim."}
                 </ToastDescription>
               </Toast>
             ),
@@ -86,14 +86,14 @@ export function ForgotPasswordView({
 
   const handleVerifyForgotOtp = () => {
     setForgotErrorMsg(null);
-    if (!forgotOtp.trim()) {
+    if (!forgotOtp.trim() || forgotOtp.trim().length !== 6) {
       haptics.error();
-      setForgotErrorMsg("Masukkan 4 digit kode OTP verifikasi.");
+      setForgotErrorMsg("Masukkan 6 digit kode OTP verifikasi.");
       return;
     }
-    if (forgotNewPassword.length < 6) {
+    if (forgotNewPassword.length < 8) {
       haptics.error();
-      setForgotErrorMsg("Kata sandi baru minimal 6 karakter.");
+      setForgotErrorMsg("Kata sandi baru minimal 8 karakter.");
       return;
     }
 
@@ -138,10 +138,10 @@ export function ForgotPasswordView({
     return (
       <VStack space="sm" className="w-full">
         <Text
-          size="xs"
-          className="text-muted-foreground text-xs leading-relaxed"
+          size="sm"
+          className="text-muted-foreground text-sm leading-relaxed"
         >
-          Masukkan email atau nomor WhatsApp terdaftar untuk menerima 4 digit kode verifikasi OTP:
+          Masukkan email atau nomor WhatsApp terdaftar untuk menerima 6 digit kode verifikasi OTP:
         </Text>
 
         <FormControl
@@ -150,7 +150,7 @@ export function ForgotPasswordView({
           isInvalid={Boolean(forgotErrorMsg)}
         >
           <FormControlLabel htmlFor="forgot-email-input">
-            <FormControlLabelText className="text-xs font-bold text-foreground">
+            <FormControlLabelText className="text-sm font-bold text-foreground">
               Email / Nomor WhatsApp
             </FormControlLabelText>
           </FormControlLabel>
@@ -168,6 +168,7 @@ export function ForgotPasswordView({
               placeholder="email terdaftar"
               keyboardType="email-address"
               autoCapitalize="none"
+              className="text-sm text-foreground placeholder:text-muted-foreground"
             />
           </Input>
           {forgotErrorMsg && (
@@ -196,16 +197,17 @@ export function ForgotPasswordView({
           space="xs"
           className="items-center justify-center pt-2 border-t border-border/40 mt-1"
         >
-          <Text size="xs" className="text-muted-foreground text-xs">
+          <Text size="sm" className="text-muted-foreground text-sm">
             Ingat kata sandi?
           </Text>
           <Pressable
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             onPress={() => {
               haptics.light();
               setTab("login");
             }}
           >
-            <Text size="xs" bold className="text-primary underline">
+            <Text size="sm" bold className="text-primary underline">
               Kembali ke Masuk
             </Text>
           </Pressable>
@@ -217,10 +219,10 @@ export function ForgotPasswordView({
   return (
     <VStack space="sm" className="w-full">
       <Text
-        size="xs"
-        className="text-muted-foreground text-xs leading-relaxed"
+        size="sm"
+        className="text-muted-foreground text-sm leading-relaxed"
       >
-        Kode 4-digit OTP telah dikirim. Masukkan kode verifikasi dan tentukan sandi baru:
+        Kode 6-digit OTP telah dikirim. Masukkan kode verifikasi dan tentukan sandi baru:
       </Text>
 
       <FormControl
@@ -231,13 +233,13 @@ export function ForgotPasswordView({
         <FormControlLabel htmlFor="forgot-otp-input">
           <HStack space="xs" className="w-full items-center justify-between">
             <FormControlLabelText className="text-sm font-bold text-foreground">
-              Kode OTP (4 Digit)
+              Kode OTP (6 Digit)
             </FormControlLabelText>
             <Text
               size="sm"
               className="text-sm text-muted-foreground font-semibold"
             >
-              {forgotOtp.length}/4
+              {forgotOtp.length}/6
             </Text>
           </HStack>
         </FormControlLabel>
@@ -245,17 +247,17 @@ export function ForgotPasswordView({
           <InputField
             id="forgot-otp-input"
             name="forgotOtp"
-            accessibilityLabel="Kode OTP empat digit"
+            accessibilityLabel="Kode OTP enam digit"
             accessibilityHint={forgotErrorMsg ?? undefined}
             value={forgotOtp}
             onChangeText={(t) => {
               setForgotErrorMsg(null);
-              setForgotOtp(t.replace(/[^0-9]/g, "").slice(0, 4));
+              setForgotOtp(t.replace(/[^0-9]/g, "").slice(0, 6));
             }}
-            placeholder="0 0 0 0"
+            placeholder="0 0 0 0 0 0"
             keyboardType="number-pad"
-            maxLength={4}
-            className="text-center font-mono font-bold text-xl tracking-[16px] text-foreground"
+            maxLength={6}
+            className="text-center font-mono font-bold text-xl tracking-[12px] text-foreground"
           />
         </Input>
         {forgotErrorMsg && (
@@ -271,8 +273,8 @@ export function ForgotPasswordView({
         isInvalid={Boolean(forgotErrorMsg)}
       >
         <FormControlLabel htmlFor="forgot-new-password-input">
-          <FormControlLabelText className="text-xs font-bold text-foreground">
-            Kata Sandi Baru
+          <FormControlLabelText className="text-sm font-bold text-foreground">
+            Kata Sandi Baru (Min. 8 Karakter)
           </FormControlLabelText>
         </FormControlLabel>
         <Input className="rounded-xl border-border bg-background h-11 px-3 flex-row items-center">
