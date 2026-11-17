@@ -5,6 +5,34 @@ describe("11. Auth Flow & Password Reset Contract Suite (RLN-5 & RLN-9)", () => 
   it("should have correct endpoints for forgotPassword and resetPassword in authService", () => {
     expect(typeof authService.forgotPassword).toBe("function");
     expect(typeof authService.resetPassword).toBe("function");
+    expect(typeof authService.requestOtp).toBe("function");
+    expect(typeof authService.verifyOtp).toBe("function");
+  });
+
+  describe("OTP 6-digit validation rules (matching Core API VerifyOtpDto)", () => {
+    const isValidOtp = (otp: string) => {
+      const trimmed = otp.trim();
+      return /^\d{6}$/.test(trimmed) && trimmed.length === 6;
+    };
+
+    it("should accept valid 6-digit numeric OTP codes", () => {
+      expect(isValidOtp("123456")).toBe(true);
+      expect(isValidOtp("000000")).toBe(true);
+      expect(isValidOtp("987654")).toBe(true);
+    });
+
+    it("should strictly reject 4-digit or incomplete OTP codes", () => {
+      expect(isValidOtp("1234")).toBe(false);
+      expect(isValidOtp("0000")).toBe(false);
+      expect(isValidOtp("12345")).toBe(false);
+    });
+
+    it("should reject OTP codes with non-numeric characters or overflow", () => {
+      expect(isValidOtp("12345a")).toBe(false);
+      expect(isValidOtp("12 345")).toBe(false);
+      expect(isValidOtp("1234567")).toBe(false);
+      expect(isValidOtp("")).toBe(false);
+    });
   });
 
   describe("Username validation rules (matching Core API PasswordRegisterDto)", () => {
