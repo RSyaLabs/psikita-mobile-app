@@ -275,7 +275,7 @@ export const consultationService = {
     signal?: AbortSignal,
   ): Promise<ConsultationResponseDto[]> {
     const query = params ? withQueryParams("/consultations", params) : "/consultations";
-    const response = await apiRequest<unknown>(query, { signal });
+    const response = await apiRequest<unknown>(query, { signal, adapter: (v) => v });
     if (Array.isArray(response)) {
       return response.map((item) => consultationAdapter(undefined, undefined, false)(item));
     }
@@ -294,7 +294,7 @@ export const consultationService = {
     signal?: AbortSignal,
   ): Promise<ConsultationResponseDto[]> {
     const query = params ? withQueryParams("/patient/me/consultations", params) : "/patient/me/consultations";
-    const response = await apiRequest<unknown>(query, { signal });
+    const response = await apiRequest<unknown>(query, { signal, adapter: (v) => v });
     if (Array.isArray(response)) {
       return response.map((item) => consultationAdapter(undefined, undefined, false)(item));
     }
@@ -334,6 +334,7 @@ export const consultationService = {
       `/rooms/${encodeURIComponent(normalizedRoomId)}/ice-servers`,
       {
         signal,
+        adapter: (v) => v as any,
       },
     );
   },

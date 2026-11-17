@@ -48,7 +48,7 @@ export interface LmsProgressDto {
 export const lmsService = {
   getCourses: async (topic?: string, signal?: AbortSignal): Promise<LmsCourseDto[]> => {
     const path = topic ? withQueryParams("/lms/courses", { topic }) : "/lms/courses";
-    const response = await apiRequest<unknown>(path, { signal });
+    const response = await apiRequest<unknown>(path, { signal, adapter: (v) => v });
     if (Array.isArray(response)) {
       return response as LmsCourseDto[];
     }
@@ -59,26 +59,39 @@ export const lmsService = {
   },
 
   getCourseById: async (courseId: string, signal?: AbortSignal): Promise<LmsCourseDetailDto> => {
-    const response = await apiRequest<LmsCourseDetailDto>(`/lms/courses/${courseId}`, { signal });
+    const response = await apiRequest<LmsCourseDetailDto>(`/lms/courses/${courseId}`, {
+      signal,
+      adapter: (v) => v as LmsCourseDetailDto,
+    });
     return response;
   },
 
   completeLesson: async (lessonId: string): Promise<{ success: boolean }> => {
     return apiRequest<{ success: boolean }>(`/lms/lessons/${lessonId}/complete`, {
       method: "POST",
+      adapter: (v) => (isRecord(v) ? (v as any) : { success: true }),
     });
   },
 
   getMyProgress: async (signal?: AbortSignal): Promise<LmsProgressDto> => {
-    return apiRequest<LmsProgressDto>("/lms/my-progress", { signal });
+    return apiRequest<LmsProgressDto>("/lms/my-progress", {
+      signal,
+      adapter: (v) => v as LmsProgressDto,
+    });
   },
 
   getActiveTest: async (signal?: AbortSignal): Promise<any> => {
-    return apiRequest<any>("/lms/active-test", { signal });
+    return apiRequest<any>("/lms/active-test", {
+      signal,
+      adapter: (v) => v,
+    });
   },
 
   getTestHistory: async (signal?: AbortSignal): Promise<any[]> => {
-    const res = await apiRequest<any>("/lms/test-history", { signal });
+    const res = await apiRequest<any>("/lms/test-history", {
+      signal,
+      adapter: (v) => v,
+    });
     if (Array.isArray(res)) return res;
     if (isRecord(res) && Array.isArray((res as any).data)) return (res as any).data;
     return [];
@@ -87,6 +100,7 @@ export const lmsService = {
   evaluatePromotion: async (): Promise<any> => {
     return apiRequest<any>("/lms/evaluate-promotion", {
       method: "POST",
+      adapter: (v) => v,
     });
   },
 
@@ -94,6 +108,7 @@ export const lmsService = {
     return apiRequest<any>("/lms/competency-test/start", {
       method: "POST",
       body: JSON.stringify({ targetLevel }),
+      adapter: (v) => v,
     });
   },
 
@@ -105,6 +120,7 @@ export const lmsService = {
     return apiRequest<any>("/lms/competency-test/submit", {
       method: "POST",
       body: JSON.stringify(dto),
+      adapter: (v) => v,
     });
   },
 };

@@ -36,7 +36,7 @@ export const carePlanService = {
     try {
       return await apiRequest<CarePlanDto>(
         `/consultation/${consultationId}/care-plan`,
-        { signal },
+        { signal, adapter: (v) => v as CarePlanDto },
       );
     } catch {
       return null;
@@ -50,6 +50,7 @@ export const carePlanService = {
     return apiRequest<CarePlanDto>(`/consultation/${consultationId}/care-plan`, {
       method: "POST",
       body: JSON.stringify(payload),
+      adapter: (v) => v as CarePlanDto,
     });
   },
 };

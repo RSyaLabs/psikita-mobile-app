@@ -185,7 +185,7 @@ export const prescriptionService = {
     const path = params
       ? withQueryParams("/referral/nearest-facilities", params)
       : "/referral/nearest-facilities";
-    const res = await apiRequest<unknown>(path, { signal });
+    const res = await apiRequest<unknown>(path, { signal, adapter: (v) => v });
     if (Array.isArray(res)) return res as FacilityResponseDto[];
     if (res && Array.isArray((res as any).data)) {
       return (res as any).data as FacilityResponseDto[];
@@ -203,7 +203,7 @@ export const prescriptionService = {
     const id = requireServerId(referralId, "referralId");
     return apiRequest<ReferralLetterResponseDto>(
       `/consultation/referral/${encodeURIComponent(id)}/letter`,
-      { signal },
+      { signal, adapter: (v) => v as ReferralLetterResponseDto },
     );
   },
 
@@ -216,7 +216,7 @@ export const prescriptionService = {
     const id = requireServerId(referralId, "referralId");
     return apiRequest<ReferralLetterResponseDto>(
       `/consultation/referral/${encodeURIComponent(id)}/letter`,
-      { method: "POST" },
+      { method: "POST", adapter: (v) => v as ReferralLetterResponseDto },
     );
   },
 
@@ -228,6 +228,9 @@ export const prescriptionService = {
     signal?: AbortSignal,
   ): Promise<MedicationSuggestionsDto> {
     const path = withQueryParams("/medications/suggestions", params);
-    return apiRequest<MedicationSuggestionsDto>(path, { signal });
+    return apiRequest<MedicationSuggestionsDto>(path, {
+      signal,
+      adapter: (v) => v as MedicationSuggestionsDto,
+    });
   },
 };

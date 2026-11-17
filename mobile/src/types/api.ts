@@ -584,6 +584,10 @@ export interface CreatePractitionerDto {
   sippNumber: string;
   specialization: string;
   type: PractitionerType;
+  firstName?: string;
+  lastName?: string;
+  birthDate?: string;
+  gender?: string;
   nik?: string;
   phone?: string;
   almamater?: string;

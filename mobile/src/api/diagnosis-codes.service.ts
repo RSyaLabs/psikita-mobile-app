@@ -35,6 +35,7 @@ export const diagnosisCodesService = {
       : "/diagnosis-codes";
     const res = await apiRequest<PaginatedDiagnosisCodesResponseDto>(query, {
       signal,
+      adapter: (v) => v as PaginatedDiagnosisCodesResponseDto,
     });
     return res?.data ?? [];
   },

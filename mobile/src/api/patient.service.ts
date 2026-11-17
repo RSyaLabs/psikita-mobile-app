@@ -82,9 +82,16 @@ export const patientService = {
    * Buat Profil Pasien Baru
    */
   async createProfile(dto: CreatePatientDto): Promise<PatientResponseDto> {
+    const payload = { ...dto };
+    if ((!payload.firstName || !payload.lastName) && payload.fullName) {
+      const parts = payload.fullName.trim().split(/\s+/);
+      payload.firstName = payload.firstName || parts[0] || "Pasien";
+      payload.lastName = payload.lastName || parts.slice(1).join(" ") || parts[0] || "Baru";
+    }
+
     return apiRequest<PatientResponseDto>("/patient", {
       method: "POST",
-      body: JSON.stringify(dto),
+      body: JSON.stringify(payload),
       adapter: patientDtoAdapter,
     });
   },
@@ -128,7 +135,10 @@ export const patientService = {
   async getMyResults(
     signal?: AbortSignal,
   ): Promise<PatientConsultationResultDto[]> {
-    const res = await apiRequest<unknown>("/patient/me/results", { signal });
+    const res = await apiRequest<unknown>("/patient/me/results", {
+      signal,
+      adapter: (v) => v,
+    });
     if (Array.isArray(res)) return res as PatientConsultationResultDto[];
     if (res && Array.isArray((res as any).data)) {
       return (res as any).data as PatientConsultationResultDto[];
@@ -146,7 +156,10 @@ export const patientService = {
     const id = requireServerId(consultationId, "consultationId");
     return apiRequest<PatientConsultationResultDto>(
       `/patient/me/results/${encodeURIComponent(id)}`,
-      { signal },
+      {
+        signal,
+        adapter: (v) => v as PatientConsultationResultDto,
+      },
     );
   },
 };

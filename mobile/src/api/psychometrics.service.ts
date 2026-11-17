@@ -47,7 +47,10 @@ export interface ScoreResultResponseDto {
 
 export const psychometricsService = {
   getInstruments: async (signal?: AbortSignal): Promise<PsychometricInstrumentDto[]> => {
-    const response = await apiRequest<unknown>("/psychometrics/types", { signal });
+    const response = await apiRequest<unknown>("/psychometrics/types", {
+      signal,
+      adapter: (v) => v,
+    });
     if (Array.isArray(response)) {
       return response as PsychometricInstrumentDto[];
     }
@@ -58,7 +61,10 @@ export const psychometricsService = {
   },
 
   getInstrumentForm: async (code: string, signal?: AbortSignal): Promise<PsychometricFormDto> => {
-    return apiRequest<PsychometricFormDto>(`/psychometrics/types/${code}/form`, { signal });
+    return apiRequest<PsychometricFormDto>(`/psychometrics/types/${code}/form`, {
+      signal,
+      adapter: (v) => v as PsychometricFormDto,
+    });
   },
 
   dryRunScore: async (
@@ -72,6 +78,7 @@ export const psychometricsService = {
         method: "POST",
         body: JSON.stringify(dto),
         signal,
+        adapter: (v) => v as ScoreResultResponseDto,
       },
     );
   },

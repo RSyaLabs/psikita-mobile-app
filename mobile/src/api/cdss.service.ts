@@ -35,7 +35,7 @@ export interface CdssInsightDto {
 
 export const cdssService = {
   getAlerts: async (signal?: AbortSignal): Promise<CdssAlertDto[]> => {
-    const response = await apiRequest<unknown>("/cdss/alerts", { signal });
+    const response = await apiRequest<unknown>("/cdss/alerts", { signal, adapter: (v) => v });
     if (Array.isArray(response)) {
       return response as CdssAlertDto[];
     }
@@ -46,7 +46,7 @@ export const cdssService = {
   },
 
   getPatientAlerts: async (patientId: string, signal?: AbortSignal): Promise<CdssAlertDto[]> => {
-    const response = await apiRequest<unknown>(`/cdss/patients/${patientId}/alerts`, { signal });
+    const response = await apiRequest<unknown>(`/cdss/patients/${patientId}/alerts`, { signal, adapter: (v) => v });
     if (Array.isArray(response)) {
       return response as CdssAlertDto[];
     }
@@ -60,18 +60,21 @@ export const cdssService = {
     return apiRequest<CdssInsightDto>("/cdss/evaluate", {
       method: "POST",
       body: JSON.stringify(payload),
+      adapter: (v) => v as CdssInsightDto,
     });
   },
 
   acknowledgeAlert: async (alertId: string): Promise<{ success: boolean }> => {
     return apiRequest<{ success: boolean }>(`/cdss/alerts/${alertId}/acknowledge`, {
       method: "POST",
+      adapter: (v) => (isRecord(v) ? (v as any) : { success: true }),
     });
   },
 
   resolveAlert: async (alertId: string): Promise<{ success: boolean }> => {
     return apiRequest<{ success: boolean }>(`/cdss/alerts/${alertId}/resolve`, {
       method: "POST",
+      adapter: (v) => (isRecord(v) ? (v as any) : { success: true }),
     });
   },
 };

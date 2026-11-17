@@ -197,6 +197,7 @@ export const authService = {
       "/user/me",
       {
         method: "DELETE",
+        adapter: (v) => v as { message: string; scheduledDeletionAt?: string },
       },
     );
   },
@@ -217,7 +218,9 @@ export const authService = {
         identifier?: string;
         linkedAt?: string;
       }>;
-    }>("/user/identities");
+    }>("/user/identities", {
+      adapter: (v) => v as any,
+    });
   },
 
   /**

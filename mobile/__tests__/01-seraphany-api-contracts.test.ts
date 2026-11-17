@@ -15,6 +15,8 @@ import {
 import { identityVerificationService } from "../src/api/identity-verification.service";
 import { patientService } from "../src/api/patient.service";
 import { triageService } from "../src/api/triage.service";
+import { communityService } from "../src/api/community.service";
+import { followUpService } from "../src/api/followup.service";
 import { secureStorage } from "../src/utils/storage";
 
 describe("01. SeraPhany API Contracts & Network Engine Suite", () => {
@@ -475,6 +477,114 @@ describe("01. SeraPhany API Contracts & Network Engine Suite", () => {
       expect(queue).toHaveLength(1);
       expect(queue[0].id).toBe("trg_001");
       expect(queue[0].level).toBe("RED");
+    });
+
+    it("should handle 200 OK responses with body gracefully in noContentAdapter", async () => {
+      global.fetch = jest.fn().mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        headers: {
+          get: (header: string) =>
+            header === "content-type" ? "application/json" : null,
+        },
+        json: async () => ({ message: "Success" }),
+      });
+
+      const res = await apiRequest<void>("/some-action", {
+        skipAuth: true,
+        adapter: noContentAdapter,
+      });
+      expect(res).toBeUndefined();
+    });
+
+    it("should route community post creation to POST /posts with valid CreatePostDto format", async () => {
+      global.fetch = jest.fn().mockResolvedValueOnce({
+        ok: true,
+        status: 201,
+        headers: {
+          get: (header: string) =>
+            header === "content-type" ? "application/json" : "201",
+        },
+        json: async () => ({ message: "Post berhasil dibuat" }),
+      });
+
+      const res = await communityService.createPost({
+        title: "Kecemasan Ujian",
+        content: "Bagaimana cara mengatasi cemas?",
+        category: "Cerita Harian",
+      });
+
+      expect(res.message).toBe("Post berhasil dibuat");
+      expect(global.fetch).toHaveBeenCalledWith(
+        "https://api.staging.seraphany.id/core/posts",
+        expect.objectContaining({
+          method: "POST",
+          body: JSON.stringify({
+            content: "Kecemasan Ujian\n\nBagaimana cara mengatasi cemas?",
+            type: "EXPERIENCE",
+          }),
+        }),
+      );
+    });
+
+    it("should route community reply creation to POST /posts with replyToId and EXPERIENCE type", async () => {
+      global.fetch = jest.fn().mockResolvedValueOnce({
+        ok: true,
+        status: 201,
+        headers: {
+          get: (header: string) =>
+            header === "content-type" ? "application/json" : "201",
+        },
+        json: async () => ({ message: "Post berhasil dibuat" }),
+      });
+
+      const res = await communityService.createReply("post-uuid-123", {
+        content: "Tetap semangat ya!",
+      });
+
+      expect(res.message).toBe("Post berhasil dibuat");
+      expect(global.fetch).toHaveBeenCalledWith(
+        "https://api.staging.seraphany.id/core/posts",
+        expect.objectContaining({
+          method: "POST",
+          body: JSON.stringify({
+            content: "Tetap semangat ya!",
+            type: "EXPERIENCE",
+            replyToId: "post-uuid-123",
+          }),
+        }),
+      );
+    });
+
+    it("should route follow-up booking with slotStart and Idempotency-Key header", async () => {
+      global.fetch = jest.fn().mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        headers: {
+          get: (header: string) =>
+            header === "content-type" ? "application/json" : "200",
+        },
+        json: async () => ({ success: true }),
+      });
+
+      const res = await followUpService.bookFollowUpSlot(
+        "fu-123",
+        "2026-11-20T10:00:00.000Z",
+      );
+
+      expect(res.success).toBe(true);
+      expect(global.fetch).toHaveBeenCalledWith(
+        "https://api.staging.seraphany.id/core/follow-ups/fu-123/book",
+        expect.objectContaining({
+          method: "POST",
+          headers: expect.objectContaining({
+            "Idempotency-Key": expect.stringContaining("book-fu-123-"),
+          }),
+          body: JSON.stringify({
+            slotStart: "2026-11-20T10:00:00.000Z",
+          }),
+        }),
+      );
     });
   });
 });

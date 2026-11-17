@@ -161,9 +161,16 @@ export const practitionerService = {
   async createProfile(
     dto: CreatePractitionerDto,
   ): Promise<PractitionerResponseDto> {
+    const payload = { ...dto };
+    if ((!payload.firstName || !payload.lastName) && (payload as any).fullName) {
+      const parts = ((payload as any).fullName as string).trim().split(/\s+/);
+      payload.firstName = payload.firstName || parts[0] || "Praktisi";
+      payload.lastName = payload.lastName || parts.slice(1).join(" ") || parts[0] || "Baru";
+    }
+
     return apiRequest<PractitionerResponseDto>("/practitioner", {
       method: "POST",
-      body: JSON.stringify(dto),
+      body: JSON.stringify(payload),
       adapter: practitionerAdapter,
     });
   },
@@ -263,6 +270,7 @@ export const practitionerService = {
       `/practitioners/${encodeURIComponent(id)}/competency-profile`,
       {
         signal,
+        adapter: (v) => v,
       },
     );
   },
@@ -280,6 +288,7 @@ export const practitionerService = {
       {
         method: "PUT",
         body: JSON.stringify(dto),
+        adapter: (v) => v,
       },
     );
   },

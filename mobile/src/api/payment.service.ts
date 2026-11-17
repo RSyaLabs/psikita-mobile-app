@@ -524,6 +524,7 @@ export const paymentService = {
     return apiRequest<any>("/bpjs/bridging/eligibility", {
       method: "POST",
       body: JSON.stringify({ memberNumber: normalized }),
+      adapter: (v) => v,
     });
   },
 
@@ -537,7 +538,7 @@ export const paymentService = {
     const normalized = requireContextValue(referralNumber, "referralNumber");
     return apiRequest<any>(
       `/bpjs/bridging/referrals/${encodeURIComponent(normalized)}`,
-      { signal },
+      { signal, adapter: (v) => v },
     );
   },
 
@@ -554,6 +555,7 @@ export const paymentService = {
       {
         method: "POST",
         body: JSON.stringify(payload),
+        adapter: (v) => v,
       },
     );
   },

@@ -45,10 +45,9 @@ export function zodAdapter<T>(schema: z.ZodType<T>): ResponseAdapter<T> {
   return (value) => schema.parse(value);
 }
 
-export function noContentAdapter(value: unknown): void {
-  if (value !== undefined) {
-    throw new Error("Expected an empty response body");
-  }
+export function noContentAdapter(_value: unknown): void {
+  // Accepts both 204 No Content (undefined) and 200 OK with messages/payloads, returning void
+  return undefined;
 }
 
 /**
