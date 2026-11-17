@@ -55,8 +55,8 @@ export default function ResetPasswordScreen() {
     setErrorMsg(null);
 
     const trimmedToken = token.trim();
-    if (!trimmedToken) {
-      setErrorMsg("Masukkan token reset yang diterima di email Anda.");
+    if (!trimmedToken || trimmedToken.length !== 6) {
+      setErrorMsg("Masukkan 6 digit kode OTP verifikasi.");
       haptics.error();
       return;
     }
@@ -189,10 +189,10 @@ export default function ResetPasswordScreen() {
                     bold
                     className="text-foreground tracking-tight"
                   >
-                    Masukkan Token & Sandi Baru
+                    Verifikasi OTP (6 Digit)
                   </Heading>
                   <Text className="text-sm text-muted-foreground leading-relaxed">
-                    Salin token reset dari email Anda lalu buat kata sandi baru minimal 8 karakter.
+                    Masukkan 6 digit kode OTP yang diterima di email dan buat kata sandi baru minimal 8 karakter.
                   </Text>
                 </VStack>
 
@@ -204,30 +204,36 @@ export default function ResetPasswordScreen() {
                   </Box>
                 )}
 
-                {/* Token */}
-                <FormControl isRequired>
+                {/* Kode OTP 6 Digit */}
+                <FormControl isRequired isInvalid={Boolean(errorMsg && (!token || token.length !== 6))}>
                   <FormControlLabel>
-                    <FormControlLabelText className="text-sm font-bold text-foreground">
-                      Token Reset Password
-                    </FormControlLabelText>
+                    <HStack space="xs" className="w-full items-center justify-between">
+                      <FormControlLabelText className="text-sm font-bold text-foreground">
+                        Kode OTP (6 Digit)
+                      </FormControlLabelText>
+                      <Text className="text-sm text-muted-foreground font-semibold">
+                        {token.length}/6
+                      </Text>
+                    </HStack>
                   </FormControlLabel>
-                  <Input className="h-12 rounded-2xl border-border bg-card px-3">
+                  <Input className="h-14 rounded-2xl border-border bg-card px-3 justify-center">
                     <InputField
-                      placeholder="Masukkan kode token dari email"
+                      id="reset-otp-input"
+                      accessibilityLabel="Kode OTP enam digit"
+                      placeholder="0 0 0 0 0 0"
                       placeholderTextColor="#8C829D"
                       value={token}
                       onChangeText={(val) => {
-                        setToken(val);
+                        setToken(val.replace(/[^0-9]/g, "").slice(0, 6));
                         if (errorMsg) setErrorMsg(null);
                       }}
                       autoCapitalize="none"
                       autoCorrect={false}
+                      keyboardType="number-pad"
+                      maxLength={6}
                       returnKeyType="next"
-                      className="text-sm text-foreground flex-1"
+                      className="text-center font-mono font-bold text-2xl tracking-[12px] text-foreground flex-1"
                     />
-                    <InputSlot className="pr-2">
-                      <InputIcon as={KeyRound} className="text-muted-foreground" />
-                    </InputSlot>
                   </Input>
                 </FormControl>
 
@@ -309,7 +315,7 @@ export default function ResetPasswordScreen() {
                     <ButtonSpinner className="text-primary-foreground" />
                   ) : (
                     <ButtonText className="text-primary-foreground font-bold text-base">
-                      Simpan Kata Sandi Baru
+                      Verifikasi OTP & Simpan Sandi
                     </ButtonText>
                   )}
                 </Button>
