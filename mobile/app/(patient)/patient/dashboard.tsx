@@ -240,7 +240,7 @@ export default function PatientDashboard() {
         {!isVerified && (
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="Verifikasi identitas Didit KYC"
+            accessibilityLabel="Verifikasi identitas"
             onPress={() => {
               haptics.selection();
               setKycModalOpen(true);
@@ -251,21 +251,11 @@ export default function PatientDashboard() {
               <ShieldAlert size={20} color="#D97706" />
             </Box>
             <VStack className="flex-1" space="xs">
-              <HStack space="xs" className="items-center">
-                <Text size="sm" bold className="text-amber-900 font-bold">
-                  Verifikasi Identitas Diperlukan
-                </Text>
-                <Badge
-                  variant="outline"
-                  className="border-amber-500/40 bg-amber-500/20 rounded-full px-2 py-0.5"
-                >
-                  <BadgeText className="text-sm text-amber-900 font-bold">
-                    Didit KYC
-                  </BadgeText>
-                </Badge>
-              </HStack>
+              <Text size="sm" bold className="text-amber-900 font-bold">
+                Verifikasi Identitas
+              </Text>
               <Text size="sm" className="text-amber-800 leading-tight">
-                Selesaikan Didit KYC untuk membuka Konsultasi Langsung & Matching (mencegah 403 Forbidden).
+                Verifikasi akun Anda untuk mengakses konsultasi psikolog dan resep digital.
               </Text>
             </VStack>
             <ChevronRight size={18} color="#D97706" />
@@ -569,7 +559,7 @@ export default function PatientDashboard() {
                   Verifikasi Identitas
                 </Heading>
                 <Text size="sm" className="text-muted-foreground">
-                  Didit KYC Resmi
+                  Keamanan Rekam Medis
                 </Text>
               </VStack>
               <ModalCloseButton />
@@ -578,15 +568,10 @@ export default function PatientDashboard() {
           <ModalBody className="py-4">
             <VStack space="sm">
               <Text size="sm" className="text-foreground leading-relaxed">
-                Untuk mengakses layanan <Text bold>Konsultasi Langsung</Text> dan <Text bold>Pencocokan Praktisi</Text>, akun Anda wajib terverifikasi melalui Didit KYC.
+                Untuk mengakses layanan <Text bold>Konsultasi Langsung</Text> dan <Text bold>Pencocokan Praktisi</Text>, akun Anda memerlukan verifikasi e-KTP.
               </Text>
-              <Box className="bg-muted p-3.5 rounded-2xl border border-border">
-                <Text size="sm" className="text-muted-foreground leading-relaxed">
-                  Jika akun belum berstatus <Text bold className="text-foreground">VERIFIED</Text>, server akan menolak permintaan triase dan antrean matching dengan status <Text bold className="text-destructive">403 Forbidden</Text>.
-                </Text>
-              </Box>
               <Text size="sm" className="text-muted-foreground leading-relaxed">
-                Verifikasi berjalan langsung di dalam aplikasi melalui Didit Native SDK tanpa membuka browser external.
+                Verifikasi foto e-KTP dan pindai wajah berlangsung cepat dan aman langsung di dalam aplikasi.
               </Text>
             </VStack>
           </ModalBody>
@@ -600,7 +585,7 @@ export default function PatientDashboard() {
                 <ButtonSpinner color="#FFFFFF" />
               ) : (
                 <ButtonText className="text-sm font-bold text-primary-foreground">
-                  Mulai Verifikasi Didit Sekarang
+                  Mulai Verifikasi Sekarang
                 </ButtonText>
               )}
             </Button>

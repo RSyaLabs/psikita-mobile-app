@@ -45,11 +45,9 @@ export default function PatientLayout() {
 
   const onboardingRedirectRoute =
     !isPublicGuestRoute && status === "authenticated" && hasRole("patient")
-      ? isProfileNotFound && leafSegment !== "onboarding"
-        ? ROUTES.PATIENT.ONBOARDING
-        : patientProfile && leafSegment === "onboarding"
-          ? ROUTES.PATIENT.DASHBOARD
-          : null
+      ? patientProfile && leafSegment === "onboarding"
+        ? ROUTES.PATIENT.DASHBOARD
+        : null
       : null;
 
   const redirectRoute = authRedirectRoute ?? onboardingRedirectRoute;

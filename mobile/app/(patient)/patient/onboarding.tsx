@@ -92,7 +92,7 @@ export default function PatientOnboardingScreen() {
               <Toast nativeID={id} action="success">
                 <ToastTitle>Verifikasi Berhasil</ToastTitle>
                 <ToastDescription>
-                  Identitas resmi Anda telah terverifikasi via Didit KYC. Silakan lengkapi profil di bawah ini.
+                  Identitas Anda telah terverifikasi. Silakan lengkapi profil di bawah ini.
                 </ToastDescription>
               </Toast>
             ),
@@ -119,9 +119,9 @@ export default function PatientOnboardingScreen() {
             placement: "top",
             render: ({ id }) => (
               <Toast nativeID={id} action="info">
-                <ToastTitle>Portal Verifikasi Didit</ToastTitle>
+                <ToastTitle>Verifikasi Identitas</ToastTitle>
                 <ToastDescription>
-                  Membuka portal verifikasi identitas resmi Didit untuk menyelesaikan KYC Anda.
+                  Membuka portal verifikasi identitas untuk menyelesaikan validasi akun Anda.
                 </ToastDescription>
               </Toast>
             ),
@@ -145,7 +145,7 @@ export default function PatientOnboardingScreen() {
       const message =
         err instanceof Error
           ? err.message
-          : "Gagal memulai sesi Didit KYC. Silakan coba lagi.";
+          : "Gagal memulai sesi verifikasi. Silakan coba lagi.";
       toast.show({
         placement: "top",
         render: ({ id }) => (
@@ -168,7 +168,7 @@ export default function PatientOnboardingScreen() {
     haptics.medium();
 
     if (!isVerified || !verifiedIdentity?.nik) {
-      setErrorMsg("Verifikasi identitas Didit KYC diperlukan terlebih dahulu.");
+      setErrorMsg("Verifikasi identitas diperlukan terlebih dahulu.");
       haptics.error();
       return;
     }
@@ -271,24 +271,13 @@ export default function PatientOnboardingScreen() {
       >
         {/* Step Badge */}
         <VStack space="xs" className="mb-4">
-          <HStack space="xs" className="items-center justify-between">
-            <Text size="sm" className="font-bold text-foreground tracking-wide uppercase">
-              {isVerified
-                ? "Langkah 2/2 • Kelengkapan Profil Pasien"
-                : "Langkah 1/2 • Verifikasi Identitas (Didit KYC)"}
-            </Text>
-            <Badge
-              variant="outline"
-              className="border-primary/30 bg-primary/5 px-2.5 py-0.5 rounded-full"
-            >
-              <BadgeText className="text-primary font-bold text-sm">
-                {isVerified ? "Siap Didaftarkan" : "Wajib Kemenkes"}
-              </BadgeText>
-            </Badge>
-          </HStack>
+          <Text size="sm" className="font-bold text-foreground tracking-wide uppercase">
+            {isVerified
+              ? "Kelengkapan Profil Pasien"
+              : "Verifikasi Identitas"}
+          </Text>
           <Text size="sm" className="text-muted-foreground leading-relaxed">
-            Sesuai regulasi Permenkes No. 24/2022, pembukaan berkas rekam medis
-            elektronik pasien memerlukan validasi identitas terverifikasi.
+            Verifikasi identitas diperlukan untuk keamanan data medis Anda.
           </Text>
         </VStack>
 
@@ -310,13 +299,13 @@ export default function PatientOnboardingScreen() {
                 </Box>
                 <VStack space="xs" className="flex-1">
                   <Text size="sm" className="font-bold text-foreground">
-                    Status Verifikasi Didit KYC
+                    Status Verifikasi
                   </Text>
                   <Text size="sm" className="text-muted-foreground">
                     {isVerified
                       ? "Identitas e-KTP Terverifikasi"
                       : kycStatus?.status === "PENDING"
-                        ? "Sedang diverifikasi oleh Didit..."
+                        ? "Sedang diproses..."
                         : "Belum diverifikasi"}
                   </Text>
                 </VStack>
@@ -342,8 +331,7 @@ export default function PatientOnboardingScreen() {
             {!isVerified && (
               <VStack space="sm" className="pt-2">
                 <Text size="sm" className="text-muted-foreground leading-relaxed">
-                  Lakukan verifikasi foto e-KTP dan biometrik wajah melalui
-                  layanan aman Didit KYC.
+                  Lakukan foto e-KTP dan pindai wajah untuk memvalidasi akun Anda.
                 </Text>
                 <Button
                   size="lg"
@@ -356,7 +344,7 @@ export default function PatientOnboardingScreen() {
                   ) : (
                     <HStack space="xs" className="items-center">
                       <ButtonText className="text-primary-foreground font-bold text-base">
-                        Mulai Verifikasi Didit KYC
+                        Mulai Verifikasi
                       </ButtonText>
                       <ButtonIcon as={ExternalLink} className="text-primary-foreground ml-1" />
                     </HStack>
@@ -375,7 +363,7 @@ export default function PatientOnboardingScreen() {
                     <HStack space="xs" className="items-center">
                       <ButtonIcon as={RefreshCw} className="text-foreground mr-1" />
                       <ButtonText className="text-foreground font-semibold text-sm">
-                        Cek Status Verifikasi
+                        Cek Status
                       </ButtonText>
                     </HStack>
                   )}
@@ -393,7 +381,7 @@ export default function PatientOnboardingScreen() {
                 <HStack space="xs" className="items-center mb-1">
                   <AppIcon icon={Lock} size={16} tone="primary" />
                   <Text size="sm" className="font-bold text-foreground">
-                    Data Terverifikasi (Kemenkes / Didit)
+                    Data Terverifikasi
                   </Text>
                 </HStack>
 

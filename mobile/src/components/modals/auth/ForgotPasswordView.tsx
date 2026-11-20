@@ -370,7 +370,7 @@ export function ForgotPasswordView({
           <ButtonSpinner className="text-primary-foreground" />
         ) : (
           <ButtonText className="text-primary-foreground font-bold text-sm">
-            Simpan Sandi
+            Verifikasi
           </ButtonText>
         )}
       </Button>

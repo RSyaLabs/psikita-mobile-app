@@ -339,7 +339,7 @@ export default function ResetPasswordScreen() {
                     <ButtonSpinner className="text-primary-foreground" />
                   ) : (
                     <ButtonText className="text-primary-foreground font-bold text-base">
-                      Simpan Kata Sandi
+                      Verifikasi
                     </ButtonText>
                   )}
                 </Button>
