@@ -140,9 +140,6 @@ export default function ResetPasswordScreen() {
               >
                 <ArrowLeft size={20} className="text-foreground" />
               </Pressable>
-              <Text className="text-base font-bold text-foreground">
-                Verifikasi OTP
-              </Text>
               <Box className="w-10" />
             </HStack>
 
@@ -217,11 +214,13 @@ export default function ResetPasswordScreen() {
 
                 {/* Kode OTP */}
                 <FormControl isRequired isInvalid={Boolean(errorMsg && (!token || token.length !== 6))}>
-                  <FormControlLabel>
-                    <FormControlLabelText className="text-sm font-bold text-foreground">
-                      Kode OTP
-                    </FormControlLabelText>
-                  </FormControlLabel>
+                  {!initialPassword && (
+                    <FormControlLabel>
+                      <FormControlLabelText className="text-sm font-bold text-foreground">
+                        Kode OTP
+                      </FormControlLabelText>
+                    </FormControlLabel>
+                  )}
                   <Input className="h-14 rounded-2xl border-border bg-card px-3 justify-center">
                     <InputField
                       id="reset-otp-input"

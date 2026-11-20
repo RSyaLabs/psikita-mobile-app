@@ -137,9 +137,6 @@ export default function ForgotPasswordScreen() {
               >
                 <ArrowLeft size={20} className="text-foreground" />
               </Pressable>
-              <Text className="text-base font-bold text-foreground">
-                Lupa Kata Sandi
-              </Text>
               <Box className="w-10" />
             </HStack>
 
