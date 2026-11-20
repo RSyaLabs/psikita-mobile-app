@@ -193,11 +193,18 @@ export default function ResetPasswordScreen() {
                   >
                     Verifikasi OTP
                   </Heading>
-                  <Text className="text-sm text-muted-foreground leading-relaxed">
-                    {initialEmail
-                      ? `Kode OTP telah dikirimkan ke email ${initialEmail}. Masukkan kode verifikasi untuk mengaktifkan kata sandi baru Anda.`
-                      : "Masukkan kode OTP yang diterima di email untuk memverifikasi pembaruan kata sandi."}
-                  </Text>
+                  {initialEmail ? (
+                    <Text className="text-sm text-muted-foreground">
+                      Kode dikirim ke{" "}
+                      <Text className="text-sm font-semibold text-foreground">
+                        {initialEmail}
+                      </Text>
+                    </Text>
+                  ) : (
+                    <Text className="text-sm text-muted-foreground">
+                      Masukkan kode verifikasi dari email Anda.
+                    </Text>
+                  )}
                 </VStack>
 
                 {errorMsg && (
@@ -318,7 +325,7 @@ export default function ResetPasswordScreen() {
                     <ButtonSpinner className="text-primary-foreground" />
                   ) : (
                     <ButtonText className="text-primary-foreground font-bold text-base">
-                      Verifikasi OTP & Simpan Sandi
+                      Simpan Kata Sandi
                     </ButtonText>
                   )}
                 </Button>

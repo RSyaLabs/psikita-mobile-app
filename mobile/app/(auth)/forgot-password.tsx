@@ -213,8 +213,8 @@ export default function ForgotPasswordScreen() {
                   >
                     Atur Ulang Kata Sandi
                   </Heading>
-                  <Text className="text-sm text-muted-foreground leading-relaxed">
-                    Masukkan alamat email akun dan buat kata sandi baru. Kami akan mengirimkan kode OTP untuk memverifikasi pembaruan sandi Anda.
+                  <Text className="text-sm text-muted-foreground">
+                    Masukkan email dan buat kata sandi baru Anda.
                   </Text>
                 </VStack>
 

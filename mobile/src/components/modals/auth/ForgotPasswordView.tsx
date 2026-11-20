@@ -321,9 +321,9 @@ export function ForgotPasswordView({
     <VStack space="sm" className="w-full">
       <Text
         size="sm"
-        className="text-muted-foreground text-sm leading-relaxed"
+        className="text-muted-foreground text-sm"
       >
-        Kode OTP telah dikirim ke {forgotEmail || "email Anda"}. Masukkan kode verifikasi:
+        Kode dikirim ke {forgotEmail || "email Anda"}
       </Text>
 
       {forgotErrorMsg && (
@@ -370,7 +370,7 @@ export function ForgotPasswordView({
           <ButtonSpinner className="text-primary-foreground" />
         ) : (
           <ButtonText className="text-primary-foreground font-bold text-sm">
-            Verifikasi OTP & Simpan Sandi
+            Simpan Sandi
           </ButtonText>
         )}
       </Button>
