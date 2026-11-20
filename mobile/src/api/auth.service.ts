@@ -267,7 +267,9 @@ export const authService = {
   }): Promise<void> {
     await apiRequest<void>("/user/password", {
       method: "PUT",
-      body: JSON.stringify(dto),
+      body: JSON.stringify({
+        password: dto.newPassword || (dto as any).password,
+      }),
       adapter: noContentAdapter,
     });
   },

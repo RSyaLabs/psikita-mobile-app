@@ -32,7 +32,8 @@ import {
 } from "@/components/ui";
 import { haptics } from "@/utils/haptics";
 import { useResetPassword } from "@/hooks/useApiQueries";
-import { ApiError } from "@/api/client";
+import { authService } from "@/api/auth.service";
+import { setAuthTokens, ApiError } from "@/api/client";
 
 export default function ResetPasswordScreen() {
   const router = useRouter();
@@ -48,8 +49,9 @@ export default function ResetPasswordScreen() {
 
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const isLoading = resetPasswordMutation.isPending;
+  const isLoading = isSubmitting || resetPasswordMutation.isPending;
 
   const handleResetPassword = async () => {
     haptics.medium();
@@ -75,11 +77,22 @@ export default function ResetPasswordScreen() {
       return;
     }
 
+    setIsSubmitting(true);
     try {
-      await resetPasswordMutation.mutateAsync({
-        token: trimmedToken,
-        newPassword: effectivePassword,
-      });
+      if (trimmedToken.length === 6 && initialEmail) {
+        // Alur mobile verifikasi OTP 6-digit & simpan sandi baru
+        const tokens = await authService.verifyOtp({
+          email: initialEmail,
+          otp: trimmedToken,
+        });
+        await setAuthTokens(tokens);
+        await authService.updatePassword({ newPassword: effectivePassword });
+      } else {
+        await resetPasswordMutation.mutateAsync({
+          token: trimmedToken,
+          newPassword: effectivePassword,
+        });
+      }
 
       haptics.success();
       setIsSuccess(true);
@@ -96,6 +109,8 @@ export default function ResetPasswordScreen() {
       } else {
         setErrorMsg("Terjadi kendala jaringan saat menghubungi server.");
       }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 

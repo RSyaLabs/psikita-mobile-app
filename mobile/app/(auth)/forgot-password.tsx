@@ -32,12 +32,12 @@ import {
   ScrollView,
 } from "@/components/ui";
 import { haptics } from "@/utils/haptics";
-import { useForgotPassword } from "@/hooks/useApiQueries";
+import { useRequestOtp } from "@/hooks/useApiQueries";
 import { ApiError } from "@/api/client";
 
 export default function ForgotPasswordScreen() {
   const router = useRouter();
-  const forgotPasswordMutation = useForgotPassword();
+  const requestOtpMutation = useRequestOtp();
 
   const [email, setEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -48,7 +48,7 @@ export default function ForgotPasswordScreen() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [submittedEmail, setSubmittedEmail] = useState<string | null>(null);
 
-  const isLoading = forgotPasswordMutation.isPending;
+  const isLoading = requestOtpMutation.isPending;
 
   const handleRequestReset = async () => {
     haptics.medium();
@@ -74,7 +74,7 @@ export default function ForgotPasswordScreen() {
     }
 
     try {
-      await forgotPasswordMutation.mutateAsync(trimmedEmail);
+      await requestOtpMutation.mutateAsync({ email: trimmedEmail });
       haptics.success();
       setSubmittedEmail(trimmedEmail);
       router.push({
@@ -88,7 +88,7 @@ export default function ForgotPasswordScreen() {
       haptics.error();
       if (err instanceof ApiError) {
         setErrorMsg(
-          err.message || "Gagal mengirimkan instruksi reset kata sandi.",
+          err.message || "Gagal mengirimkan kode OTP verifikasi.",
         );
       } else {
         setErrorMsg("Terjadi kendala jaringan saat menghubungi server.");

@@ -387,7 +387,7 @@ export async function apiRequest<T>(
   options: RequestOptions<T> = {},
 ): Promise<T> {
   const {
-    timeoutMs = 10000,
+    timeoutMs = 15000,
     skipAuth = false,
     headers = {},
     signal: callerSignal,
