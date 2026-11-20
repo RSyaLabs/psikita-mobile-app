@@ -6,7 +6,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import {
   ArrowLeft,
   Mail,
-  KeyRound,
+  Lock,
+  Eye,
+  EyeOff,
   CheckCircle2,
   ArrowRight,
 } from "lucide-react-native";
@@ -38,6 +40,11 @@ export default function ForgotPasswordScreen() {
   const forgotPasswordMutation = useForgotPassword();
 
   const [email, setEmail] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [submittedEmail, setSubmittedEmail] = useState<string | null>(null);
 
@@ -54,10 +61,29 @@ export default function ForgotPasswordScreen() {
       return;
     }
 
+    if (!newPassword || newPassword.length < 8) {
+      setErrorMsg("Kata sandi baru minimal 8 karakter.");
+      haptics.error();
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setErrorMsg("Konfirmasi kata sandi tidak cocok dengan kata sandi baru.");
+      haptics.error();
+      return;
+    }
+
     try {
       await forgotPasswordMutation.mutateAsync(trimmedEmail);
       haptics.success();
       setSubmittedEmail(trimmedEmail);
+      router.push({
+        pathname: ROUTES.AUTH.RESET_PASSWORD,
+        params: {
+          email: trimmedEmail,
+          newPassword,
+        },
+      } as any);
     } catch (err: unknown) {
       haptics.error();
       if (err instanceof ApiError) {
@@ -185,10 +211,10 @@ export default function ForgotPasswordScreen() {
                     bold
                     className="text-foreground tracking-tight"
                   >
-                    Pulihkan Kata Sandi
+                    Atur Ulang Kata Sandi
                   </Heading>
                   <Text className="text-sm text-muted-foreground leading-relaxed">
-                    Masukkan alamat email akun Anda. Kami akan mengirimkan token untuk mereset kata sandi Anda.
+                    Masukkan alamat email akun dan buat kata sandi baru. Kami akan mengirimkan kode OTP untuk memverifikasi pembaruan sandi Anda.
                   </Text>
                 </VStack>
 
@@ -200,6 +226,7 @@ export default function ForgotPasswordScreen() {
                   </Box>
                 )}
 
+                {/* Email */}
                 <FormControl isRequired>
                   <FormControlLabel>
                     <FormControlLabelText className="text-sm font-bold text-foreground">
@@ -218,12 +245,78 @@ export default function ForgotPasswordScreen() {
                       autoCapitalize="none"
                       autoCorrect={false}
                       keyboardType="email-address"
-                      returnKeyType="done"
-                      onSubmitEditing={handleRequestReset}
+                      returnKeyType="next"
                       className="text-sm text-foreground flex-1"
                     />
                     <InputSlot className="pr-2">
                       <InputIcon as={Mail} className="text-muted-foreground" />
+                    </InputSlot>
+                  </Input>
+                </FormControl>
+
+                {/* Kata Sandi Baru */}
+                <FormControl isRequired>
+                  <FormControlLabel>
+                    <FormControlLabelText className="text-sm font-bold text-foreground">
+                      Kata Sandi Baru
+                    </FormControlLabelText>
+                  </FormControlLabel>
+                  <Input className="h-12 rounded-2xl border-border bg-card px-3">
+                    <InputField
+                      placeholder="Minimal 8 karakter"
+                      placeholderTextColor="#8C829D"
+                      value={newPassword}
+                      onChangeText={(val) => {
+                        setNewPassword(val);
+                        if (errorMsg) setErrorMsg(null);
+                      }}
+                      secureTextEntry={!showPassword}
+                      returnKeyType="next"
+                      className="text-sm text-foreground flex-1"
+                    />
+                    <InputSlot
+                      onPress={() => setShowPassword(!showPassword)}
+                      className="pr-2"
+                    >
+                      <InputIcon
+                        as={showPassword ? EyeOff : Eye}
+                        className="text-muted-foreground"
+                      />
+                    </InputSlot>
+                  </Input>
+                </FormControl>
+
+                {/* Konfirmasi Kata Sandi Baru */}
+                <FormControl isRequired>
+                  <FormControlLabel>
+                    <FormControlLabelText className="text-sm font-bold text-foreground">
+                      Konfirmasi Kata Sandi Baru
+                    </FormControlLabelText>
+                  </FormControlLabel>
+                  <Input className="h-12 rounded-2xl border-border bg-card px-3">
+                    <InputField
+                      placeholder="Ulangi kata sandi baru"
+                      placeholderTextColor="#8C829D"
+                      value={confirmPassword}
+                      onChangeText={(val) => {
+                        setConfirmPassword(val);
+                        if (errorMsg) setErrorMsg(null);
+                      }}
+                      secureTextEntry={!showConfirmPassword}
+                      returnKeyType="done"
+                      onSubmitEditing={handleRequestReset}
+                      className="text-sm text-foreground flex-1"
+                    />
+                    <InputSlot
+                      onPress={() =>
+                        setShowConfirmPassword(!showConfirmPassword)
+                      }
+                      className="pr-2"
+                    >
+                      <InputIcon
+                        as={showConfirmPassword ? EyeOff : Eye}
+                        className="text-muted-foreground"
+                      />
                     </InputSlot>
                   </Input>
                 </FormControl>
@@ -238,7 +331,7 @@ export default function ForgotPasswordScreen() {
                     <ButtonSpinner className="text-primary-foreground" />
                   ) : (
                     <ButtonText className="text-primary-foreground font-bold text-base">
-                      Kirim Token Pemulihan
+                      Kirim Kode OTP
                     </ButtonText>
                   )}
                 </Button>
@@ -259,7 +352,7 @@ export default function ForgotPasswordScreen() {
 
                 <HStack space="xs" className="justify-center items-center pt-1">
                   <Text className="text-sm text-muted-foreground font-medium">
-                    Sudah memiliki token reset?
+                    Sudah memiliki kode OTP?
                   </Text>
                   <Pressable
                     onPress={() =>
@@ -268,7 +361,7 @@ export default function ForgotPasswordScreen() {
                     hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                   >
                     <Text className="text-sm font-bold text-primary underline">
-                      Atur Sandi Baru
+                      Verifikasi OTP
                     </Text>
                   </Pressable>
                 </HStack>

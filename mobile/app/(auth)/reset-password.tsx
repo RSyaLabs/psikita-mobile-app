@@ -36,12 +36,13 @@ import { ApiError } from "@/api/client";
 
 export default function ResetPasswordScreen() {
   const router = useRouter();
-  const { email: initialEmail } = useLocalSearchParams<{ email?: string }>();
+  const { email: initialEmail, newPassword: initialPassword } =
+    useLocalSearchParams<{ email?: string; newPassword?: string }>();
   const resetPasswordMutation = useResetPassword();
 
   const [token, setToken] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [newPassword, setNewPassword] = useState(initialPassword ?? "");
+  const [confirmPassword, setConfirmPassword] = useState(initialPassword ?? "");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -56,18 +57,19 @@ export default function ResetPasswordScreen() {
 
     const trimmedToken = token.trim();
     if (!trimmedToken || trimmedToken.length !== 6) {
-      setErrorMsg("Masukkan 6 digit kode OTP verifikasi.");
+      setErrorMsg("Masukkan kode OTP verifikasi.");
       haptics.error();
       return;
     }
 
-    if (newPassword.length < 8) {
+    const effectivePassword = initialPassword || newPassword;
+    if (!effectivePassword || effectivePassword.length < 8) {
       setErrorMsg("Kata sandi baru wajib memiliki minimal 8 karakter.");
       haptics.error();
       return;
     }
 
-    if (newPassword !== confirmPassword) {
+    if (!initialPassword && newPassword !== confirmPassword) {
       setErrorMsg("Konfirmasi kata sandi tidak cocok dengan kata sandi baru.");
       haptics.error();
       return;
@@ -76,7 +78,7 @@ export default function ResetPasswordScreen() {
     try {
       await resetPasswordMutation.mutateAsync({
         token: trimmedToken,
-        newPassword,
+        newPassword: effectivePassword,
       });
 
       haptics.success();
@@ -86,7 +88,7 @@ export default function ResetPasswordScreen() {
       if (err instanceof ApiError) {
         if (err.statusCode === 400 || err.statusCode === 401) {
           setErrorMsg(
-            "Token reset tidak valid atau telah kedaluwarsa. Silakan ajukan permohonan reset ulang.",
+            "Kode OTP tidak valid atau telah kedaluwarsa. Silakan ajukan permohonan reset ulang.",
           );
         } else {
           setErrorMsg(err.message || "Gagal mereset kata sandi.");
@@ -139,7 +141,7 @@ export default function ResetPasswordScreen() {
                 <ArrowLeft size={20} className="text-foreground" />
               </Pressable>
               <Text className="text-base font-bold text-foreground">
-                Atur Sandi Baru
+                Verifikasi OTP
               </Text>
               <Box className="w-10" />
             </HStack>
@@ -189,10 +191,12 @@ export default function ResetPasswordScreen() {
                     bold
                     className="text-foreground tracking-tight"
                   >
-                    Verifikasi OTP (6 Digit)
+                    Verifikasi OTP
                   </Heading>
                   <Text className="text-sm text-muted-foreground leading-relaxed">
-                    Masukkan 6 digit kode OTP yang diterima di email dan buat kata sandi baru minimal 8 karakter.
+                    {initialEmail
+                      ? `Kode OTP telah dikirimkan ke email ${initialEmail}. Masukkan kode verifikasi untuk mengaktifkan kata sandi baru Anda.`
+                      : "Masukkan kode OTP yang diterima di email untuk memverifikasi pembaruan kata sandi."}
                   </Text>
                 </VStack>
 
@@ -204,22 +208,17 @@ export default function ResetPasswordScreen() {
                   </Box>
                 )}
 
-                {/* Kode OTP 6 Digit */}
+                {/* Kode OTP */}
                 <FormControl isRequired isInvalid={Boolean(errorMsg && (!token || token.length !== 6))}>
                   <FormControlLabel>
-                    <HStack space="xs" className="w-full items-center justify-between">
-                      <FormControlLabelText className="text-sm font-bold text-foreground">
-                        Kode OTP (6 Digit)
-                      </FormControlLabelText>
-                      <Text className="text-sm text-muted-foreground font-semibold">
-                        {token.length}/6
-                      </Text>
-                    </HStack>
+                    <FormControlLabelText className="text-sm font-bold text-foreground">
+                      Kode OTP
+                    </FormControlLabelText>
                   </FormControlLabel>
                   <Input className="h-14 rounded-2xl border-border bg-card px-3 justify-center">
                     <InputField
                       id="reset-otp-input"
-                      accessibilityLabel="Kode OTP enam digit"
+                      accessibilityLabel="Kode verifikasi OTP"
                       placeholder="0 0 0 0 0 0"
                       placeholderTextColor="#8C829D"
                       value={token}
@@ -231,78 +230,82 @@ export default function ResetPasswordScreen() {
                       autoCorrect={false}
                       keyboardType="number-pad"
                       maxLength={6}
-                      returnKeyType="next"
+                      returnKeyType={initialPassword ? "done" : "next"}
+                      onSubmitEditing={initialPassword ? handleResetPassword : undefined}
                       className="text-center font-mono font-bold text-2xl tracking-[12px] text-foreground flex-1"
                     />
                   </Input>
                 </FormControl>
 
-                {/* Kata Sandi Baru */}
-                <FormControl isRequired>
-                  <FormControlLabel>
-                    <FormControlLabelText className="text-sm font-bold text-foreground">
-                      Kata Sandi Baru
-                    </FormControlLabelText>
-                  </FormControlLabel>
-                  <Input className="h-12 rounded-2xl border-border bg-card px-3">
-                    <InputField
-                      placeholder="Minimal 8 karakter"
-                      placeholderTextColor="#8C829D"
-                      value={newPassword}
-                      onChangeText={(val) => {
-                        setNewPassword(val);
-                        if (errorMsg) setErrorMsg(null);
-                      }}
-                      secureTextEntry={!showPassword}
-                      returnKeyType="next"
-                      className="text-sm text-foreground flex-1"
-                    />
-                    <InputSlot
-                      onPress={() => setShowPassword(!showPassword)}
-                      className="pr-2"
-                    >
-                      <InputIcon
-                        as={showPassword ? EyeOff : Eye}
-                        className="text-muted-foreground"
-                      />
-                    </InputSlot>
-                  </Input>
-                </FormControl>
+                {/* Kata Sandi Baru (hanya jika belum diisi di tahap sebelumnya) */}
+                {!initialPassword && (
+                  <>
+                    <FormControl isRequired>
+                      <FormControlLabel>
+                        <FormControlLabelText className="text-sm font-bold text-foreground">
+                          Kata Sandi Baru
+                        </FormControlLabelText>
+                      </FormControlLabel>
+                      <Input className="h-12 rounded-2xl border-border bg-card px-3">
+                        <InputField
+                          placeholder="Minimal 8 karakter"
+                          placeholderTextColor="#8C829D"
+                          value={newPassword}
+                          onChangeText={(val) => {
+                            setNewPassword(val);
+                            if (errorMsg) setErrorMsg(null);
+                          }}
+                          secureTextEntry={!showPassword}
+                          returnKeyType="next"
+                          className="text-sm text-foreground flex-1"
+                        />
+                        <InputSlot
+                          onPress={() => setShowPassword(!showPassword)}
+                          className="pr-2"
+                        >
+                          <InputIcon
+                            as={showPassword ? EyeOff : Eye}
+                            className="text-muted-foreground"
+                          />
+                        </InputSlot>
+                      </Input>
+                    </FormControl>
 
-                {/* Konfirmasi Kata Sandi Baru */}
-                <FormControl isRequired>
-                  <FormControlLabel>
-                    <FormControlLabelText className="text-sm font-bold text-foreground">
-                      Konfirmasi Kata Sandi Baru
-                    </FormControlLabelText>
-                  </FormControlLabel>
-                  <Input className="h-12 rounded-2xl border-border bg-card px-3">
-                    <InputField
-                      placeholder="Ulangi kata sandi baru"
-                      placeholderTextColor="#8C829D"
-                      value={confirmPassword}
-                      onChangeText={(val) => {
-                        setConfirmPassword(val);
-                        if (errorMsg) setErrorMsg(null);
-                      }}
-                      secureTextEntry={!showConfirmPassword}
-                      returnKeyType="done"
-                      onSubmitEditing={handleResetPassword}
-                      className="text-sm text-foreground flex-1"
-                    />
-                    <InputSlot
-                      onPress={() =>
-                        setShowConfirmPassword(!showConfirmPassword)
-                      }
-                      className="pr-2"
-                    >
-                      <InputIcon
-                        as={showConfirmPassword ? EyeOff : Eye}
-                        className="text-muted-foreground"
-                      />
-                    </InputSlot>
-                  </Input>
-                </FormControl>
+                    <FormControl isRequired>
+                      <FormControlLabel>
+                        <FormControlLabelText className="text-sm font-bold text-foreground">
+                          Konfirmasi Kata Sandi Baru
+                        </FormControlLabelText>
+                      </FormControlLabel>
+                      <Input className="h-12 rounded-2xl border-border bg-card px-3">
+                        <InputField
+                          placeholder="Ulangi kata sandi baru"
+                          placeholderTextColor="#8C829D"
+                          value={confirmPassword}
+                          onChangeText={(val) => {
+                            setConfirmPassword(val);
+                            if (errorMsg) setErrorMsg(null);
+                          }}
+                          secureTextEntry={!showConfirmPassword}
+                          returnKeyType="done"
+                          onSubmitEditing={handleResetPassword}
+                          className="text-sm text-foreground flex-1"
+                        />
+                        <InputSlot
+                          onPress={() =>
+                            setShowConfirmPassword(!showConfirmPassword)
+                          }
+                          className="pr-2"
+                        >
+                          <InputIcon
+                            as={showConfirmPassword ? EyeOff : Eye}
+                            className="text-muted-foreground"
+                          />
+                        </InputSlot>
+                      </Input>
+                    </FormControl>
+                  </>
+                )}
 
                 {/* Submit button */}
                 <Button

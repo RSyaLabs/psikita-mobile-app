@@ -199,7 +199,7 @@ export function AuthLoginModal({
                   ? "Masuk ke Akun"
                   : tab === "forgot_request"
                     ? "Lupa Kata Sandi"
-                    : "Verifikasi & Sandi Baru"}
+                    : "Verifikasi OTP"}
               </Heading>
             </HStack>
             <Pressable

@@ -38,7 +38,9 @@ export function ForgotPasswordView({
   const [forgotEmail, setForgotEmail] = useState("");
   const [forgotOtp, setForgotOtp] = useState("");
   const [forgotNewPassword, setForgotNewPassword] = useState("");
+  const [forgotConfirmPassword, setForgotConfirmPassword] = useState("");
   const [showForgotNewPassword, setShowForgotNewPassword] = useState(false);
+  const [showForgotConfirmPassword, setShowForgotConfirmPassword] = useState(false);
   const [forgotErrorMsg, setForgotErrorMsg] = useState<string | null>(null);
 
   const requestOtpMutation = useRequestOtp();
@@ -52,9 +54,20 @@ export function ForgotPasswordView({
       (!targetEmail.includes("@") && targetEmail.length < 10)
     ) {
       haptics.error();
-      setForgotErrorMsg("Masukkan email atau nomor WhatsApp yang valid.");
+      setForgotErrorMsg("Masukkan email yang valid.");
       return;
     }
+    if (!forgotNewPassword || forgotNewPassword.length < 8) {
+      haptics.error();
+      setForgotErrorMsg("Kata sandi baru minimal 8 karakter.");
+      return;
+    }
+    if (forgotNewPassword !== forgotConfirmPassword) {
+      haptics.error();
+      setForgotErrorMsg("Konfirmasi kata sandi tidak cocok.");
+      return;
+    }
+
     haptics.medium();
     requestOtpMutation.mutate(
       { email: targetEmail },
@@ -68,7 +81,7 @@ export function ForgotPasswordView({
               <Toast nativeID={id} action="success">
                 <ToastTitle>Kode OTP Terkirim</ToastTitle>
                 <ToastDescription>
-                  {res?.message || "Kode 6-digit verifikasi telah dikirim."}
+                  {res?.message || "Kode verifikasi OTP telah dikirim."}
                 </ToastDescription>
               </Toast>
             ),
@@ -88,7 +101,7 @@ export function ForgotPasswordView({
     setForgotErrorMsg(null);
     if (!forgotOtp.trim() || forgotOtp.trim().length !== 6) {
       haptics.error();
-      setForgotErrorMsg("Masukkan 6 digit kode OTP verifikasi.");
+      setForgotErrorMsg("Masukkan kode OTP verifikasi.");
       return;
     }
     if (forgotNewPassword.length < 8) {
@@ -141,8 +154,14 @@ export function ForgotPasswordView({
           size="sm"
           className="text-muted-foreground text-sm leading-relaxed"
         >
-          Masukkan email atau nomor WhatsApp terdaftar untuk menerima 6 digit kode verifikasi OTP:
+          Masukkan email dan buat kata sandi baru akun Anda:
         </Text>
+
+        {forgotErrorMsg && (
+          <Text size="sm" className="text-destructive text-sm font-medium">
+            {forgotErrorMsg}
+          </Text>
+        )}
 
         <FormControl
           id="forgot-email-field"
@@ -151,31 +170,113 @@ export function ForgotPasswordView({
         >
           <FormControlLabel htmlFor="forgot-email-input">
             <FormControlLabelText className="text-sm font-bold text-foreground">
-              Email / Nomor WhatsApp
+              Email Akun
             </FormControlLabelText>
           </FormControlLabel>
           <Input className="rounded-xl border-border bg-background h-11">
             <InputField
               id="forgot-email-input"
               name="forgotEmail"
-              accessibilityLabel="Email atau nomor WhatsApp terdaftar"
-              accessibilityHint={forgotErrorMsg ?? undefined}
+              accessibilityLabel="Email terdaftar"
               value={forgotEmail}
               onChangeText={(t) => {
                 setForgotErrorMsg(null);
                 setForgotEmail(t);
               }}
-              placeholder="email terdaftar"
+              placeholder="nama@email.com"
               keyboardType="email-address"
               autoCapitalize="none"
               className="text-sm text-foreground placeholder:text-muted-foreground"
             />
           </Input>
-          {forgotErrorMsg && (
-            <FormControlError>
-              <FormControlErrorText>{forgotErrorMsg}</FormControlErrorText>
-            </FormControlError>
+        </FormControl>
+
+        <FormControl
+          id="forgot-new-password-field"
+          isRequired
+          isInvalid={Boolean(forgotErrorMsg && forgotNewPassword.length < 8)}
+        >
+          <FormControlLabel htmlFor="forgot-new-password-input">
+            <FormControlLabelText className="text-sm font-bold text-foreground">
+              Kata Sandi Baru
+            </FormControlLabelText>
+          </FormControlLabel>
+          <Input className="rounded-xl border-border bg-background h-11 px-3 flex-row items-center">
+            <InputField
+              id="forgot-new-password-input"
+              name="forgotNewPassword"
+              accessibilityLabel="Kata sandi baru"
+              value={forgotNewPassword}
+              onChangeText={(t) => {
+                setForgotErrorMsg(null);
+                setForgotNewPassword(t);
+              }}
+              placeholder="Minimal 8 karakter"
+              secureTextEntry={!showForgotNewPassword}
+              className="flex-1 text-sm text-foreground placeholder:text-muted-foreground"
+            />
+            <Pressable
+              onPress={() => setShowForgotNewPassword(!showForgotNewPassword)}
+              className="p-1.5 -mr-1"
+              accessibilityRole="button"
+              accessibilityLabel={
+                showForgotNewPassword ? "Sembunyikan sandi" : "Tampilkan sandi"
+              }
+            >
+              {showForgotNewPassword ? (
+                <EyeOff size={18} className="text-muted-foreground" />
+              ) : (
+                <Eye size={18} className="text-muted-foreground" />
+              )}
+            </Pressable>
+          </Input>
+        </FormControl>
+
+        <FormControl
+          id="forgot-confirm-password-field"
+          isRequired
+          isInvalid={Boolean(
+            forgotErrorMsg && forgotConfirmPassword !== forgotNewPassword,
           )}
+        >
+          <FormControlLabel htmlFor="forgot-confirm-password-input">
+            <FormControlLabelText className="text-sm font-bold text-foreground">
+              Konfirmasi Kata Sandi
+            </FormControlLabelText>
+          </FormControlLabel>
+          <Input className="rounded-xl border-border bg-background h-11 px-3 flex-row items-center">
+            <InputField
+              id="forgot-confirm-password-input"
+              name="forgotConfirmPassword"
+              accessibilityLabel="Konfirmasi kata sandi"
+              value={forgotConfirmPassword}
+              onChangeText={(t) => {
+                setForgotErrorMsg(null);
+                setForgotConfirmPassword(t);
+              }}
+              placeholder="Ulangi kata sandi baru"
+              secureTextEntry={!showForgotConfirmPassword}
+              className="flex-1 text-sm text-foreground placeholder:text-muted-foreground"
+            />
+            <Pressable
+              onPress={() =>
+                setShowForgotConfirmPassword(!showForgotConfirmPassword)
+              }
+              className="p-1.5 -mr-1"
+              accessibilityRole="button"
+              accessibilityLabel={
+                showForgotConfirmPassword
+                  ? "Sembunyikan sandi"
+                  : "Tampilkan sandi"
+              }
+            >
+              {showForgotConfirmPassword ? (
+                <EyeOff size={18} className="text-muted-foreground" />
+              ) : (
+                <Eye size={18} className="text-muted-foreground" />
+              )}
+            </Pressable>
+          </Input>
         </FormControl>
 
         <Button
@@ -188,7 +289,7 @@ export function ForgotPasswordView({
             <ButtonSpinner className="text-primary-foreground" />
           ) : (
             <ButtonText className="text-primary-foreground font-bold text-sm">
-              Kirim Kode Verifikasi
+              Kirim Kode OTP
             </ButtonText>
           )}
         </Button>
@@ -222,8 +323,14 @@ export function ForgotPasswordView({
         size="sm"
         className="text-muted-foreground text-sm leading-relaxed"
       >
-        Kode 6-digit OTP telah dikirim. Masukkan kode verifikasi dan tentukan sandi baru:
+        Kode OTP telah dikirim ke {forgotEmail || "email Anda"}. Masukkan kode verifikasi:
       </Text>
+
+      {forgotErrorMsg && (
+        <Text size="sm" className="text-destructive text-sm font-medium">
+          {forgotErrorMsg}
+        </Text>
+      )}
 
       <FormControl
         id="forgot-otp-field"
@@ -231,24 +338,15 @@ export function ForgotPasswordView({
         isInvalid={Boolean(forgotErrorMsg)}
       >
         <FormControlLabel htmlFor="forgot-otp-input">
-          <HStack space="xs" className="w-full items-center justify-between">
-            <FormControlLabelText className="text-sm font-bold text-foreground">
-              Kode OTP (6 Digit)
-            </FormControlLabelText>
-            <Text
-              size="sm"
-              className="text-sm text-muted-foreground font-semibold"
-            >
-              {forgotOtp.length}/6
-            </Text>
-          </HStack>
+          <FormControlLabelText className="text-sm font-bold text-foreground">
+            Kode OTP
+          </FormControlLabelText>
         </FormControlLabel>
         <Input className="rounded-xl border-border bg-background h-12 px-3 justify-center">
           <InputField
             id="forgot-otp-input"
             name="forgotOtp"
-            accessibilityLabel="Kode OTP enam digit"
-            accessibilityHint={forgotErrorMsg ?? undefined}
+            accessibilityLabel="Kode verifikasi OTP"
             value={forgotOtp}
             onChangeText={(t) => {
               setForgotErrorMsg(null);
@@ -260,61 +358,6 @@ export function ForgotPasswordView({
             className="text-center font-mono font-bold text-xl tracking-[12px] text-foreground"
           />
         </Input>
-        {forgotErrorMsg && (
-          <FormControlError>
-            <FormControlErrorText>{forgotErrorMsg}</FormControlErrorText>
-          </FormControlError>
-        )}
-      </FormControl>
-
-      <FormControl
-        id="forgot-new-password-field"
-        isRequired
-        isInvalid={Boolean(forgotErrorMsg)}
-      >
-        <FormControlLabel htmlFor="forgot-new-password-input">
-          <FormControlLabelText className="text-sm font-bold text-foreground">
-            Kata Sandi Baru (Min. 8 Karakter)
-          </FormControlLabelText>
-        </FormControlLabel>
-        <Input className="rounded-xl border-border bg-background h-11 px-3 flex-row items-center">
-          <InputField
-            id="forgot-new-password-input"
-            name="forgotNewPassword"
-            accessibilityLabel="Kata sandi baru"
-            accessibilityHint={forgotErrorMsg ?? undefined}
-            value={forgotNewPassword}
-            onChangeText={(t) => {
-              setForgotErrorMsg(null);
-              setForgotNewPassword(t);
-            }}
-            placeholder="Minimal 8 karakter"
-            secureTextEntry={!showForgotNewPassword}
-            className="flex-1 text-sm text-foreground placeholder:text-muted-foreground"
-          />
-          <Pressable
-            onPress={() => setShowForgotNewPassword(!showForgotNewPassword)}
-            className="p-1.5 -mr-1"
-            accessibilityRole="button"
-            accessibilityLabel={
-              showForgotNewPassword ? "Sembunyikan sandi" : "Tampilkan sandi"
-            }
-          >
-            {showForgotNewPassword ? (
-              <EyeOff size={18} className="text-muted-foreground" />
-            ) : (
-              <Eye size={18} className="text-muted-foreground" />
-            )}
-          </Pressable>
-        </Input>
-        {forgotErrorMsg && (
-          <FormControlError
-            className="sr-only"
-            accessibilityLabel={forgotErrorMsg}
-          >
-            <FormControlErrorText />
-          </FormControlError>
-        )}
       </FormControl>
 
       <Button
@@ -327,7 +370,7 @@ export function ForgotPasswordView({
           <ButtonSpinner className="text-primary-foreground" />
         ) : (
           <ButtonText className="text-primary-foreground font-bold text-sm">
-            Simpan Sandi & Selesai
+            Verifikasi OTP & Simpan Sandi
           </ButtonText>
         )}
       </Button>
