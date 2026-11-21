@@ -187,15 +187,6 @@ export const queryKeys = {
         privacyToken(roomId),
       ] as const,
   },
-  lms: {
-    all: ["lms"] as const,
-    list: (topic?: string) =>
-      [...queryKeys.lms.all, "list", topic ?? "all"] as const,
-    detail: (courseId: string) =>
-      [...queryKeys.lms.all, "detail", privacyToken(courseId)] as const,
-    progress: () =>
-      [...queryKeys.lms.all, "progress"] as const,
-  },
   community: {
     all: ["community"] as const,
     list: (category?: string) =>

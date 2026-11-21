@@ -125,46 +125,6 @@ export default function ForgotPasswordScreen() {
               <Box className="w-10" />
             </HStack>
 
-            {/* Mode Switcher Tabs */}
-            <HStack className="bg-card border border-border p-1 rounded-2xl mb-6">
-              <Pressable
-                onPress={() => {
-                  haptics.selection();
-                  setMode("otp");
-                  setErrorMsg(null);
-                }}
-                className={`flex-1 py-2.5 rounded-xl items-center justify-center ${
-                  !isResetMode ? "bg-primary" : "bg-transparent"
-                }`}
-              >
-                <Text
-                  className={`text-sm font-bold ${
-                    !isResetMode ? "text-primary-foreground" : "text-muted-foreground"
-                  }`}
-                >
-                  Masuk Kode OTP
-                </Text>
-              </Pressable>
-              <Pressable
-                onPress={() => {
-                  haptics.selection();
-                  setMode("reset");
-                  setErrorMsg(null);
-                }}
-                className={`flex-1 py-2.5 rounded-xl items-center justify-center ${
-                  isResetMode ? "bg-primary" : "bg-transparent"
-                }`}
-              >
-                <Text
-                  className={`text-sm font-bold ${
-                    isResetMode ? "text-primary-foreground" : "text-muted-foreground"
-                  }`}
-                >
-                  Lupa Sandi
-                </Text>
-              </Pressable>
-            </HStack>
-
             {/* Title & Context (Wireframe MS3 & MS6) */}
             <VStack space="xs" className="pb-4">
               <Heading
@@ -240,21 +200,47 @@ export default function ForgotPasswordScreen() {
                 )}
               </Button>
 
-              {/* Links */}
-              <VStack space="xs" className="items-center pt-6">
-                <HStack space="xs" className="items-center">
-                  <Text className="text-sm text-muted-foreground font-medium">
-                    Ingin masuk dengan kata sandi?
-                  </Text>
-                  <Pressable
-                    onPress={() => router.replace(ROUTES.AUTH.LOGIN as any)}
-                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                  >
-                    <Text className="text-sm font-bold text-primary underline">
-                      Masuk ke Akun
+              {/* Links (Wireframe MS3 & MS6) */}
+              <VStack space="sm" className="items-center pt-6">
+                {isResetMode ? (
+                  <>
+                    <Pressable
+                      onPress={() => {
+                        haptics.selection();
+                        setMode("otp");
+                        setErrorMsg(null);
+                      }}
+                      hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                    >
+                      <Text className="text-sm font-bold text-primary underline">
+                        Masuk dengan Kode OTP saja
+                      </Text>
+                    </Pressable>
+                    <Pressable
+                      onPress={() => router.replace(ROUTES.AUTH.LOGIN as any)}
+                      hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                      className="pt-1"
+                    >
+                      <Text className="text-sm text-muted-foreground font-medium">
+                        Kembali ke Masuk
+                      </Text>
+                    </Pressable>
+                  </>
+                ) : (
+                  <HStack space="xs" className="items-center">
+                    <Text className="text-sm text-muted-foreground font-medium">
+                      Ingin masuk dengan kata sandi?
                     </Text>
-                  </Pressable>
-                </HStack>
+                    <Pressable
+                      onPress={() => router.replace(ROUTES.AUTH.LOGIN as any)}
+                      hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                    >
+                      <Text className="text-sm font-bold text-primary underline">
+                        Masuk
+                      </Text>
+                    </Pressable>
+                  </HStack>
+                )}
               </VStack>
             </VStack>
           </Box>

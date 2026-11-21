@@ -15,7 +15,6 @@ export * from "./queries/notes";
 export * from "./queries/prescription";
 export * from "./queries/chat";
 export * from "./queries/engagement";
-export * from "./queries/lms";
 export * from "./queries/community";
 export * from "./queries/careplan";
 export * from "./queries/followup";

@@ -10,7 +10,6 @@ import {
   EyeOff,
   Mail,
   Lock,
-  HeartPulse,
 } from "lucide-react-native";
 import {
   Box,
@@ -129,14 +128,6 @@ export default function LoginScreen() {
     }
   };
 
-  const handleGuestTriage = () => {
-    haptics.light();
-    router.push({
-      pathname: ROUTES.PATIENT.TRIAGE,
-      params: { guest: "true" },
-    } as any);
-  };
-
   const openUrl = (url: string) => {
     haptics.light();
     Linking.openURL(url).catch(() => {});
@@ -195,7 +186,7 @@ export default function LoginScreen() {
                 Masuk ke Akun
               </Heading>
               <Text className="text-sm text-muted-foreground leading-relaxed">
-                Akses konsultasi psikolog, riwayat triage, dan ruang aman Anda.
+                Ruang aman untuk bercerita dan berkonsultasi.
               </Text>
             </VStack>
 
@@ -297,7 +288,7 @@ export default function LoginScreen() {
                   <ButtonSpinner className="text-primary-foreground" />
                 ) : (
                   <ButtonText className="text-primary-foreground font-bold text-base">
-                    Masuk Sekarang
+                    Masuk
                   </ButtonText>
                 )}
               </Button>
@@ -344,32 +335,10 @@ export default function LoginScreen() {
                   hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 >
                   <Text className="text-sm font-bold text-primary underline">
-                    Daftar Akun Baru
+                    Daftar
                   </Text>
                 </Pressable>
               </HStack>
-            </VStack>
-
-            {/* Guest Triage Gateway Divider & Action */}
-            <VStack space="sm" className="pt-8 items-center">
-              <HStack space="sm" className="items-center w-full">
-                <Box className="flex-1 h-[1px] bg-border" />
-                <Text className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-                  atau
-                </Text>
-                <Box className="flex-1 h-[1px] bg-border" />
-              </HStack>
-
-              <Pressable
-                onPress={handleGuestTriage}
-                className="w-full p-4 rounded-2xl bg-card border border-border items-center justify-center flex-row gap-2 active:bg-muted mt-2"
-              >
-                <HeartPulse size={18} className="text-primary" />
-                <Text className="text-sm font-bold text-foreground">
-                  Periksa Kondisimu Sekarang (Triage Skrining)
-                </Text>
-                <ArrowRight size={16} className="text-primary" />
-              </Pressable>
             </VStack>
           </Box>
 

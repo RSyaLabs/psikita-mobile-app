@@ -8,11 +8,10 @@ import {
   Mail,
   Lock,
   User,
-  AtSign,
   Eye,
   EyeOff,
   MailCheck,
-  CheckCircle2,
+  Check,
 } from "lucide-react-native";
 import {
   Box,
@@ -42,12 +41,10 @@ export default function RegisterScreen() {
   const registerMutation = useRegisterPatient();
 
   const [fullName, setFullName] = useState("");
-  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [agreed, setAgreed] = useState(true);
 
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [registeredEmail, setRegisteredEmail] = useState<string | null>(null);
@@ -59,34 +56,10 @@ export default function RegisterScreen() {
     setErrorMsg(null);
 
     const trimmedName = fullName.trim();
-    const trimmedUsername = username.trim();
     const trimmedEmail = email.trim().toLowerCase();
 
     if (!trimmedName) {
       setErrorMsg("Nama lengkap wajib diisi.");
-      haptics.error();
-      return;
-    }
-
-    // Username format check: 3 to 30 characters, alphanumeric + . _ -
-    if (trimmedUsername.length < 3 || trimmedUsername.length > 30) {
-      setErrorMsg("Username harus memiliki panjang 3 hingga 30 karakter.");
-      haptics.error();
-      return;
-    }
-
-    if (!/^[a-zA-Z0-9._-]+$/.test(trimmedUsername)) {
-      setErrorMsg(
-        "Username hanya boleh memuat huruf, angka, titik (.), strip (-), dan garis bawah (_).",
-      );
-      haptics.error();
-      return;
-    }
-
-    if (!/^(?![._-])(?!.*[._-]{2})[a-zA-Z0-9._-]+(?<![._-])$/.test(trimmedUsername)) {
-      setErrorMsg(
-        "Username tidak boleh diawali/diakhiri simbol dan tidak boleh memuat simbol berurutan.",
-      );
       haptics.error();
       return;
     }
@@ -97,22 +70,32 @@ export default function RegisterScreen() {
       return;
     }
 
-    // Core API requires min length 8
     if (password.length < 8) {
       setErrorMsg("Kata sandi wajib memiliki minimal 8 karakter.");
       haptics.error();
       return;
     }
 
-    if (password !== confirmPassword) {
-      setErrorMsg("Konfirmasi kata sandi tidak cocok dengan kata sandi.");
+    if (!agreed) {
+      setErrorMsg("Anda harus menyetujui Syarat Layanan dan Kebijakan Privasi.");
       haptics.error();
       return;
     }
 
+    // Auto-generate a clean, conformant username from email/name
+    const mailPrefix = trimmedEmail
+      .split("@")[0]
+      .replace(/[^a-zA-Z0-9._-]/g, "")
+      .replace(/^[._-]+|[._-]+$/g, "")
+      .toLowerCase();
+    const cleanUsername =
+      mailPrefix.length >= 3
+        ? mailPrefix.slice(0, 24)
+        : `user_${Date.now().toString().slice(-6)}`;
+
     try {
       await registerMutation.mutateAsync({
-        username: trimmedUsername,
+        username: cleanUsername,
         fullName: trimmedName,
         email: trimmedEmail,
         password,
@@ -125,7 +108,7 @@ export default function RegisterScreen() {
       if (err instanceof ApiError) {
         if (err.statusCode === 409) {
           setErrorMsg(
-            "Alamat email atau username ini sudah terdaftar. Silakan gunakan kredensial lain atau masuk.",
+            "Alamat email ini sudah terdaftar. Silakan gunakan email lain atau masuk.",
           );
         } else {
           setErrorMsg(err.message || "Gagal melakukan pendaftaran akun.");
@@ -202,7 +185,7 @@ export default function RegisterScreen() {
                     Aktivasi Akun Dikirim
                   </Heading>
                   <Text className="text-sm text-muted-foreground text-center leading-relaxed mt-1">
-                    Akun tidak otomatis aktif. Silakan periksa inbox email di{" "}
+                    Silakan periksa inbox email di{" "}
                     <Text className="text-sm font-bold text-foreground">
                       {registeredEmail}
                     </Text>{" "}
@@ -223,7 +206,7 @@ export default function RegisterScreen() {
                 </VStack>
               </VStack>
             ) : (
-              /* Registration Form */
+              /* Registration Form (Wireframe MS5) */
               <VStack space="md">
                 <VStack space="xs" className="pb-3">
                   <Heading
@@ -232,10 +215,10 @@ export default function RegisterScreen() {
                     bold
                     className="text-foreground tracking-tight"
                   >
-                    Buat Akun SeraPhany
+                    Buat Akun Baru
                   </Heading>
                   <Text className="text-sm text-muted-foreground leading-relaxed">
-                    Satu akun tunggal untuk pasien, konseling, dan praktisi kesehatan mental.
+                    Mulai perjalanan kesehatan mental Anda dengan ruang yang aman dan terpercaya.
                   </Text>
                 </VStack>
 
@@ -251,12 +234,12 @@ export default function RegisterScreen() {
                 <FormControl isRequired>
                   <FormControlLabel>
                     <FormControlLabelText className="text-sm font-bold text-foreground">
-                      Nama Lengkap
+                      Nama lengkap
                     </FormControlLabelText>
                   </FormControlLabel>
                   <Input className="h-12 rounded-2xl border-border bg-card px-3">
                     <InputField
-                      placeholder="Nama lengkap sesuai identitas"
+                      placeholder="Contoh: Sinta Maharani"
                       placeholderTextColor="#8C829D"
                       value={fullName}
                       onChangeText={(val) => {
@@ -273,41 +256,11 @@ export default function RegisterScreen() {
                   </Input>
                 </FormControl>
 
-                {/* Username */}
-                <FormControl isRequired>
-                  <FormControlLabel>
-                    <FormControlLabelText className="text-sm font-bold text-foreground">
-                      Username
-                    </FormControlLabelText>
-                  </FormControlLabel>
-                  <Input className="h-12 rounded-2xl border-border bg-card px-3">
-                    <InputField
-                      placeholder="john_doe (3-30 karakter)"
-                      placeholderTextColor="#8C829D"
-                      value={username}
-                      onChangeText={(val) => {
-                        setUsername(val);
-                        if (errorMsg) setErrorMsg(null);
-                      }}
-                      autoCapitalize="none"
-                      autoCorrect={false}
-                      returnKeyType="next"
-                      className="text-sm text-foreground flex-1"
-                    />
-                    <InputSlot className="pr-2">
-                      <InputIcon as={AtSign} className="text-muted-foreground" />
-                    </InputSlot>
-                  </Input>
-                  <Text className="text-sm text-muted-foreground mt-1">
-                    Huruf, angka, titik, strip, dan garis bawah.
-                  </Text>
-                </FormControl>
-
                 {/* Email */}
                 <FormControl isRequired>
                   <FormControlLabel>
                     <FormControlLabelText className="text-sm font-bold text-foreground">
-                      Alamat Email
+                      Email
                     </FormControlLabelText>
                   </FormControlLabel>
                   <Input className="h-12 rounded-2xl border-border bg-card px-3">
@@ -335,7 +288,7 @@ export default function RegisterScreen() {
                 <FormControl isRequired>
                   <FormControlLabel>
                     <FormControlLabelText className="text-sm font-bold text-foreground">
-                      Kata Sandi
+                      Kata sandi
                     </FormControlLabelText>
                   </FormControlLabel>
                   <Input className="h-12 rounded-2xl border-border bg-card px-3">
@@ -348,7 +301,8 @@ export default function RegisterScreen() {
                         if (errorMsg) setErrorMsg(null);
                       }}
                       secureTextEntry={!showPassword}
-                      returnKeyType="next"
+                      returnKeyType="done"
+                      onSubmitEditing={handleRegister}
                       className="text-sm text-foreground flex-1"
                     />
                     <InputSlot
@@ -363,40 +317,41 @@ export default function RegisterScreen() {
                   </Input>
                 </FormControl>
 
-                {/* Konfirmasi Kata Sandi */}
-                <FormControl isRequired>
-                  <FormControlLabel>
-                    <FormControlLabelText className="text-sm font-bold text-foreground">
-                      Konfirmasi Kata Sandi
-                    </FormControlLabelText>
-                  </FormControlLabel>
-                  <Input className="h-12 rounded-2xl border-border bg-card px-3">
-                    <InputField
-                      placeholder="Ulangi kata sandi"
-                      placeholderTextColor="#8C829D"
-                      value={confirmPassword}
-                      onChangeText={(val) => {
-                        setConfirmPassword(val);
-                        if (errorMsg) setErrorMsg(null);
-                      }}
-                      secureTextEntry={!showConfirmPassword}
-                      returnKeyType="done"
-                      onSubmitEditing={handleRegister}
-                      className="text-sm text-foreground flex-1"
-                    />
-                    <InputSlot
+                {/* Checkbox Persetujuan (Wireframe MS5) */}
+                <Pressable
+                  onPress={() => setAgreed(!agreed)}
+                  className="flex-row items-center gap-2.5 pt-2"
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                >
+                  <Box
+                    className={`w-5 h-5 rounded-md border items-center justify-center ${
+                      agreed ? "bg-primary border-primary" : "border-border bg-card"
+                    }`}
+                  >
+                    {agreed && <Check size={14} color="#FFFFFF" />}
+                  </Box>
+                  <Text className="text-sm text-muted-foreground flex-1 leading-relaxed">
+                    Saya menyetujui{" "}
+                    <Text
                       onPress={() =>
-                        setShowConfirmPassword(!showConfirmPassword)
+                        openUrl("https://staging.seraphany.id/syarat-layanan")
                       }
-                      className="pr-2"
+                      className="text-sm font-bold text-primary underline"
                     >
-                      <InputIcon
-                        as={showConfirmPassword ? EyeOff : Eye}
-                        className="text-muted-foreground"
-                      />
-                    </InputSlot>
-                  </Input>
-                </FormControl>
+                      Syarat Layanan
+                    </Text>{" "}
+                    dan{" "}
+                    <Text
+                      onPress={() =>
+                        openUrl("https://staging.seraphany.id/kebijakan-privasi")
+                      }
+                      className="text-sm font-bold text-primary underline"
+                    >
+                      Kebijakan Privasi
+                    </Text>{" "}
+                    SeraPhany.
+                  </Text>
+                </Pressable>
 
                 {/* Tombol Submit */}
                 <Button
@@ -409,7 +364,7 @@ export default function RegisterScreen() {
                     <ButtonSpinner className="text-primary-foreground" />
                   ) : (
                     <ButtonText className="text-primary-foreground font-bold text-base">
-                      Daftar Akun Baru
+                      Daftar Sekarang
                     </ButtonText>
                   )}
                 </Button>
@@ -417,14 +372,14 @@ export default function RegisterScreen() {
                 {/* Sudah punya akun */}
                 <HStack space="xs" className="justify-center items-center pt-3">
                   <Text className="text-sm text-muted-foreground font-medium">
-                    Sudah memiliki akun?
+                    Sudah punya akun?
                   </Text>
                   <Pressable
                     onPress={() => router.replace(ROUTES.AUTH.LOGIN as any)}
                     hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                   >
                     <Text className="text-sm font-bold text-primary underline">
-                      Masuk Sekarang
+                      Masuk
                     </Text>
                   </Pressable>
                 </HStack>
@@ -437,28 +392,7 @@ export default function RegisterScreen() {
             space="xs"
             className="w-full max-w-[480px] md:max-w-[540px] self-center items-center pt-8"
           >
-            <Text className="text-sm text-muted-foreground text-center leading-relaxed">
-              Dengan mendaftar, Anda menyetujui{" "}
-              <Text
-                onPress={() =>
-                  openUrl("https://staging.seraphany.id/syarat-layanan")
-                }
-                className="text-sm text-primary font-bold underline"
-              >
-                Syarat Layanan
-              </Text>{" "}
-              dan{" "}
-              <Text
-                onPress={() =>
-                  openUrl("https://staging.seraphany.id/kebijakan-privasi")
-                }
-                className="text-sm text-primary font-bold underline"
-              >
-                Kebijakan Privasi
-              </Text>{" "}
-              SeraPhany.
-            </Text>
-            <HStack space="xs" className="items-center mt-1">
+            <HStack space="xs" className="items-center">
               <Text
                 onPress={() =>
                   openUrl("https://staging.seraphany.id/en/terms-of-service")
