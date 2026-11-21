@@ -34,7 +34,7 @@ import {
   InputField,
   Pressable as UIPressable,
 } from "@/components/ui";
-import { Building2, ShieldCheck, AlertCircle, Edit3 } from "lucide-react-native";
+import { Building2, AlertCircle, Edit3 } from "lucide-react-native";
 import { haptics } from "@/utils";
 import { resolveServerValue } from "@/utils/server-value";
 

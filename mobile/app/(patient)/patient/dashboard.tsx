@@ -8,7 +8,6 @@ import {
   Clock,
   AlertCircle,
   Frown,
-  ChevronRight,
   ShieldCheck,
   ShieldAlert,
   Sparkles,

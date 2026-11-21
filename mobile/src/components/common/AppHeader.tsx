@@ -63,9 +63,7 @@ export function AppHeader({
             {/* Truncation is platform-specific, on both elements below. numberOfLines
                 is a real react-native Text prop, so it is kept on native; on web
                 Heading renders a real <h1> and Text a raw <span>, both of which
-                forward the unknown prop and make React warn, so it is omitted there.
-                See the longer note beside the Heading in AuthLoginModal for why
-                isTruncated does not actually produce an ellipsis here. */}
+                forward the unknown prop and make React warn, so it is omitted there. */}
             <Heading
               size="sm"
               bold

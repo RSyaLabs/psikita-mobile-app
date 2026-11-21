@@ -1,17 +1,7 @@
 import React from "react";
 import {
-  MessageSquare,
-  Shield,
   X,
-  Phone,
-  Mail,
-  Clock,
-  ArrowRight,
-  CheckCircle2,
-  Lock,
   HelpCircle,
-  MapPin,
-  Navigation,
 } from "lucide-react-native";
 import {
   Box,
@@ -22,7 +12,6 @@ import {
   Pressable,
   Button,
   ButtonText,
-  ButtonIcon,
   ScrollView,
   Modal,
   ModalBackdrop,
@@ -30,7 +19,6 @@ import {
   ModalHeader,
   ModalBody,
 } from "@/components/ui";
-import { haptics } from "@/utils/haptics";
 
 
 /* -------------------------------------------------------------------------- */

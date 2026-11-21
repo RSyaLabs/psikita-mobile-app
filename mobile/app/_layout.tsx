@@ -57,8 +57,9 @@ export default function RootLayout() {
          * With QueryProvider down here, a Modal child calling useMutation or
          * useQueryClient threw "No QueryClient set, use QueryClientProvider to
          * set one" and took the whole app down behind it, because
-         * AppErrorBoundary wraps everything. ForgotPasswordView did exactly
-         * that: it is rendered from inside ModalBody and calls useRequestOtp.
+         * AppErrorBoundary wraps everything. Modal children rendered from inside
+         * ModalBody that call mutations or useQueryClient require the QueryProvider
+         * to be mounted above GluestackUIProvider.
          *
          * The jest suite never saw it. __tests__/utils/test-utils.tsx nested the
          * query client ABOVE Gluestack, so the passing LoginForm test that drives

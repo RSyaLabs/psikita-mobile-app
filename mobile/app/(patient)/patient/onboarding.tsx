@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Linking, ActivityIndicator } from "react-native";
+import { ActivityIndicator } from "react-native";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
@@ -8,18 +8,12 @@ import {
   Lock,
   ExternalLink,
   RefreshCw,
-  CheckCircle2,
-  User,
-  Phone,
-  MapPin,
-  CreditCard,
   ArrowRight,
   LogOut,
 } from "lucide-react-native";
 import {
   Box,
   Text,
-  Heading,
   VStack,
   HStack,
   Pressable,

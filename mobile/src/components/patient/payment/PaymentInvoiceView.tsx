@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ArrowLeft, Copy, Check, FileText } from "lucide-react-native";
+import { ArrowLeft, Copy, Check } from "lucide-react-native";
 import {
   Box,
   Text,

@@ -1,12 +1,11 @@
 import React, { useState } from "react";
-import { Alert, ActivityIndicator, Linking } from "react-native";
+import { Alert, ActivityIndicator } from "react-native";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   Calendar,
   Check,
   ChevronRight,
-  ExternalLink,
   HelpCircle,
   LogOut,
   Settings,

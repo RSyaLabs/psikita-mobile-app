@@ -1,5 +1,5 @@
 import React from "react";
-import { AlertCircle, RefreshCw } from "lucide-react-native";
+import { AlertCircle } from "lucide-react-native";
 import {
   Box,
   Text,
@@ -8,7 +8,6 @@ import {
   Pressable,
   Button,
   ButtonText,
-  ButtonIcon,
   ScrollView,
 } from "@/components/ui";
 import { haptics } from "@/utils/haptics";

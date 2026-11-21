@@ -8,7 +8,6 @@ import {
   Heading,
   Pressable,
   ScrollView,
-  Text,
 } from "@/components/ui";
 import {
   DoctorHeroCard,

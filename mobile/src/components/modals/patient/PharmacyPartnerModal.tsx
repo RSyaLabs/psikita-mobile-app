@@ -1,15 +1,8 @@
 import React from "react";
 import {
-  MessageSquare,
-  Shield,
   X,
-  Phone,
-  Mail,
   Clock,
-  ArrowRight,
   CheckCircle2,
-  Lock,
-  HelpCircle,
   MapPin,
   Navigation,
 } from "lucide-react-native";
@@ -23,7 +16,6 @@ import {
   Button,
   ButtonText,
   ButtonIcon,
-  ScrollView,
   Modal,
   ModalBackdrop,
   ModalContent,

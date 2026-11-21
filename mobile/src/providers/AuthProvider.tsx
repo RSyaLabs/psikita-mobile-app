@@ -14,7 +14,6 @@ import { clearActiveConsultationContextCache } from "@/clinical/activeConsultati
 import {
   getAuthToken,
   invalidateAuthContext,
-  setAuthToken,
   setAuthTokens,
   rotateAuthToken,
   onSessionExpired,

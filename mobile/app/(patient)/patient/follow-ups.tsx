@@ -4,9 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import {
   ChevronLeft,
   Calendar,
-  Clock,
   CheckCircle2,
-  AlertCircle,
   User,
 } from "lucide-react-native";
 import {

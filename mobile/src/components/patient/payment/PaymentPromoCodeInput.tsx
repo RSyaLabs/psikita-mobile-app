@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { TextInput } from "react-native";
 import { Box, Text, HStack, Pressable } from "@/components/ui";
-import { Tag, Check } from "lucide-react-native";
+import { Check } from "lucide-react-native";
 import { haptics } from "@/utils/haptics";
 
 export interface PaymentPromoCodeInputProps {

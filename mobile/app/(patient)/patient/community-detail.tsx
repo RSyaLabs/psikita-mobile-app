@@ -18,7 +18,6 @@ import {
   HStack,
   Pressable,
   Button,
-  ButtonText,
   ScrollView,
   Badge,
   BadgeText,

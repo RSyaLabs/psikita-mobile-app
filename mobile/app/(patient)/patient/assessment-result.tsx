@@ -8,7 +8,6 @@ import {
   Wind,
   BookOpen,
   ShieldCheck,
-  ShieldAlert,
 } from "lucide-react-native";
 import {
   Badge,
@@ -39,7 +38,6 @@ import {
   ModalFooter,
   ModalCloseButton,
 } from "@/components/ui";
-import { BackendIntegrationBanner } from "@/components/common";
 import {
   useTriageAssessment,
   useMyVerificationStatus,

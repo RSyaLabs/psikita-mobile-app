@@ -3,10 +3,7 @@ import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   ArrowLeft,
-  RefreshCw,
   AlertCircle,
-  CheckCircle2,
-  Clock,
   ShieldCheck,
   Plus,
 } from "lucide-react-native";

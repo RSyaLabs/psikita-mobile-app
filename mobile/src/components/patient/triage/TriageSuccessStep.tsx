@@ -1,5 +1,5 @@
 import React from "react";
-import { CheckCircle2, Clock, ArrowRight } from "lucide-react-native";
+import { CheckCircle2, ArrowRight } from "lucide-react-native";
 import {
   VStack,
   HStack,

@@ -5,7 +5,6 @@ import {
   ChevronLeft,
   MessageSquare,
   Heart,
-  Share2,
   Plus,
   Shield,
   User,

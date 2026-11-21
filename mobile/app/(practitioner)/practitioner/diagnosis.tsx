@@ -5,7 +5,6 @@ import { FileText, Save, ShieldAlert } from "lucide-react-native";
 import {
   Badge,
   BadgeText,
-  Box,
   Button,
   ButtonIcon,
   ButtonSpinner,
@@ -21,7 +20,6 @@ import {
 } from "@/components/ui";
 import { CLINICAL_CONSTANTS, getIcd10Description, ROUTES } from "@/constants";
 import {
-  BackendIntegrationBanner,
   UnavailableState,
 } from "@/components/common";
 import {

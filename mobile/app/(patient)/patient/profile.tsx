@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useRouter } from "expo-router";
-import { Image as RNImage, Alert, ActivityIndicator, Linking } from "react-native";
+import { Image as RNImage, Alert, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   Edit3,
@@ -11,7 +11,6 @@ import {
   MessageSquare,
   Shield,
   ShieldCheck,
-  ExternalLink,
   LogOut,
   ChevronRight,
   Stethoscope,

@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Stack, useGlobalSearchParams, useRouter, useSegments } from "expo-router";
+import { Stack, useRouter, useSegments } from "expo-router";
 import { colors } from "@/theme/colors";
 import { AuthLoadingState } from "@/providers/AuthProvider";
 import { useAuth } from "@/hooks/useAuth";

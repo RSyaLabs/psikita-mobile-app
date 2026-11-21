@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { RefreshCw, CheckCircle2 } from "lucide-react-native";
+import { RefreshCw } from "lucide-react-native";
 import { Animated, Easing } from "react-native";
 import {
   Box,
