@@ -160,6 +160,7 @@ export default function ProfileScreen() {
         }}
         showsVerticalScrollIndicator={false}
       >
+        <Box className="w-full max-w-[640px] md:max-w-[720px] self-center">
         {/* Care Continuity Banner */}
         <Card className="bg-card rounded-2xl p-4 border border-border mb-4">
           <HStack space="md" className="items-center">
@@ -388,6 +389,7 @@ export default function ProfileScreen() {
             </Text>
           </Pressable>
         </Card>
+        </Box>
       </ScrollView>
 
       {/* Persistent Bottom Tab Bar */}

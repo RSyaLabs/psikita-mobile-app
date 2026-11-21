@@ -39,6 +39,7 @@ import { useCommunityPosts, useCreatePost } from "@/hooks/useApiQueries";
 import { safeNavigateBack } from "@/utils/navigation";
 import { ROUTES } from "@/constants/routes";
 import { haptics } from "@/utils/haptics";
+import { PatientTabBar } from "@/components/navigation/PatientTabBar";
 
 const CATEGORIES = ["Semua", "Pemulihan", "Cerita Harian", "Tanya Psikolog", "Tips Koping"];
 
@@ -149,9 +150,10 @@ export default function CommunityFeedScreen() {
 
       {/* Main Feed Content */}
       <ScrollView
-        contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 16, paddingBottom: 40 }}
+        contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 16, paddingBottom: 110 }}
         showsVerticalScrollIndicator={false}
       >
+        <Box className="w-full max-w-[640px] md:max-w-[720px] self-center">
         {isLoading ? (
           <Box className="py-20 items-center justify-center">
             <Spinner size="large" />
@@ -242,6 +244,7 @@ export default function CommunityFeedScreen() {
             ))}
           </VStack>
         )}
+        </Box>
       </ScrollView>
 
       {/* Modal Buat Kiriman Baru */}
@@ -315,6 +318,9 @@ export default function CommunityFeedScreen() {
           </ModalFooter>
         </ModalContent>
       </Modal>
+
+      {/* Persistent Bottom Tab Bar */}
+      <PatientTabBar activeTab="feed" />
     </SafeAreaView>
   );
 }

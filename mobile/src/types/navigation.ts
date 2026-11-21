@@ -1,4 +1,4 @@
-export type PatientTab = "beranda" | "sesi" | "edukasi" | "akun";
+export type PatientTab = "beranda" | "sesi" | "feed" | "akun";
 
 export type PractitionerTab = "beranda" | "sesi" | "profil";
 

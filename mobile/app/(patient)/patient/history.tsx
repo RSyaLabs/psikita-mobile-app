@@ -120,6 +120,7 @@ export default function HistoryScreen() {
         }}
         showsVerticalScrollIndicator={false}
       >
+        <Box className="w-full max-w-[640px] md:max-w-[720px] self-center">
         {isPending ? (
           <LoadingState label="Memuat riwayat konsultasi klinis..." />
         ) : capabilityUnavailable ? (
@@ -200,6 +201,7 @@ export default function HistoryScreen() {
             })}
           </VStack>
         )}
+        </Box>
       </ScrollView>
 
       {/* Persistent Bottom Tab Bar */}

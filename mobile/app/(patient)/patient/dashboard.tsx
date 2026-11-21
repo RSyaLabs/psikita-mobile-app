@@ -218,6 +218,7 @@ export default function PatientDashboard() {
         contentContainerStyle={{ paddingBottom: 110 }}
         showsVerticalScrollIndicator={false}
       >
+        <Box className="w-full max-w-[640px] md:max-w-[720px] self-center">
         {/* Header Greeting */}
         <VStack space="xs" className="px-5 pt-3">
           <HStack className="justify-between items-center">
@@ -540,6 +541,7 @@ export default function PatientDashboard() {
             </Pressable>
           </VStack>
         </VStack>
+        </Box>
       </ScrollView>
 
       {/* Persistent Bottom Tab Bar */}
