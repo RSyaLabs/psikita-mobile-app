@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useRouter } from "expo-router";
-import { Image as RNImage } from "react-native";
+import { Image as RNImage, Linking } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   Smile,
@@ -9,21 +9,20 @@ import {
   AlertCircle,
   Frown,
   ChevronRight,
-  Video,
-  Calendar,
-  ClipboardCheck,
-  MessageSquare,
-  CalendarCheck,
-  ShieldAlert,
   ShieldCheck,
+  ShieldAlert,
   Sparkles,
   ArrowRight,
+  Lock,
+  PhoneCall,
+  Bell,
+  ClipboardCheck,
+  MessageSquare,
 } from "lucide-react-native";
 import {
   Box,
   Text,
   Heading,
-  Card,
   VStack,
   HStack,
   Pressable,
@@ -33,7 +32,6 @@ import {
   Badge,
   BadgeText,
   ScrollView,
-  Image,
   useToast,
   Toast,
   ToastTitle,
@@ -47,12 +45,12 @@ import {
   ModalCloseButton,
 } from "@/components/ui";
 import { PatientTabBar } from "@/components/navigation/PatientTabBar";
-import { AppIcon } from "@/components/common/AppIcon";
 import {
   usePatientProfile,
-  usePractitioners,
   useMyVerificationStatus,
   useStartDiditVerification,
+  useWaitingRoomStatus,
+  usePatientConsultations,
 } from "@/hooks/useApiQueries";
 import { launchDiditVerification } from "@/services/didit-kyc";
 import { haptics } from "@/utils/haptics";
@@ -61,52 +59,46 @@ import { ROUTES } from "@/constants/routes";
 const SeraPhanyLogo = require("../../../assets/icon.png");
 
 const MOODS = [
-  {
-    id: "Tenang",
-    label: "Tenang",
-    icon: <AppIcon icon={Smile} size={20} tone="primary" />,
-  },
-  {
-    id: "Biasa",
-    label: "Biasa",
-    icon: <AppIcon icon={Meh} size={20} tone="primary" />,
-  },
-  {
-    id: "Lelah",
-    label: "Lelah",
-    icon: <AppIcon icon={Clock} size={20} tone="primary" />,
-  },
-  {
-    id: "Cemas",
-    label: "Cemas",
-    icon: <AppIcon icon={AlertCircle} size={20} tone="primary" />,
-  },
-  {
-    id: "Sedih",
-    label: "Sedih",
-    icon: <AppIcon icon={Frown} size={20} tone="primary" />,
-  },
+  { id: "Tenang", label: "Tenang", icon: Smile },
+  { id: "Biasa", label: "Biasa", icon: Meh },
+  { id: "Lelah", label: "Lelah", icon: Clock },
+  { id: "Cemas", label: "Cemas", icon: AlertCircle },
+  { id: "Sedih", label: "Sedih", icon: Frown },
 ] as const;
 
 export default function PatientDashboard() {
   const router = useRouter();
   const toast = useToast();
+
   const [selectedMood, setSelectedMood] = useState("Tenang");
   const [kycModalOpen, setKycModalOpen] = useState(false);
   const [isKycLaunching, setIsKycLaunching] = useState(false);
+  const [emergencyModalOpen, setEmergencyModalOpen] = useState(false);
 
+  // Queries
   const { data: patient } = usePatientProfile();
-  const { data: practitionersData } = usePractitioners();
   const { data: kycStatus, refetch: refetchKyc } = useMyVerificationStatus();
+  const { data: waitingRoom } = useWaitingRoomStatus();
+  const { data: activeConsultations } = usePatientConsultations({ status: "ACTIVE" });
   const startKycMutation = useStartDiditVerification();
 
+  // Verification state: Wireframe BR1 (unverified) vs BR2/BR3 (verified)
   const isVerified =
     kycStatus?.status === "VERIFIED" || kycStatus?.status === "APPROVED";
 
-  const patientFirstName = patient?.fullName?.split(" ")[0];
-  const practitionersList = practitionersData?.data || [];
-  const onlineCount = practitionersList.length;
+  // Active consultation state: Wireframe BR3
+  const isWaitingRoomActive = Boolean(
+    waitingRoom?.status &&
+      waitingRoom.status !== "CANCELLED" &&
+      waitingRoom.status !== "TIMEOUT" &&
+      waitingRoom.status !== "COMPLETED",
+  );
+  const activeConsultation = activeConsultations?.[0];
+  const hasActiveConsultation = isWaitingRoomActive || Boolean(activeConsultation);
 
+  const patientFirstName = patient?.fullName?.split(" ")[0] || "Pasien";
+
+  // Handlers
   const handleLaunchDidit = async () => {
     haptics.selection();
     setIsKycLaunching(true);
@@ -123,7 +115,7 @@ export default function PatientDashboard() {
               <Toast nativeID={id} action="success">
                 <ToastTitle>Identitas Terverifikasi</ToastTitle>
                 <ToastDescription>
-                  Akun Anda telah berstatus VERIFIED. Layanan konsultasi dan pencocokan kini aktif penuh!
+                  Akun Anda telah terverifikasi. Layanan konsultasi dan triase mandiri kini aktif penuh!
                 </ToastDescription>
               </Toast>
             ),
@@ -139,7 +131,7 @@ export default function PatientDashboard() {
               <Toast nativeID={id} action="info">
                 <ToastTitle>Verifikasi Ditunda</ToastTitle>
                 <ToastDescription>
-                  Selesaikan verifikasi Didit KYC sebelum memulai konsultasi langsung.
+                  Selesaikan verifikasi identitas e-KTP sebelum memulai konsultasi langsung.
                 </ToastDescription>
               </Toast>
             ),
@@ -147,17 +139,6 @@ export default function PatientDashboard() {
         },
         onFallbackUrlLaunched: () => {
           setKycModalOpen(false);
-          toast.show({
-            placement: "top",
-            render: ({ id }) => (
-              <Toast nativeID={id} action="info">
-                <ToastTitle>Portal Verifikasi Didit</ToastTitle>
-                <ToastDescription>
-                  Membuka portal verifikasi identitas resmi Didit untuk menyelesaikan KYC Anda.
-                </ToastDescription>
-              </Toast>
-            ),
-          });
         },
         onError: (err) => {
           haptics.error();
@@ -195,21 +176,11 @@ export default function PatientDashboard() {
   const handleMoodSelect = (moodId: string) => {
     haptics.light();
     setSelectedMood(moodId);
-    // The selection is component-local and is discarded on unmount, and no
-    // request is sent. The previous toast said "berhasil dicatat", which told the
-    // user something was saved when nothing left the device. It now says what
-    // actually happened.
-    toast.show({
-      placement: "top",
-      render: ({ id }) => (
-        <Toast nativeID={id} action="info">
-          <ToastTitle>Suasana Hari Ini</ToastTitle>
-          <ToastDescription>
-            Kamu memilih {moodId}. Catatan ini belum dikirim ke server.
-          </ToastDescription>
-        </Toast>
-      ),
-    });
+  };
+
+  const dialEmergency = (phone: string) => {
+    haptics.medium();
+    Linking.openURL(`tel:${phone}`).catch(() => {});
   };
 
   return (
@@ -218,339 +189,505 @@ export default function PatientDashboard() {
         contentContainerStyle={{ paddingBottom: 110 }}
         showsVerticalScrollIndicator={false}
       >
-        <Box className="w-full max-w-[640px] md:max-w-[720px] self-center">
-        {/* Header Greeting */}
-        <VStack space="xs" className="px-5 pt-3">
-          <HStack className="justify-between items-center">
-            <VStack className="flex-1 pr-3">
-              <Heading size="xl" bold className="text-foreground text-2xl font-bold tracking-tight">
-                {patientFirstName ? `Halo, ${patientFirstName}` : "Halo"}
-              </Heading>
-              <Text size="sm" className="text-muted-foreground mt-0.5 font-medium">
-                Cek kabarmu hari ini atau lanjutkan sesi konselingmu.
-              </Text>
-            </VStack>
-            <RNImage
-              source={SeraPhanyLogo}
-              style={{ width: 44, height: 44, borderRadius: 12 }}
-            />
-          </HStack>
-        </VStack>
-
-        {/* Verification Warning Banner if Not Verified */}
-        {!isVerified && (
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Verifikasi identitas"
-            onPress={() => {
-              haptics.selection();
-              setKycModalOpen(true);
-            }}
-            className="mx-5 mt-3.5 p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex-row items-center gap-3 active:opacity-90"
-          >
-            <Box className="w-10 h-10 rounded-xl bg-amber-500/20 items-center justify-center">
-              <ShieldAlert size={20} color="#D97706" />
-            </Box>
-            <VStack className="flex-1" space="xs">
-              <Text size="sm" bold className="text-amber-900 font-bold">
-                Verifikasi Identitas
-              </Text>
-              <Text size="sm" className="text-amber-800 leading-tight">
-                Verifikasi akun Anda untuk mengakses konsultasi psikolog dan resep digital.
-              </Text>
-            </VStack>
-            <ChevronRight size={18} color="#D97706" />
-          </Pressable>
-        )}
-
-        {/* Golden Flow Hero Card - Tujuan Utama Aplikasi */}
-        <Box className="mx-5 mt-4 rounded-3xl overflow-hidden bg-card border border-primary/25 shadow-sm p-4">
-          <VStack space="sm">
-            {/* Top Tag & Live Status */}
-            <HStack className="justify-between items-center">
-              <Badge
-                variant="default"
-                className="bg-primary/10 border border-primary/30 rounded-full px-2.5 py-1 flex-row items-center gap-1.5"
+        <Box className="w-full max-w-[640px] md:max-w-[720px] self-center px-5 pt-3">
+          {/* ========================================================
+           * TOP HEADER: SALUTATION & NOTIFICATION
+           * ======================================================== */}
+          <HStack className="justify-between items-center pb-4">
+            <VStack space="xs" className="flex-1 pr-3">
+              <Heading
+                level={1}
+                size="2xl"
+                bold
+                className="text-foreground tracking-tight"
               >
-                <AppIcon icon={Sparkles} size={14} color="#6b5b95" />
-                <BadgeText className="text-sm font-bold text-primary">
-                  ALUR UTAMA
-                </BadgeText>
-              </Badge>
-              <HStack className="items-center gap-1.5 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
-                <Box className="w-2 h-2 rounded-full bg-emerald-500" />
-                <Text size="sm" className="text-emerald-700 font-semibold">
-                  {onlineCount > 0 ? `${onlineCount} Praktisi Siaga` : "Praktisi Siaga"}
-                </Text>
-              </HStack>
-            </HStack>
-
-            {/* Title & Core Purpose */}
-            <VStack space="xs" className="mt-0.5">
-              <Heading size="lg" bold className="text-foreground tracking-tight text-xl font-bold">
-                Konsultasi Langsung & Triase Cepat
+                Halo, {patientFirstName}
               </Heading>
-              <Text size="sm" className="text-muted-foreground leading-relaxed">
-                Temukan psikolog tepat dalam hitungan menit melalui asesmen mandiri terarah dan radar pencocokan otomatis.
+              <Text className="text-sm text-muted-foreground font-medium">
+                {!isVerified
+                  ? "Satu langkah lagi sebelum mulai."
+                  : hasActiveConsultation
+                  ? "Lanjutkan dari mana kamu berhenti."
+                  : "Apa kabarmu hari ini?"}
               </Text>
             </VStack>
 
-            {/* 3-Step Visual Process Bar */}
-            <Box className="bg-muted/70 p-2.5 rounded-2xl border border-border my-0.5">
-              <HStack className="justify-between items-center">
-                <HStack space="xs" className="items-center flex-1">
-                  <Box className="w-6 h-6 rounded-full bg-primary/20 items-center justify-center">
-                    <Text size="sm" bold className="text-primary font-bold">
-                      1
-                    </Text>
-                  </Box>
-                  <Text size="sm" className="font-semibold text-foreground">
-                    Triase
-                  </Text>
-                </HStack>
-                <AppIcon icon={ChevronRight} size={14} color="#6b5b95" />
-                <HStack space="xs" className="items-center flex-1 justify-center">
-                  <Box className="w-6 h-6 rounded-full bg-primary/20 items-center justify-center">
-                    <Text size="sm" bold className="text-primary font-bold">
-                      2
-                    </Text>
-                  </Box>
-                  <Text size="sm" className="font-semibold text-foreground">
-                    Matching
-                  </Text>
-                </HStack>
-                <AppIcon icon={ChevronRight} size={14} color="#6b5b95" />
-                <HStack space="xs" className="items-center flex-1 justify-end">
-                  <Box className="w-6 h-6 rounded-full bg-primary/20 items-center justify-center">
-                    <Text size="sm" bold className="text-primary font-bold">
-                      3
-                    </Text>
-                  </Box>
-                  <Text size="sm" className="font-semibold text-foreground">
-                    War Room
-                  </Text>
-                </HStack>
-              </HStack>
-            </Box>
+            <HStack space="sm" className="items-center">
+              <Pressable
+                onPress={() => {
+                  haptics.light();
+                  toast.show({
+                    placement: "top",
+                    render: ({ id }) => (
+                      <Toast nativeID={id} action="info">
+                        <ToastTitle>Notifikasi</ToastTitle>
+                        <ToastDescription>
+                          Tidak ada notifikasi baru saat ini.
+                        </ToastDescription>
+                      </Toast>
+                    ),
+                  });
+                }}
+                accessibilityRole="button"
+                accessibilityLabel="Notifikasi"
+                className="w-10 h-10 rounded-xl bg-card border border-border/80 items-center justify-center active:bg-muted"
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              >
+                <Bell size={20} color="#262130" strokeWidth={2} />
+              </Pressable>
+              <RNImage
+                source={SeraPhanyLogo}
+                style={{ width: 40, height: 40, borderRadius: 10 }}
+                resizeMode="contain"
+              />
+            </HStack>
+          </HStack>
 
-            {/* Primary Action Button */}
-            <Button
-              size="default"
-              accessibilityRole="button"
-              accessibilityLabel="Mulai Triase dan Konsultasi Langsung"
-              onPress={() => {
-                haptics.medium();
-                if (!isVerified) {
-                  setKycModalOpen(true);
-                  return;
-                }
-                router.push({
-                  pathname: ROUTES.PATIENT.TRIAGE,
-                  params: { mode: "consultation" },
-                } as any);
-              }}
-              className="bg-primary py-3 rounded-2xl flex-row items-center justify-center gap-2 active:opacity-90 shadow-sm mt-0.5"
-            >
-              <AppIcon icon={Video} size={18} color="#FFFFFF" />
-              <ButtonText className="text-sm font-bold text-primary-foreground">
-                Mulai Konsultasi (Triase Mandiri)
-              </ButtonText>
-              <AppIcon icon={ArrowRight} size={16} color="#FFFFFF" />
-            </Button>
-          </VStack>
-        </Box>
+          {/* ========================================================
+           * CONDITIONAL HERO: WIREFRAME BR1 (LOCKED) vs BR3 (ACTIVE) vs BR2 (STANDARD)
+           * ======================================================== */}
 
-        {/* Sections */}
-        <VStack space="sm" className="px-5 mt-3">
-          {/* Vibe Section */}
-          <VStack space="xs" className="pt-1">
-            <Text size="sm" className="font-bold text-foreground">
-              Check-in hari ini
-            </Text>
-            <HStack space="xs">
-              {MOODS.map((mood) => {
-                const isSelected = selectedMood === mood.id;
-                return (
-                  <Pressable
-                    key={mood.id}
-                    onPress={() => handleMoodSelect(mood.id)}
-                    accessibilityRole="button"
-                    accessibilityLabel={`Suasana ${mood.label}`}
-                    accessibilityState={{ selected: isSelected }}
-                    className={`flex-1 py-2.5 rounded-xl items-center justify-center border border-border active:opacity-80 ${
-                      isSelected ? "bg-muted border-primary" : "bg-card"
-                    }`}
-                  >
-                    {mood.icon}
-                    <Text
-                      size="sm"
-                      className={`text-sm mt-1.5 ${
-                        isSelected
-                          ? "font-bold text-foreground"
-                          : "font-semibold text-muted-foreground"
-                      }`}
+          {!isVerified ? (
+            /* ========================================================
+             * WIREFRAME BR1: HERO GATE (VERIFIKASI IDENTITAS DULU)
+             * ======================================================== */
+            <VStack space="lg" className="pt-1">
+              {/* Gate Card */}
+              <Box className="rounded-xl bg-card border-[2px] border-border/90 p-5 shadow-sm">
+                <VStack space="md">
+                  <HStack space="sm" className="items-center">
+                    <Box className="w-10 h-10 rounded-xl bg-primary/10 items-center justify-center">
+                      <ShieldCheck size={22} color="#4A3B6B" />
+                    </Box>
+                    <Heading
+                      level={2}
+                      size="lg"
+                      bold
+                      className="text-foreground flex-1 tracking-tight"
                     >
-                      {mood.label}
+                      Verifikasi identitas dulu
+                    </Heading>
+                  </HStack>
+
+                  <Text className="text-sm text-muted-foreground leading-relaxed">
+                    Butuh sekitar 3 menit. Siapkan e-KTP dan cari tempat dengan cahaya cukup.
+                  </Text>
+
+                  <Button
+                    size="lg"
+                    onPress={() => {
+                      haptics.medium();
+                      setKycModalOpen(true);
+                    }}
+                    className="w-full h-[52px] rounded-xl bg-primary active:opacity-90 flex-row items-center justify-center shadow-sm"
+                  >
+                    <ButtonText className="text-primary-foreground font-bold text-base">
+                      Verifikasi Sekarang
+                    </ButtonText>
+                  </Button>
+
+                  <Text className="text-sm text-muted-foreground text-center">
+                    Agar akun dan data kesehatanmu tetap aman.
+                  </Text>
+                </VStack>
+              </Box>
+
+              {/* Locked Features Preview (Wireframe BR1) */}
+              <VStack space="xs" className="pt-2">
+                <Text className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-1">
+                  SETELAH TERVERIFIKASI
+                </Text>
+                <Box className="rounded-xl bg-card border border-dashed border-border/80 overflow-hidden divide-y divide-dashed divide-border/80">
+                  {[
+                    { label: "Mulai konsultasi", target: "konsultasi" },
+                    { label: "Tes mandiri", target: "tes mandiri" },
+                    { label: "Feed komunitas", target: "feed komunitas" },
+                    { label: "Riwayat & hasil", target: "riwayat & hasil" },
+                  ].map((item, idx) => (
+                    <Pressable
+                      key={idx}
+                      onPress={() => {
+                        haptics.light();
+                        setKycModalOpen(true);
+                      }}
+                      className="flex-row items-center justify-between p-4 active:bg-muted/50"
+                    >
+                      <Text className="text-base text-muted-foreground font-medium">
+                        {item.label}
+                      </Text>
+                      <Box className="w-7 h-7 rounded-lg bg-muted items-center justify-center">
+                        <Lock size={15} color="#8C829D" />
+                      </Box>
+                    </Pressable>
+                  ))}
+                </Box>
+              </VStack>
+            </VStack>
+          ) : hasActiveConsultation ? (
+            /* ========================================================
+             * WIREFRAME BR3: HERO KONSULTASI AKTIF
+             * ======================================================== */
+            <VStack space="lg" className="pt-1">
+              <Box className="rounded-xl bg-card border-[2px] border-primary/40 p-5 shadow-sm">
+                <VStack space="md">
+                  <HStack className="justify-between items-center">
+                    <Text className="text-sm font-bold text-primary tracking-wider uppercase">
+                      KONSULTASI AKTIF
+                    </Text>
+                    <Badge
+                      variant="default"
+                      className="bg-primary/10 border border-primary/20 rounded-full px-3 py-1"
+                    >
+                      <BadgeText className="text-sm font-bold text-primary">
+                        {isWaitingRoomActive ? "Mencari psikolog" : "Sesi Aktif"}
+                      </BadgeText>
+                    </Badge>
+                  </HStack>
+
+                  <VStack space="xs">
+                    <Heading
+                      level={2}
+                      size="lg"
+                      bold
+                      className="text-foreground tracking-tight"
+                    >
+                      {isWaitingRoomActive
+                        ? "Kami sedang mencarikan psikolog untukmu"
+                        : "Sesi konsultasi Anda sedang berlangsung"}
+                    </Heading>
+                    <Text className="text-sm text-muted-foreground leading-relaxed">
+                      {isWaitingRoomActive
+                        ? "Posisi antreanmu aman. Anda dapat melihat radar pencocokan atau menunggu di sini."
+                        : "Tekan tombol di bawah untuk masuk ke ruang konsultasi."}
+                    </Text>
+                  </VStack>
+
+                  {/* 4-Step Progress Indicator */}
+                  <HStack space="xs" className="w-full py-1">
+                    <Box className="flex-1 h-1.5 rounded-full bg-primary" />
+                    <Box className="flex-1 h-1.5 rounded-full bg-primary" />
+                    <Box className={`flex-1 h-1.5 rounded-full ${!isWaitingRoomActive ? "bg-primary" : "bg-border"}`} />
+                    <Box className="flex-1 h-1.5 rounded-full bg-border" />
+                  </HStack>
+
+                  <Button
+                    size="lg"
+                    onPress={() => {
+                      haptics.medium();
+                      if (isWaitingRoomActive) {
+                        router.push(ROUTES.PATIENT.MATCHING as any);
+                      } else {
+                        router.push(ROUTES.PATIENT.CHAT_ROOM as any);
+                      }
+                    }}
+                    className="w-full h-[52px] rounded-xl bg-primary active:opacity-90 flex-row items-center justify-center shadow-sm"
+                  >
+                    <ButtonText className="text-primary-foreground font-bold text-base">
+                      {isWaitingRoomActive ? "Lihat Status Pencocokan" : "Masuk ke Sesi Konsultasi"}
+                    </ButtonText>
+                    <ArrowRight size={18} color="#FFFFFF" className="ml-1" />
+                  </Button>
+                </VStack>
+              </Box>
+
+              {/* Notice */}
+              <Box className="rounded-xl border border-dashed border-border p-4 bg-muted/40">
+                <Text className="text-sm text-muted-foreground leading-relaxed">
+                  Mulai konsultasi baru tersedia setelah konsultasi aktif ini selesai.
+                </Text>
+              </Box>
+
+              {/* Grid 2 Kolom (Wireframe BR3) */}
+              <VStack space="xs" className="pt-1">
+                <Text className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-1">
+                  UNTUK DIRIMU SENDIRI
+                </Text>
+                <HStack space="sm" className="w-full">
+                  <Pressable
+                    onPress={() => {
+                      haptics.light();
+                      router.push({
+                        pathname: ROUTES.PATIENT.TRIAGE,
+                        params: { mode: "assessment", guest: "false" },
+                      } as any);
+                    }}
+                    className="flex-1 rounded-xl bg-card border border-border p-4 active:bg-muted"
+                  >
+                    <Box className="w-10 h-10 rounded-xl bg-primary/10 items-center justify-center mb-3">
+                      <ClipboardCheck size={20} color="#4A3B6B" />
+                    </Box>
+                    <Text className="text-base font-bold text-foreground">
+                      Tes mandiri
+                    </Text>
+                    <Text className="text-sm text-muted-foreground mt-0.5 leading-snug">
+                      Cek stres & kecemasan
                     </Text>
                   </Pressable>
-                );
-              })}
-            </HStack>
-          </VStack>
 
-          {/* Layanan Utama */}
-          <VStack space="xs" className="pt-2">
-            {/* Konsultasi Langsung */}
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Konsultasi langsung"
-              onPress={() => {
-                haptics.medium();
-                if (!isVerified) {
-                  setKycModalOpen(true);
-                  return;
-                }
-                router.push({
-                  pathname: ROUTES.PATIENT.TRIAGE,
-                  params: { mode: "consultation" },
-                } as any);
-              }}
-              className="bg-card p-3.5 rounded-2xl flex-row items-center border border-border active:bg-muted"
-            >
-              <Box className="w-11 h-11 rounded-xl bg-primary/10 items-center justify-center mr-3.5">
-                <AppIcon icon={Video} size={22} color="#4A3B6B" />
-              </Box>
-              <VStack space="xs" className="flex-1">
-                <HStack space="xs" className="items-center">
-                  <Text size="md" bold className="text-foreground">
-                    Konsultasi langsung
-                  </Text>
-                  <Badge
-                    variant="default"
-                    className="bg-primary/10 rounded-full px-2 py-0.5"
+                  <Pressable
+                    onPress={() => {
+                      haptics.light();
+                      router.push(ROUTES.PATIENT.COMMUNITY as any);
+                    }}
+                    className="flex-1 rounded-xl bg-card border border-border p-4 active:bg-muted"
                   >
-                    <BadgeText className="text-sm text-primary font-bold">
-                      Utama
-                    </BadgeText>
-                  </Badge>
+                    <Box className="w-10 h-10 rounded-xl bg-primary/10 items-center justify-center mb-3">
+                      <MessageSquare size={20} color="#4A3B6B" />
+                    </Box>
+                    <Text className="text-base font-bold text-foreground">
+                      Feed
+                    </Text>
+                    <Text className="text-sm text-muted-foreground mt-0.5 leading-snug">
+                      Cerita & komunitas
+                    </Text>
+                  </Pressable>
                 </HStack>
-                <Text size="sm" className="text-muted-foreground font-medium">
-                  {onlineCount} psikolog online • Triase & Pencocokan
-                </Text>
               </VStack>
-              <AppIcon icon={ChevronRight} size={18} color="#4B4656" />
-            </Pressable>
+            </VStack>
+          ) : (
+            /* ========================================================
+             * WIREFRAME BR2: HERO STANDAR (TERVERIFIKASI & AKSES PENUH)
+             * ======================================================== */
+            <VStack space="lg" className="pt-1">
+              {/* Hero Mulai Konsultasi */}
+              <Box className="rounded-xl bg-card border-[2px] border-primary/30 p-5 shadow-sm">
+                <VStack space="md">
+                  <HStack space="xs" className="items-center">
+                    <Box className="w-10 h-10 rounded-xl bg-primary/10 items-center justify-center mr-2">
+                      <Sparkles size={22} color="#4A3B6B" />
+                    </Box>
+                    <VStack className="flex-1">
+                      <Heading
+                        level={2}
+                        size="lg"
+                        bold
+                        className="text-foreground tracking-tight"
+                      >
+                        Butuh bicara dengan psikolog?
+                      </Heading>
+                    </VStack>
+                  </HStack>
 
-            {/* Jadwalkan Sesi */}
+                  <Text className="text-sm text-muted-foreground leading-relaxed">
+                    Jawab beberapa pertanyaan singkat (sekitar 3 menit). Kami carikan psikolog yang sesuai.
+                  </Text>
+
+                  <Button
+                    size="lg"
+                    onPress={() => {
+                      haptics.medium();
+                      router.push({
+                        pathname: ROUTES.PATIENT.TRIAGE,
+                        params: { mode: "consultation" },
+                      } as any);
+                    }}
+                    className="w-full h-[52px] rounded-xl bg-primary active:opacity-90 flex-row items-center justify-center shadow-sm"
+                  >
+                    <ButtonText className="text-primary-foreground font-bold text-base">
+                      Mulai Konsultasi
+                    </ButtonText>
+                    <ArrowRight size={18} color="#FFFFFF" className="ml-1" />
+                  </Button>
+
+                  <Text className="text-sm text-muted-foreground text-center">
+                    Privat dan bukan diagnosis.
+                  </Text>
+                </VStack>
+              </Box>
+
+              {/* Mood Check-In Section (Wireframe BR2) */}
+              <VStack space="xs" className="pt-1">
+                <Text className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-1">
+                  BAGAIMANA PERASAANMU HARI INI? (OPSIONAL)
+                </Text>
+                <HStack space="xs" className="w-full">
+                  {MOODS.map((mood) => {
+                    const isSelected = selectedMood === mood.id;
+                    const IconComp = mood.icon;
+                    return (
+                      <Pressable
+                        key={mood.id}
+                        onPress={() => handleMoodSelect(mood.id)}
+                        className={`flex-1 py-3 px-1 rounded-xl items-center justify-center border transition-all ${
+                          isSelected
+                            ? "bg-primary/10 border-primary"
+                            : "bg-card border-border/80 active:bg-muted"
+                        }`}
+                      >
+                        <IconComp
+                          size={22}
+                          color={isSelected ? "#4A3B6B" : "#75618E"}
+                          strokeWidth={isSelected ? 2.5 : 2}
+                        />
+                        <Text
+                          className={`text-sm mt-1.5 ${
+                            isSelected
+                              ? "font-bold text-primary"
+                              : "font-semibold text-foreground"
+                          }`}
+                        >
+                          {mood.label}
+                        </Text>
+                      </Pressable>
+                    );
+                  })}
+                </HStack>
+              </VStack>
+
+              {/* Grid 2 Kolom: UNTUK DIRIMU SENDIRI (Wireframe BR2) */}
+              <VStack space="xs" className="pt-1">
+                <Text className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-1">
+                  UNTUK DIRIMU SENDIRI
+                </Text>
+                <HStack space="sm" className="w-full">
+                  <Pressable
+                    onPress={() => {
+                      haptics.light();
+                      router.push({
+                        pathname: ROUTES.PATIENT.TRIAGE,
+                        params: { mode: "assessment", guest: "false" },
+                      } as any);
+                    }}
+                    className="flex-1 rounded-xl bg-card border border-border p-4 active:bg-muted"
+                  >
+                    <Box className="w-10 h-10 rounded-xl bg-primary/10 items-center justify-center mb-3">
+                      <ClipboardCheck size={20} color="#4A3B6B" />
+                    </Box>
+                    <Text className="text-base font-bold text-foreground">
+                      Tes mandiri
+                    </Text>
+                    <Text className="text-sm text-muted-foreground mt-0.5 leading-snug">
+                      Cek stres & kecemasan
+                    </Text>
+                  </Pressable>
+
+                  <Pressable
+                    onPress={() => {
+                      haptics.light();
+                      router.push(ROUTES.PATIENT.COMMUNITY as any);
+                    }}
+                    className="flex-1 rounded-xl bg-card border border-border p-4 active:bg-muted"
+                  >
+                    <Box className="w-10 h-10 rounded-xl bg-primary/10 items-center justify-center mb-3">
+                      <MessageSquare size={20} color="#4A3B6B" />
+                    </Box>
+                    <Text className="text-base font-bold text-foreground">
+                      Feed
+                    </Text>
+                    <Text className="text-sm text-muted-foreground mt-0.5 leading-snug">
+                      Cerita & komunitas
+                    </Text>
+                  </Pressable>
+                </HStack>
+              </VStack>
+            </VStack>
+          )}
+
+          {/* ========================================================
+           * EMERGENCY CRISIS LINK (WIREFRAME BR1 - BR3 PERSISTENT)
+           * ======================================================== */}
+          <VStack className="pt-6 pb-2 items-center">
             <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Jadwalkan sesi"
               onPress={() => {
                 haptics.light();
-                router.push(ROUTES.PATIENT.DOCTORS);
+                setEmergencyModalOpen(true);
               }}
-              className="bg-card p-3.5 rounded-2xl flex-row items-center border border-border active:bg-muted"
+              className="py-2 px-3 active:opacity-75 flex-row items-center gap-1.5"
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             >
-              <Box className="w-11 h-11 rounded-xl bg-primary/10 items-center justify-center mr-3.5">
-                <AppIcon icon={Calendar} size={22} color="#4A3B6B" />
-              </Box>
-              <VStack space="xs" className="flex-1">
-                <Text size="md" bold className="text-foreground">
-                  Jadwalkan sesi
-                </Text>
-                <Text size="sm" className="text-muted-foreground font-medium">
-                  Pilih dokter & jam
-                </Text>
-              </VStack>
-              <AppIcon icon={ChevronRight} size={18} color="#4B4656" />
-            </Pressable>
-
-            {/* Tes Mandiri */}
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Tes mandiri"
-              onPress={() => {
-                haptics.light();
-                router.push({
-                  pathname: ROUTES.PATIENT.TRIAGE,
-                  params: { mode: "assessment", guest: "false" },
-                } as any);
-              }}
-              className="bg-card p-3.5 rounded-2xl flex-row items-center border border-border active:bg-muted"
-            >
-              <Box className="w-11 h-11 rounded-xl bg-primary/10 items-center justify-center mr-3.5">
-                <AppIcon icon={ClipboardCheck} size={22} color="#4A3B6B" />
-              </Box>
-              <VStack space="xs" className="flex-1">
-                <Text size="md" bold className="text-foreground">
-                  Tes mandiri
-                </Text>
-                <Text size="sm" className="text-muted-foreground font-medium">
-                  Cek tingkat stres & kecemasan
-                </Text>
-              </VStack>
-              <AppIcon icon={ChevronRight} size={18} color="#4B4656" />
-            </Pressable>
-
-            {/* Ruang Cerita & Komunitas */}
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Ruang cerita dan komunitas"
-              onPress={() => {
-                haptics.light();
-                router.push(ROUTES.PATIENT.COMMUNITY);
-              }}
-              className="bg-card p-3.5 rounded-2xl flex-row items-center border border-border active:bg-muted"
-            >
-              <Box className="w-11 h-11 rounded-xl bg-primary/10 items-center justify-center mr-3.5">
-                <AppIcon icon={MessageSquare} size={22} color="#4A3B6B" />
-              </Box>
-              <VStack space="xs" className="flex-1">
-                <Text size="md" bold className="text-foreground">
-                  Ruang cerita & komunitas
-                </Text>
-                <Text size="sm" className="text-muted-foreground font-medium">
-                  Dukungan sebaya & berbagi cerita aman
-                </Text>
-              </VStack>
-              <AppIcon icon={ChevronRight} size={18} color="#4B4656" />
-            </Pressable>
-
-            {/* Sesi Kontrol & Lanjutan */}
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Sesi kontrol dan lanjutan"
-              onPress={() => {
-                haptics.light();
-                router.push(ROUTES.PATIENT.FOLLOW_UPS);
-              }}
-              className="bg-card p-3.5 rounded-2xl flex-row items-center border border-border active:bg-muted"
-            >
-              <Box className="w-11 h-11 rounded-xl bg-primary/10 items-center justify-center mr-3.5">
-                <AppIcon icon={CalendarCheck} size={22} color="#4A3B6B" />
-              </Box>
-              <VStack space="xs" className="flex-1">
-                <Text size="md" bold className="text-foreground">
-                  Sesi kontrol & lanjutan
-                </Text>
-                <Text size="sm" className="text-muted-foreground font-medium">
-                  Jadwal tindak lanjut dari psikolog
-                </Text>
-              </VStack>
-              <AppIcon icon={ChevronRight} size={18} color="#4B4656" />
+              <PhoneCall size={16} color="#4A3B6B" />
+              <Text className="text-sm font-bold text-primary underline">
+                Butuh bantuan segera? Lihat kontak bantuan
+              </Text>
             </Pressable>
           </VStack>
-        </VStack>
         </Box>
       </ScrollView>
 
       {/* Persistent Bottom Tab Bar */}
       <PatientTabBar activeTab="beranda" />
 
-      {/* Modal Verifikasi Didit KYC */}
+      {/* ========================================================
+       * EMERGENCY / CRISIS HOTLINE MODAL
+       * ======================================================== */}
+      <Modal
+        isOpen={emergencyModalOpen}
+        onClose={() => setEmergencyModalOpen(false)}
+      >
+        <ModalBackdrop />
+        <ModalContent className="max-w-[92%] p-5 rounded-2xl bg-card border border-border">
+          <ModalHeader className="pb-3 border-b border-border">
+            <HStack space="sm" className="items-center">
+              <Box className="w-10 h-10 rounded-xl bg-destructive/10 items-center justify-center">
+                <ShieldAlert size={22} color="#CF2424" />
+              </Box>
+              <VStack className="flex-1">
+                <Heading size="md" bold className="text-foreground">
+                  Kontak Bantuan Darurat
+                </Heading>
+                <Text className="text-sm text-muted-foreground">
+                  Layanan Krisis 24 Jam
+                </Text>
+              </VStack>
+              <ModalCloseButton />
+            </HStack>
+          </ModalHeader>
+          <ModalBody className="py-4">
+            <VStack space="md">
+              <Text className="text-sm text-foreground leading-relaxed">
+                Jika Anda atau orang terdekat sedang berada dalam krisis atau membutuhkan bantuan darurat segera:
+              </Text>
+              <Pressable
+                onPress={() => dialEmergency("119")}
+                className="p-3.5 rounded-xl bg-primary/10 border border-primary/20 flex-row items-center justify-between active:bg-primary/20"
+              >
+                <VStack space="xs" className="flex-1">
+                  <Text className="text-base font-bold text-primary">
+                    Hotline Sejiwa Kemenkes (119 ext 8)
+                  </Text>
+                  <Text className="text-sm text-muted-foreground">
+                    Konseling krisis kesehatan jiwa gratis 24 jam
+                  </Text>
+                </VStack>
+                <PhoneCall size={20} color="#4A3B6B" />
+              </Pressable>
+
+              <Pressable
+                onPress={() => dialEmergency("112")}
+                className="p-3.5 rounded-xl bg-destructive/10 border border-destructive/20 flex-row items-center justify-between active:bg-destructive/20"
+              >
+                <VStack space="xs" className="flex-1">
+                  <Text className="text-base font-bold text-destructive">
+                    Panggilan Darurat Indonesia (112)
+                  </Text>
+                  <Text className="text-sm text-muted-foreground">
+                    Ambulans & penanganan gawat darurat umum
+                  </Text>
+                </VStack>
+                <PhoneCall size={20} color="#CF2424" />
+              </Pressable>
+            </VStack>
+          </ModalBody>
+          <ModalFooter className="pt-3 border-t border-border">
+            <Button
+              variant="outline"
+              onPress={() => setEmergencyModalOpen(false)}
+              className="w-full border-border rounded-xl h-11"
+            >
+              <ButtonText className="text-sm font-semibold text-foreground">
+                Tutup
+              </ButtonText>
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* ========================================================
+       * MODAL VERIFIKASI DIDIT KYC (GATE MODAL)
+       * ======================================================== */}
       <Modal isOpen={kycModalOpen} onClose={() => setKycModalOpen(false)}>
         <ModalBackdrop />
-        <ModalContent className="max-w-[92%] p-5 rounded-3xl bg-card border border-border">
+        <ModalContent className="max-w-[92%] p-5 rounded-2xl bg-card border border-border">
           <ModalHeader className="pb-3 border-b border-border">
             <HStack space="sm" className="items-center">
               <Box className="w-10 h-10 rounded-xl bg-primary/10 items-center justify-center">
@@ -560,7 +697,7 @@ export default function PatientDashboard() {
                 <Heading size="md" bold className="text-foreground">
                   Verifikasi Identitas
                 </Heading>
-                <Text size="sm" className="text-muted-foreground">
+                <Text className="text-sm text-muted-foreground">
                   Keamanan Rekam Medis
                 </Text>
               </VStack>
@@ -569,11 +706,11 @@ export default function PatientDashboard() {
           </ModalHeader>
           <ModalBody className="py-4">
             <VStack space="sm">
-              <Text size="sm" className="text-foreground leading-relaxed">
-                Untuk mengakses layanan <Text bold>Konsultasi Langsung</Text> dan <Text bold>Pencocokan Praktisi</Text>, akun Anda memerlukan verifikasi e-KTP.
+              <Text className="text-sm text-foreground leading-relaxed">
+                Untuk mengakses layanan <Text className="font-bold">Konsultasi Langsung</Text> dan <Text className="font-bold">Pencocokan Praktisi</Text>, akun Anda memerlukan verifikasi e-KTP.
               </Text>
-              <Text size="sm" className="text-muted-foreground leading-relaxed">
-                Verifikasi foto e-KTP dan pindai wajah berlangsung cepat dan aman langsung di dalam aplikasi.
+              <Text className="text-sm text-muted-foreground leading-relaxed">
+                Verifikasi foto e-KTP dan pindai wajah berlangsung sekitar 3 menit langsung di dalam aplikasi.
               </Text>
             </VStack>
           </ModalBody>
@@ -581,12 +718,12 @@ export default function PatientDashboard() {
             <Button
               onPress={handleLaunchDidit}
               disabled={isKycLaunching}
-              className="w-full bg-primary rounded-xl py-3"
+              className="w-full h-12 bg-primary rounded-xl flex-row items-center justify-center shadow-sm"
             >
               {isKycLaunching ? (
                 <ButtonSpinner color="#FFFFFF" />
               ) : (
-                <ButtonText className="text-sm font-bold text-primary-foreground">
+                <ButtonText className="text-base font-bold text-primary-foreground">
                   Mulai Verifikasi Sekarang
                 </ButtonText>
               )}
@@ -594,7 +731,7 @@ export default function PatientDashboard() {
             <Button
               variant="outline"
               onPress={() => setKycModalOpen(false)}
-              className="w-full border-border rounded-xl"
+              className="w-full h-11 border-border rounded-xl"
             >
               <ButtonText className="text-sm font-semibold text-foreground">
                 Nanti Saja
