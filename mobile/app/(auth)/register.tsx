@@ -5,9 +5,6 @@ import { ROUTES } from "@/constants/routes";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   ArrowLeft,
-  Mail,
-  Lock,
-  User,
   Eye,
   EyeOff,
   MailCheck,
@@ -124,6 +121,15 @@ export default function RegisterScreen() {
     Linking.openURL(url).catch(() => {});
   };
 
+  const handleBack = () => {
+    haptics.light();
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace(ROUTES.AUTH.LOGIN as any);
+    }
+  };
+
   return (
     <SafeAreaView className="flex-1 bg-background">
       <KeyboardAvoidingView
@@ -141,24 +147,17 @@ export default function RegisterScreen() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <Box className="w-full max-w-[480px] md:max-w-[540px] self-center">
+          <Box className="w-full max-w-[440px] md:max-w-[480px] self-center">
             {/* Header with Back Button */}
             <HStack className="items-center justify-between pb-6">
               <Pressable
-                onPress={() => {
-                  haptics.light();
-                  if (router.canGoBack()) {
-                    router.back();
-                  } else {
-                    router.replace(ROUTES.AUTH.LOGIN as any);
-                  }
-                }}
+                onPress={handleBack}
                 accessibilityRole="button"
                 accessibilityLabel="Kembali"
-                className="w-10 h-10 rounded-full bg-card border border-border items-center justify-center active:bg-muted"
+                className="w-10 h-10 rounded-xl bg-card border border-border/80 items-center justify-center active:bg-muted"
                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               >
-                <ArrowLeft size={20} className="text-foreground" />
+                <ArrowLeft size={20} color="#262130" strokeWidth={2} />
               </Pressable>
               <Text className="text-base font-bold text-foreground">
                 Pendaftaran Akun
@@ -170,10 +169,10 @@ export default function RegisterScreen() {
               /* Success Activation Banner */
               <VStack
                 space="lg"
-                className="pt-10 items-center bg-card border border-border p-6 rounded-3xl"
+                className="pt-10 items-center bg-card border border-border p-6 rounded-2xl"
               >
                 <Box className="w-16 h-16 rounded-full bg-primary/10 items-center justify-center">
-                  <MailCheck size={36} className="text-primary" />
+                  <MailCheck size={36} color="#4A3B6B" />
                 </Box>
                 <VStack space="xs" className="items-center">
                   <Heading
@@ -197,7 +196,7 @@ export default function RegisterScreen() {
                   <Button
                     size="lg"
                     onPress={() => router.replace(ROUTES.AUTH.LOGIN as any)}
-                    className="w-full h-12 rounded-2xl bg-primary flex-row items-center justify-center"
+                    className="w-full h-[52px] rounded-xl bg-primary flex-row items-center justify-center"
                   >
                     <ButtonText className="text-primary-foreground font-bold text-base">
                       Ke Halaman Masuk
@@ -208,7 +207,7 @@ export default function RegisterScreen() {
             ) : (
               /* Registration Form (Wireframe MS5) */
               <VStack space="md">
-                <VStack space="xs" className="pb-3">
+                <VStack space="xs" className="pb-2">
                   <Heading
                     level={1}
                     size="2xl"
@@ -223,7 +222,7 @@ export default function RegisterScreen() {
                 </VStack>
 
                 {errorMsg && (
-                  <Box className="bg-destructive/10 border border-destructive/20 p-3.5 rounded-2xl mb-2">
+                  <Box className="bg-destructive/10 border border-destructive/20 p-3.5 rounded-xl mb-2">
                     <Text className="text-sm text-destructive font-medium leading-relaxed">
                       {errorMsg}
                     </Text>
@@ -233,11 +232,11 @@ export default function RegisterScreen() {
                 {/* Nama Lengkap */}
                 <FormControl isRequired>
                   <FormControlLabel>
-                    <FormControlLabelText className="text-sm font-bold text-foreground">
+                    <FormControlLabelText className="text-sm font-semibold text-foreground mb-1">
                       Nama lengkap
                     </FormControlLabelText>
                   </FormControlLabel>
-                  <Input className="h-12 rounded-2xl border-border bg-card px-3">
+                  <Input className="h-[52px] rounded-xl border-border bg-card px-4">
                     <InputField
                       placeholder="Contoh: Sinta Maharani"
                       placeholderTextColor="#8C829D"
@@ -248,22 +247,19 @@ export default function RegisterScreen() {
                       }}
                       autoCapitalize="words"
                       returnKeyType="next"
-                      className="text-sm text-foreground flex-1"
+                      className="text-base text-foreground flex-1"
                     />
-                    <InputSlot className="pr-2">
-                      <InputIcon as={User} className="text-muted-foreground" />
-                    </InputSlot>
                   </Input>
                 </FormControl>
 
                 {/* Email */}
                 <FormControl isRequired>
                   <FormControlLabel>
-                    <FormControlLabelText className="text-sm font-bold text-foreground">
+                    <FormControlLabelText className="text-sm font-semibold text-foreground mb-1">
                       Email
                     </FormControlLabelText>
                   </FormControlLabel>
-                  <Input className="h-12 rounded-2xl border-border bg-card px-3">
+                  <Input className="h-[52px] rounded-xl border-border bg-card px-4">
                     <InputField
                       placeholder="nama@email.com"
                       placeholderTextColor="#8C829D"
@@ -276,22 +272,19 @@ export default function RegisterScreen() {
                       autoCorrect={false}
                       keyboardType="email-address"
                       returnKeyType="next"
-                      className="text-sm text-foreground flex-1"
+                      className="text-base text-foreground flex-1"
                     />
-                    <InputSlot className="pr-2">
-                      <InputIcon as={Mail} className="text-muted-foreground" />
-                    </InputSlot>
                   </Input>
                 </FormControl>
 
                 {/* Kata Sandi */}
                 <FormControl isRequired>
                   <FormControlLabel>
-                    <FormControlLabelText className="text-sm font-bold text-foreground">
+                    <FormControlLabelText className="text-sm font-semibold text-foreground mb-1">
                       Kata sandi
                     </FormControlLabelText>
                   </FormControlLabel>
-                  <Input className="h-12 rounded-2xl border-border bg-card px-3">
+                  <Input className="h-[52px] rounded-xl border-border bg-card px-4">
                     <InputField
                       placeholder="Minimal 8 karakter"
                       placeholderTextColor="#8C829D"
@@ -303,7 +296,7 @@ export default function RegisterScreen() {
                       secureTextEntry={!showPassword}
                       returnKeyType="done"
                       onSubmitEditing={handleRegister}
-                      className="text-sm text-foreground flex-1"
+                      className="text-base text-foreground flex-1"
                     />
                     <InputSlot
                       onPress={() => setShowPassword(!showPassword)}
@@ -311,7 +304,7 @@ export default function RegisterScreen() {
                     >
                       <InputIcon
                         as={showPassword ? EyeOff : Eye}
-                        className="text-muted-foreground"
+                        color="#75618E"
                       />
                     </InputSlot>
                   </Input>
@@ -358,7 +351,7 @@ export default function RegisterScreen() {
                   size="lg"
                   disabled={isLoading}
                   onPress={handleRegister}
-                  className="w-full h-12 rounded-2xl bg-primary active:opacity-90 flex-row items-center justify-center mt-3"
+                  className="w-full h-[52px] rounded-xl bg-primary active:opacity-90 flex-row items-center justify-center mt-3 shadow-sm"
                 >
                   {isLoading ? (
                     <ButtonSpinner className="text-primary-foreground" />
@@ -390,7 +383,7 @@ export default function RegisterScreen() {
           {/* Official Legal Footer */}
           <VStack
             space="xs"
-            className="w-full max-w-[480px] md:max-w-[540px] self-center items-center pt-8"
+            className="w-full max-w-[440px] md:max-w-[480px] self-center items-center pt-8"
           >
             <HStack space="xs" className="items-center">
               <Text

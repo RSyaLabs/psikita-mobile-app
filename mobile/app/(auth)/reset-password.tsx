@@ -5,14 +5,11 @@ import { ROUTES } from "@/constants/routes";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   ArrowLeft,
-  KeyRound,
-  Lock,
   Eye,
   EyeOff,
   CheckCircle2,
   RotateCcw,
   ArrowRight,
-  Mail,
 } from "lucide-react-native";
 import {
   Box,
@@ -33,6 +30,7 @@ import {
   FormControlLabelText,
   ScrollView,
 } from "@/components/ui";
+import { OtpDigitInput } from "@/components/auth";
 import { haptics } from "@/utils/haptics";
 import { useAuth } from "@/hooks/useAuth";
 import { authService } from "@/api/auth.service";
@@ -202,6 +200,17 @@ export default function ResetPasswordScreen() {
     Linking.openURL(url).catch(() => {});
   };
 
+  const handleBack = () => {
+    haptics.light();
+    if (step === "new_password") {
+      setStep("otp");
+    } else if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace(ROUTES.AUTH.LOGIN as any);
+    }
+  };
+
   return (
     <SafeAreaView className="flex-1 bg-background">
       <KeyboardAvoidingView
@@ -219,26 +228,17 @@ export default function ResetPasswordScreen() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <Box className="w-full max-w-[480px] md:max-w-[540px] self-center">
+          <Box className="w-full max-w-[440px] md:max-w-[480px] self-center">
             {/* Header with Back Button */}
             <HStack className="items-center justify-between pb-6">
               <Pressable
-                onPress={() => {
-                  haptics.light();
-                  if (step === "new_password") {
-                    setStep("otp");
-                  } else if (router.canGoBack()) {
-                    router.back();
-                  } else {
-                    router.replace(ROUTES.AUTH.LOGIN as any);
-                  }
-                }}
+                onPress={handleBack}
                 accessibilityRole="button"
                 accessibilityLabel="Kembali"
-                className="w-10 h-10 rounded-full bg-card border border-border items-center justify-center active:bg-muted"
+                className="w-10 h-10 rounded-xl bg-card border border-border/80 items-center justify-center active:bg-muted"
                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               >
-                <ArrowLeft size={20} className="text-foreground" />
+                <ArrowLeft size={20} color="#262130" strokeWidth={2} />
               </Pressable>
               <Text className="text-base font-bold text-foreground">
                 {step === "new_password"
@@ -252,7 +252,7 @@ export default function ResetPasswordScreen() {
 
             {/* Error & Feedback Banner */}
             {errorMsg && (
-              <Box className="bg-destructive/10 border border-destructive/20 p-3.5 rounded-2xl mb-4">
+              <Box className="bg-destructive/10 border border-destructive/20 p-3.5 rounded-xl mb-4">
                 <Text className="text-sm text-destructive font-medium leading-relaxed">
                   {errorMsg}
                 </Text>
@@ -260,7 +260,7 @@ export default function ResetPasswordScreen() {
             )}
 
             {resendMsg && (
-              <Box className="bg-primary/10 border border-primary/20 p-3.5 rounded-2xl mb-4">
+              <Box className="bg-primary/10 border border-primary/20 p-3.5 rounded-xl mb-4">
                 <Text className="text-sm text-primary font-medium leading-relaxed">
                   {resendMsg}
                 </Text>
@@ -269,10 +269,10 @@ export default function ResetPasswordScreen() {
 
             {step === "otp" && (
               /* ========================================================
-               * WIREFRAME MS4: STANDALONE OTP SCREEN (HANYA KODE OTP 6-DIGIT)
+               * WIREFRAME MS4: STANDALONE OTP SCREEN (6 DISCRETE DIGIT BOXES)
                * ======================================================== */
               <VStack space="md">
-                <VStack space="xs" className="pb-3">
+                <VStack space="xs" className="pb-2">
                   <Heading
                     level={1}
                     size="2xl"
@@ -295,7 +295,7 @@ export default function ResetPasswordScreen() {
                         params: { mode: isResetMode ? "reset" : "otp", email },
                       } as any)
                     }
-                    className="pt-1 self-start"
+                    className="pt-1.5 self-start"
                   >
                     <Text className="text-sm font-bold text-primary underline">
                       Ganti email
@@ -303,40 +303,28 @@ export default function ResetPasswordScreen() {
                   </Pressable>
                 </VStack>
 
-                {/* 6-Digit Standalone OTP Box */}
-                <FormControl isRequired>
-                  <FormControlLabel>
-                    <FormControlLabelText className="text-sm font-bold text-foreground">
-                      Kode Verifikasi (6 Digit)
-                    </FormControlLabelText>
-                  </FormControlLabel>
-                  <Input className="h-14 rounded-2xl border-border bg-card px-3">
-                    <InputField
-                      placeholder="Contoh: 123456"
-                      placeholderTextColor="#8C829D"
-                      value={otp}
-                      onChangeText={(val) => {
-                        setOtp(val.replace(/\D/g, "").slice(0, 6));
-                        if (errorMsg) setErrorMsg(null);
-                      }}
-                      keyboardType="number-pad"
-                      maxLength={6}
-                      returnKeyType="done"
-                      onSubmitEditing={handleVerifyOtp}
-                      className="text-lg font-bold tracking-widest text-foreground text-center flex-1"
-                    />
-                    <InputSlot className="pr-3">
-                      <InputIcon as={KeyRound} className="text-muted-foreground" />
-                    </InputSlot>
-                  </Input>
-                </FormControl>
+                {/* 6 Individual Discrete Digit Input Boxes (Wireframe MS4) */}
+                <VStack space="xs" className="py-2">
+                  <Text className="text-sm font-semibold text-foreground">
+                    Kode Verifikasi (6 Digit)
+                  </Text>
+                  <OtpDigitInput
+                    value={otp}
+                    onChange={(val) => {
+                      setOtp(val);
+                      if (errorMsg) setErrorMsg(null);
+                    }}
+                    disabled={isSubmitting}
+                    autoFocus={true}
+                  />
+                </VStack>
 
                 {/* Submit Button */}
                 <Button
                   size="lg"
                   disabled={isSubmitting || otp.length !== 6}
                   onPress={handleVerifyOtp}
-                  className="w-full h-12 rounded-2xl bg-primary active:opacity-90 flex-row items-center justify-center mt-3"
+                  className="w-full h-[52px] rounded-xl bg-primary active:opacity-90 flex-row items-center justify-center mt-2 shadow-sm"
                 >
                   {isSubmitting ? (
                     <ButtonSpinner className="text-primary-foreground" />
@@ -345,7 +333,7 @@ export default function ResetPasswordScreen() {
                       <ButtonText className="text-primary-foreground font-bold text-base">
                         {isResetMode ? "Verifikasi Kode" : "Verifikasi & Masuk"}
                       </ButtonText>
-                      <ArrowRight size={18} className="text-primary-foreground" />
+                      <ArrowRight size={18} color="#FFFFFF" />
                     </HStack>
                   )}
                 </Button>
@@ -362,10 +350,10 @@ export default function ResetPasswordScreen() {
                   ) : (
                     <Pressable
                       onPress={handleResendOtp}
-                      className="flex-row items-center gap-1.5 active:opacity-80"
+                      className="flex-row items-center gap-1.5 active:opacity-80 py-1"
                       hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                     >
-                      <RotateCcw size={16} color="#75618E" />
+                      <RotateCcw size={16} color="#4A3B6B" />
                       <Text className="text-sm font-bold text-primary underline">
                         Kirim ulang kode
                       </Text>
@@ -397,11 +385,11 @@ export default function ResetPasswordScreen() {
                 {/* Password Baru */}
                 <FormControl isRequired>
                   <FormControlLabel>
-                    <FormControlLabelText className="text-sm font-bold text-foreground">
+                    <FormControlLabelText className="text-sm font-semibold text-foreground mb-1">
                       Kata Sandi Baru
                     </FormControlLabelText>
                   </FormControlLabel>
-                  <Input className="h-12 rounded-2xl border-border bg-card px-3">
+                  <Input className="h-[52px] rounded-xl border-border bg-card px-4">
                     <InputField
                       placeholder="Minimal 8 karakter"
                       placeholderTextColor="#8C829D"
@@ -412,7 +400,7 @@ export default function ResetPasswordScreen() {
                       }}
                       secureTextEntry={!showPassword}
                       returnKeyType="next"
-                      className="text-sm text-foreground flex-1"
+                      className="text-base text-foreground flex-1"
                     />
                     <InputSlot
                       onPress={() => setShowPassword(!showPassword)}
@@ -420,7 +408,7 @@ export default function ResetPasswordScreen() {
                     >
                       <InputIcon
                         as={showPassword ? EyeOff : Eye}
-                        className="text-muted-foreground"
+                        color="#75618E"
                       />
                     </InputSlot>
                   </Input>
@@ -429,11 +417,11 @@ export default function ResetPasswordScreen() {
                 {/* Konfirmasi Password Baru */}
                 <FormControl isRequired>
                   <FormControlLabel>
-                    <FormControlLabelText className="text-sm font-bold text-foreground">
+                    <FormControlLabelText className="text-sm font-semibold text-foreground mb-1">
                       Konfirmasi Kata Sandi Baru
                     </FormControlLabelText>
                   </FormControlLabel>
-                  <Input className="h-12 rounded-2xl border-border bg-card px-3">
+                  <Input className="h-[52px] rounded-xl border-border bg-card px-4">
                     <InputField
                       placeholder="Ulangi kata sandi baru"
                       placeholderTextColor="#8C829D"
@@ -445,7 +433,7 @@ export default function ResetPasswordScreen() {
                       secureTextEntry={!showConfirmPassword}
                       returnKeyType="done"
                       onSubmitEditing={handleSaveNewPassword}
-                      className="text-sm text-foreground flex-1"
+                      className="text-base text-foreground flex-1"
                     />
                     <InputSlot
                       onPress={() => setShowConfirmPassword(!showConfirmPassword)}
@@ -453,7 +441,7 @@ export default function ResetPasswordScreen() {
                     >
                       <InputIcon
                         as={showConfirmPassword ? EyeOff : Eye}
-                        className="text-muted-foreground"
+                        color="#75618E"
                       />
                     </InputSlot>
                   </Input>
@@ -464,7 +452,7 @@ export default function ResetPasswordScreen() {
                   size="lg"
                   disabled={isSubmitting}
                   onPress={handleSaveNewPassword}
-                  className="w-full h-12 rounded-2xl bg-primary active:opacity-90 flex-row items-center justify-center mt-3"
+                  className="w-full h-[52px] rounded-xl bg-primary active:opacity-90 flex-row items-center justify-center mt-3 shadow-sm"
                 >
                   {isSubmitting ? (
                     <ButtonSpinner className="text-primary-foreground" />
@@ -483,10 +471,10 @@ export default function ResetPasswordScreen() {
                * ======================================================== */
               <VStack
                 space="lg"
-                className="pt-10 items-center bg-card border border-border p-6 rounded-3xl"
+                className="pt-10 items-center bg-card border border-border p-6 rounded-2xl"
               >
                 <Box className="w-16 h-16 rounded-full bg-primary/10 items-center justify-center">
-                  <CheckCircle2 size={36} className="text-primary" />
+                  <CheckCircle2 size={36} color="#4A3B6B" />
                 </Box>
                 <VStack space="xs" className="items-center">
                   <Heading
@@ -506,7 +494,7 @@ export default function ResetPasswordScreen() {
                   <Button
                     size="lg"
                     onPress={() => router.replace(ROUTES.AUTH.LOGIN as any)}
-                    className="w-full h-12 rounded-2xl bg-primary flex-row items-center justify-center"
+                    className="w-full h-[52px] rounded-xl bg-primary flex-row items-center justify-center"
                   >
                     <ButtonText className="text-primary-foreground font-bold text-base">
                       Masuk ke Akun Sekarang
@@ -520,7 +508,7 @@ export default function ResetPasswordScreen() {
           {/* Official Legal Footer */}
           <VStack
             space="xs"
-            className="w-full max-w-[480px] md:max-w-[540px] self-center items-center pt-8"
+            className="w-full max-w-[440px] md:max-w-[480px] self-center items-center pt-8"
           >
             <Text className="text-sm text-muted-foreground text-center leading-relaxed">
               Dengan melanjutkan, Anda menyetujui{" "}

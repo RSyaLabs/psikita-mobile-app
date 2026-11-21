@@ -5,9 +5,7 @@ import { ROUTES } from "@/constants/routes";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   ArrowLeft,
-  Mail,
   ArrowRight,
-  ShieldCheck,
 } from "lucide-react-native";
 import {
   Box,
@@ -21,8 +19,6 @@ import {
   ButtonSpinner,
   Input,
   InputField,
-  InputSlot,
-  InputIcon,
   FormControl,
   FormControlLabel,
   FormControlLabelText,
@@ -83,6 +79,15 @@ export default function ForgotPasswordScreen() {
 
   const isResetMode = mode === "reset";
 
+  const handleBack = () => {
+    haptics.light();
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace(ROUTES.AUTH.LOGIN as any);
+    }
+  };
+
   return (
     <SafeAreaView className="flex-1 bg-background">
       <KeyboardAvoidingView
@@ -100,24 +105,17 @@ export default function ForgotPasswordScreen() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <Box className="w-full max-w-[480px] md:max-w-[540px] self-center">
+          <Box className="w-full max-w-[440px] md:max-w-[480px] self-center">
             {/* Header with Back button */}
             <HStack className="items-center justify-between pb-6">
               <Pressable
-                onPress={() => {
-                  haptics.light();
-                  if (router.canGoBack()) {
-                    router.back();
-                  } else {
-                    router.replace(ROUTES.AUTH.LOGIN as any);
-                  }
-                }}
+                onPress={handleBack}
                 accessibilityRole="button"
                 accessibilityLabel="Kembali"
-                className="w-10 h-10 rounded-full bg-card border border-border items-center justify-center active:bg-muted"
+                className="w-10 h-10 rounded-xl bg-card border border-border/80 items-center justify-center active:bg-muted"
                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               >
-                <ArrowLeft size={20} className="text-foreground" />
+                <ArrowLeft size={20} color="#262130" strokeWidth={2} />
               </Pressable>
               <Text className="text-base font-bold text-foreground">
                 {isResetMode ? "Lupa Kata Sandi" : "Masuk dengan OTP"}
@@ -144,22 +142,22 @@ export default function ForgotPasswordScreen() {
 
             {/* Error Message */}
             {errorMsg && (
-              <Box className="bg-destructive/10 border border-destructive/20 p-3.5 rounded-2xl mb-4">
+              <Box className="bg-destructive/10 border border-destructive/20 p-3.5 rounded-xl mb-4">
                 <Text className="text-sm text-destructive font-medium leading-relaxed">
                   {errorMsg}
                 </Text>
               </Box>
             )}
 
-            {/* Form Input: ONLY EMAIL */}
+            {/* Form Input: ONLY EMAIL (Clean, no left icon) */}
             <VStack space="md">
               <FormControl isRequired>
                 <FormControlLabel>
-                  <FormControlLabelText className="text-sm font-bold text-foreground">
+                  <FormControlLabelText className="text-sm font-semibold text-foreground mb-1">
                     Alamat Email
                   </FormControlLabelText>
                 </FormControlLabel>
-                <Input className="h-12 rounded-2xl border-border bg-card px-3">
+                <Input className="h-[52px] rounded-xl border-border bg-card px-4">
                   <InputField
                     placeholder="nama@email.com"
                     placeholderTextColor="#8C829D"
@@ -173,11 +171,8 @@ export default function ForgotPasswordScreen() {
                     keyboardType="email-address"
                     returnKeyType="done"
                     onSubmitEditing={handleSendOtp}
-                    className="text-sm text-foreground flex-1"
+                    className="text-base text-foreground flex-1"
                   />
-                  <InputSlot className="pr-2">
-                    <InputIcon as={Mail} className="text-muted-foreground" />
-                  </InputSlot>
                 </Input>
               </FormControl>
 
@@ -186,7 +181,7 @@ export default function ForgotPasswordScreen() {
                 size="lg"
                 disabled={isLoading}
                 onPress={handleSendOtp}
-                className="w-full h-12 rounded-2xl bg-primary active:opacity-90 flex-row items-center justify-center mt-3"
+                className="w-full h-[52px] rounded-xl bg-primary active:opacity-90 flex-row items-center justify-center mt-3 shadow-sm"
               >
                 {isLoading ? (
                   <ButtonSpinner className="text-primary-foreground" />
@@ -195,7 +190,7 @@ export default function ForgotPasswordScreen() {
                     <ButtonText className="text-primary-foreground font-bold text-base">
                       Kirim Kode OTP
                     </ButtonText>
-                    <ArrowRight size={18} className="text-primary-foreground" />
+                    <ArrowRight size={18} color="#FFFFFF" />
                   </HStack>
                 )}
               </Button>
@@ -211,6 +206,7 @@ export default function ForgotPasswordScreen() {
                         setErrorMsg(null);
                       }}
                       hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                      className="py-1"
                     >
                       <Text className="text-sm font-bold text-primary underline">
                         Masuk dengan Kode OTP saja
@@ -227,7 +223,7 @@ export default function ForgotPasswordScreen() {
                     </Pressable>
                   </>
                 ) : (
-                  <HStack space="xs" className="items-center">
+                  <HStack space="xs" className="items-center py-1">
                     <Text className="text-sm text-muted-foreground font-medium">
                       Ingin masuk dengan kata sandi?
                     </Text>
@@ -248,7 +244,7 @@ export default function ForgotPasswordScreen() {
           {/* Official Legal Footer */}
           <VStack
             space="xs"
-            className="w-full max-w-[480px] md:max-w-[540px] self-center items-center pt-8"
+            className="w-full max-w-[440px] md:max-w-[480px] self-center items-center pt-8"
           >
             <Text className="text-sm text-muted-foreground text-center leading-relaxed">
               Dengan melanjutkan, Anda menyetujui{" "}

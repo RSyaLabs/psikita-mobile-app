@@ -5,11 +5,9 @@ import { ROUTES } from "@/constants/routes";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   ArrowLeft,
-  ArrowRight,
   Eye,
   EyeOff,
   Mail,
-  Lock,
 } from "lucide-react-native";
 import {
   Box,
@@ -150,17 +148,18 @@ export default function LoginScreen() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          {/* Header & Back Button */}
-          <Box className="w-full max-w-[480px] md:max-w-[540px] self-center">
+          {/* Main Card Container */}
+          <Box className="w-full max-w-[440px] md:max-w-[480px] self-center">
+            {/* Header with Back Button and Brand */}
             <HStack className="items-center justify-between pb-6">
               <Pressable
                 onPress={handleBack}
                 accessibilityRole="button"
                 accessibilityLabel="Kembali"
-                className="w-10 h-10 rounded-full bg-card border border-border items-center justify-center active:bg-muted"
+                className="w-10 h-10 rounded-xl bg-card border border-border/80 items-center justify-center active:bg-muted"
                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               >
-                <ArrowLeft size={20} className="text-foreground" />
+                <ArrowLeft size={20} color="#262130" strokeWidth={2} />
               </Pressable>
               <HStack space="xs" className="items-center">
                 <Image
@@ -176,7 +175,7 @@ export default function LoginScreen() {
             </HStack>
 
             {/* Title & Context */}
-            <VStack space="xs" className="pt-2 pb-6">
+            <VStack space="xs" className="pt-1 pb-6">
               <Heading
                 level={1}
                 size="2xl"
@@ -192,23 +191,23 @@ export default function LoginScreen() {
 
             {/* Error Banner */}
             {loginErrorMsg && (
-              <Box className="bg-destructive/10 border border-destructive/20 p-3.5 rounded-2xl mb-4">
+              <Box className="bg-destructive/10 border border-destructive/20 p-3.5 rounded-xl mb-4">
                 <Text className="text-sm text-destructive font-medium leading-relaxed">
                   {loginErrorMsg}
                 </Text>
               </Box>
             )}
 
-            {/* Form Inputs */}
+            {/* Clean Form Inputs (No inner icon clutter, generous touch targets) */}
             <VStack space="md">
               {/* Username / Email */}
               <FormControl isRequired>
                 <FormControlLabel>
-                  <FormControlLabelText className="text-sm font-bold text-foreground">
+                  <FormControlLabelText className="text-sm font-semibold text-foreground mb-1">
                     Username atau Email
                   </FormControlLabelText>
                 </FormControlLabel>
-                <Input className="h-12 rounded-2xl border-border bg-card px-3">
+                <Input className="h-[52px] rounded-xl border-border bg-card px-4">
                   <InputField
                     placeholder="nama@email.com atau username"
                     placeholderTextColor="#8C829D"
@@ -221,19 +220,16 @@ export default function LoginScreen() {
                     autoCorrect={false}
                     keyboardType="email-address"
                     returnKeyType="next"
-                    className="text-sm text-foreground flex-1"
+                    className="text-base text-foreground flex-1"
                   />
-                  <InputSlot className="pr-2">
-                    <InputIcon as={Mail} className="text-muted-foreground" />
-                  </InputSlot>
                 </Input>
               </FormControl>
 
               {/* Password */}
               <FormControl isRequired>
-                <HStack className="items-center justify-between">
+                <HStack className="items-center justify-between mb-1">
                   <FormControlLabel>
-                    <FormControlLabelText className="text-sm font-bold text-foreground">
+                    <FormControlLabelText className="text-sm font-semibold text-foreground">
                       Kata Sandi
                     </FormControlLabelText>
                   </FormControlLabel>
@@ -251,7 +247,7 @@ export default function LoginScreen() {
                     </Text>
                   </Pressable>
                 </HStack>
-                <Input className="h-12 rounded-2xl border-border bg-card px-3">
+                <Input className="h-[52px] rounded-xl border-border bg-card px-4">
                   <InputField
                     placeholder="Masukkan kata sandi"
                     placeholderTextColor="#8C829D"
@@ -263,7 +259,7 @@ export default function LoginScreen() {
                     secureTextEntry={!showPassword}
                     returnKeyType="done"
                     onSubmitEditing={handleCredentialLogin}
-                    className="text-sm text-foreground flex-1"
+                    className="text-base text-foreground flex-1"
                   />
                   <InputSlot
                     onPress={() => setShowPassword(!showPassword)}
@@ -271,7 +267,7 @@ export default function LoginScreen() {
                   >
                     <InputIcon
                       as={showPassword ? EyeOff : Eye}
-                      className="text-muted-foreground"
+                      color="#75618E"
                     />
                   </InputSlot>
                 </Input>
@@ -282,7 +278,7 @@ export default function LoginScreen() {
                 size="lg"
                 disabled={isLoading}
                 onPress={handleCredentialLogin}
-                className="w-full h-12 rounded-2xl bg-primary active:opacity-90 flex-row items-center justify-center mt-2"
+                className="w-full h-[52px] rounded-xl bg-primary active:opacity-90 flex-row items-center justify-center mt-2 shadow-sm"
               >
                 {isLoading ? (
                   <ButtonSpinner className="text-primary-foreground" />
@@ -294,11 +290,11 @@ export default function LoginScreen() {
               </Button>
             </VStack>
 
-            {/* Divider atau Masuk dengan Kode OTP (Wireframe MS2) */}
-            <VStack space="sm" className="pt-5 items-center">
+            {/* Divider (Wireframe MS2) */}
+            <VStack space="sm" className="pt-6 items-center">
               <HStack space="sm" className="items-center w-full">
                 <Box className="flex-1 h-[1px] bg-border" />
-                <Text className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                <Text className="text-sm font-semibold text-muted-foreground uppercase tracking-wider px-2">
                   atau
                 </Text>
                 <Box className="flex-1 h-[1px] bg-border" />
@@ -312,17 +308,17 @@ export default function LoginScreen() {
                     params: { mode: "otp" },
                   } as any);
                 }}
-                className="w-full h-12 rounded-2xl bg-card border border-border items-center justify-center flex-row gap-2 active:bg-muted mt-1"
+                className="w-full h-[52px] rounded-xl bg-card border border-border items-center justify-center flex-row gap-2.5 active:bg-muted mt-2 shadow-sm"
               >
-                <Mail size={18} color="#262130" />
-                <Text className="text-sm font-bold text-foreground">
+                <Mail size={18} color="#4A3B6B" />
+                <Text className="text-base font-bold text-foreground">
                   Masuk dengan Kode OTP
                 </Text>
               </Pressable>
             </VStack>
 
             {/* Register Link */}
-            <VStack space="xs" className="items-center pt-5">
+            <VStack space="xs" className="items-center pt-6">
               <HStack space="xs" className="items-center">
                 <Text className="text-sm text-muted-foreground font-medium">
                   Belum punya akun?
@@ -345,7 +341,7 @@ export default function LoginScreen() {
           {/* Official Legal Footer */}
           <VStack
             space="xs"
-            className="w-full max-w-[480px] md:max-w-[540px] self-center items-center pt-8"
+            className="w-full max-w-[440px] md:max-w-[480px] self-center items-center pt-8"
           >
             <Text className="text-sm text-muted-foreground text-center leading-relaxed">
               Dengan masuk, Anda menyetujui{" "}
