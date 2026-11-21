@@ -158,7 +158,7 @@ export default function RegisterScreen() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <Box className="w-full max-w-[440px] self-center">
+          <Box className="w-full max-w-[480px] md:max-w-[540px] self-center">
             {/* Header with Back Button */}
             <HStack className="items-center justify-between pb-6">
               <Pressable
@@ -435,7 +435,7 @@ export default function RegisterScreen() {
           {/* Official Legal Footer */}
           <VStack
             space="xs"
-            className="w-full max-w-[440px] self-center items-center pt-8"
+            className="w-full max-w-[480px] md:max-w-[540px] self-center items-center pt-8"
           >
             <Text className="text-sm text-muted-foreground text-center leading-relaxed">
               Dengan mendaftar, Anda menyetujui{" "}

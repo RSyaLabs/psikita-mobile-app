@@ -160,7 +160,7 @@ export default function LoginScreen() {
           showsVerticalScrollIndicator={false}
         >
           {/* Header & Back Button */}
-          <Box className="w-full max-w-[440px] self-center">
+          <Box className="w-full max-w-[480px] md:max-w-[540px] self-center">
             <HStack className="items-center justify-between pb-6">
               <Pressable
                 onPress={handleBack}
@@ -248,7 +248,10 @@ export default function LoginScreen() {
                   </FormControlLabel>
                   <Pressable
                     onPress={() =>
-                      router.push(ROUTES.AUTH.FORGOT_PASSWORD as any)
+                      router.push({
+                        pathname: ROUTES.AUTH.FORGOT_PASSWORD,
+                        params: { mode: "reset" },
+                      } as any)
                     }
                     hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                   >
@@ -300,8 +303,35 @@ export default function LoginScreen() {
               </Button>
             </VStack>
 
+            {/* Divider atau Masuk dengan Kode OTP (Wireframe MS2) */}
+            <VStack space="sm" className="pt-5 items-center">
+              <HStack space="sm" className="items-center w-full">
+                <Box className="flex-1 h-[1px] bg-border" />
+                <Text className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                  atau
+                </Text>
+                <Box className="flex-1 h-[1px] bg-border" />
+              </HStack>
+
+              <Pressable
+                onPress={() => {
+                  haptics.light();
+                  router.push({
+                    pathname: ROUTES.AUTH.FORGOT_PASSWORD,
+                    params: { mode: "otp" },
+                  } as any);
+                }}
+                className="w-full h-12 rounded-2xl bg-card border border-border items-center justify-center flex-row gap-2 active:bg-muted mt-1"
+              >
+                <Mail size={18} color="#262130" />
+                <Text className="text-sm font-bold text-foreground">
+                  Masuk dengan Kode OTP
+                </Text>
+              </Pressable>
+            </VStack>
+
             {/* Register Link */}
-            <VStack space="xs" className="items-center pt-6">
+            <VStack space="xs" className="items-center pt-5">
               <HStack space="xs" className="items-center">
                 <Text className="text-sm text-muted-foreground font-medium">
                   Belum punya akun?
@@ -346,7 +376,7 @@ export default function LoginScreen() {
           {/* Official Legal Footer */}
           <VStack
             space="xs"
-            className="w-full max-w-[440px] self-center items-center pt-8"
+            className="w-full max-w-[480px] md:max-w-[540px] self-center items-center pt-8"
           >
             <Text className="text-sm text-muted-foreground text-center leading-relaxed">
               Dengan masuk, Anda menyetujui{" "}
