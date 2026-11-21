@@ -209,34 +209,48 @@ export default function DoctorsDirectoryScreen() {
           showsVerticalScrollIndicator={false}
         >
           {filteredDoctors.length === 0 ? (
-            <Box className="py-12 items-center justify-center">
-              <Text size="sm" className="font-bold text-foreground">
-                Tidak ada praktisi ditemukan
+            <Box className="py-8 items-center justify-center">
+              <Text size="sm" bold className="text-foreground text-center">
+                Belum ada praktisi yang sesuai kriteria
               </Text>
               <Text
                 size="sm"
-                className="text-muted-foreground text-center mt-1 max-w-[280px]"
+                className="text-muted-foreground text-center mt-1 max-w-[300px] leading-relaxed"
               >
-                Coba ganti filter spesialisasi atau ubah kata kunci pencarian
-                Anda.
+                Coba ubah filter atau kata kunci pencarian. Anda juga dapat langsung mencocokkan psikolog melalui antrean klinis.
               </Text>
-              <Button
-                size="sm"
-                variant="outline"
-                onPress={() => {
-                  haptics.light();
-                  setSearchQuery("");
-                  setSelectedFilter("Semua");
-                  setFilterBpjsOnly(false);
-                  setFilterOnlineOnly(false);
-                  setFilterPriceRange("Semua");
-                }}
-                className="mt-4 border-border/80 rounded-xl bg-card h-10"
-              >
-                <ButtonText className="text-sm text-foreground font-semibold">
-                  Reset Filter & Pencarian
-                </ButtonText>
-              </Button>
+              <HStack space="sm" className="mt-4">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onPress={() => {
+                    haptics.light();
+                    setSearchQuery("");
+                    setSelectedFilter("Semua");
+                    setFilterBpjsOnly(false);
+                    setFilterOnlineOnly(false);
+                    setFilterPriceRange("Semua");
+                  }}
+                  className="border-border/80 rounded-xl bg-card h-10 px-4"
+                >
+                  <ButtonText className="text-sm text-foreground font-semibold">
+                    Reset Filter
+                  </ButtonText>
+                </Button>
+                <Button
+                  size="sm"
+                  variant="default"
+                  onPress={() => {
+                    haptics.medium();
+                    router.push(ROUTES.PATIENT.MATCHING as never);
+                  }}
+                  className="bg-primary rounded-xl h-10 px-4 shadow-xs"
+                >
+                  <ButtonText className="text-sm text-primary-foreground font-bold">
+                    Cari Psikolog
+                  </ButtonText>
+                </Button>
+              </HStack>
             </Box>
           ) : (
             <VStack space="md">

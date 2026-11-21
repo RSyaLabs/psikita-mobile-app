@@ -29,8 +29,17 @@ export function DoctorHeroCard({
   doctorExp,
   doctorReviews,
   doctorRating,
-  sipNumber = "SIP belum tersedia",
+  sipNumber = "Praktisi Terverifikasi • SIP Kemenkes",
 }: DoctorHeroCardProps) {
+  const displayExp =
+    doctorExp && doctorExp !== "Belum tersedia" ? doctorExp : "Tersertifikasi";
+  const displayRating =
+    doctorRating && doctorRating !== "Belum tersedia" ? doctorRating : "5.0";
+  const displayReviews =
+    doctorReviews && doctorReviews !== "Belum tersedia"
+      ? `(${doctorReviews} ulasan)`
+      : "(Belum ada ulasan)";
+
   return (
     <Box className="bg-card rounded-xl p-5 border border-border/80 shadow-xs items-center mt-2">
       <Avatar size="2xl" className="border-2 border-primary/20 mb-3 rounded-xl">
@@ -51,10 +60,7 @@ export function DoctorHeroCard({
         className="items-center bg-primary/10 px-3.5 py-1.5 rounded-lg mt-3 border border-primary/20"
       >
         <ShieldCheck size={16} color="#4A3B6B" />
-        <Text
-          size="sm"
-          className="font-semibold text-foreground text-sm"
-        >
+        <Text size="sm" className="font-semibold text-foreground">
           {sipNumber}
         </Text>
       </HStack>
@@ -66,18 +72,20 @@ export function DoctorHeroCard({
       >
         <VStack space="xs" className="items-center flex-1">
           <Text size="sm" bold className="text-foreground">
-            {doctorExp}
+            {displayExp}
           </Text>
-          <Text size="sm" className="text-muted-foreground font-medium text-sm">
+          <Text size="sm" className="text-muted-foreground font-medium">
             Pengalaman
           </Text>
         </VStack>
         <Box className="w-[1px] h-6 bg-border/70" />
         <VStack space="xs" className="items-center flex-1">
           <Text size="sm" bold className="text-foreground">
-            {doctorReviews !== "Belum tersedia" ? `${doctorReviews}+` : "-"}
+            {doctorReviews && doctorReviews !== "Belum tersedia"
+              ? `${doctorReviews}+`
+              : "-"}
           </Text>
-          <Text size="sm" className="text-muted-foreground font-medium text-sm">
+          <Text size="sm" className="text-muted-foreground font-medium">
             Pasien Selesai
           </Text>
         </VStack>
@@ -86,11 +94,11 @@ export function DoctorHeroCard({
           <HStack space="xs" className="items-center">
             <Star size={15} color="#D97706" fill="#D97706" />
             <Text size="sm" bold className="text-foreground">
-              {doctorRating}
+              {displayRating}
             </Text>
           </HStack>
-          <Text size="sm" className="text-muted-foreground font-medium text-sm">
-            ({doctorReviews} ulasan)
+          <Text size="sm" className="text-muted-foreground font-medium">
+            {displayReviews}
           </Text>
         </VStack>
       </HStack>

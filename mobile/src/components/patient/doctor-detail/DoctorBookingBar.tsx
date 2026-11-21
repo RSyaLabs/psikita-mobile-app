@@ -23,7 +23,7 @@ export function DoctorBookingBar({
       <Box className="w-full max-w-[640px] md:max-w-[720px] self-center">
         <HStack space="md" className="items-center justify-between">
           <VStack>
-            <Text size="sm" className="text-muted-foreground font-medium text-sm">
+            <Text size="sm" className="text-muted-foreground font-medium">
               Biaya Konsultasi (45 Menit)
             </Text>
             <Heading size="md" bold className="text-foreground">

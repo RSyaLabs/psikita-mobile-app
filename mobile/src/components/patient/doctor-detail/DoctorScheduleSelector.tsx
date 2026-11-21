@@ -23,12 +23,12 @@ export function DoctorScheduleSelector({
 }: DoctorScheduleSelectorProps) {
   return (
     <VStack space="xs" className="mt-4">
-      <Heading size="xs" bold className="text-foreground px-1">
+      <Heading size="sm" bold className="text-foreground px-1">
         Jadwal Konsultasi Tersedia
       </Heading>
       {slots.length === 0 ? (
         <Box className="bg-card rounded-xl p-4 border border-border/80 shadow-xs">
-          <Text size="sm" className="text-muted-foreground font-medium text-sm leading-relaxed">
+          <Text size="sm" className="text-muted-foreground font-medium leading-relaxed">
             Praktisi siap menerima sesi konsultasi langsung saat online, atau jadwal sesi dapat dikonfirmasi saat proses matching triase klinis.
           </Text>
         </Box>

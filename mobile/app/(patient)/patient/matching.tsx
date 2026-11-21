@@ -10,6 +10,7 @@ import {
   UserCheck,
   Star,
   ArrowRight,
+  CheckCircle2,
 } from "lucide-react-native";
 import {
   Box,
@@ -199,22 +200,43 @@ export default function MatchingScreen() {
             </VStack>
           )}
 
-          {/* Error State */}
+          {/* Error State (Wireframe Screen 31: Koneksi Terputus) */}
           {waitingRoom.isError && (
             <Card className="bg-card rounded-xl p-5 border border-border/80 shadow-xs gap-3 my-4">
               <HStack space="sm" className="items-center">
-                <ShieldAlert size={22} color="#DC2626" />
+                <ShieldAlert size={22} color={is403Forbidden ? "#DC2626" : "#D97706"} />
                 <Heading size="sm" bold className="text-foreground">
                   {is403Forbidden
                     ? "Akses Antrean Ditolak (403 Forbidden)"
-                    : "Koneksi Antrean Terputus"}
+                    : "Koneksi Terputus"}
                 </Heading>
               </HStack>
               <Text size="sm" className="text-muted-foreground leading-relaxed">
                 {is403Forbidden
                   ? "Server menolak permintaan pencocokan psikolog karena akun Anda belum berstatus VERIFIED pada Didit KYC. Selesaikan verifikasi identitas resmi untuk masuk ke antrean matching."
-                  : "Tidak dapat memuat status pencocokan dari server saat ini. Posisi antreanmu tetap aman, silakan coba sambungkan kembali."}
+                  : "Posisi antreanmu tetap aman. Tidak perlu mengirim ulang jawabanmu."}
               </Text>
+
+              {!is403Forbidden && (
+                <VStack space="xs" className="my-1 bg-muted/60 p-3.5 rounded-xl border border-border/60">
+                  <Text size="sm" bold className="text-foreground uppercase tracking-wider mb-1">
+                    COBA PERIKSA:
+                  </Text>
+                  <Text size="sm" className="text-muted-foreground font-medium">
+                    • Wi-Fi atau data seluler aktif
+                  </Text>
+                  <Text size="sm" className="text-muted-foreground font-medium">
+                    • Mode pesawat dimatikan
+                  </Text>
+                  <Text size="sm" className="text-muted-foreground font-medium">
+                    • Sinyal cukup kuat
+                  </Text>
+                  <Text size="sm" className="text-muted-foreground mt-2 leading-normal">
+                    Status terakhir: mencari psikolog. Diperbarui otomatis setelah tersambung.
+                  </Text>
+                </VStack>
+              )}
+
               {is403Forbidden ? (
                 <Button
                   size="sm"
@@ -232,13 +254,13 @@ export default function MatchingScreen() {
                 </Button>
               ) : (
                 <Button
-                  variant="outline"
+                  variant="default"
                   size="sm"
                   onPress={() => waitingRoom.refetch()}
-                  className="mt-2 rounded-xl border-border/80 bg-card h-11 flex-row items-center justify-center"
+                  className="mt-2 rounded-xl bg-primary h-11 flex-row items-center justify-center shadow-xs"
                 >
-                  <ButtonText className="text-foreground font-semibold text-sm">
-                    Coba Hubungkan Ulang
+                  <ButtonText className="text-primary-foreground font-bold text-sm">
+                    Coba Sambungkan Sekarang
                   </ButtonText>
                 </Button>
               )}
@@ -272,8 +294,44 @@ export default function MatchingScreen() {
                 </Text>
               </VStack>
 
+              {/* Progress Stepper (Wireframe Screen 29) */}
+              <Card className="w-full bg-card rounded-xl p-4 border border-border/80 shadow-xs gap-3 mt-1">
+                <HStack space="sm" className="items-center">
+                  <CheckCircle2 size={16} color="#16A34A" />
+                  <Text size="sm" className="text-foreground font-semibold">
+                    Jawaban diterima
+                  </Text>
+                </HStack>
+                <HStack space="sm" className="items-center">
+                  <Box className="w-4 h-4 rounded-full bg-primary/20 items-center justify-center">
+                    <Box className="w-2 h-2 rounded-full bg-primary" />
+                  </Box>
+                  <Text size="sm" className="text-primary font-bold">
+                    Mencari psikolog • {room?.estimatedWaitSeconds ? `~${Math.max(1, Math.ceil(room.estimatedWaitSeconds / 60))} menit` : "~1-3 menit"}
+                  </Text>
+                </HStack>
+                <HStack space="sm" className="items-center">
+                  <Box className="w-4 h-4 rounded-full border border-border/80" />
+                  <Text size="sm" className="text-muted-foreground font-medium">
+                    Psikolog menerima kasus
+                  </Text>
+                </HStack>
+                <HStack space="sm" className="items-center">
+                  <Box className="w-4 h-4 rounded-full border border-border/80" />
+                  <Text size="sm" className="text-muted-foreground font-medium">
+                    Pembayaran
+                  </Text>
+                </HStack>
+                <HStack space="sm" className="items-center">
+                  <Box className="w-4 h-4 rounded-full border border-border/80" />
+                  <Text size="sm" className="text-muted-foreground font-medium">
+                    Sesi dimulai
+                  </Text>
+                </HStack>
+              </Card>
+
               {/* Status Queue Card */}
-              <Card className="w-full bg-card rounded-xl p-4 border border-border/80 shadow-xs gap-3 mt-2">
+              <Card className="w-full bg-card rounded-xl p-4 border border-border/80 shadow-xs gap-3">
                 <HStack space="md" className="items-center justify-between pb-2 border-b border-border/70">
                   <HStack space="sm" className="items-center">
                     <Clock size={18} color="#4A3B6B" />
@@ -319,7 +377,7 @@ export default function MatchingScreen() {
                 variant="outline"
                 size="lg"
                 onPress={() => safeNavigateBack(router, ROUTES.PATIENT.DASHBOARD)}
-                className="w-full mt-4 rounded-xl border-border/80 bg-card h-12 flex-row items-center justify-center"
+                className="w-full mt-3 rounded-xl border-border/80 bg-card h-12 flex-row items-center justify-center"
               >
                 <ButtonText className="text-foreground font-semibold text-sm">
                   Batalkan Pencarian
@@ -352,7 +410,7 @@ export default function MatchingScreen() {
                 </Text>
               </VStack>
 
-              {/* Doctor Profile Card */}
+              {/* Doctor Profile Card (Wireframe Screen 32) */}
               <Card className="bg-card rounded-xl p-4 border border-border/80 shadow-xs gap-3">
                 <HStack space="md" className="items-center">
                   <Box className="w-14 h-14 rounded-xl bg-primary/10 items-center justify-center border border-primary/20">
@@ -367,14 +425,14 @@ export default function MatchingScreen() {
                       {room?.assignedDoctor?.name || "Psikolog Mitra"}
                     </Heading>
                     <Text size="sm" className="text-muted-foreground font-medium">
-                      {room?.assignedDoctor?.title || "Psikolog Klinis Dewasa"}
+                      {room?.assignedDoctor?.title || "Psikolog Klinis"}
                     </Text>
                     <HStack space="xs" className="items-center mt-0.5">
                       <Star size={14} color="#D97706" fill="#D97706" />
                       <Text size="sm" bold className="text-foreground font-semibold">
                         {room?.assignedDoctor?.rating?.toFixed(1) || "4.9"}
                       </Text>
-                      <Text size="sm" className="text-muted-foreground">
+                      <Text size="sm" className="text-muted-foreground font-medium">
                         • ✓ Kredensial terverifikasi
                       </Text>
                     </HStack>
@@ -382,30 +440,74 @@ export default function MatchingScreen() {
                 </HStack>
               </Card>
 
+              {/* Rincian Sesi Card (Wireframe Screen 32) */}
+              <Card className="w-full bg-card rounded-xl p-4 border border-border/80 shadow-xs gap-2.5">
+                <Text size="sm" className="font-bold text-foreground uppercase tracking-wider">
+                  RINCIAN SESI
+                </Text>
+                <HStack space="sm" className="justify-between items-center py-1 border-b border-border/50">
+                  <Text size="sm" className="text-muted-foreground">
+                    Layanan
+                  </Text>
+                  <Text size="sm" className="font-semibold text-foreground">
+                    Konsultasi psikologi
+                  </Text>
+                </HStack>
+                <HStack space="sm" className="justify-between items-center py-1 border-b border-border/50">
+                  <Text size="sm" className="text-muted-foreground">
+                    Format
+                  </Text>
+                  <Text size="sm" className="font-semibold text-foreground">
+                    Chat Medis Privat
+                  </Text>
+                </HStack>
+                <HStack space="sm" className="justify-between items-center py-1 border-b border-border/50">
+                  <Text size="sm" className="text-muted-foreground">
+                    Durasi
+                  </Text>
+                  <Text size="sm" className="font-semibold text-foreground">
+                    45 Menit
+                  </Text>
+                </HStack>
+                <HStack space="sm" className="justify-between items-center py-1">
+                  <Text size="sm" className="text-muted-foreground">
+                    Mulai
+                  </Text>
+                  <Text size="sm" className="font-semibold text-primary">
+                    Setelah pembayaran
+                  </Text>
+                </HStack>
+              </Card>
+
               {/* Primary Action Button */}
-              <Button
-                size="lg"
-                isDisabled={!canRequestConsultation || createConsultation.isPending}
-                onPress={handleCreateConsultation}
-                className="w-full mt-2 rounded-xl bg-primary h-12 flex-row items-center justify-center active:opacity-90 shadow-xs"
-              >
-                {createConsultation.isPending ? (
-                  <ButtonSpinner />
-                ) : (
-                  <>
-                    <ButtonText className="text-white font-bold text-base mr-1">
-                      Lanjut ke Pembayaran
-                    </ButtonText>
-                    <ButtonIcon as={ArrowRight} color="#FFFFFF" />
-                  </>
-                )}
-              </Button>
+              <VStack space="xs" className="w-full mt-2">
+                <Button
+                  size="lg"
+                  isDisabled={!canRequestConsultation || createConsultation.isPending}
+                  onPress={handleCreateConsultation}
+                  className="w-full rounded-xl bg-primary h-12 flex-row items-center justify-center active:opacity-90 shadow-xs"
+                >
+                  {createConsultation.isPending ? (
+                    <ButtonSpinner />
+                  ) : (
+                    <>
+                      <ButtonText className="text-white font-bold text-base mr-1">
+                        Lanjut ke Pembayaran
+                      </ButtonText>
+                      <ButtonIcon as={ArrowRight} color="#FFFFFF" />
+                    </>
+                  )}
+                </Button>
+                <Text size="sm" className="text-muted-foreground text-center mt-1">
+                  Belum ada biaya sampai kamu menyelesaikan pembayaran.
+                </Text>
+              </VStack>
 
               <Button
                 variant="outline"
                 size="lg"
                 onPress={() => safeNavigateBack(router, ROUTES.PATIENT.DASHBOARD)}
-                className="w-full rounded-xl border-border/80 bg-card h-12 flex-row items-center justify-center"
+                className="w-full rounded-xl border-border/80 bg-card h-12 flex-row items-center justify-center mt-1"
               >
                 <ButtonText className="text-foreground font-semibold text-sm">
                   Kembali ke Beranda

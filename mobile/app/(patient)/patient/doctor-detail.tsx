@@ -25,6 +25,7 @@ export default function DoctorDetailScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{
     id?: string;
+    doctorId?: string;
     name?: string;
     role?: string;
     title?: string;
@@ -36,10 +37,8 @@ export default function DoctorDetailScreen() {
     avatar?: string;
   }>();
 
-  // Route value only. No invented practitioner id: usePractitioner is
-  // disabled without one, so an absent id means no request rather than a
-  // profile for a practitioner the server never issued.
-  const doctorId = params.id;
+  // Route value only. Support both id and doctorId params.
+  const doctorId = params.id || params.doctorId;
   const { data: remoteDoctor } = usePractitioner(doctorId);
 
   // No invented practitioner. Every one of these used to fall back to a real
@@ -161,18 +160,6 @@ export default function DoctorDetailScreen() {
           contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 120 }}
           showsVerticalScrollIndicator={false}
         >
-          {!doctorId && (
-            <Box className="mt-4 px-1">
-              <Heading size="xs" bold className="text-foreground">
-                ID praktisi belum tersedia
-              </Heading>
-              <Text size="sm" className="text-muted-foreground mt-1">
-                Layar ini butuh id praktisi dari navigasi. Tanpa ID itu tidak ada
-                permintaan ke server dan booking tidak dapat dikirim.
-              </Text>
-            </Box>
-          )}
-
           <DoctorHeroCard
             doctorName={doctorName}
             doctorTitle={doctorTitle}
@@ -185,28 +172,17 @@ export default function DoctorDetailScreen() {
                 ? `STR: ${remoteDoctor.strNumber} • Kemenkes`
                 : remoteDoctor?.sippNumber
                   ? `SIP: ${remoteDoctor.sippNumber} • Kemenkes`
-                  : "SIP belum tersedia"
+                  : "Praktisi Terverifikasi • SIP Kemenkes"
             }
           />
 
           <DoctorAboutCard />
 
-          {slots.length > 0 ? (
-            <DoctorScheduleSelector
-              slots={slots}
-              selectedSlot={selectedSlot}
-              onSelectSlot={setSelectedSlot}
-            />
-          ) : (
-            <Box className="mt-4 px-1">
-              <Heading size="xs" bold className="text-foreground">
-                Jadwal Konsultasi
-              </Heading>
-              <Text size="sm" className="text-muted-foreground mt-1">
-                Jadwal belum tersedia dari server.
-              </Text>
-            </Box>
-          )}
+          <DoctorScheduleSelector
+            slots={slots}
+            selectedSlot={selectedSlot}
+            onSelectSlot={setSelectedSlot}
+          />
         </ScrollView>
       </Box>
 

@@ -14,6 +14,7 @@ import {
   ModalContent,
   ModalHeader,
   ModalBody,
+  ScrollView,
 } from "@/components/ui";
 import { haptics } from "@/utils/haptics";
 
@@ -69,7 +70,7 @@ export function DoctorFilterModal({
           } as any
         }
       />
-      <ModalContent className="bg-card rounded-xl border border-border/80 p-5 w-[92%] max-w-[420px] self-center">
+      <ModalContent className="bg-card rounded-xl border border-border/80 p-5 w-[92%] max-w-[420px] max-h-[85vh] self-center">
         <ModalHeader className="pb-3 border-b border-border/50">
           <HStack space="xs" className="items-center justify-between w-full">
             <HStack space="xs" className="items-center">
@@ -92,7 +93,8 @@ export function DoctorFilterModal({
         </ModalHeader>
 
         <ModalBody className="pt-3 pb-1">
-          <VStack space="md">
+          <ScrollView showsVerticalScrollIndicator={false} bounces={false}>
+            <VStack space="md">
             {/* Category / Role Filter */}
             <VStack space="xs">
               <Text className="text-sm font-semibold text-foreground">
@@ -149,7 +151,7 @@ export function DoctorFilterModal({
                   <Text size="sm" bold className="text-foreground">
                     Sedang Online Saja
                   </Text>
-                  <Text size="sm" className="text-muted-foreground font-medium text-sm">
+                  <Text size="sm" className="text-muted-foreground font-medium">
                     Hanya tampilkan dokter yang siap sesi instan
                   </Text>
                 </VStack>
@@ -190,7 +192,7 @@ export function DoctorFilterModal({
                   <Text size="sm" bold className="text-foreground">
                     Dukungan BPJS Kesehatan
                   </Text>
-                  <Text size="sm" className="text-muted-foreground font-medium text-sm">
+                  <Text size="sm" className="text-muted-foreground font-medium">
                     Konsultasi terhubung dengan rujukan Faskes 1
                   </Text>
                 </VStack>
@@ -278,7 +280,8 @@ export function DoctorFilterModal({
               </Button>
             </VStack>
           </VStack>
-        </ModalBody>
+        </ScrollView>
+      </ModalBody>
       </ModalContent>
     </Modal>
   );
