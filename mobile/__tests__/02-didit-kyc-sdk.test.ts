@@ -34,6 +34,12 @@ describe("02. Didit Native KYC SDK & URL Fallback Suite", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    jest.spyOn(console, "warn").mockImplementation(() => {});
+    jest.spyOn(console, "info").mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   describe("Method 1: Native SDK Execution (Session Token)", () => {

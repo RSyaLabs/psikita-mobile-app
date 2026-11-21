@@ -98,12 +98,12 @@ async function runServiceTestSuite() {
     await setAuthToken(res.accessToken);
   });
 
-  // 4. Auth: Request OTP & Verify OTP
-  await testCase("Auth: Request OTP & Verify OTP", async () => {
-    await authService.requestOtp({ email: "test@psikita.id" });
+  // 4. Auth: Request OTP & Verify OTP (6-Digit OTP)
+  await testCase("Auth: Request OTP & Verify OTP (6-Digit OTP)", async () => {
+    await authService.requestOtp({ email: "test@seraphany.id" });
     const verifyRes = await authService.verifyOtp({
-      email: "test@psikita.id",
-      otp: "4820",
+      email: "test@seraphany.id",
+      otp: "123456",
     });
     if (!verifyRes.accessToken)
       throw new Error("Password reset was not confirmed");

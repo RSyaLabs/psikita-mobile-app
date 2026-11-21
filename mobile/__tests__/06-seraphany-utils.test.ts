@@ -44,9 +44,9 @@ describe("06. SeraPhany Core Utilities & Formatting Engine Suite", () => {
       expect(getInitials("Ratna")).toBe("RA");
     });
 
-    it("should return default fallback 'PK' when name is absent or undefined", () => {
-      expect(getInitials(undefined)).toBe("PK");
-      expect(getInitials("")).toBe("PK");
+    it("should return default fallback 'SP' (SeraPhany) when name is absent or undefined", () => {
+      expect(getInitials(undefined)).toBe("SP");
+      expect(getInitials("")).toBe("SP");
     });
   });
 

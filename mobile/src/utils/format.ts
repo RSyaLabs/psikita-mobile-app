@@ -28,10 +28,10 @@ export function formatCompactCurrency(val: number): string {
  * Contoh: getInitials("dr. Andi Pratama, Sp.KJ") => "AP"
  *
  * The name is optional on several DTOs, so an absent name is a real
- * input rather than a programming error. Falls back to "PK".
+ * input rather than a programming error. Falls back to "SP" (SeraPhany).
  */
 export function getInitials(name: string | undefined): string {
-  if (!name) return "PK";
+  if (!name) return "SP";
   const clean = name.replace(/^(dr\.|drg\.|prof\.|ns\.)\s*/i, "").trim();
   const parts = clean.split(/\s+/).filter(Boolean);
   if (parts.length >= 2) {
