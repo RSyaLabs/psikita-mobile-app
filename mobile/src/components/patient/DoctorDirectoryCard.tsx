@@ -49,13 +49,13 @@ export const DoctorDirectoryCard = React.memo(
       <Pressable
         onPressIn={() => onPrefetch?.(doctor.id)}
         onPress={() => onSelect(doctor)}
-        className="bg-card border border-border rounded-3xl p-4 active:border-primary active:opacity-95"
+        className="bg-card border border-border/80 rounded-xl p-4 active:border-primary active:opacity-95 shadow-xs"
       >
         <HStack space="md" className="items-start">
           {/* Doctor Avatar with Online Status */}
           <Avatar
             size="lg"
-            className="rounded-2xl border border-border flex-shrink-0"
+            className="rounded-xl border border-border/70 flex-shrink-0"
           >
             <AvatarImage source={{ uri: doctor.avatar }} />
             <AvatarFallbackText>{getInitials(doctor.name)}</AvatarFallbackText>
@@ -67,7 +67,7 @@ export const DoctorDirectoryCard = React.memo(
           {/* Doctor Details */}
           <VStack space="xs" className="flex-1">
             <HStack space="xs" className="items-center justify-between">
-              <Box className="bg-muted px-2.5 py-1 rounded-md">
+              <Box className="bg-primary/10 px-2.5 py-1 rounded-lg">
                 <Text
                   size="sm"
                   bold
@@ -125,7 +125,7 @@ export const DoctorDirectoryCard = React.memo(
             {/* Fee and Select Button */}
             <HStack
               space="sm"
-              className="items-center justify-between pt-3 mt-2 border-t border-border"
+              className="items-center justify-between pt-3 mt-2 border-t border-border/70"
             >
               <VStack space="xs">
                 <Text size="sm" className="text-muted-foreground font-medium">
@@ -144,7 +144,7 @@ export const DoctorDirectoryCard = React.memo(
               <Button
                 size="default"
                 onPress={() => onSelect(doctor)}
-                className="bg-primary px-5 py-2.5 rounded-xl h-auto"
+                className="bg-primary px-4 py-2 rounded-xl h-10 flex-row items-center justify-center shadow-xs"
               >
                 <ButtonText className="text-sm font-bold text-white">
                   Pilih

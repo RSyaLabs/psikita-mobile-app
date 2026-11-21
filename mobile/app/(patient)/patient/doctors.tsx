@@ -165,90 +165,93 @@ export default function DoctorsDirectoryScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-background">
-      {/* Top Header */}
-      <HStack
-        space="sm"
-        className="items-center justify-between px-5 pt-3.5 pb-2"
-      >
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Kembali ke Dashboard Pasien"
-          onPress={() => safeNavigateBack(router, ROUTES.PATIENT.DASHBOARD)}
-          className="w-10 h-10 rounded-full bg-card border border-border items-center justify-center active:bg-muted"
+      <Box className="w-full max-w-[640px] md:max-w-[720px] self-center flex-1">
+        {/* Top Header */}
+        <HStack
+          space="sm"
+          className="items-center justify-between px-5 pt-3.5 pb-2"
         >
-          <ChevronLeft size={22} color="#262130" />
-        </Pressable>
-        <Heading size="sm" bold className="text-foreground">
-          Pilih Praktisi
-        </Heading>
-        <Box className="w-10" />
-      </HStack>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Kembali ke Dashboard Pasien"
+            onPress={() => safeNavigateBack(router, ROUTES.PATIENT.DASHBOARD)}
+            className="w-10 h-10 rounded-xl bg-card border border-border/80 items-center justify-center active:bg-muted"
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            <ChevronLeft size={20} color="#262130" strokeWidth={2} />
+          </Pressable>
+          <Heading size="sm" bold className="text-foreground">
+            Pilih Praktisi
+          </Heading>
+          <Box className="w-10" />
+        </HStack>
 
-      <DoctorSearchHeader
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        onOpenFilter={() => setShowFilterModal(true)}
-        hasActiveFilters={hasActiveFilters}
-      />
+        <DoctorSearchHeader
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          onOpenFilter={() => setShowFilterModal(true)}
+          hasActiveFilters={hasActiveFilters}
+        />
 
-      <DoctorFilterChips
-        filters={FILTERS}
-        selectedFilter={selectedFilter}
-        onSelectFilter={setSelectedFilter}
-      />
+        <DoctorFilterChips
+          filters={FILTERS}
+          selectedFilter={selectedFilter}
+          onSelectFilter={setSelectedFilter}
+        />
 
-      {/* Doctor List */}
-      <ScrollView
-        contentContainerStyle={{
-          paddingHorizontal: 20,
-          paddingTop: 14,
-          paddingBottom: 100,
-        }}
-        showsVerticalScrollIndicator={false}
-      >
-        {filteredDoctors.length === 0 ? (
-          <Box className="py-12 items-center justify-center">
-            <Text size="sm" className="font-bold text-foreground">
-              Tidak ada praktisi ditemukan
-            </Text>
-            <Text
-              size="xs"
-              className="text-muted-foreground text-center mt-1 max-w-[280px]"
-            >
-              Coba ganti filter spesialisasi atau ubah kata kunci pencarian
-              Anda.
-            </Text>
-            <Button
-              size="sm"
-              variant="outline"
-              onPress={() => {
-                haptics.light();
-                setSearchQuery("");
-                setSelectedFilter("Semua");
-                setFilterBpjsOnly(false);
-                setFilterOnlineOnly(false);
-                setFilterPriceRange("Semua");
-              }}
-              className="mt-4 border-border rounded-xl bg-muted"
-            >
-              <ButtonText className="text-sm text-foreground font-semibold">
-                Reset Filter & Pencarian
-              </ButtonText>
-            </Button>
-          </Box>
-        ) : (
-          <VStack space="md">
-            {filteredDoctors.map((doc) => (
-              <DoctorDirectoryCard
-                key={doc.id}
-                doctor={doc}
-                onSelect={handleSelectDoctor}
-                onPrefetch={prefetchPractitioner}
-              />
-            ))}
-          </VStack>
-        )}
-      </ScrollView>
+        {/* Doctor List */}
+        <ScrollView
+          contentContainerStyle={{
+            paddingHorizontal: 20,
+            paddingTop: 14,
+            paddingBottom: 100,
+          }}
+          showsVerticalScrollIndicator={false}
+        >
+          {filteredDoctors.length === 0 ? (
+            <Box className="py-12 items-center justify-center">
+              <Text size="sm" className="font-bold text-foreground">
+                Tidak ada praktisi ditemukan
+              </Text>
+              <Text
+                size="sm"
+                className="text-muted-foreground text-center mt-1 max-w-[280px]"
+              >
+                Coba ganti filter spesialisasi atau ubah kata kunci pencarian
+                Anda.
+              </Text>
+              <Button
+                size="sm"
+                variant="outline"
+                onPress={() => {
+                  haptics.light();
+                  setSearchQuery("");
+                  setSelectedFilter("Semua");
+                  setFilterBpjsOnly(false);
+                  setFilterOnlineOnly(false);
+                  setFilterPriceRange("Semua");
+                }}
+                className="mt-4 border-border/80 rounded-xl bg-card h-10"
+              >
+                <ButtonText className="text-sm text-foreground font-semibold">
+                  Reset Filter & Pencarian
+                </ButtonText>
+              </Button>
+            </Box>
+          ) : (
+            <VStack space="md">
+              {filteredDoctors.map((doc) => (
+                <DoctorDirectoryCard
+                  key={doc.id}
+                  doctor={doc}
+                  onSelect={handleSelectDoctor}
+                  onPrefetch={prefetchPractitioner}
+                />
+              ))}
+            </VStack>
+          )}
+        </ScrollView>
+      </Box>
 
       <PatientTabBar activeTab="sesi" />
 

@@ -69,12 +69,12 @@ export function DoctorFilterModal({
           } as any
         }
       />
-      <ModalContent className="bg-card rounded-3xl border border-border p-5 w-[92%] max-w-[390px]">
+      <ModalContent className="bg-card rounded-xl border border-border/80 p-5 w-[92%] max-w-[420px] self-center">
         <ModalHeader className="pb-3 border-b border-border/50">
           <HStack space="xs" className="items-center justify-between w-full">
             <HStack space="xs" className="items-center">
-              <Box className="w-8 h-8 rounded-xl bg-secondary/15 items-center justify-center">
-                <SlidersHorizontal size={18} className="text-secondary" />
+              <Box className="w-8 h-8 rounded-xl bg-primary/10 items-center justify-center">
+                <SlidersHorizontal size={18} color="#4A3B6B" />
               </Box>
               <Heading size="sm" bold className="text-foreground">
                 Filter Praktisi
@@ -95,7 +95,7 @@ export function DoctorFilterModal({
           <VStack space="md">
             {/* Category / Role Filter */}
             <VStack space="xs">
-              <Text size="xs" bold className="text-foreground">
+              <Text className="text-sm font-semibold text-foreground">
                 Jenis Praktisi
               </Text>
               <HStack space="xs" className="flex-wrap gap-1.5 pt-1">
@@ -108,18 +108,17 @@ export function DoctorFilterModal({
                         haptics.light();
                         setSelectedFilter(role);
                       }}
-                      className={`px-3 py-1.5 rounded-full border ${
+                      className={`px-3 py-1.5 rounded-xl border ${
                         isSel
-                          ? "bg-primary border-primary"
-                          : "bg-muted border-border"
+                          ? "bg-primary border-primary shadow-xs"
+                          : "bg-muted border-border/80"
                       }`}
                     >
                       <Text
-                        size="xs"
                         className={
                           isSel
-                            ? "font-bold text-primary-foreground"
-                            : "font-medium text-foreground"
+                            ? "text-sm font-bold text-primary-foreground"
+                            : "text-sm font-medium text-foreground"
                         }
                       >
                         {role}
@@ -132,7 +131,7 @@ export function DoctorFilterModal({
 
             {/* Status Online Filter */}
             <VStack space="xs">
-              <Text size="xs" bold className="text-foreground">
+              <Text className="text-sm font-semibold text-foreground">
                 Ketersediaan Waktu
               </Text>
               <Pressable
@@ -140,10 +139,10 @@ export function DoctorFilterModal({
                   haptics.light();
                   setFilterOnlineOnly(!filterOnlineOnly);
                 }}
-                className={`p-3 rounded-2xl border flex-row items-center justify-between ${
+                className={`p-3 rounded-xl border flex-row items-center justify-between ${
                   filterOnlineOnly
-                    ? "bg-secondary/15 border-secondary"
-                    : "bg-muted border-border"
+                    ? "bg-primary/10 border-primary"
+                    : "bg-muted border-border/80"
                 }`}
               >
                 <VStack space="xs">
@@ -173,7 +172,7 @@ export function DoctorFilterModal({
 
             {/* BPJS Filter */}
             <VStack space="xs">
-              <Text size="sm" bold className="text-foreground">
+              <Text className="text-sm font-semibold text-foreground">
                 Penjaminan
               </Text>
               <Pressable
@@ -181,10 +180,10 @@ export function DoctorFilterModal({
                   haptics.light();
                   setFilterBpjsOnly(!filterBpjsOnly);
                 }}
-                className={`p-3 rounded-2xl border flex-row items-center justify-between ${
+                className={`p-3 rounded-xl border flex-row items-center justify-between ${
                   filterBpjsOnly
                     ? "bg-primary/10 border-primary"
-                    : "bg-muted border-border"
+                    : "bg-muted border-border/80"
                 }`}
               >
                 <VStack space="xs">
@@ -215,7 +214,7 @@ export function DoctorFilterModal({
             {/* Price Range Filter */}
             {setFilterPriceRange && (
               <VStack space="xs">
-                <Text size="xs" bold className="text-foreground">
+                <Text className="text-sm font-semibold text-foreground">
                   Rentang Biaya Konsultasi
                 </Text>
                 <HStack space="xs" className="flex-wrap gap-1.5 pt-1">
@@ -228,18 +227,17 @@ export function DoctorFilterModal({
                           haptics.light();
                           setFilterPriceRange(price);
                         }}
-                        className={`px-3 py-1.5 rounded-full border ${
+                        className={`px-3 py-1.5 rounded-xl border ${
                           isSel
-                            ? "bg-primary border-primary"
-                            : "bg-muted border-border"
+                            ? "bg-primary border-primary shadow-xs"
+                            : "bg-muted border-border/80"
                         }`}
                       >
                         <Text
-                          size="xs"
                           className={
                             isSel
-                              ? "font-bold text-primary-foreground"
-                              : "font-medium text-foreground"
+                              ? "text-sm font-bold text-primary-foreground"
+                              : "text-sm font-medium text-foreground"
                           }
                         >
                           {price}
@@ -259,9 +257,9 @@ export function DoctorFilterModal({
                   haptics.medium();
                   onApply();
                 }}
-                className="w-full bg-secondary h-11 rounded-xl"
+                className="w-full bg-primary h-12 rounded-xl flex-row items-center justify-center shadow-xs"
               >
-                <ButtonText className="text-xs font-bold text-secondary-foreground">
+                <ButtonText className="text-sm font-bold text-primary-foreground">
                   Terapkan Filter
                 </ButtonText>
               </Button>
@@ -272,9 +270,9 @@ export function DoctorFilterModal({
                   haptics.light();
                   onReset();
                 }}
-                className="w-full border-border bg-card h-11 rounded-xl"
+                className="w-full border-border/80 bg-card h-12 rounded-xl flex-row items-center justify-center"
               >
-                <ButtonText className="text-xs font-semibold text-foreground">
+                <ButtonText className="text-sm font-semibold text-foreground">
                   Reset Filter
                 </ButtonText>
               </Button>

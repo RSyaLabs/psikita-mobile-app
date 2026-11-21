@@ -32,10 +32,10 @@ export function DoctorFilterChips({
               }}
               accessibilityRole="button"
               accessibilityLabel={`Filter ${filter}`}
-              className={`px-4 py-2 rounded-full border ${
+              className={`px-4 py-2 rounded-xl border ${
                 isSelected
-                  ? "bg-primary border-primary"
-                  : "bg-card border-border"
+                  ? "bg-primary border-primary shadow-xs"
+                  : "bg-card border-border/80 active:bg-muted"
               }`}
             >
               <Text

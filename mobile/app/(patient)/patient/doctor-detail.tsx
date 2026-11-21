@@ -121,93 +121,94 @@ export default function DoctorDetailScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-background">
-      {/* Top Bar */}
-      <HStack
-        space="sm"
-        className="items-center justify-between px-5 pt-3.5 pb-2"
-      >
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Kembali ke Daftar Praktisi"
-          onPress={() => safeNavigateBack(router, ROUTES.PATIENT.DOCTORS)}
-          className="w-10 h-10 rounded-full bg-card border border-border items-center justify-center active:bg-muted"
+      <Box className="w-full max-w-[640px] md:max-w-[720px] self-center flex-1">
+        {/* Top Bar */}
+        <HStack
+          space="sm"
+          className="items-center justify-between px-5 pt-3.5 pb-2"
         >
-          <ChevronLeft size={22} color="#262130" />
-        </Pressable>
-        <Heading size="sm" bold className="text-foreground">
-          Profil Praktisi
-        </Heading>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Favorit"
-          onPress={() => {
-            haptics.light();
-            setIsFavorite(!isFavorite);
-          }}
-          className="w-10 h-10 rounded-full bg-card border border-border items-center justify-center active:bg-muted"
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Kembali ke Daftar Praktisi"
+            onPress={() => safeNavigateBack(router, ROUTES.PATIENT.DOCTORS)}
+            className="w-10 h-10 rounded-xl bg-card border border-border/80 items-center justify-center active:bg-muted"
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            <ChevronLeft size={20} color="#262130" strokeWidth={2} />
+          </Pressable>
+          <Heading size="sm" bold className="text-foreground">
+            Profil Praktisi
+          </Heading>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Favorit"
+            onPress={() => {
+              haptics.light();
+              setIsFavorite(!isFavorite);
+            }}
+            className="w-10 h-10 rounded-xl bg-card border border-border/80 items-center justify-center active:bg-muted"
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            <Heart
+              size={18}
+              color={isFavorite ? "#DC2626" : "#75618E"}
+              fill={isFavorite ? "#DC2626" : "none"}
+            />
+          </Pressable>
+        </HStack>
+
+        <ScrollView
+          contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 120 }}
+          showsVerticalScrollIndicator={false}
         >
-          <Heart
-            size={18}
-            className={
-              isFavorite
-                ? "text-destructive fill-destructive"
-                : "text-muted-foreground"
+          {!doctorId && (
+            <Box className="mt-4 px-1">
+              <Heading size="xs" bold className="text-foreground">
+                ID praktisi belum tersedia
+              </Heading>
+              <Text size="sm" className="text-muted-foreground mt-1">
+                Layar ini butuh id praktisi dari navigasi. Tanpa ID itu tidak ada
+                permintaan ke server dan booking tidak dapat dikirim.
+              </Text>
+            </Box>
+          )}
+
+          <DoctorHeroCard
+            doctorName={doctorName}
+            doctorTitle={doctorTitle}
+            doctorAvatar={doctorAvatar}
+            doctorExp={doctorExp}
+            doctorReviews={doctorReviews}
+            doctorRating={doctorRating}
+            sipNumber={
+              remoteDoctor?.strNumber
+                ? `STR: ${remoteDoctor.strNumber} • Kemenkes`
+                : remoteDoctor?.sippNumber
+                  ? `SIP: ${remoteDoctor.sippNumber} • Kemenkes`
+                  : "SIP belum tersedia"
             }
           />
-        </Pressable>
-      </HStack>
 
-      <ScrollView
-        contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 120 }}
-        showsVerticalScrollIndicator={false}
-      >
-        {!doctorId && (
-          <Box className="mt-4 px-1">
-            <Heading size="xs" bold className="text-foreground">
-              ID praktisi belum tersedia
-            </Heading>
-            <Text size="xs" className="text-muted-foreground mt-1">
-              Layar ini butuh id praktisi dari navigasi. Tanpa ID itu tidak ada
-              permintaan ke server dan booking tidak dapat dikirim.
-            </Text>
-          </Box>
-        )}
+          <DoctorAboutCard />
 
-        <DoctorHeroCard
-          doctorName={doctorName}
-          doctorTitle={doctorTitle}
-          doctorAvatar={doctorAvatar}
-          doctorExp={doctorExp}
-          doctorReviews={doctorReviews}
-          doctorRating={doctorRating}
-          sipNumber={
-            remoteDoctor?.strNumber
-              ? `STR: ${remoteDoctor.strNumber} • Kemenkes`
-              : remoteDoctor?.sippNumber
-                ? `SIP: ${remoteDoctor.sippNumber} • Kemenkes`
-                : "SIP belum tersedia"
-          }
-        />
-
-        <DoctorAboutCard />
-
-        {slots.length > 0 ? (
-          <DoctorScheduleSelector
-            slots={slots}
-            selectedSlot={selectedSlot}
-            onSelectSlot={setSelectedSlot}
-          />
-        ) : (
-          <Box className="mt-4 px-1">
-            <Heading size="xs" bold className="text-foreground">
-              Jadwal Konsultasi
-            </Heading>
-            <Text size="xs" className="text-muted-foreground mt-1">
-              Jadwal belum tersedia dari server.
-            </Text>
-          </Box>
-        )}
-      </ScrollView>
+          {slots.length > 0 ? (
+            <DoctorScheduleSelector
+              slots={slots}
+              selectedSlot={selectedSlot}
+              onSelectSlot={setSelectedSlot}
+            />
+          ) : (
+            <Box className="mt-4 px-1">
+              <Heading size="xs" bold className="text-foreground">
+                Jadwal Konsultasi
+              </Heading>
+              <Text size="sm" className="text-muted-foreground mt-1">
+                Jadwal belum tersedia dari server.
+              </Text>
+            </Box>
+          )}
+        </ScrollView>
+      </Box>
 
       <DoctorBookingBar feeLabel={doctorFee} onBooking={handleBooking} />
     </SafeAreaView>
