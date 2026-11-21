@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from "react";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ChevronLeft } from "lucide-react-native";
+import { ChevronLeft, SearchX } from "lucide-react-native";
 import {
   Box,
   Text,
@@ -210,6 +210,9 @@ export default function DoctorsDirectoryScreen() {
         >
           {filteredDoctors.length === 0 ? (
             <Box className="py-8 items-center justify-center">
+              <Box className="w-14 h-14 rounded-full bg-primary/10 items-center justify-center mb-3 border border-primary/20">
+                <SearchX size={26} color="#4A3B6B" strokeWidth={1.75} />
+              </Box>
               <Text size="sm" bold className="text-foreground text-center">
                 Belum ada praktisi yang sesuai kriteria
               </Text>

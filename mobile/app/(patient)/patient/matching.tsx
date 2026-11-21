@@ -11,6 +11,7 @@ import {
   Star,
   ArrowRight,
   CheckCircle2,
+  WifiOff,
 } from "lucide-react-native";
 import {
   Box,
@@ -204,7 +205,11 @@ export default function MatchingScreen() {
           {waitingRoom.isError && (
             <Card className="bg-card rounded-xl p-5 border border-border/80 shadow-xs gap-3 my-4">
               <HStack space="sm" className="items-center">
-                <ShieldAlert size={22} color={is403Forbidden ? "#DC2626" : "#D97706"} />
+                {is403Forbidden ? (
+                  <ShieldAlert size={22} color="#DC2626" />
+                ) : (
+                  <WifiOff size={22} color="#D97706" />
+                )}
                 <Heading size="sm" bold className="text-foreground">
                   {is403Forbidden
                     ? "Akses Antrean Ditolak (403 Forbidden)"

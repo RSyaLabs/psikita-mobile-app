@@ -27,11 +27,14 @@ export function DoctorScheduleSelector({
         Jadwal Konsultasi Tersedia
       </Heading>
       {slots.length === 0 ? (
-        <Box className="bg-card rounded-xl p-4 border border-border/80 shadow-xs">
-          <Text size="sm" className="text-muted-foreground font-medium leading-relaxed">
+        <HStack space="sm" className="bg-card rounded-xl p-4 border border-border/80 shadow-xs items-center">
+          <Box className="w-10 h-10 rounded-lg bg-primary/10 items-center justify-center shrink-0">
+            <Calendar size={18} color="#4A3B6B" />
+          </Box>
+          <Text size="sm" className="text-muted-foreground font-medium leading-relaxed flex-1">
             Praktisi siap menerima sesi konsultasi langsung saat online, atau jadwal sesi dapat dikonfirmasi saat proses matching triase klinis.
           </Text>
-        </Box>
+        </HStack>
       ) : (
         <HStack space="xs" className="flex-wrap gap-2 pt-1">
           {slots.map((slot) => {
