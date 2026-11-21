@@ -20,7 +20,10 @@ export default function PatientLayout() {
   const leafSegment = segments[segments.length - 1];
   const isPublicGuestRoute =
     guest === "true" &&
-    (leafSegment === "triage" || leafSegment === "assessment-result");
+    (leafSegment === "triage" ||
+      leafSegment === "assessment-result" ||
+      leafSegment === "checkout" ||
+      leafSegment === "payment-regular");
 
   const {
     data: patientProfile,

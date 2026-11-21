@@ -8,39 +8,39 @@ export interface CheckoutSessionCardProps {
 
 export function CheckoutSessionCard({ doctorSlot }: CheckoutSessionCardProps) {
   return (
-    <Card className="bg-card rounded-2xl p-3.5 border border-border gap-2.5">
-      <Text size="sm" bold className="text-foreground">
+    <Card className="bg-card rounded-2xl p-4 border border-border gap-3">
+      <Text size="sm" bold className="text-foreground text-base">
         Detail sesi
       </Text>
       <HStack space="sm" className="items-center">
-        <Video size={16} className="text-secondary" />
-        <VStack space="xs">
-          <Text size="xs" className="text-muted-foreground">
+        <Video size={18} color="#75618E" />
+        <VStack space="xs" className="flex-1">
+          <Text size="sm" className="text-muted-foreground font-medium">
             Telekonsultasi Video • 45 Menit
           </Text>
-          <Text size="xs" bold className="text-foreground">
+          <Text size="sm" bold className="text-foreground font-semibold">
             {doctorSlot}
           </Text>
         </VStack>
       </HStack>
       <HStack space="sm" className="items-center">
-        <Calendar size={16} className="text-secondary" />
-        <VStack space="xs">
-          <Text size="xs" className="text-muted-foreground">
+        <Calendar size={18} color="#75618E" />
+        <VStack space="xs" className="flex-1">
+          <Text size="sm" className="text-muted-foreground font-medium">
             Kebijakan Jadwal
           </Text>
-          <Text size="xs" bold className="text-foreground">
+          <Text size="sm" bold className="text-foreground font-semibold">
             Dapat dijadwalkan ulang hingga 2 jam sebelum sesi
           </Text>
         </VStack>
       </HStack>
       <HStack space="sm" className="items-center">
-        <Globe size={16} className="text-secondary" />
-        <VStack space="xs">
-          <Text size="xs" className="text-muted-foreground">
+        <Globe size={18} color="#75618E" />
+        <VStack space="xs" className="flex-1">
+          <Text size="sm" className="text-muted-foreground font-medium">
             Privasi & Bahasa
           </Text>
-          <Text size="xs" bold className="text-foreground">
+          <Text size="sm" bold className="text-foreground font-semibold">
             Enkripsi Medis End-to-End • Bahasa Indonesia
           </Text>
         </VStack>

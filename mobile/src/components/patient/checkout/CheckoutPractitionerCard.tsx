@@ -23,26 +23,26 @@ export function CheckoutPractitionerCard({
   doctorAvatar,
 }: CheckoutPractitionerCardProps) {
   return (
-    <Card className="bg-card rounded-2xl p-3.5 border border-border flex-row items-center gap-3">
+    <Card className="bg-card rounded-2xl p-4 border border-border flex-row items-center gap-3">
       <Avatar size="md">
         <AvatarImage source={{ uri: doctorAvatar }} />
         <AvatarFallbackText>{getInitials(doctorName)}</AvatarFallbackText>
       </Avatar>
       <Box className="flex-1">
-        <Text size="sm" bold className="text-foreground">
+        <Text size="sm" bold className="text-foreground text-base">
           {doctorName}
         </Text>
-        <Text size="xs" className="text-muted-foreground">
+        <Text size="sm" className="text-muted-foreground font-medium">
           {doctorTitle}
         </Text>
-        <HStack space="xs" className="items-center mt-0.5">
-          <Star size={12} className="text-warning fill-warning" />
-          <Text size="xs" className="text-muted-foreground">
+        <HStack space="xs" className="items-center mt-1">
+          <Star size={14} className="text-warning fill-warning" />
+          <Text size="sm" className="text-muted-foreground font-medium">
             4.9 (Terverifikasi) • Online
           </Text>
         </HStack>
       </Box>
-      <ShieldCheck size={20} className="text-secondary" />
+      <ShieldCheck size={22} color="#4A3B6B" />
     </Card>
   );
 }

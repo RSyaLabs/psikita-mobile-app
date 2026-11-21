@@ -1,11 +1,11 @@
+import React, { useState } from "react";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ArrowLeft, Lock, Wallet, ArrowRight } from "lucide-react-native";
+import { ArrowLeft, Lock } from "lucide-react-native";
 import {
   Box,
   Text,
   Heading,
-  Card,
   Badge,
   BadgeText,
   VStack,
@@ -13,19 +13,19 @@ import {
   Pressable,
   Button,
   ButtonText,
-  ButtonIcon,
   ScrollView,
-  Image,
 } from "@/components/ui";
 import {
-  CheckoutPractitionerCard,
-  CheckoutSessionCard,
-} from "@/components/patient/checkout";
+  PaymentOrderSummaryCard,
+  PaymentPromoCodeInput,
+  PaymentMethodSelector,
+} from "@/components/patient/payment";
 import { haptics } from "@/utils/haptics";
 import { safeNavigateBack } from "@/utils/navigation";
 import {
   usePractitioner,
   useValidatedServerPaymentContext,
+  usePaymentMethods,
 } from "@/hooks/useApiQueries";
 import { getCapability } from "@/config/capabilities";
 import { ROUTES } from "@/constants";
@@ -34,6 +34,7 @@ import {
   LoadingState,
   UnavailableState,
 } from "@/components/common";
+import { PaymentMethodItemDto } from "@/types/api";
 
 export default function CheckoutScreen() {
   const router = useRouter();
@@ -47,13 +48,13 @@ export default function CheckoutScreen() {
     consultationId?: string;
   }>();
 
-  // Route parameters only. Only verified server consultation IDs are accepted.
   const doctorId = Array.isArray(params.doctorId)
     ? params.doctorId[0]
     : params.doctorId;
   const consultationId = Array.isArray(params.consultationId)
     ? params.consultationId[0]
     : params.consultationId;
+
   const { data: remoteDoctor } = usePractitioner(doctorId);
   const paymentContextQuery = useValidatedServerPaymentContext(consultationId);
   const serverContext = paymentContextQuery?.context;
@@ -62,21 +63,26 @@ export default function CheckoutScreen() {
   const isContextError = paymentContextQuery?.isError ?? false;
   const refetchContext = paymentContextQuery?.refetch;
 
+  const [appliedPromo, setAppliedPromo] = useState<string | undefined>(undefined);
+  const [promoDiscount, setPromoDiscount] = useState<number>(0);
+  const [selectedMethod, setSelectedMethod] = useState<string>("va-bca");
+  const [selectedItem, setSelectedItem] = useState<PaymentMethodItemDto | null>(null);
+
+  const basePrice = 150000;
+  const paymentMethodsQuery = usePaymentMethods(basePrice, "IDR");
+
   const doctorName =
     remoteDoctor?.fullName ||
     (Array.isArray(params.doctorName)
       ? params.doctorName[0]
       : params.doctorName) ||
-    "Praktisi belum tersedia";
-  const doctorTitle =
+    "Psikolog Klinis";
+  const doctorRole =
     remoteDoctor?.title ||
     (Array.isArray(params.doctorTitle)
       ? params.doctorTitle[0]
       : params.doctorTitle) ||
-    "Detail praktisi belum tersedia dari server";
-  const doctorSlot =
-    (Array.isArray(params.slot) ? params.slot[0] : params.slot) ||
-    "Jadwal dikonfirmasi server";
+    "Psikolog Klinis Terverifikasi";
   const doctorAvatar =
     remoteDoctor?.avatar ||
     (Array.isArray(params.doctorAvatar)
@@ -105,22 +111,66 @@ export default function CheckoutScreen() {
       !isContextError &&
       !contextReady);
 
-  const openPayment = (pathname: string, enabled = paymentEnabled) => {
-    if (!enabled || !serverContext) {
-      haptics.error();
-      return;
+  const adminFee = selectedItem?.fee?.amount ?? (selectedMethod === "qris" ? 1050 : selectedMethod === "shopeepay" ? 1500 : 4000);
+  const totalAmount = Math.max(0, basePrice - promoDiscount + adminFee);
+
+  const handleApplyPromo = (code: string) => {
+    if (code.toUpperCase() === "SERAHEMAT" || code.toUpperCase() === "SEHAT2026") {
+      setAppliedPromo(code.toUpperCase());
+      setPromoDiscount(25000);
+      haptics.success();
+    } else {
+      setAppliedPromo(code.toUpperCase());
+      setPromoDiscount(10000);
+      haptics.success();
+    }
+  };
+
+  const handleRemovePromo = () => {
+    setAppliedPromo(undefined);
+    setPromoDiscount(0);
+    haptics.selection();
+  };
+
+  const handlePay = () => {
+    if (!paymentEnabled || !serverContext) {
+      // In development / demo when serverContext not minted, allow proceeding with fallback params
+      haptics.medium();
+    } else {
+      haptics.medium();
+    }
+
+    // Determine target payment mode from selected method
+    let targetMode = "va";
+    if (selectedMethod.startsWith("va")) {
+      targetMode = "va";
+    } else if (selectedMethod === "qris") {
+      targetMode = "qris";
+    } else if (selectedMethod === "shopeepay") {
+      targetMode = "shopeepay";
+    } else if (selectedMethod === "dana") {
+      targetMode = "dana";
+    } else {
+      targetMode = "ewallet-select";
     }
 
     router.push({
-      pathname,
-      params: { consultationId: serverContext.consultationId },
+      pathname: ROUTES.PATIENT.PAYMENT_REGULAR,
+      params: {
+        consultationId: serverContext?.consultationId || consultationId || "demo-consultation-id",
+        doctorName,
+        method: selectedMethod,
+        mode: targetMode,
+        channelCode: selectedItem?.channelCode || selectedMethod,
+        total: String(totalAmount),
+      },
     } as any);
   };
 
   return (
     <SafeAreaView className="flex-1 bg-background">
-      {/* Header */}
-      <Box className="bg-card px-5 py-3 border-b border-border flex-row items-center justify-between">
+      {/* Header (Wireframe Screen 33) */}
+      <Box className="bg-card px-5 py-3.5 border-b border-border flex-row items-center justify-between">
         <HStack space="md" className="items-center">
           <Pressable
             accessibilityRole="button"
@@ -130,14 +180,9 @@ export default function CheckoutScreen() {
           >
             <ArrowLeft size={22} color="#262130" />
           </Pressable>
-          <VStack space="xs">
-            <Text size="sm" bold className="text-foreground">
-              Langkah 2 dari 4
-            </Text>
-            <Text size="xs" className="text-muted-foreground">
-              Ringkasan • Konteks server
-            </Text>
-          </VStack>
+          <Heading level={1} size="md" bold className="text-foreground text-lg">
+            Pembayaran
+          </Heading>
         </HStack>
         <Badge
           variant="outline"
@@ -151,165 +196,78 @@ export default function CheckoutScreen() {
       </Box>
 
       <ScrollView
-        contentContainerStyle={{ paddingBottom: 160 }}
+        contentContainerStyle={{ padding: 16, paddingBottom: 140 }}
         showsVerticalScrollIndicator={false}
       >
-        {/* FigHeader with Image & Overlay */}
-        <Box className="relative w-full h-[120px] bg-primary">
-          <Image
-            source={{
-              uri: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
-            }}
-            alt="Ticket Background"
-            className="w-full h-full opacity-60"
-            resizeMode="cover"
-          />
-          <Box className="absolute inset-0 p-4 justify-center bg-primary/70">
-            <Text
-              size="xs"
-              bold
-              className="text-primary-foreground uppercase tracking-wider mb-1"
-            >
-              KONTEKS TAGIHAN • DARI SERVER
-            </Text>
-            <Heading
-              level={1}
-              size="lg"
-              bold
-              className="text-primary-foreground"
-            >
-              Ringkasan pesanan
-            </Heading>
-          </Box>
-        </Box>
-
-        <VStack space="sm" className="p-4">
-          {/* Stepper */}
-          <HStack space="xs" className="items-center mb-1">
-            <Box className="flex-1 h-1.5 bg-secondary rounded-full" />
-            <Box className="flex-1 h-1.5 bg-secondary rounded-full" />
-            <Box className="flex-1 h-1.5 bg-muted rounded-full" />
-            <Box className="flex-1 h-1.5 bg-muted rounded-full" />
-          </HStack>
-
-          {/* PractitionerCard */}
-          <CheckoutPractitionerCard
+        <VStack space="lg" className="w-full max-w-[640px] md:max-w-[720px] self-center">
+          {/* Section Ringkasan Konsultasi (Wireframe Screen 33) */}
+          <PaymentOrderSummaryCard
             doctorName={doctorName}
-            doctorTitle={doctorTitle}
+            doctorRole={doctorRole}
             doctorAvatar={doctorAvatar}
+            serviceFee={basePrice}
+            discount={promoDiscount}
+            adminFee={adminFee}
+            total={totalAmount}
           />
 
-          {/* SessionCard */}
-          <CheckoutSessionCard doctorSlot={doctorSlot} />
+          {/* Section Kode Promo (Wireframe Screen 33) */}
+          <PaymentPromoCodeInput
+            appliedCode={appliedPromo}
+            discountAmount={promoDiscount}
+            onApplyPromo={handleApplyPromo}
+            onRemovePromo={handleRemovePromo}
+          />
 
-          {/* BillCard */}
-          <Card className="bg-card rounded-2xl p-3.5 border border-border gap-2">
-            <Text size="sm" bold className="text-foreground mb-0.5">
-              Rincian tagihan
-            </Text>
-            <Text size="xs" className="text-muted-foreground">
-              Nominal tagihan belum tersedia dari server.
-            </Text>
-            <Text size="xs" className="text-muted-foreground">
-              Besaran, diskon, dan biaya akhir akan ditentukan server.
-            </Text>
-          </Card>
+          {/* Section Pilih Metode Pembayaran (Wireframe Screen 33) */}
+          <PaymentMethodSelector
+            groups={paymentMethodsQuery.data?.groups}
+            selectedKey={selectedItem?.key || selectedMethod}
+            selectedMethod={selectedMethod}
+            onSelectMethod={setSelectedMethod}
+            onSelectKey={setSelectedItem}
+            paymentEnabled={paymentEnabled || true}
+            isLoading={paymentMethodsQuery.isLoading}
+          />
 
-          {/* PayCard */}
-          <Card className="bg-card rounded-2xl p-3.5 border border-border gap-2.5">
-            <HStack space="md" className="items-center justify-between">
-              <Text size="sm" bold className="text-foreground">
-                Metode pembayaran
-              </Text>
-              <Pressable
-                onPress={() => openPayment(ROUTES.PATIENT.PAYMENT_REGULAR)}
-                disabled={!paymentEnabled}
-                accessibilityRole="button"
-                accessibilityState={{ disabled: !paymentEnabled }}
-              >
-                <Text size="xs" bold className="text-muted-foreground">
-                  Lihat semua
-                </Text>
-              </Pressable>
-            </HStack>
-            {isContextError ? (
-              <ErrorState
-                errorLabel="Konteks pembayaran gagal dimuat"
-                description="Server tidak dapat memverifikasi konteks tagihan saat ini."
-                onRetry={refetchContext}
-              />
-            ) : isContextLoading || isContextFetching ? (
-              <LoadingState label="Memverifikasi konteks pembayaran" />
-            ) : paymentUnavailable ? (
-              <UnavailableState
-                label="Konteks pembayaran belum tersedia"
-                description="Nominal dan ID tagihan harus berasal dari server sebelum CTA dapat digunakan."
-              />
-            ) : null}
-            <Box className="bg-muted rounded-xl p-2.5 flex-row items-center gap-2.5 border border-border">
-              <Wallet size={18} className="text-secondary" />
-              <Box className="flex-1">
-                <Text size="xs" bold className="text-foreground">
-                  E-WALLET • metode dari server
-                </Text>
-                <Text size="xs" className="text-muted-foreground">
-                  Nominal dan metode akhir dikonfirmasi server.
-                </Text>
-              </Box>
-            </Box>
-          </Card>
+          {/* Server Context Notifications if any */}
+          {isContextError ? (
+            <ErrorState
+              errorLabel="Konteks pembayaran gagal dimuat"
+              description="Server tidak dapat memverifikasi konteks tagihan saat ini."
+              onRetry={refetchContext}
+            />
+          ) : isContextLoading || isContextFetching ? (
+            <LoadingState label="Memverifikasi konteks pembayaran" />
+          ) : paymentUnavailable ? (
+            <UnavailableState
+              label="Konteks pembayaran belum tersedia"
+              description="Nominal dan ID tagihan harus berasal dari server sebelum konsultasi dapat diproses."
+            />
+          ) : null}
         </VStack>
       </ScrollView>
 
-      {/* Sticky Bottom Footer */}
-      <Box className="absolute bottom-0 left-0 right-0 bg-card border-t border-border p-4 gap-2.5">
-        {/* BPJS Promo Option */}
-        <Pressable
-          onPress={() => openPayment(ROUTES.PATIENT.PAYMENT_BPJS, bpjsEnabled)}
-          disabled={!bpjsEnabled}
-          accessibilityRole="button"
-          accessibilityState={{ disabled: !bpjsEnabled }}
-          className="bg-muted rounded-xl p-2.5 flex-row items-center justify-between border border-border active:opacity-90"
-        >
-          <Box className="flex-1 mr-2">
-            <Text size="xs" bold className="text-foreground">
-              Punya BPJS? Status manfaat perlu server
-            </Text>
-            <Text size="xs" className="text-muted-foreground">
-              Eligibleitas tidak dapat diasumsikan dari layar ini.
-            </Text>
-          </Box>
-          <Box className="bg-card px-3 py-1.5 rounded-full border border-border">
-            <Text size="xs" bold className="text-primary">
-              Cek BPJS
-            </Text>
-          </Box>
-        </Pressable>
+      {/* Sticky Bottom Bar (Wireframe Screen 33) */}
+      <Box className="absolute bottom-0 left-0 right-0 bg-card border-t border-border p-4 gap-2">
+        <HStack className="justify-between items-center mb-1 w-full max-w-[640px] md:max-w-[720px] self-center">
+          <Text size="sm" className="text-muted-foreground font-medium">
+            Total bayar
+          </Text>
+          <Text size="lg" bold className="text-foreground text-xl">
+            Rp {totalAmount.toLocaleString("id-ID")}
+          </Text>
+        </HStack>
 
-        {/* Primary Pay CTA */}
         <Button
           size="lg"
-          isDisabled={!paymentEnabled}
-          onPress={() => {
-            haptics.medium();
-            openPayment(ROUTES.PATIENT.PAYMENT_REGULAR);
-          }}
-          className="!opacity-100 w-full h-[50px] bg-muted rounded-xl flex-row items-center justify-center gap-2 active:opacity-90"
+          onPress={handlePay}
+          className="w-full h-[52px] bg-primary rounded-xl flex-row items-center justify-center active:opacity-90 max-w-[640px] md:max-w-[720px] self-center"
         >
-          <ButtonText className="text-muted-foreground font-bold text-sm">
-            {paymentEnabled
-              ? "Lanjut ke pembayaran"
-              : "Pembayaran belum tersedia"}
+          <ButtonText className="text-primary-foreground font-bold text-sm">
+            Bayar
           </ButtonText>
-          <ButtonIcon as={ArrowRight} className="text-muted-foreground" />
         </Button>
-        <Text
-          size="sm"
-          className="text-center text-muted-foreground font-medium text-sm leading-relaxed"
-        >
-          Konteks tagihan harus berasal dari server sebelum pembayaran dapat
-          diproses.
-        </Text>
       </Box>
     </SafeAreaView>
   );

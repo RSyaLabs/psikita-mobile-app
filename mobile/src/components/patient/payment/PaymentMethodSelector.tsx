@@ -14,8 +14,8 @@ import { PaymentMethodGroupDto, PaymentMethodItemDto } from "@/types/api";
 export interface PaymentMethodSelectorProps {
   groups?: PaymentMethodGroupDto[];
   selectedKey?: string;
-  selectedMethod?: "gopay" | "qris" | string;
-  onSelectMethod?: (method: "gopay" | "qris" | string) => void;
+  selectedMethod?: "gopay" | "qris" | "shopeepay" | "dana" | "va-bca" | "va-mandiri" | string;
+  onSelectMethod?: (method: string) => void;
   onSelectKey?: (method: PaymentMethodItemDto) => void;
   paymentEnabled: boolean;
   isLoading?: boolean;
@@ -47,58 +47,114 @@ export function PaymentMethodSelector({
 }: PaymentMethodSelectorProps) {
   const currentKey = selectedKey || selectedMethod;
 
-  // Fallback default mock/static groups if server catalog is loading or empty
-  const activeGroups: PaymentMethodGroupDto[] =
-    groups && groups.length > 0
-      ? groups
-      : [
-          {
-            groupName: "E-Wallet",
-            methodType: "E_WALLET",
-            methods: [
-              {
-                key: "gopay",
-                name: "GoPay / E-Wallet",
-                methodType: "E_WALLET",
-                channelCode: "GOPAY",
-                available: true,
-                providerVerified: true,
-                fee: { amount: 0, currency: "IDR" },
-                feeBearer: "PATIENT",
-                totalPayable: { amount: 50000, currency: "IDR" },
-              },
-            ],
-          },
-          {
-            groupName: "QRIS",
-            methodType: "QRIS",
-            methods: [
-              {
-                key: "qris",
-                name: "QRIS (Semua Pembayaran)",
-                methodType: "QRIS",
-                channelCode: "QRIS",
-                available: true,
-                providerVerified: true,
-                fee: { amount: 0, currency: "IDR" },
-                feeBearer: "PATIENT",
-                totalPayable: { amount: 50000, currency: "IDR" },
-              },
-            ],
-          },
-        ];
+  // Canonical Wireframe Fallback Groups (Screens 33, 34, 35, 36)
+  const defaultGroups: PaymentMethodGroupDto[] = [
+    {
+      groupName: "VIRTUAL ACCOUNT",
+      methodType: "VIRTUAL_ACCOUNT",
+      methods: [
+        {
+          key: "va-bca",
+          name: "BCA Virtual Account",
+          methodType: "VIRTUAL_ACCOUNT",
+          channelCode: "VA_BCA",
+          available: true,
+          providerVerified: true,
+          fee: { amount: 4000, currency: "IDR" },
+          feeBearer: "PATIENT",
+          totalPayable: { amount: 154000, currency: "IDR" },
+        },
+        {
+          key: "va-mandiri",
+          name: "Mandiri Virtual Account",
+          methodType: "VIRTUAL_ACCOUNT",
+          channelCode: "VA_MANDIRI",
+          available: true,
+          providerVerified: true,
+          fee: { amount: 4000, currency: "IDR" },
+          feeBearer: "PATIENT",
+          totalPayable: { amount: 154000, currency: "IDR" },
+        },
+      ],
+    },
+    {
+      groupName: "QRIS",
+      methodType: "QRIS",
+      methods: [
+        {
+          key: "qris",
+          name: "QRIS (Semua Pembayaran)",
+          methodType: "QRIS",
+          channelCode: "QRIS",
+          available: true,
+          providerVerified: true,
+          fee: { amount: 1050, currency: "IDR" },
+          feeBearer: "PATIENT",
+          totalPayable: { amount: 151050, currency: "IDR" },
+        },
+      ],
+    },
+    {
+      groupName: "E-WALLET",
+      methodType: "E_WALLET",
+      methods: [
+        {
+          key: "shopeepay",
+          name: "ShopeePay",
+          methodType: "E_WALLET",
+          channelCode: "SHOPEEPAY",
+          available: true,
+          providerVerified: true,
+          fee: { amount: 1500, currency: "IDR" },
+          feeBearer: "PATIENT",
+          totalPayable: { amount: 151500, currency: "IDR" },
+        },
+        {
+          key: "dana",
+          name: "DANA",
+          methodType: "E_WALLET",
+          channelCode: "DANA",
+          available: true,
+          providerVerified: true,
+          fee: { amount: 0, currency: "IDR" },
+          feeBearer: "PATIENT",
+          totalPayable: { amount: 150000, currency: "IDR" },
+        },
+        {
+          key: "other-ewallet",
+          name: "E-wallet Lain",
+          methodType: "E_WALLET",
+          channelCode: "OTHER",
+          available: false,
+          providerVerified: false,
+          fee: { amount: 0, currency: "IDR" },
+          feeBearer: "PATIENT",
+          totalPayable: { amount: 150000, currency: "IDR" },
+          disabledReason: "Tidak tersedia sekarang",
+        },
+      ],
+    },
+  ];
+
+  const activeGroups = groups && groups.length > 0 ? groups : defaultGroups;
 
   return (
-    <VStack space="sm">
+    <VStack space="md">
+      {/* Category header */}
       <HStack space="md" className="items-center justify-between">
         <Text
-          size="xs"
+          size="sm"
           bold
-          className="text-muted-foreground uppercase tracking-wider"
+          className="text-foreground uppercase tracking-wider text-base"
         >
-          Duitku • Pembayaran Aman
+          Pilih metode pembayaran
         </Text>
-        <ShieldCheck size={16} className="text-secondary" />
+        <HStack space="xs" className="items-center">
+          <Text size="sm" className="text-muted-foreground font-medium">
+            Duitku • Pembayaran Aman
+          </Text>
+          <ShieldCheck size={18} color="#75618E" />
+        </HStack>
       </HStack>
 
       {isLoading ? (
@@ -110,7 +166,11 @@ export function PaymentMethodSelector({
       ) : (
         activeGroups.map((group) => (
           <VStack key={group.groupName} space="xs" className="mb-2">
-            <Text size="xs" bold className="text-muted-foreground ml-1">
+            <Text
+              size="sm"
+              bold
+              className="text-muted-foreground uppercase tracking-wider ml-1 mb-1 font-semibold"
+            >
               {group.groupName}
             </Text>
 
@@ -134,11 +194,11 @@ export function PaymentMethodSelector({
                     onSelectKey?.(method);
                     onSelectMethod?.(method.key as any);
                   }}
-                  className={`p-3.5 rounded-xl border flex-row items-center justify-between active:opacity-90 mb-1 ${
+                  className={`p-4 rounded-xl border flex-row items-center justify-between active:opacity-90 mb-1.5 ${
                     isSelected
-                      ? "bg-muted border-primary"
-                      : "bg-card border-border"
-                  } ${!method.available ? "opacity-60" : ""}`}
+                      ? "bg-card border-2 border-foreground"
+                      : "bg-card border border-border"
+                  } ${!method.available ? "opacity-60 bg-muted/30" : ""}`}
                 >
                   <HStack space="md" className="items-center flex-1 mr-2">
                     {getMethodIcon(method.methodType)}
@@ -152,31 +212,31 @@ export function PaymentMethodSelector({
                             variant="outline"
                             className="bg-muted border-border px-2 py-0.5 rounded-full"
                           >
-                            <BadgeText className="text-xs text-muted-foreground">
-                              {method.disabledReason || "Tidak aktif"}
+                            <BadgeText className="text-sm text-muted-foreground font-medium">
+                              {method.disabledReason || "Tidak tersedia sekarang"}
                             </BadgeText>
                           </Badge>
                         )}
                       </HStack>
                       <Text
-                        size="xs"
+                        size="sm"
                         className="text-muted-foreground font-medium"
                       >
                         {method.fee.amount > 0
-                          ? `Biaya: Rp ${method.fee.amount.toLocaleString("id-ID")}`
-                          : "Bebas Biaya Admin"}
+                          ? `Biaya layanan Rp ${method.fee.amount.toLocaleString("id-ID")}`
+                          : "Termasuk dalam harga"}
                       </Text>
                     </VStack>
                   </HStack>
                   <Box
-                    className={`w-5 h-5 rounded-full border items-center justify-center ${
+                    className={`w-6 h-6 rounded-full border items-center justify-center ${
                       isSelected
-                        ? "border-primary bg-primary"
+                        ? "border-foreground bg-foreground"
                         : "border-border"
                     }`}
                   >
                     {isSelected && (
-                      <Box className="w-2 h-2 rounded-full bg-primary-foreground" />
+                      <Box className="w-2.5 h-2.5 rounded-full bg-card" />
                     )}
                   </Box>
                 </Pressable>
@@ -185,6 +245,11 @@ export function PaymentMethodSelector({
           </VStack>
         ))
       )}
+
+      {/* Wireframe Disclaimer */}
+      <Text size="sm" className="text-muted-foreground leading-relaxed px-1">
+        Metode, ketersediaan, dan biaya diambil dari server. Nominal akhir dikunci saat pesanan dibuat.
+      </Text>
     </VStack>
   );
 }
