@@ -1,4 +1,5 @@
 export * from "./DoctorFilterModal";
+export * from "./CrisisHelpModal";
 export * from "./UserDetailModal";
 export * from "./ChangePhotoModal";
 export * from "./RevisionRequestModal";
