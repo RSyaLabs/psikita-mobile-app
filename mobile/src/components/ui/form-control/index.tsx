@@ -59,14 +59,6 @@ const formControlLabelTextStyle = tva({
   base: "font-medium text-foreground text-sm md:text-sm",
 });
 
-const formControlHelperStyle = tva({
-  base: "flex flex-row justify-start items-center gap-1 mt-1",
-});
-
-const formControlHelperTextStyle = tva({
-  base: "text-muted-foreground text-sm font-normal",
-});
-
 const formControlErrorStyle = tva({
   base: "flex flex-row justify-start items-center gap-1 mt-1",
 });
@@ -138,46 +130,8 @@ const FormControlLabelText = React.forwardRef<
   );
 });
 
-type IFormControlHelperProps = React.ComponentProps<
-  typeof UIFormControl.Helper
-> &
-  VariantProps<typeof formControlHelperStyle> & { className?: string };
-
-const FormControlHelper = React.forwardRef<
-  React.ComponentRef<typeof UIFormControl.Helper>,
-  IFormControlHelperProps
->(function FormControlHelper({ className, ...props }, ref) {
-  return (
-    <UIFormControl.Helper
-      ref={ref}
-      {...props}
-      className={formControlHelperStyle({ class: className })}
-    />
-  );
-});
-
-type IFormControlHelperTextProps = React.ComponentProps<
-  typeof UIFormControl.Helper.Text
-> &
-  VariantProps<typeof formControlHelperTextStyle> & { className?: string };
-
-const FormControlHelperText = React.forwardRef<
-  React.ComponentRef<typeof UIFormControl.Helper.Text>,
-  IFormControlHelperTextProps
->(function FormControlHelperText({ className, ...props }, ref) {
-  return (
-    <UIFormControl.Helper.Text
-      ref={ref}
-      {...props}
-      className={formControlHelperTextStyle({ class: className })}
-    />
-  );
-});
-
 export {
   FormControl,
   FormControlLabel,
   FormControlLabelText,
-  FormControlHelper,
-  FormControlHelperText,
 };

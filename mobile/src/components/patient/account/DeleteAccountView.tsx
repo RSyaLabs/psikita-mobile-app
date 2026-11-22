@@ -35,11 +35,6 @@ export function DeleteAccountView({
     onConfirmDelete?.(password);
   };
 
-  const handleCancel = () => {
-    haptics.light();
-    onCancel ? onCancel() : onBack?.();
-  };
-
   return (
     <ScrollView
       className="flex-1 bg-[#FAF8F5]"
@@ -47,7 +42,6 @@ export function DeleteAccountView({
       showsVerticalScrollIndicator={false}
       testID="delete-account-scroll"
     >
-      {/* Top Header */}
       <View className="flex-row items-center gap-1 -ml-3">
         <Pressable
           accessibilityRole="button"
@@ -61,7 +55,6 @@ export function DeleteAccountView({
         <Text className="text-[17px] font-bold text-[#222222]">Hapus akun</Text>
       </View>
 
-      {/* Warning Box */}
       <View className="border-[2.5px] border-[#222222] rounded-[14px] p-4 gap-2 bg-white">
         <Text className="text-[22px] font-bold text-[#222222]">Hapus akunmu?</Text>
         <Text className="text-[15px] leading-relaxed text-[#333333]">
@@ -69,36 +62,21 @@ export function DeleteAccountView({
         </Text>
       </View>
 
-      {/* Consequences List */}
       <View className="gap-2 px-1">
-        <View className="flex-row items-start gap-2">
-          <Text className="text-[15px] text-[#333333]">•</Text>
-          <Text className="flex-1 text-[15px] leading-relaxed text-[#333333]">
-            Kamu tidak bisa masuk lagi dengan akun ini.
-          </Text>
-        </View>
-        <View className="flex-row items-start gap-2">
-          <Text className="text-[15px] text-[#333333]">•</Text>
-          <Text className="flex-1 text-[15px] leading-relaxed text-[#333333]">
-            [Data yang dihapus, sesuai kebijakan]
-          </Text>
-        </View>
-        <View className="flex-row items-start gap-2">
-          <Text className="text-[15px] text-[#333333]">•</Text>
-          <Text className="flex-1 text-[15px] leading-relaxed text-[#333333]">
-            [Data yang tetap disimpan sesuai kewajiban hukum]
-          </Text>
-        </View>
+        {["Kamu tidak bisa masuk lagi dengan akun ini.", "[Data yang dihapus, sesuai kebijakan]", "[Data yang tetap disimpan sesuai kewajiban hukum]"].map((item, idx) => (
+          <View key={idx} className="flex-row items-start gap-2">
+            <Text className="text-[15px] text-[#333333]">•</Text>
+            <Text className="flex-1 text-[15px] leading-relaxed text-[#333333]">{item}</Text>
+          </View>
+        ))}
       </View>
 
-      {/* Ongoing Consultation / Payment Notice Box */}
       <View className="border-[1.5px] border-[#333333] rounded-xl p-3 bg-white">
         <Text className="text-sm leading-relaxed text-[#333333]">
           Ada konsultasi atau pembayaran yang berjalan? Selesaikan dulu. Server bisa menolak penghapusan sampai semuanya beres.
         </Text>
       </View>
 
-      {/* Password Confirmation */}
       <View className="gap-1.5">
         <Text className="text-[15px] font-semibold text-[#222222]">Kata sandi</Text>
         <TextInput
@@ -113,17 +91,12 @@ export function DeleteAccountView({
         />
       </View>
 
-      {/* Agreement Checkbox */}
       <Pressable
         accessibilityRole="checkbox"
         accessibilityState={{ checked: isAgreed }}
         accessibilityLabel="Saya mengerti dan ingin menghapus akun"
         testID="checkbox-delete-confirm"
-        onPress={() => {
-          haptics.selection();
-          setIsAgreed(!isAgreed);
-          setErrorMsg(null);
-        }}
+        onPress={() => { haptics.selection(); setIsAgreed(!isAgreed); setErrorMsg(null); }}
         className="flex-row items-center gap-3 min-h-[56px] border-[1.5px] border-[#333333] rounded-xl px-4 bg-white active:bg-stone-50"
       >
         <View
@@ -133,9 +106,7 @@ export function DeleteAccountView({
         >
           {isAgreed && <AppIcon icon={Check} size={16} tone="white" />}
         </View>
-        <Text className="flex-1 text-[15px] text-[#222222]">
-          Saya mengerti dan ingin menghapus akun
-        </Text>
+        <Text className="flex-1 text-[15px] text-[#222222]">Saya mengerti dan ingin menghapus akun</Text>
       </Pressable>
 
       {errorMsg && (
@@ -144,7 +115,6 @@ export function DeleteAccountView({
         </Text>
       )}
 
-      {/* Action Buttons */}
       <View className="mt-4 gap-2">
         <Pressable
           accessibilityRole="button"
@@ -159,7 +129,7 @@ export function DeleteAccountView({
           accessibilityRole="button"
           accessibilityLabel="Batal, simpan akunku"
           testID="btn-cancel-delete-account"
-          onPress={handleCancel}
+          onPress={() => { haptics.light(); onCancel ? onCancel() : onBack?.(); }}
           className="h-[52px] border-[1.5px] border-[#222222] rounded-[10px] bg-[#222222] items-center justify-center active:opacity-90"
         >
           <Text className="text-[16px] font-semibold text-white">Batal, simpan akunku</Text>

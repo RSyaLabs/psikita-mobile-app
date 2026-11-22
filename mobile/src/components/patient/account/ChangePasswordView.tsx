@@ -39,11 +39,6 @@ export function ChangePasswordView({
     onSubmit?.({ currentPass, newPass, logoutOtherDevices: logoutOthers });
   };
 
-  const handleCancel = () => {
-    haptics.light();
-    onCancel ? onCancel() : onBack?.();
-  };
-
   return (
     <ScrollView
       className="flex-1 bg-[#FAF8F5]"
@@ -51,7 +46,6 @@ export function ChangePasswordView({
       showsVerticalScrollIndicator={false}
       testID="change-password-scroll"
     >
-      {/* Top Header */}
       <View className="flex-row items-center gap-1 -ml-3">
         <Pressable
           accessibilityRole="button"
@@ -65,7 +59,6 @@ export function ChangePasswordView({
         <Text className="text-[17px] font-bold text-[#222222]">Ubah kata sandi</Text>
       </View>
 
-      {/* Field 1: Kata sandi saat ini */}
       <View className="gap-1.5">
         <Text className="text-[15px] font-semibold text-[#222222]">Kata sandi saat ini</Text>
         <TextInput
@@ -80,7 +73,6 @@ export function ChangePasswordView({
         />
       </View>
 
-      {/* Field 2: Kata sandi baru */}
       <View className="gap-1.5">
         <Text className="text-[15px] font-semibold text-[#222222]">Kata sandi baru</Text>
         <TextInput
@@ -95,7 +87,6 @@ export function ChangePasswordView({
         />
       </View>
 
-      {/* Field 3: Ulangi kata sandi baru */}
       <View className="gap-1.5">
         <Text className="text-[15px] font-semibold text-[#222222]">Ulangi kata sandi baru</Text>
         <TextInput
@@ -116,23 +107,18 @@ export function ChangePasswordView({
         </Text>
       )}
 
-      {/* Server Rules Notice Box */}
       <View className="border-[1.5px] border-dashed border-[#555555] rounded-xl p-3 bg-stone-50/60">
         <Text className="text-sm leading-relaxed text-[#333333]">
           Aturan kata sandi dari server. Pesan salah tampil di bawah kolom yang bermasalah.
         </Text>
       </View>
 
-      {/* Logout other devices checkbox */}
       <Pressable
         accessibilityRole="checkbox"
         accessibilityState={{ checked: logoutOthers }}
         accessibilityLabel="Keluar dari perangkat lain setelah diubah"
         testID="checkbox-logout-others"
-        onPress={() => {
-          haptics.selection();
-          setLogoutOthers(!logoutOthers);
-        }}
+        onPress={() => { haptics.selection(); setLogoutOthers(!logoutOthers); }}
         className="flex-row items-center gap-3 min-h-[56px] border-[1.5px] border-[#333333] rounded-xl px-4 bg-white active:bg-stone-50"
       >
         <View
@@ -147,23 +133,16 @@ export function ChangePasswordView({
         </Text>
       </Pressable>
 
-      {/* Forgot Password Link */}
       <Pressable
         accessibilityRole="button"
         accessibilityLabel="Lupa kata sandi saat ini?"
         testID="btn-forgot-password-link"
-        onPress={() => {
-          haptics.selection();
-          onForgotPassword?.();
-        }}
+        onPress={() => { haptics.selection(); onForgotPassword?.(); }}
         className="min-h-[44px] justify-center active:opacity-70"
       >
-        <Text className="text-[15px] font-semibold text-[#222222]">
-          Lupa kata sandi saat ini?
-        </Text>
+        <Text className="text-[15px] font-semibold text-[#222222]">Lupa kata sandi saat ini?</Text>
       </Pressable>
 
-      {/* Action Buttons */}
       <View className="mt-4 gap-1">
         <Pressable
           accessibilityRole="button"
@@ -178,7 +157,7 @@ export function ChangePasswordView({
           accessibilityRole="button"
           accessibilityLabel="Batal"
           testID="btn-cancel-change-password"
-          onPress={handleCancel}
+          onPress={() => { haptics.light(); onCancel ? onCancel() : onBack?.(); }}
           className="min-h-[44px] items-center justify-center active:opacity-70"
         >
           <Text className="text-[15px] font-semibold text-[#222222]">Batal</Text>

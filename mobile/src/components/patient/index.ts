@@ -1,4 +1,4 @@
-export * from "./edit-profile";
+export * from "./account";
 export * from "./payment";
 export * from "./triage";
 export * from "./chat";

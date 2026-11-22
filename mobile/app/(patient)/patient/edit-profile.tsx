@@ -1,164 +1,54 @@
-import React, { useState, useEffect, useRef } from "react";
-import { View } from "react-native";
+import React, { useState } from "react";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ChevronLeft, Camera, CheckCircle2 } from "lucide-react-native";
-import {
-  Box,
-  Text,
-  Heading,
-  HStack,
-  Pressable,
-  Button,
-  ButtonText,
-  ButtonSpinner,
-  ScrollView,
-  Avatar,
-  AvatarImage,
-  AvatarFallbackText,
-  useToast,
-  Toast,
-  ToastTitle,
-  ToastDescription,
-} from "@/components/ui";
-import { ChangePhotoModal } from "@/components/modals";
-import {
-  PersonalIdentitySection,
-  MedicalHistorySection,
-  EmergencyContactSection,
-  BpjsIntegrationSection,
-} from "@/components/patient/edit-profile";
 import { PersonalDataView } from "@/components/patient/account";
+import { ChangePhotoModal } from "@/components/modals";
 import {
   usePatientProfile,
   useUpdatePatientProfile,
-  useMyAvatar,
   useMyVerificationStatus,
 } from "@/hooks/useApiQueries";
-import { getInitials } from "@/utils/format";
-import { haptics } from "@/utils/haptics";
-import { ROUTES } from "@/constants";
+import { useToast, Toast, ToastTitle, ToastDescription } from "@/components/ui";
+import { ROUTES } from "@/constants/routes";
 import { safeNavigateBack } from "@/utils/navigation";
+import { haptics } from "@/utils/haptics";
 
 export default function EditProfileScreen() {
   const router = useRouter();
   const toast = useToast();
   const { data: profile } = usePatientProfile();
-  const { data: avatarData } = useMyAvatar();
   const { data: kycStatus } = useMyVerificationStatus();
+  const updateProfileMutation = useUpdatePatientProfile();
+  const [showPhotoModal, setShowPhotoModal] = useState(false);
+
   const isKycVerified =
     kycStatus?.status === "APPROVED" ||
     kycStatus?.status === "VERIFIED" ||
     profile?.status === "VERIFIED";
-  const updateProfileMutation = useUpdatePatientProfile();
-  const isLoading = updateProfileMutation.isPending;
 
-  const [tab, setTab] = useState<"data-diri" | "medis">("data-diri");
-  const [fullName, setFullName] = useState(profile?.fullName || "");
-  const [phone, setPhone] = useState(profile?.phoneNumber || "");
-  const [nik, setNik] = useState(profile?.nik || "");
-  const [birthDate, setBirthDate] = useState(profile?.birthDate || "");
-  const [gender, setGender] = useState<"FEMALE" | "MALE">(
-    profile?.gender === "MALE" ? "MALE" : "FEMALE",
-  );
-  const [bloodType, setBloodType] = useState("B");
-  const [allergies, setAllergies] = useState("");
-  const [emergencyContactName, setEmergencyContactName] = useState("");
-  const [emergencyPhone, setEmergencyPhone] = useState("");
-  const [bpjsNumber, setBpjsNumber] = useState(profile?.bpjsNumber || "");
-  const [faskes1, setFaskes1] = useState(profile?.faskes1 || "");
-  const [savedSuccess, setSavedSuccess] = useState(false);
-  const [showPhotoModal, setShowPhotoModal] = useState(false);
-
-  // The post-save navigation used to run on a bare setTimeout with no cleanup, so
-  // a user who tapped back inside the delay was popped a second screen later by
-  // an orphaned timer. The timer is now owned and cleared on unmount.
-  const navigateBackTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  // The profile query refetches on reconnect and after every save. Tracking which
-  // fields the user actually edited lets the sync effect below leave those alone.
-  const dirtyFields = useRef<Set<string>>(new Set());
-
-  // Wraps a field setter so using it records that the field is dirty.
-  const track =
-    <T,>(field: string, setter: (value: T) => void) =>
-    (value: T) => {
-      dirtyFields.current.add(field);
-      setter(value);
-    };
-
-  useEffect(() => {
-    if (!profile) return;
-    // Only fill a field the user has not touched. The profile query refetches on
-    // reconnect and after every save, and filling unconditionally discarded edits
-    // that had not been saved yet.
-    const isDirty = (field: string) => dirtyFields.current.has(field);
-
-    if (profile.fullName && !isDirty("fullName")) setFullName(profile.fullName);
-    if (profile.phoneNumber && !isDirty("phone")) setPhone(profile.phoneNumber);
-    if (profile.nik && !isDirty("nik")) setNik(profile.nik);
-    if (profile.birthDate && !isDirty("birthDate"))
-      setBirthDate(profile.birthDate);
-    if (profile.gender && !isDirty("gender"))
-      setGender(profile.gender === "MALE" ? "MALE" : "FEMALE");
-    if (profile.bpjsNumber && !isDirty("bpjsNumber"))
-      setBpjsNumber(profile.bpjsNumber);
-    if (profile.faskes1 && !isDirty("faskes1")) setFaskes1(profile.faskes1);
-  }, [profile]);
-
-  useEffect(() => {
-    return () => {
-      if (navigateBackTimer.current) {
-        clearTimeout(navigateBackTimer.current);
-        navigateBackTimer.current = null;
-      }
-    };
-  }, []);
-
-  const handleSave = () => {
-    haptics.medium();
+  const handleSave = (data: { fullName: string; phone: string; birthDate: string }) => {
     updateProfileMutation.mutate(
       {
-        // Never fall back to a placeholder id. Writing to a hardcoded patient
-        // would edit the wrong record while looking successful, so an unresolved
-        // profile is sent as empty and rejected before a request is built.
         patientId: profile?.id ?? "",
         dto: {
-          fullName,
-          phoneNumber: phone,
-          nik,
-          bpjsNumber,
-          birthDate,
-          gender,
-          // `address` is deliberately absent. This screen has no address input,
-          // and the old payload wrote a hardcoded "Jakarta Selatan" on every save,
-          // so a patient who had never entered an address still ended up with one
-          // stored on the server. Omitting the key leaves the server value alone.
+          fullName: data.fullName,
+          phoneNumber: data.phone,
+          birthDate: data.birthDate,
         },
       },
       {
         onSuccess: () => {
-          setSavedSuccess(true);
           haptics.success();
-          // The save succeeded, so the server is now authoritative again.
-          dirtyFields.current.clear();
           toast.show({
             placement: "top",
             render: ({ id }) => (
               <Toast nativeID={id} action="success">
-                <ToastTitle>Profil Berhasil Disimpan</ToastTitle>
-                <ToastDescription>
-                  Data pribadi dan riwayat medis Anda telah diperbarui.
-                </ToastDescription>
+                <ToastTitle>Profil Disimpan</ToastTitle>
+                <ToastDescription>Data dirimu berhasil diperbarui.</ToastDescription>
               </Toast>
             ),
           });
-          // The timer is owned and cleared on unmount. A bare setTimeout used to
-          // survive the screen being left, popping a second screen afterwards.
-          navigateBackTimer.current = setTimeout(() => {
-            navigateBackTimer.current = null;
-            safeNavigateBack(router, ROUTES.PATIENT.PROFILE);
-          }, 800);
+          safeNavigateBack(router, ROUTES.PATIENT.PROFILE);
         },
         onError: () => {
           haptics.error();
@@ -168,220 +58,21 @@ export default function EditProfileScreen() {
     );
   };
 
-  const tabPill = (
-    <View className="flex-row bg-stone-200/60 p-1 rounded-xl">
-      <Pressable
-        testID="tab-btn-data-diri"
-        accessibilityRole="tab"
-        accessibilityLabel="Tab Data Diri"
-        accessibilityState={{ selected: tab === "data-diri" }}
-        onPress={() => {
-          haptics.selection();
-          setTab("data-diri");
-        }}
-        className={`flex-1 py-2 items-center rounded-lg ${
-          tab === "data-diri" ? "bg-white shadow-sm" : ""
-        }`}
-      >
-        <Text
-          className={`text-sm font-bold ${
-            tab === "data-diri" ? "text-[#222222]" : "text-[#777777]"
-          }`}
-        >
-          Data Diri (AC1)
-        </Text>
-      </Pressable>
-      <Pressable
-        testID="tab-btn-data-medis"
-        accessibilityRole="tab"
-        accessibilityLabel="Tab Data Medis & BPJS"
-        accessibilityState={{ selected: tab === "medis" }}
-        onPress={() => {
-          haptics.selection();
-          setTab("medis");
-        }}
-        className={`flex-1 py-2 items-center rounded-lg ${
-          tab === "medis" ? "bg-white shadow-sm" : ""
-        }`}
-      >
-        <Text
-          className={`text-sm font-bold ${
-            tab === "medis" ? "text-[#222222]" : "text-[#777777]"
-          }`}
-        >
-          Data Medis & BPJS
-        </Text>
-      </Pressable>
-    </View>
-  );
-
-  if (tab === "data-diri") {
-    return (
-      <SafeAreaView className="flex-1 bg-[#FAF8F5]" edges={["top", "bottom"]}>
-        <PersonalDataView
-          initialData={{
-            fullName,
-            email: (profile as any)?.user?.email || "pasien@seraphany.id",
-            phone,
-            birthDate,
-          }}
-          isKycVerified={isKycVerified}
-          tabSlot={tabPill}
-          onBack={() => safeNavigateBack(router, ROUTES.PATIENT.PROFILE)}
-          onCancel={() => safeNavigateBack(router, ROUTES.PATIENT.PROFILE)}
-          onChangePhoto={() => setShowPhotoModal(true)}
-          onSave={(data) => {
-            setFullName(data.fullName);
-            setPhone(data.phone);
-            setBirthDate(data.birthDate);
-            handleSave();
-          }}
-        />
-        <ChangePhotoModal
-          isOpen={showPhotoModal}
-          onClose={() => setShowPhotoModal(false)}
-        />
-      </SafeAreaView>
-    );
-  }
-
   return (
-    <SafeAreaView className="flex-1 bg-background">
-      {/* Header */}
-      <HStack
-        space="sm"
-        className="items-center justify-between px-5 pt-3.5 pb-2"
-      >
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Kembali"
-          onPress={() => {
-            haptics.light();
-            safeNavigateBack(router, ROUTES.PATIENT.PROFILE);
-          }}
-          className="w-10 h-10 rounded-full bg-card border border-border items-center justify-center active:bg-muted"
-        >
-          <ChevronLeft size={22} color="#262130" />
-        </Pressable>
-        <Heading size="sm" bold className="text-foreground">
-          Ubah Profil Medis
-        </Heading>
-        <Box className="w-10" />
-      </HStack>
-
-      <Box className="px-5 pt-1 pb-2">
-        {tabPill}
-      </Box>
-
-      <ScrollView
-        contentContainerStyle={{
-          paddingHorizontal: 20,
-          paddingTop: 10,
-          paddingBottom: 120,
+    <SafeAreaView className="flex-1 bg-[#FAF8F5]" edges={["top", "bottom"]}>
+      <PersonalDataView
+        initialData={{
+          fullName: profile?.fullName || "SeraPhany User",
+          email: (profile as any)?.user?.email || "user@seraphany.id",
+          phone: profile?.phoneNumber || "+62 812-3456-7890",
+          birthDate: profile?.birthDate || "15/08/1998",
         }}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Avatar with Camera Icon */}
-        <Box className="items-center my-3">
-          <Box className="relative">
-            <Avatar size="2xl" className="border-2 border-border shadow-sm">
-              {avatarData?.avatarUrl ? (
-                <AvatarImage
-                  source={{
-                    uri: avatarData.avatarUrl,
-                  }}
-                />
-              ) : null}
-              {/* getInitials falls back to the generic "PK", not a borrowed
-                  person's name, so an empty field never greets the patient as
-                  someone they are not. */}
-              <AvatarFallbackText>{getInitials(fullName)}</AvatarFallbackText>
-            </Avatar>
-            <Pressable
-              onPress={() => {
-                haptics.light();
-                setShowPhotoModal(true);
-              }}
-              accessibilityRole="button"
-              accessibilityLabel="Ubah foto profil"
-              className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-secondary items-center justify-center border-2 border-card shadow-sm active:bg-secondary/90"
-            >
-              <Camera size={14} className="text-secondary-foreground" />
-            </Pressable>
-          </Box>
-          <Text size="sm" className="text-muted-foreground mt-2 font-medium">
-            Ketuk ikon kamera untuk mengubah foto profil
-          </Text>
-        </Box>
-
-        {/* Success Alert Banner */}
-        {savedSuccess && (
-          <Box className="bg-secondary/10 border border-secondary/20 rounded-2xl p-3.5 mb-4 flex-row items-center gap-2">
-            <CheckCircle2 size={18} className="text-secondary" />
-            <Text size="sm" bold className="text-secondary flex-1">
-              Data profil dan kontak darurat berhasil diperbarui!
-            </Text>
-          </Box>
-        )}
-
-        {/* Section 1: Data Identitas & Satu Sehat */}
-        <PersonalIdentitySection
-          fullName={fullName}
-          onChangeFullName={track("fullName", setFullName)}
-          nik={nik}
-          onChangeNik={track("nik", setNik)}
-          birthDate={birthDate}
-          onChangeBirthDate={track("birthDate", setBirthDate)}
-          gender={gender}
-          onChangeGender={track("gender", setGender)}
-          phone={phone}
-          onChangePhone={track("phone", setPhone)}
-        />
-
-        {/* Section 2: Data Medis */}
-        <MedicalHistorySection
-          bloodType={bloodType}
-          onChangeBloodType={setBloodType}
-          allergies={allergies}
-          onChangeAllergies={setAllergies}
-        />
-
-        {/* Section 3: Kontak Darurat */}
-        <EmergencyContactSection
-          emergencyContactName={emergencyContactName}
-          onChangeEmergencyContactName={setEmergencyContactName}
-          emergencyPhone={emergencyPhone}
-          onChangeEmergencyPhone={setEmergencyPhone}
-        />
-
-        {/* Section 4: BPJS Kesehatan */}
-        <BpjsIntegrationSection
-          bpjsNumber={bpjsNumber}
-          onChangeBpjsNumber={track("bpjsNumber", setBpjsNumber)}
-          faskes1={faskes1}
-          onChangeFaskes1={track("faskes1", setFaskes1)}
-        />
-      </ScrollView>
-
-      {/* Sticky Bottom Save Bar */}
-      <Box className="absolute bottom-0 left-0 right-0 bg-card border-t border-border px-5 py-4">
-        <Button
-          size="lg"
-          isDisabled={isLoading}
-          onPress={handleSave}
-          className="w-full bg-primary h-12 rounded-2xl"
-        >
-          {isLoading ? (
-            <ButtonSpinner className="text-primary-foreground" />
-          ) : (
-            <ButtonText className="text-sm font-bold text-primary-foreground">
-              Simpan Perubahan Profil
-            </ButtonText>
-          )}
-        </Button>
-      </Box>
-
-      {/* Pop-up Modal: Ganti Foto Profil */}
+        isKycVerified={isKycVerified}
+        onBack={() => safeNavigateBack(router, ROUTES.PATIENT.PROFILE)}
+        onCancel={() => safeNavigateBack(router, ROUTES.PATIENT.PROFILE)}
+        onChangePhoto={() => setShowPhotoModal(true)}
+        onSave={handleSave}
+      />
       <ChangePhotoModal
         isOpen={showPhotoModal}
         onClose={() => setShowPhotoModal(false)}

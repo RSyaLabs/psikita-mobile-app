@@ -201,11 +201,11 @@ describe("20. Tahap 13: Akun & Keamanan Pasien (Screens 70–73) Flow Suite", ()
       expect(content).toContain("Kata sandi & keamanan");
     });
 
-    it("should have edit-profile.tsx integrate PersonalDataView as default AC1 tab", () => {
+    it("should have edit-profile.tsx render PersonalDataView as canonical Screen 70 view", () => {
       const content = fs.readFileSync(editProfileRoutePath, "utf-8");
       expect(content).toContain("PersonalDataView");
-      expect(content).toContain("Data Diri (AC1)");
-      expect(content).toContain("data-diri");
+      expect(content).toContain("ROUTES.PATIENT.PROFILE");
+      expect(content).toContain("useUpdatePatientProfile");
     });
 
     it("should register patient/security in patient layout and public guest whitelist", () => {

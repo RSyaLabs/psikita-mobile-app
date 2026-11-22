@@ -4,21 +4,13 @@ import { ChevronLeft } from "lucide-react-native";
 import { haptics } from "@/utils/haptics";
 import { AppIcon } from "@/components/common/AppIcon";
 
-interface PersonalDataPayload {
-  fullName: string;
-  email: string;
-  phone: string;
-  birthDate: string;
-}
-
 interface PersonalDataViewProps {
-  initialData?: Partial<PersonalDataPayload>;
+  initialData?: { fullName?: string; email?: string; phone?: string; birthDate?: string };
   isKycVerified?: boolean;
   onBack?: () => void;
-  onSave?: (data: PersonalDataPayload) => void;
+  onSave?: (data: { fullName: string; email: string; phone: string; birthDate: string }) => void;
   onCancel?: () => void;
   onChangePhoto?: () => void;
-  tabSlot?: React.ReactNode;
 }
 
 export function PersonalDataView({
@@ -28,7 +20,6 @@ export function PersonalDataView({
   onSave,
   onCancel,
   onChangePhoto,
-  tabSlot,
 }: PersonalDataViewProps) {
   const [fullName, setFullName] = useState(initialData?.fullName || "SeraPhany User");
   const [email, setEmail] = useState(initialData?.email || "user@seraphany.id");
@@ -37,16 +28,6 @@ export function PersonalDataView({
 
   const avatarInitial = fullName.trim() ? fullName.trim()[0].toUpperCase() : "S";
 
-  const handleSave = () => {
-    haptics.medium();
-    onSave?.({ fullName, email, phone, birthDate });
-  };
-
-  const handleCancel = () => {
-    haptics.light();
-    onCancel ? onCancel() : onBack?.();
-  };
-
   return (
     <ScrollView
       className="flex-1 bg-[#FAF8F5]"
@@ -54,25 +35,19 @@ export function PersonalDataView({
       showsVerticalScrollIndicator={false}
       testID="personal-data-scroll"
     >
-      {/* Top Header */}
-      <View className="flex-row items-center justify-between -ml-3">
-        <View className="flex-row items-center gap-1">
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Kembali"
-            testID="btn-personal-data-back"
-            onPress={() => { haptics.light(); onBack?.(); }}
-            className="w-11 h-11 items-center justify-center rounded-full active:bg-stone-200/50"
-          >
-            <AppIcon icon={ChevronLeft} size={24} tone="foreground" />
-          </Pressable>
-          <Text className="text-[17px] font-bold text-[#222222]">Data diri</Text>
-        </View>
+      <View className="flex-row items-center gap-1 -ml-3">
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Kembali"
+          testID="btn-personal-data-back"
+          onPress={() => { haptics.light(); onBack?.(); }}
+          className="w-11 h-11 items-center justify-center rounded-full active:bg-stone-200/50"
+        >
+          <AppIcon icon={ChevronLeft} size={24} tone="foreground" />
+        </Pressable>
+        <Text className="text-[17px] font-bold text-[#222222]">Data diri</Text>
       </View>
 
-      {tabSlot}
-
-      {/* Avatar & Change Photo */}
       <View className="flex-row items-center gap-3.5">
         <View
           aria-hidden={true}
@@ -91,7 +66,6 @@ export function PersonalDataView({
         </Pressable>
       </View>
 
-      {/* Field 1: Nama lengkap */}
       <View className="gap-1.5">
         <Text className="text-[15px] font-semibold text-[#222222]">Nama lengkap</Text>
         <TextInput
@@ -107,7 +81,6 @@ export function PersonalDataView({
         <Text className="text-sm text-[#555555]">Terkunci setelah verifikasi identitas.</Text>
       </View>
 
-      {/* Field 2: Email */}
       <View className="gap-1.5">
         <Text className="text-[15px] font-semibold text-[#222222]">Email</Text>
         <TextInput
@@ -123,7 +96,6 @@ export function PersonalDataView({
         <Text className="text-sm text-[#555555]">Terverifikasi</Text>
       </View>
 
-      {/* Field 3: Nomor telepon */}
       <View className="gap-1.5">
         <Text className="text-[15px] font-semibold text-[#222222]">Nomor telepon</Text>
         <TextInput
@@ -137,7 +109,6 @@ export function PersonalDataView({
         />
       </View>
 
-      {/* Field 4: Tanggal lahir */}
       <View className="gap-1.5">
         <Text className="text-[15px] font-semibold text-[#222222]">Tanggal lahir</Text>
         <TextInput
@@ -151,20 +122,18 @@ export function PersonalDataView({
         />
       </View>
 
-      {/* Validation Notice Box */}
       <View className="border-[1.5px] border-dashed border-[#777777] rounded-xl p-3.5 bg-stone-50/60">
         <Text className="text-sm leading-relaxed text-[#555555]">
           Kolom wajib dan aturan validasi dari server. Belum ditetapkan.
         </Text>
       </View>
 
-      {/* Action Buttons */}
       <View className="mt-4 gap-1">
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Simpan"
           testID="btn-personal-data-save"
-          onPress={handleSave}
+          onPress={() => { haptics.medium(); onSave?.({ fullName, email, phone, birthDate }); }}
           className="h-[52px] border-[1.5px] border-[#222222] rounded-[10px] bg-[#222222] items-center justify-center active:opacity-90"
         >
           <Text className="text-[16px] font-semibold text-white">Simpan</Text>
@@ -173,7 +142,7 @@ export function PersonalDataView({
           accessibilityRole="button"
           accessibilityLabel="Batal"
           testID="btn-personal-data-cancel"
-          onPress={handleCancel}
+          onPress={() => { haptics.light(); onCancel ? onCancel() : onBack?.(); }}
           className="min-h-[44px] items-center justify-center active:opacity-70"
         >
           <Text className="text-[15px] font-semibold text-[#222222]">Batal</Text>
