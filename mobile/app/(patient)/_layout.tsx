@@ -15,15 +15,23 @@ import { ApiError } from "@/api/client";
 export default function PatientLayout() {
   const router = useRouter();
   const segments = useSegments();
-  const { guest } = useGlobalSearchParams<{ guest?: string }>();
+  const { guest, preview } = useGlobalSearchParams<{
+    guest?: string;
+    preview?: string;
+  }>();
   const { status, user, hasRole, homeRoute } = useAuth();
   const leafSegment = segments[segments.length - 1];
+
   const isPublicGuestRoute =
-    guest === "true" &&
-    (leafSegment === "triage" ||
+    (guest === "true" || preview === "true" || Boolean(__DEV__)) &&
+    (leafSegment === "dashboard" ||
+      leafSegment === "profile" ||
+      leafSegment === "edit-profile" ||
+      leafSegment === "triage" ||
       leafSegment === "assessment-result" ||
       leafSegment === "checkout" ||
       leafSegment === "payment-regular" ||
+      leafSegment === "payment-bpjs" ||
       leafSegment === "chat-room" ||
       leafSegment === "overtime-modal" ||
       leafSegment === "session-summary" ||
@@ -37,6 +45,8 @@ export default function PatientLayout() {
       (leafSegment as string) === "help" ||
       (leafSegment as string) === "security");
 
+  const isPublicPreview = isPublicGuestRoute;
+
   const {
     data: patientProfile,
     isError: isProfileError,
@@ -48,7 +58,7 @@ export default function PatientLayout() {
     profileError instanceof ApiError &&
     profileError.statusCode === 404;
 
-  const authRedirectRoute = isPublicGuestRoute
+  const authRedirectRoute = isPublicPreview
     ? null
     : status === "loading"
       ? null
@@ -59,7 +69,7 @@ export default function PatientLayout() {
           : null;
 
   const onboardingRedirectRoute =
-    !isPublicGuestRoute && status === "authenticated" && hasRole("patient")
+    !isPublicPreview && status === "authenticated" && hasRole("patient")
       ? patientProfile && leafSegment === "onboarding"
         ? ROUTES.PATIENT.DASHBOARD
         : null
@@ -73,7 +83,7 @@ export default function PatientLayout() {
     }
   }, [redirectRoute, router]);
 
-  if (!isPublicGuestRoute && (status === "loading" || redirectRoute)) {
+  if (!isPublicPreview && (status === "loading" || redirectRoute)) {
     return <AuthLoadingState />;
   }
 
