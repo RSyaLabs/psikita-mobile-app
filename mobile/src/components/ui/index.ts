@@ -17,7 +17,6 @@ export * from "./switch";
 export * from "./spinner";
 export * from "./textarea";
 export * from "./progress";
-export * from "./alert";
 export * from "./alert-dialog";
 export * from "./radio";
 export * from "./accordion";
