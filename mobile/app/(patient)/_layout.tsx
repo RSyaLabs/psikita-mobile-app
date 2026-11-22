@@ -31,7 +31,8 @@ export default function PatientLayout() {
       leafSegment === "history" ||
       leafSegment === "refunds" ||
       leafSegment === "community" ||
-      leafSegment === "community-detail");
+      leafSegment === "community-detail" ||
+      (leafSegment as string) === "self-screening");
 
   const {
     data: patientProfile,

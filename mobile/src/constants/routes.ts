@@ -31,6 +31,7 @@ export const ROUTES = {
     COMMUNITY: "/patient/community",
     COMMUNITY_DETAIL: "/patient/community-detail",
     FOLLOW_UPS: "/patient/follow-ups",
+    SELF_SCREENING: "/patient/self-screening",
   },
   PRACTITIONER: {
     REGISTER: "/practitioner/register",
