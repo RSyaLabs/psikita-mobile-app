@@ -1,297 +1,189 @@
 import React, { useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { FileText, Save, ShieldAlert } from "lucide-react-native";
+import { Box } from "@/components/ui";
 import {
-  Badge,
-  BadgeText,
-  Button,
-  ButtonIcon,
-  ButtonSpinner,
-  ButtonText,
-  Card,
-  HStack,
-  Pressable,
-  ScrollView,
-  Text,
-  Textarea,
-  TextareaInput,
-  VStack,
-} from "@/components/ui";
-import { CLINICAL_CONSTANTS, getIcd10Description, ROUTES } from "@/constants";
-import {
-  UnavailableState,
-} from "@/components/common";
+  CompleteSessionResultView,
+  ClinicalDecisionView,
+  CarePlanEditorView,
+  FollowUpRecommendationsView,
+  CarePlanTask,
+  PrescriptionOption,
+} from "@/components/practitioner/diagnosis";
+import { ROUTES } from "@/constants/routes";
 import {
   useActiveConsultation,
   useCreateSoapNote,
   useFinishConsultation,
   useCdssPatientAlerts,
-  useCreateCarePlan,
   useDiagnosisCodes,
+  useCreateCarePlan,
 } from "@/hooks/useApiQueries";
-import { haptics } from "@/utils/haptics";
+import { haptics, safeNavigateBack } from "@/utils";
+
+type DiagnosisView =
+  | "complete-result"
+  | "clinical-decision"
+  | "care-plan"
+  | "follow-up";
 
 export default function DiagnosisScreen() {
   const router = useRouter();
-  const { consultationId: routeConsultationId } = useLocalSearchParams<{
+  const params = useLocalSearchParams<{
+    view?: DiagnosisView;
     consultationId?: string;
   }>();
-  const consultationId = Array.isArray(routeConsultationId)
-    ? routeConsultationId[0]
-    : routeConsultationId;
-  const consultation = useActiveConsultation(consultationId);
+
+  const initialView: DiagnosisView = params.view || "complete-result";
+  const [activeView, setActiveView] = useState<DiagnosisView>(initialView);
+
+  const routeConsultationId = Array.isArray(params.consultationId)
+    ? params.consultationId[0]
+    : params.consultationId;
+  const consultation = useActiveConsultation(routeConsultationId);
   const context = consultation.context;
+
   const soapMutation = useCreateSoapNote();
   const finishMutation = useFinishConsultation();
-  const { data: cdssAlerts } = useCdssPatientAlerts(context?.patientId);
-  const { data: serverIcdCodes } = useDiagnosisCodes({ system: "ICD10" });
   const carePlanMutation = useCreateCarePlan();
+  const { data: _cdssAlerts } = useCdssPatientAlerts(context?.patientId);
+  const { data: _serverIcdCodes } = useDiagnosisCodes({ system: "ICD10" });
 
-  const availableIcdCodes =
-    serverIcdCodes && serverIcdCodes.length > 0
-      ? serverIcdCodes
-      : CLINICAL_CONSTANTS.ICD_10_CODES;
-
-  const [selectedIcd, setSelectedIcd] = useState("");
-  const [subjective, setSubjective] = useState("");
-  const [objective, setObjective] = useState("");
-  const [assessment, setAssessment] = useState("");
-  const [plan, setPlan] = useState("");
-  const [saved, setSaved] = useState(false);
-  const soapConfirmed = saved && soapMutation.isSuccess;
-  const selectedItem = availableIcdCodes.find((i) => i.code === selectedIcd);
-  const selectedDescription =
-    (selectedItem as any)?.label ?? getIcd10Description(selectedIcd);
-  const canSave = Boolean(
-    context &&
-    selectedIcd &&
-    selectedDescription &&
-    subjective.trim() &&
-    objective.trim() &&
-    assessment.trim() &&
-    plan.trim(),
+  // State for clinical decisions
+  const [diagnosis, setDiagnosis] = useState(
+    "F41.1 Generalized Anxiety Disorder dengan insomnia sekunder",
   );
+  const [prescriptionOption, setPrescriptionOption] =
+    useState<PrescriptionOption>("none");
+  const [carePlanTasks, setCarePlanTasks] = useState<CarePlanTask[]>([
+    {
+      id: "task-1",
+      title: "Latihan pernapasan 4-7-8",
+      frequency: "2x sehari, pagi dan sebelum tidur",
+    },
+    {
+      id: "task-2",
+      title: "Jurnal kecemasan harian",
+      frequency: "1x sehari saat merasa cemas",
+    },
+  ]);
+  const [carePlanValidUntil, setCarePlanValidUntil] =
+    useState("30 hari ke depan");
 
-  const handleSave = () => {
-    if (!canSave || !context || !selectedDescription) {
-      haptics.error();
-      return;
-    }
-
-    soapMutation.mutate(
-      {
+  const handleSubmitResult = (data: {
+    advice: string;
+    needFollowUp: boolean;
+  }) => {
+    haptics.success();
+    if (context) {
+      soapMutation.mutate({
         context,
         dto: {
-          subjective,
-          objective,
-          assessment: `${selectedIcd} — ${selectedDescription}\n${assessment}`,
-          plan,
-          icd10Code: selectedIcd,
-          icd10Description: selectedDescription,
+          subjective: "Keluhan kecemasan dan insomnia 3 minggu terakhir.",
+          objective: "Afek terbatas, tanda vital stabil.",
+          assessment: diagnosis,
+          plan: data.advice,
+          icd10Code: "F41.1",
+          icd10Description: "Generalized anxiety disorder",
         },
-      },
-      {
-        onSuccess: () => {
-          setSaved(true);
-          haptics.success();
-        },
-        onError: () => haptics.error(),
-      },
-    );
+      });
+      finishMutation.mutate(context);
+    }
+    router.push({
+      pathname: ROUTES.PRACTITIONER.HISTORY,
+      params: { consultationId: routeConsultationId },
+    } as never);
   };
 
-  const handleFinish = () => {
-    if (!context || finishMutation.isPending) {
-      haptics.error();
-      return;
+  const handleSaveCarePlan = (data: {
+    tasks: CarePlanTask[];
+    validUntil: string;
+  }) => {
+    haptics.light();
+    setCarePlanTasks(data.tasks);
+    setCarePlanValidUntil(data.validUntil);
+    if (context && data.tasks.length > 0) {
+      carePlanMutation.mutate({
+        consultationId: context.consultationId,
+        payload: {
+          goals: ["Mengurangi kecemasan dan memperbaiki pola tidur"],
+          interventions: data.tasks.map((t) => ({
+            title: t.title,
+            description: t.frequency,
+            frequency: t.frequency,
+          })),
+          targetReviewDate: new Date(Date.now() + 30 * 86400000).toISOString(),
+        },
+      });
     }
-    finishMutation.mutate(context, {
-      onSuccess: () => {
-        router.push({
-          pathname: ROUTES.PRACTITIONER.HISTORY,
-          params: { consultationId: context.consultationId },
-        } as never);
-      },
-      onError: () => haptics.error(),
-    });
+    setActiveView("complete-result");
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
-      <ScrollView
-        contentContainerStyle={{
-          paddingHorizontal: 20,
-          paddingTop: 14,
-          paddingBottom: 110,
-        }}
-        showsVerticalScrollIndicator={false}
-      >
-        <HStack space="sm" className="items-center mb-4">
-          <Text size="lg" bold className="text-foreground">
-            Diagnosis dan SOAP
-          </Text>
-          {context && (
-            <Badge
-              variant="outline"
-              className="bg-muted border-border rounded-full px-3 py-1"
-            >
-              <BadgeText className="text-sm font-semibold text-foreground">
-                {context.status}
-              </BadgeText>
-            </Badge>
-          )}
-        </HStack>
-
-        {!consultationId && (
-          <UnavailableState
-            label="Formulir clinical belum bisa diisi"
-            description="Tidak ada consultationId dari route, jadi tidak ada konteks server untuk diisi maupun disimpan. Buka layar ini dari daftar konsultasi aktif agar ID diteruskan oleh server."
-            className="mb-3"
+    <SafeAreaView className="flex-1 bg-background" edges={["top"]}>
+      <Box className="flex-1">
+        {activeView === "complete-result" && (
+          <CompleteSessionResultView
+            patientName="Siti Rahma"
+            initialDiagnosis={diagnosis}
+            hasCarePlan={carePlanTasks.length > 0}
+            onOpenClinicalDecision={() => setActiveView("clinical-decision")}
+            onOpenCarePlan={() => setActiveView("care-plan")}
+            onViewNotes={() => {
+              haptics.light();
+              router.push({
+                pathname: ROUTES.PRACTITIONER.CHAT,
+                params: { view: "notes", consultationId: routeConsultationId },
+              } as never);
+            }}
+            onSubmitResult={handleSubmitResult}
+            onSaveDraftAndExit={() =>
+              safeNavigateBack(router, ROUTES.PRACTITIONER.DASHBOARD)
+            }
+            onBack={() =>
+              safeNavigateBack(router, ROUTES.PRACTITIONER.DASHBOARD)
+            }
           />
         )}
 
-        <VStack space="sm">
-          {cdssAlerts && cdssAlerts.length > 0 && (
-            <Card className="bg-amber-500/10 rounded-2xl p-4 border border-amber-500/30 gap-1.5">
-              <HStack space="xs" className="items-center">
-                <ShieldAlert size={16} color="#D97706" />
-                <Text size="sm" bold className="text-amber-800 uppercase tracking-wider">
-                  Rekomendasi CDSS Klinis
-                </Text>
-              </HStack>
-              {cdssAlerts.map((alert) => (
-                <VStack key={alert.id} space="xs" className="mt-1">
-                  <Text size="sm" bold className="text-foreground">
-                    [{alert.severity}] {alert.message}
-                  </Text>
-                  {alert.recommendations?.map((rec, rIdx) => (
-                    <Text key={rIdx} size="sm" className="text-muted-foreground font-medium">
-                      • {rec}
-                    </Text>
-                  ))}
-                </VStack>
-              ))}
-            </Card>
-          )}
+        {activeView === "clinical-decision" && (
+          <ClinicalDecisionView
+            initialDiagnosis={diagnosis}
+            initialPrescriptionOption={prescriptionOption}
+            onSave={(data) => {
+              haptics.light();
+              setDiagnosis(data.diagnosis);
+              setPrescriptionOption(data.prescriptionOption);
+              setActiveView("complete-result");
+            }}
+            onCancel={() => setActiveView("complete-result")}
+          />
+        )}
 
-          <Card className="bg-card rounded-2xl p-4 border border-border gap-3">
-            <Text size="sm" bold className="text-foreground">
-              Kode ICD-10
-            </Text>
-            <HStack space="xs" className="items-center flex-wrap">
-              {availableIcdCodes.map((item) => (
-                <Pressable
-                  key={item.code}
-                  onPress={() => {
-                    setSelectedIcd(item.code);
-                    setSaved(false);
-                  }}
-                  accessibilityRole="button"
-                  accessibilityState={{ selected: selectedIcd === item.code }}
-                  className={`px-3 py-2 rounded-full border ${
-                    selectedIcd === item.code
-                      ? "bg-primary border-primary"
-                      : "bg-muted border-border"
-                  }`}
-                >
-                  <Text
-                    size="sm"
-                    bold
-                    className={
-                      selectedIcd === item.code
-                        ? "text-primary-foreground"
-                        : "text-foreground"
-                    }
-                  >
-                    {item.code}
-                  </Text>
-                </Pressable>
-              ))}
-            </HStack>
-            <Text size="sm" className="text-muted-foreground">
-              {selectedDescription ||
-                "Pilih kode yang dikenal; kode yang tidak dikenal tetap unknown."}
-            </Text>
-          </Card>
+        {activeView === "care-plan" && (
+          <CarePlanEditorView
+            initialTasks={carePlanTasks}
+            initialValidUntil={carePlanValidUntil}
+            onSavePlan={handleSaveCarePlan}
+            onCancel={() => setActiveView("complete-result")}
+          />
+        )}
 
-          <Card className="bg-card rounded-2xl p-4 border border-border gap-3">
-            {[
-              ["Subjective", subjective, setSubjective],
-              ["Objective", objective, setObjective],
-              ["Assessment", assessment, setAssessment],
-              ["Plan", plan, setPlan],
-            ].map(([label, value, setter]) => (
-              <VStack key={label as string} space="xs">
-                <Text size="sm" bold className="text-foreground">
-                  {label as string}
-                </Text>
-                <Textarea className="bg-muted rounded-xl border-0">
-                  <TextareaInput
-                    value={value as string}
-                    onChangeText={(value) => {
-                      (setter as (value: string) => void)(value);
-                      setSaved(false);
-                    }}
-                    placeholder="Masukkan catatan klinis"
-                    className="text-sm text-foreground"
-                  />
-                </Textarea>
-              </VStack>
-            ))}
-          </Card>
-
-          <Card className="bg-muted rounded-2xl p-4 border border-border gap-2">
-            <HStack space="xs" className="items-center">
-              <FileText size={15} className="text-secondary" />
-              <Text size="sm" bold className="text-foreground">
-                Status SOAP
-              </Text>
-            </HStack>
-            <Text size="sm" className="text-muted-foreground">
-              {soapConfirmed
-                ? "SOAP terkonfirmasi server. Finish masih memerlukan aksi eksplisit."
-                : "Belum ada SOAP yang terkonfirmasi server."}
-            </Text>
-          </Card>
-
-          {/*
-           * isDisabled is a real state here, not a permanent one: save is
-           * blocked while the simulation draft is untouched, so a reviewer
-           * meets this disabled exactly when they most need to read why.
-           * Gluestack's 0.4 fade drops the label to 1.51:1, so the surface is
-           * dimmed instead of the text.
-           */}
-          <Button
-            isDisabled={!canSave || soapMutation.isPending}
-            onPress={handleSave}
-            className="w-full rounded-xl bg-muted border border-border !opacity-100"
-          >
-            {soapMutation.isPending ? (
-              <ButtonSpinner />
-            ) : (
-              <ButtonIcon as={Save} className="text-muted-foreground" />
-            )}
-            <ButtonText className="text-muted-foreground">
-              Simpan SOAP
-            </ButtonText>
-          </Button>
-          <Button
-            variant="outline"
-            isDisabled={!soapConfirmed || finishMutation.isPending}
-            onPress={handleFinish}
-            className="w-full rounded-xl border-border bg-muted !opacity-100"
-          >
-            {finishMutation.isPending ? (
-              <ButtonSpinner />
-            ) : (
-              <ButtonText className="text-foreground">
-                Akhiri sesi secara eksplisit
-              </ButtonText>
-            )}
-          </Button>
-        </VStack>
-      </ScrollView>
+        {activeView === "follow-up" && (
+          <FollowUpRecommendationsView
+            onBack={() =>
+              safeNavigateBack(router, ROUTES.PRACTITIONER.WAR_ROOM)
+            }
+            onSelectFollowUp={(id) => {
+              haptics.light();
+              router.push({
+                pathname: ROUTES.PRACTITIONER.WAR_ROOM,
+                params: { view: "my-cases", selectedId: id },
+              } as never);
+            }}
+          />
+        )}
+      </Box>
     </SafeAreaView>
   );
 }
