@@ -237,7 +237,7 @@ export default function AssessmentResultScreen() {
                 Level server: {result.level} • {result.disposition}
               </Text>
               {result.hasRedFlags && (
-                <Text size="xs" className="text-destructive">
+                <Text size="sm" className="text-destructive">
                   Server menandai red flag. Tindakan berikutnya harus mengikuti
                   protokol layanan.
                 </Text>

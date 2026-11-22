@@ -70,7 +70,7 @@ export function PatientSupportModal({
 
         <ModalBody className="pt-3 pb-1">
           <VStack space="md">
-            <Text size="xs" className="text-muted-foreground leading-relaxed">
+            <Text size="sm" className="text-muted-foreground leading-relaxed">
               Tim Care Navigator SeraPhany siap membantu kendala teknis
               konsultasi, pertanyaan resep digital, atau proses rujukan BPJS
               Anda.
@@ -80,12 +80,12 @@ export function PatientSupportModal({
               <Box className="bg-muted p-3 rounded-2xl border border-border">
                 <HStack space="sm" className="items-center mb-1">
                   <Phone size={15} className="text-secondary" />
-                  <Text size="xs" bold className="text-foreground">
+                  <Text size="sm" bold className="text-foreground">
                     Hotline WhatsApp Care
                   </Text>
                 </HStack>
                 <Text
-                  size="xs"
+                  size="sm"
                   className="text-muted-foreground font-mono pl-6"
                 >
                   0812-8899-7711 (Respon cepat)
@@ -95,11 +95,11 @@ export function PatientSupportModal({
               <Box className="bg-muted p-3 rounded-2xl border border-border">
                 <HStack space="sm" className="items-center mb-1">
                   <Mail size={15} className="text-secondary" />
-                  <Text size="xs" bold className="text-foreground">
+                  <Text size="sm" bold className="text-foreground">
                     Email Pengaduan & Layanan
                   </Text>
                 </HStack>
-                <Text size="xs" className="text-muted-foreground pl-6">
+                <Text size="sm" className="text-muted-foreground pl-6">
                   halo@seraphany.id
                 </Text>
               </Box>
@@ -107,11 +107,11 @@ export function PatientSupportModal({
               <Box className="bg-muted p-3 rounded-2xl border border-border">
                 <HStack space="sm" className="items-center mb-1">
                   <Clock size={15} className="text-secondary" />
-                  <Text size="xs" bold className="text-foreground">
+                  <Text size="sm" bold className="text-foreground">
                     Jam Operasional Layanan
                   </Text>
                 </HStack>
-                <Text size="xs" className="text-muted-foreground pl-6">
+                <Text size="sm" className="text-muted-foreground pl-6">
                   Senin – Minggu: 08:00 – 22:00 WIB
                 </Text>
               </Box>
@@ -122,7 +122,7 @@ export function PatientSupportModal({
               onPress={onClose}
               className="w-full bg-secondary h-11 rounded-xl mt-1"
             >
-              <ButtonText className="text-xs font-bold text-secondary-foreground">
+              <ButtonText className="text-sm font-bold text-secondary-foreground">
                 Tutup
               </ButtonText>
             </Button>

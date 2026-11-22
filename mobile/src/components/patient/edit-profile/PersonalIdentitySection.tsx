@@ -45,7 +45,7 @@ export function PersonalIdentitySection({
   return (
     <VStack space="xs" className="mb-4">
       <HStack space="xs" className="items-center justify-between px-1">
-        <Heading size="xs" bold className="text-foreground">
+        <Heading size="sm" bold className="text-foreground">
           Data Pribadi Pasien
         </Heading>
         <HStack

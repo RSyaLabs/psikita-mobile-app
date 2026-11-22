@@ -156,7 +156,7 @@ export default function PaymentBpjsScreen() {
           <Heading level={1} size="md" bold className="text-foreground">
             Validasi BPJS
           </Heading>
-          <Text size="xs" className="text-muted-foreground">
+          <Text size="sm" className="text-muted-foreground">
             Status manfaat belum tersedia
           </Text>
         </VStack>
@@ -258,12 +258,12 @@ export default function PaymentBpjsScreen() {
                 <Text size="sm" bold className="text-foreground">
                   Status eligibility
                 </Text>
-                <Text size="xs" className="text-muted-foreground">
+                <Text size="sm" className="text-muted-foreground">
                   {eligibilityLabel}
                 </Text>
               </VStack>
             </HStack>
-            <Text size="xs" className="text-muted-foreground">
+            <Text size="sm" className="text-muted-foreground">
               Respons 201 hanya menerima permintaan; kontrak tidak menyediakan
               status manfaat atau nominal final.
             </Text>
@@ -293,7 +293,7 @@ export default function PaymentBpjsScreen() {
                 <Text size="sm" bold className="text-foreground">
                   Konfirmasi BPJS belum tersedia
                 </Text>
-                <Text size="xs" className="text-muted-foreground">
+                <Text size="sm" className="text-muted-foreground">
                   Jangan menganggap eligibleitas belum diketahui sebagai gratis
                   atau pembayaran berhasil.
                 </Text>

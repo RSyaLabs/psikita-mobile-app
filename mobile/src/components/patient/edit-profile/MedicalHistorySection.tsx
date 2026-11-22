@@ -31,12 +31,12 @@ export function MedicalHistorySection({
 }: MedicalHistorySectionProps) {
   return (
     <VStack space="xs" className="mb-4">
-      <Heading size="xs" bold className="text-foreground px-1">
+      <Heading size="sm" bold className="text-foreground px-1">
         Informasi Medis & Alergi
       </Heading>
       <Card className="bg-card rounded-2xl p-4 border border-border gap-3">
         <VStack space="xs">
-          <Text size="xs" bold className="text-foreground">
+          <Text size="sm" bold className="text-foreground">
             Golongan Darah
           </Text>
           <HStack space="sm">
@@ -56,7 +56,7 @@ export function MedicalHistorySection({
                   }`}
                 >
                   <Text
-                    size="xs"
+                    size="sm"
                     bold
                     className={
                       isSelected
@@ -74,7 +74,7 @@ export function MedicalHistorySection({
 
         <FormControl>
           <FormControlLabel>
-            <FormControlLabelText className="text-xs font-bold text-foreground">
+            <FormControlLabelText className="text-sm font-bold text-foreground">
               Riwayat Alergi Obat / Makanan
             </FormControlLabelText>
           </FormControlLabel>
@@ -83,7 +83,7 @@ export function MedicalHistorySection({
               value={allergies}
               onChangeText={onChangeAllergies}
               placeholder="Contoh: Alergi Amoksisilin"
-              className="text-foreground text-xs"
+              className="text-foreground text-sm"
             />
           </Input>
         </FormControl>

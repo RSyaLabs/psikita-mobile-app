@@ -25,13 +25,13 @@ export function EmergencyContactSection({
 }: EmergencyContactSectionProps) {
   return (
     <VStack space="xs" className="mb-4">
-      <Heading size="xs" bold className="text-foreground px-1">
+      <Heading size="sm" bold className="text-foreground px-1">
         Kontak Darurat Keluarga
       </Heading>
       <Card className="bg-card rounded-2xl p-4 border border-border gap-3">
         <FormControl>
           <FormControlLabel>
-            <FormControlLabelText className="text-xs font-bold text-foreground">
+            <FormControlLabelText className="text-sm font-bold text-foreground">
               Nama Keluarga / Wali
             </FormControlLabelText>
           </FormControlLabel>
@@ -40,14 +40,14 @@ export function EmergencyContactSection({
               value={emergencyContactName}
               onChangeText={onChangeEmergencyContactName}
               placeholder="Nama kontak darurat"
-              className="text-foreground text-xs"
+              className="text-foreground text-sm"
             />
           </Input>
         </FormControl>
 
         <FormControl>
           <FormControlLabel>
-            <FormControlLabelText className="text-xs font-bold text-foreground">
+            <FormControlLabelText className="text-sm font-bold text-foreground">
               No. Telepon / WhatsApp Darurat
             </FormControlLabelText>
           </FormControlLabel>
@@ -56,7 +56,7 @@ export function EmergencyContactSection({
               value={emergencyPhone}
               onChangeText={onChangeEmergencyPhone}
               keyboardType="phone-pad"
-              className="text-foreground text-xs"
+              className="text-foreground text-sm"
             />
           </Input>
         </FormControl>

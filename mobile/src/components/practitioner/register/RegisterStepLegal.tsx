@@ -78,7 +78,7 @@ export function RegisterStepLegal({
         <Heading size="lg" className="font-bold text-foreground">
           Kredensial & Berkas Legalitas
         </Heading>
-        <Text size="xs" className="text-muted-foreground">
+        <Text size="sm" className="text-muted-foreground">
           {practitionerType === "PSYCHIATRIST"
             ? "STR KKI dan SIP Dokter Spesialis Jiwa aktif dari Dinkes."
             : "STR KTKI dan SIPP dari Dinkes/HIMPSI."}
@@ -93,7 +93,7 @@ export function RegisterStepLegal({
         {/* Nomor STR */}
         <FormControl>
           <FormControlLabel>
-            <FormControlLabelText className="text-xs font-semibold text-foreground">
+            <FormControlLabelText className="text-sm font-semibold text-foreground">
               Nomor STR Aktif (
               {practitionerType === "PSYCHIATRIST" ? "KKI" : "KTKI Kemenkes"})
             </FormControlLabelText>
@@ -115,7 +115,7 @@ export function RegisterStepLegal({
         {/* Nomor SIP / SIPP */}
         <FormControl>
           <FormControlLabel>
-            <FormControlLabelText className="text-xs font-semibold text-foreground">
+            <FormControlLabelText className="text-sm font-semibold text-foreground">
               {practitionerType === "PSYCHIATRIST"
                 ? "Nomor SIP Dokter (Dinas Kesehatan)"
                 : "Nomor SIPP (Surat Izin Praktik Psikologi)"}
@@ -137,7 +137,7 @@ export function RegisterStepLegal({
 
         {/* Compact Unified Upload Dropzone */}
         <VStack space="xs">
-          <Text size="xs" className="text-xs font-semibold text-foreground">
+          <Text size="sm" className="text-sm font-semibold text-foreground">
             Berkas Bukti Fisik (PDF Scan STR & SIP)
           </Text>
           <Pressable
@@ -270,7 +270,7 @@ export function RegisterStepLegal({
           }}
           className="w-full h-11 rounded-2xl border-border bg-card"
         >
-          <ButtonText className="text-xs font-semibold text-muted-foreground">
+          <ButtonText className="text-sm font-semibold text-muted-foreground">
             Kembali ke Langkah 1
           </ButtonText>
         </Button>

@@ -210,7 +210,7 @@ export default function PractitionerDashboardScreen() {
           </HStack>
 
           {isBankLoading ? (
-            <Text size="xs" className="text-muted-foreground">
+            <Text size="sm" className="text-muted-foreground">
               Memeriksa status rekening...
             </Text>
           ) : bankAccount && bankAccount.status !== "NOT_CONFIGURED" ? (
@@ -232,10 +232,10 @@ export default function PractitionerDashboardScreen() {
                   <Edit3 size={16} className="text-muted-foreground" />
                 </UIPressable>
               </HStack>
-              <Text size="xs" className="text-muted-foreground">
+              <Text size="sm" className="text-muted-foreground">
                 Atas Nama: {bankAccount.accountName || "Nama belum diverifikasi"}
               </Text>
-              <Text size="xs" className="text-muted-foreground mt-1">
+              <Text size="sm" className="text-muted-foreground mt-1">
                 {bankAccount.status === "VERIFIED"
                   ? "Rekening siap menerima pencairan insentif otomatis sesuai jadwal siklus."
                   : "Rekening sedang ditinjau. Pencairan dana diproses setelah status terverifikasi."}
@@ -243,7 +243,7 @@ export default function PractitionerDashboardScreen() {
             </VStack>
           ) : (
             <VStack space="sm">
-              <Text size="xs" className="text-muted-foreground">
+              <Text size="sm" className="text-muted-foreground">
                 Daftarkan rekening bank resmi Anda untuk menerima pencairan
                 insentif konsultasi klinis.
               </Text>
@@ -268,18 +268,18 @@ export default function PractitionerDashboardScreen() {
           {showBankModal && (
             <Box className="mt-2 p-3 bg-muted rounded-xl border border-border gap-2.5">
               <HStack space="sm" className="items-center justify-between">
-                <Text size="xs" bold className="text-foreground">
+                <Text size="sm" bold className="text-foreground">
                   Atur Rekening Bank
                 </Text>
                 <UIPressable onPress={() => setShowBankModal(false)}>
-                  <Text size="xs" className="text-muted-foreground">
+                  <Text size="sm" className="text-muted-foreground">
                     Batal
                   </Text>
                 </UIPressable>
               </HStack>
 
               <VStack space="xs">
-                <Text size="xs" className="text-muted-foreground">
+                <Text size="sm" className="text-muted-foreground">
                   Kode Bank (BCA, MANDIRI, BNI, BRI, dll):
                 </Text>
                 <Input className="border-border bg-background rounded-lg h-9">
@@ -293,7 +293,7 @@ export default function PractitionerDashboardScreen() {
               </VStack>
 
               <VStack space="xs">
-                <Text size="xs" className="text-muted-foreground">
+                <Text size="sm" className="text-muted-foreground">
                   Nomor Rekening:
                 </Text>
                 <Input className="border-border bg-background rounded-lg h-9">
@@ -307,7 +307,7 @@ export default function PractitionerDashboardScreen() {
               </VStack>
 
               <VStack space="xs">
-                <Text size="xs" className="text-muted-foreground">
+                <Text size="sm" className="text-muted-foreground">
                   Nama Pemilik Rekening:
                 </Text>
                 <Input className="border-border bg-background rounded-lg h-9">
@@ -322,7 +322,7 @@ export default function PractitionerDashboardScreen() {
               {bankFormError && (
                 <HStack space="xs" className="items-center">
                   <AlertCircle size={14} className="text-destructive" />
-                  <Text size="xs" className="text-destructive font-medium flex-1">
+                  <Text size="sm" className="text-destructive font-medium flex-1">
                     {bankFormError}
                   </Text>
                 </HStack>

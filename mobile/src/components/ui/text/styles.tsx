@@ -23,7 +23,7 @@ export const textStyle = tva({
     },
     size: {
       "2xs": "text-2xs",
-      xs: "text-xs",
+      xs: "text-sm",
       sm: "text-sm",
       md: "text-base",
       lg: "text-lg",
@@ -35,7 +35,7 @@ export const textStyle = tva({
       "6xl": "text-6xl",
     },
     sub: {
-      true: "text-xs",
+      true: "text-sm",
     },
     italic: {
       true: "italic",

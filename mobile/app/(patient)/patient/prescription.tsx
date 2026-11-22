@@ -78,11 +78,11 @@ export default function PrescriptionScreen() {
             <Box className="w-14 h-14 rounded-2xl bg-muted items-center justify-center mb-3">
               <Pill size={24} className="text-secondary" />
             </Box>
-            <Heading size="xs" bold className="text-foreground text-center">
+            <Heading size="sm" bold className="text-foreground text-center">
               Belum Ada Resep Digital Aktif
             </Heading>
             <Text
-              size="xs"
+              size="sm"
               className="text-muted-foreground text-center mt-1 leading-relaxed"
             >
               Resep obat digital akan otomatis diterbitkan oleh dokter/psikiater
@@ -134,7 +134,7 @@ export default function PrescriptionScreen() {
                       <Text size="sm" bold className="text-primary-foreground">
                         {med.name}
                       </Text>
-                      <Text size="xs" className="text-primary-foreground/80">
+                      <Text size="sm" className="text-primary-foreground/80">
                         {med.frequency}
                       </Text>
                     </VStack>
@@ -143,7 +143,7 @@ export default function PrescriptionScreen() {
               ))}
 
               <Text
-                size="xs"
+                size="sm"
                 className="text-primary-foreground/90 leading-relaxed"
               >
                 {rx?.notes || "Catatan dokter belum tersedia"}
@@ -232,7 +232,7 @@ export default function PrescriptionScreen() {
             >
               <ProgressFilledTrack className="bg-secondary" />
             </Progress>
-            <Text size="xs" className="text-muted-foreground">
+            <Text size="sm" className="text-muted-foreground">
               Data kepatuhan belum tersedia
             </Text>
           </VStack>

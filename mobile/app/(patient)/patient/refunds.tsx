@@ -198,7 +198,7 @@ export default function PatientRefundsScreen() {
               Kebijakan Pengembalian Dana Aman
             </Text>
           </HStack>
-          <Text size="xs" className="text-muted-foreground leading-relaxed">
+          <Text size="sm" className="text-muted-foreground leading-relaxed">
             Seluruh permohonan pengembalian dana diproses berdasarkan riwayat transaksi yang sah dan kuotasi resmi server. Dana refund dicairkan ke rekening terdaftar pasien setelah verifikasi selesai.
           </Text>
         </Card>
@@ -225,7 +225,7 @@ export default function PatientRefundsScreen() {
               >
                 <HStack space="md" className="items-center justify-between">
                   <VStack space="xs">
-                    <Text size="xs" className="text-muted-foreground font-mono">
+                    <Text size="sm" className="text-muted-foreground font-mono">
                       ID: {item.id.substring(0, 12)}...
                     </Text>
                     <Text size="lg" bold className="text-foreground">
@@ -239,14 +239,14 @@ export default function PatientRefundsScreen() {
 
                 <HStack space="md" className="items-center justify-between">
                   <VStack space="xs">
-                    <Text size="xs" className="text-muted-foreground">
+                    <Text size="sm" className="text-muted-foreground">
                       ID Transaksi Terkait:
                     </Text>
-                    <Text size="xs" bold className="text-foreground font-mono">
+                    <Text size="sm" bold className="text-foreground font-mono">
                       {item.paymentId.substring(0, 8)}...{item.paymentId.substring(item.paymentId.length - 4)}
                     </Text>
                   </VStack>
-                  <Text size="xs" className="text-muted-foreground">
+                  <Text size="sm" className="text-muted-foreground">
                     {new Date(item.createdAt).toLocaleDateString("id-ID", {
                       day: "numeric",
                       month: "short",
@@ -273,7 +273,7 @@ export default function PatientRefundsScreen() {
               </Pressable>
             </HStack>
 
-            <Text size="xs" className="text-muted-foreground">
+            <Text size="sm" className="text-muted-foreground">
               Masukkan ID Pembayaran (ULID 26 karakter) dari riwayat transaksi yang ingin diajukan pengembalian:
             </Text>
 
@@ -288,10 +288,10 @@ export default function PatientRefundsScreen() {
 
             {destinations && destinations.items.length > 0 && (
               <VStack space="xs" className="mt-1">
-                <Text size="xs" bold className="text-muted-foreground">
+                <Text size="sm" bold className="text-muted-foreground">
                   Kanal Pencairan Didukung:
                 </Text>
-                <Text size="xs" className="text-muted-foreground">
+                <Text size="sm" className="text-muted-foreground">
                   {destinations.items.map((d) => d.name).join(", ")}
                 </Text>
               </VStack>
@@ -300,7 +300,7 @@ export default function PatientRefundsScreen() {
             {formError && (
               <Box className="p-3 bg-destructive/10 rounded-xl flex-row items-center gap-2">
                 <AlertCircle size={16} className="text-destructive" />
-                <Text size="xs" className="text-destructive font-medium flex-1">
+                <Text size="sm" className="text-destructive font-medium flex-1">
                   {formError}
                 </Text>
               </Box>

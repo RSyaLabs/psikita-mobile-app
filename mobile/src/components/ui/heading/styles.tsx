@@ -20,7 +20,7 @@ export const headingStyle = tva({
       true: "line-through",
     },
     sub: {
-      true: "text-xs",
+      true: "text-sm",
     },
     italic: {
       true: "italic",

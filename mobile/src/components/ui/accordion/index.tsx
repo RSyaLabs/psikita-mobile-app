@@ -67,7 +67,7 @@ const accordionContentStyle = tva({
 });
 
 const accordionContentTextStyle = tva({
-  base: "text-xs text-muted-foreground leading-relaxed font-sans",
+  base: "text-sm text-muted-foreground leading-relaxed font-sans",
 });
 
 type IAccordionProps = React.ComponentPropsWithoutRef<typeof UIAccordion> &

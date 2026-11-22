@@ -37,9 +37,9 @@ const avatarFallbackTextStyle = tva({
   base: "text-foreground font-medium text-transform:uppercase",
   parentVariants: {
     size: {
-      xs: "text-xs",
-      sm: "text-xs",
-      md: "text-xs",
+      xs: "text-sm",
+      sm: "text-sm",
+      md: "text-sm",
       lg: "text-sm",
       xl: "text-base",
       "2xl": "text-xl",

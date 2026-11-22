@@ -49,7 +49,7 @@ const buttonStyle = tva({
     },
     size: {
       default: "px-4 py-2",
-      sm: "min-h-8 rounded-md px-3 text-xs",
+      sm: "min-h-8 rounded-md px-3 text-sm",
       lg: "min-h-10 rounded-md px-8",
       icon: "min-h-9 min-w-9",
     },
@@ -69,7 +69,7 @@ const buttonTextStyle = tva({
     },
     size: {
       default: "text-sm",
-      sm: "text-xs",
+      sm: "text-sm",
       lg: "text-sm",
       icon: "text-sm",
     },

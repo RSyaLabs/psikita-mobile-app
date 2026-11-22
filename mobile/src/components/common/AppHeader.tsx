@@ -77,7 +77,7 @@ export function AppHeader({
             </Heading>
             {subtitle ? (
               <Text
-                size="xs"
+                size="sm"
                 isTruncated
                 numberOfLines={Platform.OS === "web" ? undefined : 1}
                 className={

@@ -31,7 +31,7 @@ export function BpjsIntegrationSection({
   return (
     <VStack space="xs" className="mb-4">
       <HStack space="xs" className="items-center justify-between px-1">
-        <Heading size="xs" bold className="text-foreground">
+        <Heading size="sm" bold className="text-foreground">
           Integrasi JKN / BPJS Kesehatan
         </Heading>
         <Box className="bg-primary/10 px-3 py-1 rounded-full">
@@ -65,7 +65,7 @@ export function BpjsIntegrationSection({
 
         <FormControl>
           <FormControlLabel>
-            <FormControlLabelText className="text-xs font-bold text-foreground">
+            <FormControlLabelText className="text-sm font-bold text-foreground">
               Fasilitas Kesehatan Tingkat 1 (Faskes 1)
             </FormControlLabelText>
           </FormControlLabel>
@@ -74,7 +74,7 @@ export function BpjsIntegrationSection({
               value={faskes1}
               onChangeText={onChangeFaskes1}
               placeholder="Contoh: Puskesmas Tebet"
-              className="text-foreground text-xs"
+              className="text-foreground text-sm"
             />
           </Input>
         </FormControl>

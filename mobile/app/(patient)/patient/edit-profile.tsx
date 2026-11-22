@@ -219,7 +219,7 @@ export default function EditProfileScreen() {
               <Camera size={14} className="text-secondary-foreground" />
             </Pressable>
           </Box>
-          <Text size="xs" className="text-muted-foreground mt-2 font-medium">
+          <Text size="sm" className="text-muted-foreground mt-2 font-medium">
             Ketuk ikon kamera untuk mengubah foto profil
           </Text>
         </Box>
@@ -228,7 +228,7 @@ export default function EditProfileScreen() {
         {savedSuccess && (
           <Box className="bg-secondary/10 border border-secondary/20 rounded-2xl p-3.5 mb-4 flex-row items-center gap-2">
             <CheckCircle2 size={18} className="text-secondary" />
-            <Text size="xs" bold className="text-secondary flex-1">
+            <Text size="sm" bold className="text-secondary flex-1">
               Data profil dan kontak darurat berhasil diperbarui!
             </Text>
           </Box>

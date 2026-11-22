@@ -103,7 +103,7 @@ export default function RatingScreen() {
               <Heading size="md" bold className="text-foreground">
                 Bagaimana sesinya?
               </Heading>
-              <Text size="xs" className="text-muted-foreground">
+              <Text size="sm" className="text-muted-foreground">
                 Data praktisi dan tanggal belum ditambahkan jika tidak tersedia
                 dari server.
               </Text>

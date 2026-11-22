@@ -90,11 +90,11 @@ export function PatientFaqModal({ isOpen, onClose }: PatientFaqModalProps) {
                   key={idx}
                   className="bg-muted rounded-2xl p-3 border border-border"
                 >
-                  <Text size="xs" bold className="text-foreground mb-1">
+                  <Text size="sm" bold className="text-foreground mb-1">
                     {faq.q}
                   </Text>
                   <Text
-                    size="xs"
+                    size="sm"
                     className="text-muted-foreground leading-relaxed"
                   >
                     {faq.a}
@@ -110,7 +110,7 @@ export function PatientFaqModal({ isOpen, onClose }: PatientFaqModalProps) {
             onPress={onClose}
             className="w-full border-border bg-card h-11 rounded-xl mt-3"
           >
-            <ButtonText className="text-xs font-semibold text-foreground">
+            <ButtonText className="text-sm font-semibold text-foreground">
               Tutup
             </ButtonText>
           </Button>

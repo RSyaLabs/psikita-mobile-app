@@ -62,7 +62,7 @@ export function ChangePhotoModal({
               className="p-3.5 rounded-2xl bg-muted border border-border flex-row items-center gap-3 active:bg-muted/80"
             >
               <Camera size={18} className="text-secondary" />
-              <Text size="xs" bold className="text-foreground">
+              <Text size="sm" bold className="text-foreground">
                 Ambil Foto Baru (Kamera)
               </Text>
             </Pressable>
@@ -75,7 +75,7 @@ export function ChangePhotoModal({
               className="p-3.5 rounded-2xl bg-muted border border-border flex-row items-center gap-3 active:bg-muted/80"
             >
               <ImageIcon size={18} className="text-primary" />
-              <Text size="xs" bold className="text-foreground">
+              <Text size="sm" bold className="text-foreground">
                 Pilih dari Galeri Perangkat
               </Text>
             </Pressable>
@@ -85,7 +85,7 @@ export function ChangePhotoModal({
               onPress={onClose}
               className="w-full border-border bg-card h-11 rounded-xl mt-1"
             >
-              <ButtonText className="text-xs font-semibold text-foreground">
+              <ButtonText className="text-sm font-semibold text-foreground">
                 Batal
               </ButtonText>
             </Button>

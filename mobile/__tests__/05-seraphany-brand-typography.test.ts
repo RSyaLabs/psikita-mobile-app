@@ -46,8 +46,9 @@ describe("05. SeraPhany Brand Identity, Metadata & Rule of 14px Suite", () => {
     });
   });
 
-  describe("Rule of 14px Accessibility Enforcement (Zero text-xs in app/)", () => {
+  describe("Rule of 14px Accessibility Enforcement (Zero text-xs and size='xs' in app/ and src/)", () => {
     const appDir = path.resolve(__dirname, "../app");
+    const srcDir = path.resolve(__dirname, "../src");
 
     function findFiles(dir: string, extensions: string[]): string[] {
       const results: string[] = [];
@@ -64,21 +65,20 @@ describe("05. SeraPhany Brand Identity, Metadata & Rule of 14px Suite", () => {
       return results;
     }
 
-    it("should enforce that no screen in mobile/app uses text-xs class", () => {
-      const screenFiles = findFiles(appDir, [".tsx", ".ts"]);
-      expect(screenFiles.length).toBeGreaterThan(0);
+    it("should enforce that no component or screen in app/ or src/ uses text-xs class", () => {
+      const allFiles = [...findFiles(appDir, [".tsx", ".ts"]), ...findFiles(srcDir, [".tsx", ".ts"])];
+      expect(allFiles.length).toBeGreaterThan(0);
 
       const violations: { file: string; line: number; text: string }[] = [];
 
-      for (const filePath of screenFiles) {
+      for (const filePath of allFiles) {
         const content = fs.readFileSync(filePath, "utf-8");
         const lines = content.split("\n");
 
         lines.forEach((lineText, index) => {
-          // Check for text-xs as a standalone Tailwind class or within className/tw
           if (/\btext-xs\b/.test(lineText)) {
             violations.push({
-              file: path.relative(appDir, filePath),
+              file: path.relative(path.resolve(__dirname, ".."), filePath),
               line: index + 1,
               text: lineText.trim(),
             });
@@ -91,7 +91,40 @@ describe("05. SeraPhany Brand Identity, Metadata & Rule of 14px Suite", () => {
           .map((v) => `  ${v.file}:${v.line} -> ${v.text}`)
           .join("\n");
         throw new Error(
-          `Found ${violations.length} occurrence(s) of 'text-xs' in app screens (Rule of 14px violation):\n${formatted}`,
+          `Found ${violations.length} occurrence(s) of 'text-xs' (Rule of 14px violation):\n${formatted}`,
+        );
+      }
+
+      expect(violations).toHaveLength(0);
+    });
+
+    it("should enforce that no component in app/ or src/ uses size='xs'", () => {
+      const allFiles = [...findFiles(appDir, [".tsx", ".ts"]), ...findFiles(srcDir, [".tsx", ".ts"])];
+      expect(allFiles.length).toBeGreaterThan(0);
+
+      const violations: { file: string; line: number; text: string }[] = [];
+
+      for (const filePath of allFiles) {
+        const content = fs.readFileSync(filePath, "utf-8");
+        const lines = content.split("\n");
+
+        lines.forEach((lineText, index) => {
+          if (/size=["']xs["']/.test(lineText)) {
+            violations.push({
+              file: path.relative(path.resolve(__dirname, ".."), filePath),
+              line: index + 1,
+              text: lineText.trim(),
+            });
+          }
+        });
+      }
+
+      if (violations.length > 0) {
+        const formatted = violations
+          .map((v) => `  ${v.file}:${v.line} -> ${v.text}`)
+          .join("\n");
+        throw new Error(
+          `Found ${violations.length} occurrence(s) of size='xs' (Rule of 14px violation):\n${formatted}`,
         );
       }
 

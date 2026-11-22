@@ -48,7 +48,7 @@ export function PractitionerDashboardHeader({
               </Heading>
               <Text
                 size="sm"
-                className="text-white/80 font-medium text-xs"
+                className="text-white/80 font-medium text-sm"
               >
                 {specText} • {isOnline ? "Siaga Menerima Sesi" : "Offline"}
               </Text>
@@ -87,7 +87,7 @@ export function PractitionerDashboardHeader({
               </Text>
               <Text
                 size="sm"
-                className="text-white/80 font-medium text-xs"
+                className="text-white/80 font-medium text-sm"
               >
                 {licenseText}
               </Text>

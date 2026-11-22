@@ -310,7 +310,7 @@ export default function PractitionerProfileScreen() {
                 <Box className="w-8 h-8 rounded-xl bg-muted items-center justify-center">
                   <HelpCircle size={16} className="text-foreground" />
                 </Box>
-                <Text size="xs" className="font-bold text-foreground">
+                <Text size="sm" className="font-bold text-foreground">
                   Pusat bantuan
                 </Text>
               </HStack>
@@ -327,7 +327,7 @@ export default function PractitionerProfileScreen() {
                 <Box className="w-8 h-8 rounded-xl bg-destructive/10 items-center justify-center">
                   <LogOut size={16} className="text-destructive" />
                 </Box>
-                <Text size="xs" className="font-bold text-destructive">
+                <Text size="sm" className="font-bold text-destructive">
                   Keluar akun
                 </Text>
               </HStack>

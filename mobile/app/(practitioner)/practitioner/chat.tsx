@@ -64,7 +64,7 @@ export default function PractitionerChatScreen() {
               <Heading size="sm" bold className="text-foreground">
                 Konsultasi
               </Heading>
-              <Text size="xs" className="text-muted-foreground">
+              <Text size="sm" className="text-muted-foreground">
                 {context
                   ? `Status server: ${context.status}`
                   : "Konteks server belum tersedia"}
@@ -104,11 +104,11 @@ export default function PractitionerChatScreen() {
             <Card className="bg-muted rounded-2xl p-3 border border-border gap-1">
               <HStack space="xs" className="items-center">
                 <Info size={14} className="text-secondary" />
-                <Text size="xs" bold className="text-foreground">
+                <Text size="sm" bold className="text-foreground">
                   Ringkasan triase
                 </Text>
               </HStack>
-              <Text size="xs" className="text-muted-foreground">
+              <Text size="sm" className="text-muted-foreground">
                 {triage?.notes
                   ? `${triage.notes} (Skor: ${triage.score}, Level: ${triage.level})`
                   : "Ringkasan klinis tambahan belum tersedia pada konteks konsultasi ini."}
@@ -146,12 +146,12 @@ export default function PractitionerChatScreen() {
                 }`}
               >
                 {message.senderRole === "SYSTEM" && (
-                  <Text size="xs" bold className="text-foreground">
+                  <Text size="sm" bold className="text-foreground">
                     SYSTEM
                   </Text>
                 )}
                 <Text
-                  size="xs"
+                  size="sm"
                   className={
                     message.senderRole === "PRACTITIONER"
                       ? "text-primary-foreground"
@@ -166,7 +166,7 @@ export default function PractitionerChatScreen() {
                  * light-surface foreground onto the sender's own dark bubble.
                  */}
                 <Text
-                  size="xs"
+                  size="sm"
                   className={
                     message.senderRole === "PRACTITIONER"
                       ? "text-primary-foreground mt-1"

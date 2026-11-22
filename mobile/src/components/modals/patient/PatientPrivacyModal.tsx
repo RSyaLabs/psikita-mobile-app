@@ -72,11 +72,11 @@ export function PatientPrivacyModal({
             <VStack space="xs">
               <HStack space="xs" className="items-center">
                 <Lock size={14} className="text-secondary" />
-                <Text size="xs" bold className="text-foreground">
+                <Text size="sm" bold className="text-foreground">
                   Enkripsi End-to-End
                 </Text>
               </HStack>
-              <Text size="xs" className="text-muted-foreground leading-relaxed">
+              <Text size="sm" className="text-muted-foreground leading-relaxed">
                 Seluruh percakapan chat, panggilan video, dan catatan konsultasi
                 dilindungi enkripsi standar medis internasional dan hanya dapat
                 diakses oleh Anda dan praktisi yang bertugas.
@@ -86,11 +86,11 @@ export function PatientPrivacyModal({
             <VStack space="xs">
               <HStack space="xs" className="items-center">
                 <CheckCircle2 size={14} className="text-secondary" />
-                <Text size="xs" bold className="text-foreground">
+                <Text size="sm" bold className="text-foreground">
                   Kepatuhan UU Perlindungan Data (PDP)
                 </Text>
               </HStack>
-              <Text size="xs" className="text-muted-foreground leading-relaxed">
+              <Text size="sm" className="text-muted-foreground leading-relaxed">
                 SeraPhany tunduk pada regulasi kerahasiaan medis Kemenkes RI dan
                 Undang-Undang Perlindungan Data Pribadi No. 27 Tahun 2022. Data
                 medis Anda tidak pernah diperjualbelikan kepada pihak ketiga.
@@ -102,7 +102,7 @@ export function PatientPrivacyModal({
               onPress={onClose}
               className="w-full bg-primary h-11 rounded-xl mt-1"
             >
-              <ButtonText className="text-xs font-bold text-primary-foreground">
+              <ButtonText className="text-sm font-bold text-primary-foreground">
                 Saya Mengerti
               </ButtonText>
             </Button>

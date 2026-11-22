@@ -196,7 +196,7 @@ export default function DiagnosisScreen() {
                   }`}
                 >
                   <Text
-                    size="xs"
+                    size="sm"
                     bold
                     className={
                       selectedIcd === item.code
@@ -209,7 +209,7 @@ export default function DiagnosisScreen() {
                 </Pressable>
               ))}
             </HStack>
-            <Text size="xs" className="text-muted-foreground">
+            <Text size="sm" className="text-muted-foreground">
               {selectedDescription ||
                 "Pilih kode yang dikenal; kode yang tidak dikenal tetap unknown."}
             </Text>
@@ -223,7 +223,7 @@ export default function DiagnosisScreen() {
               ["Plan", plan, setPlan],
             ].map(([label, value, setter]) => (
               <VStack key={label as string} space="xs">
-                <Text size="xs" bold className="text-foreground">
+                <Text size="sm" bold className="text-foreground">
                   {label as string}
                 </Text>
                 <Textarea className="bg-muted rounded-xl border-0">
@@ -244,11 +244,11 @@ export default function DiagnosisScreen() {
           <Card className="bg-muted rounded-2xl p-4 border border-border gap-2">
             <HStack space="xs" className="items-center">
               <FileText size={15} className="text-secondary" />
-              <Text size="xs" bold className="text-foreground">
+              <Text size="sm" bold className="text-foreground">
                 Status SOAP
               </Text>
             </HStack>
-            <Text size="xs" className="text-muted-foreground">
+            <Text size="sm" className="text-muted-foreground">
               {soapConfirmed
                 ? "SOAP terkonfirmasi server. Finish masih memerlukan aksi eksplisit."
                 : "Belum ada SOAP yang terkonfirmasi server."}

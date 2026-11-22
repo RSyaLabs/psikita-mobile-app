@@ -156,7 +156,7 @@ export default function CommunityFeedScreen() {
         {isLoading ? (
           <Box className="py-20 items-center justify-center">
             <Spinner size="large" />
-            <Text size="xs" className="text-muted-foreground mt-3">
+            <Text size="sm" className="text-muted-foreground mt-3">
               Memuat kiriman komunitas...
             </Text>
           </Box>
@@ -165,7 +165,7 @@ export default function CommunityFeedScreen() {
             <Text size="sm" bold className="text-foreground text-center">
               Gagal memuat kiriman
             </Text>
-            <Text size="xs" className="text-muted-foreground text-center mt-1">
+            <Text size="sm" className="text-muted-foreground text-center mt-1">
               Periksa jaringan Anda atau coba kembali beberapa saat lagi.
             </Text>
           </Card>
@@ -175,7 +175,7 @@ export default function CommunityFeedScreen() {
             <Text size="sm" bold className="text-foreground text-center">
               Belum ada cerita di kategori ini
             </Text>
-            <Text size="xs" className="text-muted-foreground text-center mt-1">
+            <Text size="sm" className="text-muted-foreground text-center mt-1">
               Jadilah yang pertama berbagi cerita hangat atau pengalaman koping Anda.
             </Text>
             <Button

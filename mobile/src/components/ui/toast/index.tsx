@@ -50,7 +50,7 @@ const toastTitleStyle = tva({
 });
 
 const toastDescriptionStyle = tva({
-  base: "text-xs text-muted-foreground font-sans leading-relaxed",
+  base: "text-sm text-muted-foreground font-sans leading-relaxed",
 });
 
 type IToastProps = React.ComponentPropsWithoutRef<typeof UIToast> &

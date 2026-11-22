@@ -57,7 +57,7 @@ export function CareTeamModal({ isOpen, onClose }: CareTeamModalProps) {
 
         <ModalBody className="pt-3 pb-1">
           <VStack space="md">
-            <Text size="xs" className="text-muted-foreground leading-relaxed">
+            <Text size="sm" className="text-muted-foreground leading-relaxed">
               Tim Care Navigator SeraPhany siap memandu proses administrasi di
               rumah sakit tujuan agar antrean dan klaim BPJS berjalan lancar.
             </Text>
@@ -65,11 +65,11 @@ export function CareTeamModal({ isOpen, onClose }: CareTeamModalProps) {
             <Box className="bg-muted p-3.5 rounded-2xl border border-border">
               <HStack space="sm" className="items-center mb-1">
                 <Phone size={16} className="text-secondary" />
-                <Text size="xs" bold className="text-foreground">
+                <Text size="sm" bold className="text-foreground">
                   Hotline WhatsApp Care Team
                 </Text>
               </HStack>
-              <Text size="xs" className="text-muted-foreground font-mono pl-6">
+              <Text size="sm" className="text-muted-foreground font-mono pl-6">
                 0811-9988-7766
               </Text>
             </Box>
@@ -79,7 +79,7 @@ export function CareTeamModal({ isOpen, onClose }: CareTeamModalProps) {
               onPress={onClose}
               className="w-full bg-primary h-11 rounded-xl mt-1"
             >
-              <ButtonText className="text-xs font-bold text-primary-foreground">
+              <ButtonText className="text-sm font-bold text-primary-foreground">
                 Tutup
               </ButtonText>
             </Button>

@@ -90,7 +90,7 @@ export default function CommunityDetailScreen() {
         {isPostLoading ? (
           <Box className="py-20 items-center justify-center">
             <Spinner size="large" />
-            <Text size="xs" className="text-muted-foreground mt-3">
+            <Text size="sm" className="text-muted-foreground mt-3">
               Membuka utas diskusi...
             </Text>
           </Box>
@@ -183,7 +183,7 @@ export default function CommunityDetailScreen() {
                         </Badge>
                       )}
                     </HStack>
-                    <Text size="xs" className="text-foreground leading-relaxed pl-8">
+                    <Text size="sm" className="text-foreground leading-relaxed pl-8">
                       {reply.content}
                     </Text>
                   </Card>

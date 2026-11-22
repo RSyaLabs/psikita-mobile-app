@@ -95,7 +95,7 @@ export default function ReferralScreen() {
             <Text size="sm" bold className="text-foreground">
               Surat rujukan belum tersedia
             </Text>
-            <Text size="xs" className="text-muted-foreground">
+            <Text size="sm" className="text-muted-foreground">
               Layar ini butuh consultationId dari navigasi. Tanpa ID itu tidak
               ada permintaan ke server dan isi surat di bawah adalah status
               sebenarnya, bukan data. Buka dari daftar konsultasi agar ID
@@ -116,7 +116,7 @@ export default function ReferralScreen() {
           <Card className="bg-card rounded-3xl p-4 mb-3.5 border border-border gap-2">
             <HStack space="xs" className="items-center mb-1">
               <MapPin size={16} className="text-secondary" />
-              <Heading size="xs" bold className="text-foreground">
+              <Heading size="sm" bold className="text-foreground">
                 Fasilitas Kesehatan Jiwa Terdekat
               </Heading>
             </HStack>

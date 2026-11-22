@@ -35,7 +35,7 @@ export function PractitionerHistorySearchFilter({
             value={search}
             onChangeText={onSearchChange}
             placeholder="Cari nama pasien, diagnosa, atau no sesi..."
-            className="text-xs text-foreground p-0"
+            className="text-sm text-foreground p-0"
           />
         </Input>
       </Box>
@@ -60,7 +60,7 @@ export function PractitionerHistorySearchFilter({
               }`}
             >
               <Text
-                size="xs"
+                size="sm"
                 className={`font-semibold ${
                   isSelected
                     ? "text-primary-foreground font-bold"

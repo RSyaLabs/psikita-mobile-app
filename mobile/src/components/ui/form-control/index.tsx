@@ -56,7 +56,7 @@ const formControlLabelStyle = tva({
 });
 
 const formControlLabelTextStyle = tva({
-  base: "font-medium text-foreground text-xs md:text-sm",
+  base: "font-medium text-foreground text-sm md:text-sm",
 });
 
 const formControlHelperStyle = tva({
@@ -64,7 +64,7 @@ const formControlHelperStyle = tva({
 });
 
 const formControlHelperTextStyle = tva({
-  base: "text-muted-foreground text-xs font-normal",
+  base: "text-muted-foreground text-sm font-normal",
 });
 
 const formControlErrorStyle = tva({
@@ -72,7 +72,7 @@ const formControlErrorStyle = tva({
 });
 
 const formControlErrorTextStyle = tva({
-  base: "text-destructive text-xs font-normal",
+  base: "text-destructive text-sm font-normal",
 });
 
 const formControlErrorIconStyle = tva({

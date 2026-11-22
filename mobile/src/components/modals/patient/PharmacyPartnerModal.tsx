@@ -75,10 +75,10 @@ export function PharmacyPartnerModal({
         <ModalBody className="pt-3 pb-1">
           <VStack space="md">
             <VStack space="xs">
-              <Heading size="xs" bold className="text-foreground">
+              <Heading size="sm" bold className="text-foreground">
                 Apotek Sehat Medika
               </Heading>
-              <Text size="xs" className="text-muted-foreground">
+              <Text size="sm" className="text-muted-foreground">
                 Jl. Salemba Raya No. 42, Senen, Jakarta Pusat
               </Text>
             </VStack>
@@ -105,7 +105,7 @@ export function PharmacyPartnerModal({
                 onPress={onClose}
                 className="flex-1 rounded-xl border-border bg-card h-11"
               >
-                <ButtonText className="text-xs font-semibold text-foreground">
+                <ButtonText className="text-sm font-semibold text-foreground">
                   Tutup
                 </ButtonText>
               </Button>
@@ -119,7 +119,7 @@ export function PharmacyPartnerModal({
                 className="flex-1 bg-secondary rounded-xl h-11"
               >
                 <ButtonIcon as={Navigation} />
-                <ButtonText className="text-xs font-bold text-secondary-foreground">
+                <ButtonText className="text-sm font-bold text-secondary-foreground">
                   Buka Rute Maps
                 </ButtonText>
               </Button>

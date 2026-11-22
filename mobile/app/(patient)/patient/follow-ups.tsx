@@ -72,7 +72,7 @@ export default function FollowUpsScreen() {
         {isLoading ? (
           <Box className="py-20 items-center justify-center">
             <Spinner size="large" />
-            <Text size="xs" className="text-muted-foreground mt-3">
+            <Text size="sm" className="text-muted-foreground mt-3">
               Memuat jadwal kontrol...
             </Text>
           </Box>
@@ -88,7 +88,7 @@ export default function FollowUpsScreen() {
             <Text size="sm" bold className="text-foreground text-center">
               Belum ada rekomendasi kontrol
             </Text>
-            <Text size="xs" className="text-muted-foreground text-center mt-1">
+            <Text size="sm" className="text-muted-foreground text-center mt-1">
               Rekomendasi sesi lanjutan akan muncul setelah sesi konseling selesai dan dokter menetapkan jadwal kontrol.
             </Text>
           </Card>

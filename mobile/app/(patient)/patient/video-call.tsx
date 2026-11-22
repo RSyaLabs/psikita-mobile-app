@@ -87,7 +87,7 @@ export default function VideoCallScreen() {
           </Pressable>
           <Box className="w-2.5 h-2.5 rounded-full bg-secondary" />
           <VStack space="xs">
-            <Text size="xs" bold className="text-primary-foreground">
+            <Text size="sm" bold className="text-primary-foreground">
               Belum ada praktisi
             </Text>
             <HStack space="xs" className="items-center">

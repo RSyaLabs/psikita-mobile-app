@@ -85,10 +85,10 @@ export function BackendIntegrationBanner({
       </HStack>
 
       <VStack space="xs">
-        <Heading size="xs" bold className="text-foreground">
+        <Heading size="sm" bold className="text-foreground">
           {title}
         </Heading>
-        <Text size="xs" className="text-muted-foreground leading-relaxed">
+        <Text size="sm" className="text-muted-foreground leading-relaxed">
           {description}
         </Text>
       </VStack>
