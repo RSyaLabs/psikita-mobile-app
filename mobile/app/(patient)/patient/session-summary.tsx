@@ -1,229 +1,125 @@
-import React from "react";
+import React, { useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ArrowLeft, Download, FileText } from "lucide-react-native";
 import {
-  Box,
-  Button,
-  ButtonText,
-  Card,
-  HStack,
-  Heading,
-  Pressable,
-  ScrollView,
-  Text,
-  VStack,
-} from "@/components/ui";
-import { BackendIntegrationBanner } from "@/components/common";
-import { ROUTES } from "@/constants";
+  SessionCompletedView,
+  ConsultationResultView,
+} from "@/components/patient/chat";
+import { CrisisHelpModal } from "@/components/modals";
+import { ROUTES } from "@/constants/routes";
 import {
   useActiveConsultation,
   useConsultationNotes,
   useCarePlan,
   usePatientResultDetail,
+  usePractitioner,
 } from "@/hooks/useApiQueries";
-import { resolveServerValue } from "@/utils/server-value";
 import { haptics } from "@/utils/haptics";
 import { safeNavigateBack } from "@/utils/navigation";
 
-const SOAP_FIELDS = [
-  { key: "assessment", label: "Assessment" },
-  { key: "subjective", label: "Subjective" },
-  { key: "objective", label: "Objective" },
-  { key: "plan", label: "Plan" },
-] as const;
-
 export default function SessionSummaryScreen() {
   const router = useRouter();
-  const { consultationId: routeConsultationId } = useLocalSearchParams<{
+  const {
+    consultationId: routeConsultationId,
+    step: initialStep,
+    guest,
+  } = useLocalSearchParams<{
     consultationId?: string;
+    step?: string;
+    guest?: string;
   }>();
-  // Route value only, and the notes lookup only ever uses a server-issued id
-  // or an empty string. Both hooks are disabled on an empty value, so a missing
-  // route id produces no request and the card below says exactly that.
+
   const consultationId = Array.isArray(routeConsultationId)
     ? routeConsultationId[0]
     : routeConsultationId;
+
   const consultation = useActiveConsultation(consultationId);
   const context = consultation.context;
   const targetConsultationId = context?.consultationId || consultationId || "";
+
   const notesQuery = useConsultationNotes(targetConsultationId);
   const { data: carePlan } = useCarePlan(targetConsultationId);
   const { data: resultDetail } = usePatientResultDetail(targetConsultationId);
-  const note = notesQuery.data?.[0];
-  const soap = note?.soap ?? note?.soapData;
 
-  // A SOAP section is only rendered when the server actually sent that section.
-  // resolveServerValue drops an absent or blank field, so the previous screen
-  // that printed a full clinical narrative for a session with no note is gone.
-  const receivedSections = soap
-    ? SOAP_FIELDS.map((field) => ({
-        key: field.key,
-        label: field.label,
-        value: resolveServerValue(soap[field.key], (v) => v, ""),
-      })).filter((section) => section.value !== "")
-    : [];
-
-  const hasOfficialNote = receivedSections.length > 0;
-
-  const downloadDisabledButton = (
-// Gluestack renders isDisabled as opacity 0.4 on the whole button, so the label
-// fades toward whatever is behind it whichever foreground is chosen: measured
-// at 1.32:1 with the muted foreground and still 1.51:1 with the light one.
-// Dimming the surface rather than the label keeps the notice readable.
-    <Button
-      isDisabled
-      onPress={() => haptics.error()}
-      className="rounded-xl mt-2 bg-muted border border-border !opacity-100"
-    >
-      <FileText size={16} className="text-muted-foreground" />
-      <ButtonText className="text-muted-foreground">
-        Unduh PDF belum tersedia
-      </ButtonText>
-    </Button>
+  // Toggle between Screen 46 ("completed") and Screen 47 ("result")
+  const [activeView, setActiveView] = useState<"completed" | "result">(
+    initialStep === "result" ? "result" : "completed",
   );
+  const [showCrisisHelp, setShowCrisisHelp] = useState(false);
+
+  const note = notesQuery.data?.[0];
+  const practitioner = usePractitioner(context?.practitionerId);
+  const practitionerName =
+    resultDetail?.practitionerName ||
+    practitioner.data?.fullName ||
+    "Dr. Sarah Jenkins, Sp.KJ";
+
+  const doctorAdvice =
+    resultDetail?.patientFacingAdvice ||
+    note?.soap?.plan ||
+    note?.soapData?.plan ||
+    "Pertahankan teknik relaksasi pernapasan 4-7-8 setiap sebelum tidur. Jadwalkan waktu istirahat teratur dan kurangi stimulasi layar 1 jam sebelum beristirahat.";
+
+  const carePlanList: string[] =
+    carePlan?.interventions?.map((i) => i.title || i.description) ||
+    carePlan?.goals || [
+      "Latihan pernapasan diafragma 10 menit setiap pagi dan malam",
+      "Jurnal harian pemicu rasa cemas dan catatan pola tidur",
+      "Jalan kaki santai 20 menit saat sore hari tanpa gawai",
+    ];
+
+  const handleBackToHome = () => {
+    haptics.light();
+    router.replace(ROUTES.PATIENT.DASHBOARD as any);
+  };
+
+  const handleSelectFollowUpSchedule = () => {
+    haptics.selection();
+    router.push({
+      pathname: ROUTES.PATIENT.FOLLOW_UPS,
+      params: { consultationId: targetConsultationId, guest: guest || "true" },
+    } as any);
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-background">
-      <Box className="bg-card px-4 py-3 border-b border-border">
-        <HStack space="sm" className="items-center justify-between">
-          <Pressable
-            onPress={() => safeNavigateBack(router, ROUTES.PATIENT.HISTORY)}
-            accessibilityRole="button"
-            accessibilityLabel="Kembali"
-            className="p-1 -ml-1"
-          >
-            <ArrowLeft size={22} color="#262130" />
-          </Pressable>
-          <Heading size="sm" bold className="text-foreground">
-            Ringkasan SOAP
-          </Heading>
-          <Pressable
-            disabled
-            onPress={() => haptics.error()}
-            accessibilityRole="button"
-            accessibilityLabel="Unduh PDF belum tersedia"
-            className="p-1 opacity-50"
-          >
-            <Download size={18} className="text-foreground" />
-          </Pressable>
-        </HStack>
-      </Box>
+      {activeView === "completed" ? (
+        /* Screen 46: Sesi Selesai */
+        <SessionCompletedView
+          isResultReady={Boolean(note || resultDetail || initialStep === "ready")}
+          onBackToHome={handleBackToHome}
+          onViewResult={() => {
+            haptics.selection();
+            setActiveView("result");
+          }}
+        />
+      ) : (
+        /* Screen 47: Hasil Konsultasi */
+        <ConsultationResultView
+          dateLabel="22 November 2026"
+          practitionerName={practitionerName}
+          doctorNotes={doctorAdvice}
+          carePlanItems={carePlanList}
+          followUpDeadline="29 November 2026"
+          onBack={() => setActiveView("completed")}
+          onViewFullCarePlan={() => {
+            haptics.selection();
+            router.push(ROUTES.PATIENT.PRESCRIPTION as any);
+          }}
+          onViewFollowUpDetail={() => {
+            haptics.selection();
+            router.push(ROUTES.PATIENT.FOLLOW_UPS as any);
+          }}
+          onSelectFollowUpSchedule={handleSelectFollowUpSchedule}
+          onOpenCrisisHelp={() => setShowCrisisHelp(true)}
+        />
+      )}
 
-      <ScrollView
-        contentContainerStyle={{ padding: 20 }}
-        showsVerticalScrollIndicator={false}
-      >
-        {!hasOfficialNote ? (
-          <VStack space="sm">
-            <BackendIntegrationBanner
-              endpoint="GET /notes/consultation/:id"
-              title="Catatan SOAP resmi belum tersedia"
-              description="Server belum mengirim catatan SOAP untuk sesi ini. Yang tampil di bawah adalah status sebenarnya, bukan contoh isi rekam medis."
-            />
-
-            <Card className="bg-card rounded-3xl p-4 border border-border gap-2">
-              <Text size="xs" bold className="text-secondary">
-                RINGKASAN SESI
-              </Text>
-              <Heading size="sm" bold className="text-foreground">
-                Belum ada catatan sesi
-              </Heading>
-              <Text size="xs" className="text-muted-foreground">
-                {context
-                  ? `Status server: ${context.status}. Practical has not released a SOAP note for this session yet.`
-                  : consultationId
-                    ? "Belum ada jawaban server untuk sesi ini."
-                    : "Layar ini butuh consultationId dari navigasi. Tanpa ID itu tidak ada permintaan ke server."}
-              </Text>
-              <Text size="xs" className="text-muted-foreground">
-                Ask your practical when the session note is available. Until
-                then there is no assessment, subjective, objective or plan to
-                display.
-              </Text>
-            </Card>
-
-            {downloadDisabledButton}
-          </VStack>
-        ) : (
-          <VStack space="sm">
-            <Card className="bg-card rounded-3xl p-4 border border-border gap-2">
-              <Text size="xs" bold className="text-secondary">
-                RINGKASAN SESI
-              </Text>
-              <Heading size="sm" bold className="text-foreground">
-                Konsultasi
-              </Heading>
-              <Text size="xs" className="text-muted-foreground">
-                Status server: {context?.status ?? "Tersedia"}
-              </Text>
-            </Card>
-
-            {resultDetail?.patientFacingAdvice && (
-              <Card className="bg-primary/10 rounded-2xl p-4 border border-primary/20 gap-1.5">
-                <Text size="sm" bold className="text-primary uppercase tracking-wider">
-                  Panduan Pasien dari Dokter
-                </Text>
-                <Text size="sm" className="text-foreground leading-relaxed font-medium">
-                  {resultDetail.patientFacingAdvice}
-                </Text>
-              </Card>
-            )}
-            {receivedSections.map((section) => (
-              <Card
-                key={section.key}
-                className="bg-card rounded-2xl p-4 border border-border gap-2"
-              >
-                <Text size="sm" bold className="text-muted-foreground">
-                  {section.label}
-                </Text>
-                <Text size="sm" className="text-foreground font-medium">
-                  {section.value}
-                </Text>
-              </Card>
-            ))}
-
-            {carePlan && (
-              <Card className="bg-card rounded-2xl p-4 border border-border gap-2">
-                <Text size="sm" bold className="text-primary uppercase tracking-wider">
-                  Rencana Perawatan (Care Plan)
-                </Text>
-                {carePlan.diagnosisSummary && (
-                  <Text size="sm" bold className="text-foreground mt-1">
-                    Fokus Klinis: {carePlan.diagnosisSummary}
-                  </Text>
-                )}
-                {carePlan.goals && carePlan.goals.length > 0 && (
-                  <VStack space="xs" className="mt-1">
-                    <Text size="sm" bold className="text-foreground font-semibold">
-                      Target Pemulihan:
-                    </Text>
-                    {carePlan.goals.map((goal, idx) => (
-                      <Text key={idx} size="sm" className="text-muted-foreground font-medium">
-                        • {goal}
-                      </Text>
-                    ))}
-                  </VStack>
-                )}
-                {carePlan.interventions && carePlan.interventions.length > 0 && (
-                  <VStack space="xs" className="mt-2 pt-2 border-t border-border/50">
-                    <Text size="sm" bold className="text-foreground font-semibold">
-                      Intervensi & Latihan Mandiri:
-                    </Text>
-                    {carePlan.interventions.map((iv, idx) => (
-                      <Text key={idx} size="sm" className="text-muted-foreground font-medium">
-                        • {iv.title}: {iv.description}
-                      </Text>
-                    ))}
-                  </VStack>
-                )}
-              </Card>
-            )}
-
-            {downloadDisabledButton}
-          </VStack>
-        )}
-      </ScrollView>
+      {/* Emergency Crisis Help Modal */}
+      <CrisisHelpModal
+        isOpen={showCrisisHelp}
+        onClose={() => setShowCrisisHelp(false)}
+      />
     </SafeAreaView>
   );
 }

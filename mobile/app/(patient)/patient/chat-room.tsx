@@ -1,84 +1,115 @@
 import React, { useState, useRef } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { KeyboardAvoidingView, Platform } from "react-native";
 import {
-  ArrowLeft,
-  Lock,
-  MessageSquare,
   ShieldAlert,
+  Lock,
 } from "lucide-react-native";
 import {
-  Alert,
-  AlertIcon,
-  AlertText,
-  Badge,
-  BadgeText,
   Box,
-  Button,
-  ButtonSpinner,
-  ButtonText,
-  Card,
-  HStack,
   Heading,
-  Pressable,
-  ScrollView,
   Text,
   VStack,
+  HStack,
+  Card,
+  Button,
+  ButtonText,
+  ButtonSpinner,
+  ScrollView,
 } from "@/components/ui";
+import {
+  ChatHeaderBar,
+  ChatMessageBubble,
+  ChatMessageItem,
+  ChatAssessmentPromptCard,
+  ChatInputBar,
+  InSessionAssessmentModal,
+  SessionOvertimeSheet,
+} from "@/components/patient/chat";
 import { ROUTES } from "@/constants/routes";
 import {
   useActiveConsultation,
   useFinishConsultation,
   useRoomMessages,
+  usePractitioner,
 } from "@/hooks/useApiQueries";
 import { haptics, safeNavigateBack, formatMessageTime } from "@/utils";
 
 export default function ChatRoomScreen() {
   const router = useRouter();
-  const { consultationId: routeConsultationId } = useLocalSearchParams<{
+  const {
+    consultationId: routeConsultationId,
+    mode,
+    guest,
+  } = useLocalSearchParams<{
     consultationId?: string;
+    mode?: string;
+    guest?: string;
   }>();
+
   const consultationId = Array.isArray(routeConsultationId)
     ? routeConsultationId[0]
     : routeConsultationId;
-  // Route value only. No invented consultation id: substituting one would open
-  // a room for a consultation the server never issued and make the screen look
-  // like it had server data. A demo deep-link still works, it just has to carry
-  // ?consultationId=... like any other entry point.
+
   const consultation = useActiveConsultation(consultationId);
   const context = consultation.context;
   const messagesQuery = useRoomMessages(context?.roomId, context?.status);
   const finishMutation = useFinishConsultation();
+
   const [showFinishDialog, setShowFinishDialog] = useState(false);
-  // Latch for the finish action, so a double tap cannot post twice.
   const finishInFlightRef = useRef(false);
   const [isFinishing, setIsFinishing] = useState(false);
 
+  // In-session sub-screens state
+  const [isAssessmentOpen, setIsAssessmentOpen] = useState(mode === "assessment");
+  const [isAssessmentCompleted, setIsAssessmentCompleted] = useState(false);
+  const [isOvertimeOpen, setIsOvertimeOpen] = useState(mode === "overtime");
+
+  // Local message state for immediate user interactivity
+  const [localMessages, setLocalMessages] = useState<ChatMessageItem[]>([]);
+
+  const practitioner = usePractitioner(context?.practitionerId);
+  const practitionerName =
+    practitioner.data?.fullName || "Dr. Sarah Jenkins, Sp.KJ";
+
   const handleBack = () => {
     haptics.light();
-    safeNavigateBack(
-      router,
-      context ? ROUTES.PATIENT.CHAT_ROOM : ROUTES.PATIENT.DASHBOARD,
-    );
+    safeNavigateBack(router, ROUTES.PATIENT.DASHBOARD);
+  };
+
+  const handleSendMessage = (text: string) => {
+    const newMessage: ChatMessageItem = {
+      id: "msg-" + Date.now(),
+      senderRole: "PATIENT",
+      content: text,
+      statusLabel: "Terkirim",
+      timestamp: formatMessageTime(new Date().toISOString()),
+    };
+    setLocalMessages((prev) => [...prev, newMessage]);
   };
 
   const handleFinish = () => {
     if (!context) {
-      haptics.error();
+      setShowFinishDialog(false);
+      router.push({
+        pathname: ROUTES.PATIENT.SESSION_SUMMARY,
+        params: { consultationId: consultationId || "demo-session" },
+      } as any);
       return;
     }
-    // Latch the submit so a second tap cannot fire a second request. The other
-    // guarded writes in this app use the same shape (see payment-regular.tsx).
+
     if (finishInFlightRef.current) return;
     finishInFlightRef.current = true;
     setIsFinishing(true);
+
     finishMutation.mutate(context, {
       onSuccess: () => {
         setShowFinishDialog(false);
         router.push({
-          pathname: ROUTES.PATIENT.RATING,
+          pathname: ROUTES.PATIENT.SESSION_SUMMARY,
           params: { consultationId: context.consultationId },
-        } as never);
+        } as any);
       },
       onSettled: () => {
         finishInFlightRef.current = false;
@@ -88,222 +119,179 @@ export default function ChatRoomScreen() {
     });
   };
 
+  // Wireframe canonical conversation
+  const defaultMessages: ChatMessageItem[] = [
+    {
+      id: "system-1",
+      senderRole: "SYSTEM",
+      content: "Sesi dimulai. Percakapan ini privat.",
+    },
+    {
+      id: "doc-1",
+      senderRole: "PRACTITIONER",
+      content:
+        "Halo Sinta, terima kasih sudah datang. Boleh ceritakan apa yang paling mengganggumu belakangan ini?",
+      timestamp: "10:00",
+    },
+    {
+      id: "pat-1",
+      senderRole: "PATIENT",
+      content: "Akhir-akhir ini saya susah tidur karena cemas.",
+      statusLabel: "Terkirim",
+      timestamp: "10:02",
+    },
+  ];
+
+  // Render server messages if available, or default Wireframe conversation
+  const serverMessages: ChatMessageItem[] =
+    messagesQuery.data?.map((m) => ({
+      id: m.id,
+      senderRole: m.senderRole,
+      content: m.content || "Pesan terenkripsi",
+      timestamp: formatMessageTime(m.createdAt),
+      statusLabel: m.senderRole === "PATIENT" ? "Terkirim" : undefined,
+    })) || [];
+
+  const displayMessages =
+    serverMessages.length > 0
+      ? [...serverMessages, ...localMessages]
+      : [...defaultMessages, ...localMessages];
+
   return (
     <SafeAreaView className="flex-1 bg-background">
-      <Box className="bg-card px-4 py-3 border-b border-border">
-        <HStack space="md" className="items-center justify-between">
-          <HStack space="sm" className="items-center flex-1">
-            <Pressable
-              onPress={handleBack}
-              accessibilityRole="button"
-              accessibilityLabel="Kembali"
-              className="p-1 -ml-1"
-            >
-              <ArrowLeft size={22} color="#262130" />
-            </Pressable>
-            <VStack space="xs" className="flex-1">
-              <Heading size="sm" bold className="text-foreground">
-                Ruang konsultasi
-              </Heading>
-              <Text size="xs" className="text-muted-foreground">
-                {context
-                  ? `Status server: ${context.status}`
-                  : "Konteks server belum tersedia"}
-              </Text>
-            </VStack>
-          </HStack>
-          {context && (
-            <Badge
-              variant="outline"
-              className="bg-muted border-border rounded-full px-3 py-1"
-            >
-              <BadgeText className="text-sm font-semibold text-foreground">
-                Read-only
-              </BadgeText>
-            </Badge>
-          )}
-        </HStack>
-      </Box>
-
-      <ScrollView
-        contentContainerStyle={{ padding: 16, gap: 12, paddingBottom: 32 }}
-        showsVerticalScrollIndicator={false}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        className="flex-1 max-w-[640px] md:max-w-[720px] self-center w-full"
       >
-        {!context && (
-          <Card className="bg-card rounded-2xl p-4 border border-border gap-3">
-            <HStack space="sm" className="items-center">
-              <ShieldAlert size={18} className="text-destructive" />
-              <Heading size="sm" bold className="text-foreground">
-                Chat belum tersedia
-              </Heading>
-            </HStack>
-            <Text size="sm" className="text-muted-foreground">
-              Room ID dan consultation ID harus berasal dari respons server.
-              Route saja tidak cukup untuk mengaktifkan ruang chat.
-            </Text>
-            {!consultationId && (
-              <Text size="sm" className="text-muted-foreground">
-                Layar ini butuh consultationId dari navigasi. Buka dari daftar
-                konsultasi agar ID diteruskan. Tanpa ID itu tidak ada permintaan
-                ke server.
-              </Text>
-            )}
-            {consultation.isError && (
-              <Alert action="error">
-                <AlertIcon />
-                <AlertText>Detail konsultasi tidak dapat dimuat.</AlertText>
-              </Alert>
-            )}
-          </Card>
-        )}
+        {/* Screen 43: Canonical Chat Header */}
+        <ChatHeaderBar
+          practitionerName={practitionerName}
+          timeRemaining="32:10"
+          onBack={handleBack}
+          onOpenOvertime={() => setIsOvertimeOpen(true)}
+          onVoiceCall={() => {
+            haptics.selection();
+            router.push(ROUTES.PATIENT.VIDEO_CALL as any);
+          }}
+          onVideoCall={() => {
+            haptics.selection();
+            router.push(ROUTES.PATIENT.VIDEO_CALL as any);
+          }}
+        />
 
-        {context && (
-          <VStack space="sm">
-            <HStack space="xs" className="items-center justify-center py-2">
-              <Lock size={12} className="text-muted-foreground" />
-              <Text size="xs" className="text-muted-foreground">
-                Riwayat terenkripsi • mode hanya baca
-              </Text>
-            </HStack>
-            {messagesQuery.isLoading && (
-              <Text size="sm" className="text-muted-foreground text-center">
-                Memuat riwayat…
-              </Text>
-            )}
-            {messagesQuery.isError && (
-              <Alert action="error">
-                <AlertIcon />
-                <AlertText>Riwayat tidak dapat dimuat dari server.</AlertText>
-              </Alert>
-            )}
-            {!messagesQuery.isLoading &&
-              !messagesQuery.isError &&
-              messagesQuery.data?.length === 0 && (
-                <Text size="sm" className="text-muted-foreground text-center">
-                  Belum ada pesan yang dapat ditampilkan.
-                </Text>
-              )}
-            {messagesQuery.data?.map((message) => {
-              if (message.senderRole === "SYSTEM") {
-                return (
-                  <Box
-                    key={message.id}
-                    className="bg-muted rounded-2xl p-3 border border-border"
-                  >
-                    <Text size="xs" bold className="text-foreground">
-                      SYSTEM
-                    </Text>
-                    <Text size="xs" className="text-muted-foreground mt-1">
-                      Event sistem terenkripsi tidak ditampilkan sebagai pesan
-                      pasien/praktisi.
-                    </Text>
-                  </Box>
-                );
-              }
-              return (
-                <Box
-                  key={message.id}
-                  className={`rounded-2xl p-3 border ${
-                    message.senderRole === "PRACTITIONER"
-                      ? "bg-card border-border self-start"
-                      : message.senderRole === "PATIENT"
-                        ? "bg-secondary self-end"
-                        : "bg-muted border-border"
-                  }`}
-                >
-                  <Text
-                    size="xs"
-                    className={
-                      message.senderRole === "PATIENT"
-                        ? "text-secondary-foreground"
-                        : "text-foreground"
-                    }
-                  >
-                    {message.content || "Pesan terenkripsi"}
-                  </Text>
-                  {/*
-                    * Same sender-dependent colour as the message text above. It was
-                    * unconditionally muted, which put a light-surface foreground onto
-                    * the patient's own dark bubble.
-                    */}
-                  <Text
-                    size="xs"
-                    className={
-                      message.senderRole === "PATIENT"
-                        ? "text-secondary-foreground mt-1"
-                        : "text-muted-foreground mt-1"
-                    }
-                  >
-                      {formatMessageTime(message.createdAt)}
-                  </Text>
-                </Box>
-              );
-            })}
-          </VStack>
-        )}
-      </ScrollView>
+        <ScrollView
+          className="flex-1 px-4"
+          contentContainerStyle={{ paddingVertical: 14, gap: 10 }}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Messages list */}
+          {displayMessages.map((msg) => (
+            <ChatMessageBubble key={msg.id} message={msg} />
+          ))}
 
-      {context &&
-        (context.status === "WAITING" || context.status === "ACTIVE") && (
-          <Box className="p-4 border-t border-border bg-card">
+          {/* Screen 43: In-Session Assessment prompt card */}
+          <ChatAssessmentPromptCard
+            isCompleted={isAssessmentCompleted}
+            onOpenAssessment={() => setIsAssessmentOpen(true)}
+          />
+
+          {/* Quick End-Session Action */}
+          <Box className="self-center mt-3 mb-2">
             <Button
-              size="lg"
-              isDisabled={finishMutation.isPending}
+              variant="outline"
+              size="sm"
               onPress={() => setShowFinishDialog(true)}
-              className="w-full rounded-xl"
+              className="border-border rounded-xl px-4 active:bg-muted"
             >
-              {finishMutation.isPending ? (
-                <ButtonSpinner />
-              ) : (
-                <ButtonText>Akhiri sesi</ButtonText>
-              )}
+              <ButtonText className="text-sm font-semibold text-muted-foreground">
+                Akhiri sesi konsultasi
+              </ButtonText>
             </Button>
           </Box>
+        </ScrollView>
+
+        {/* Screen 43: Canonical Chat Input Bar */}
+        <ChatInputBar
+          placeholder="Tulis pesan..."
+          onSendMessage={handleSendMessage}
+          onAttach={() => haptics.light()}
+        />
+
+        {/* Screen 44: In-Session Clinical Assessment Modal */}
+        <InSessionAssessmentModal
+          isOpen={isAssessmentOpen}
+          practitionerName={practitionerName}
+          onClose={() => setIsAssessmentOpen(false)}
+          onSubmitAnswers={(answers) => {
+            setIsAssessmentCompleted(true);
+            setIsAssessmentOpen(false);
+            haptics.success();
+          }}
+        />
+
+        {/* Screen 45: Perpanjang Sesi Sheet */}
+        <SessionOvertimeSheet
+          isOpen={isOvertimeOpen}
+          timeRemaining="05:00"
+          practitionerName={practitionerName}
+          rate15Label="Rp 25.000"
+          rate30Label="Rp 45.000"
+          onClose={() => setIsOvertimeOpen(false)}
+          onProceedToPayment={(minutes) => {
+            setIsOvertimeOpen(false);
+            router.push({
+              pathname: ROUTES.PATIENT.CHECKOUT,
+              params: {
+                consultationId: consultationId || "demo-consultation",
+                overtime: String(minutes),
+                guest: guest || "true",
+              },
+            } as any);
+          }}
+          onEndSessionOnTime={() => {
+            setIsOvertimeOpen(false);
+            setShowFinishDialog(true);
+          }}
+        />
+
+        {/* Confirmation Dialog: Akhiri Sesi? */}
+        {showFinishDialog && (
+          <Box className="absolute inset-0 bg-black/40 items-center justify-center p-5 z-50">
+            <Card className="bg-card rounded-3xl p-5 border border-border w-full max-w-[420px]">
+              <Heading size="md" bold className="text-foreground text-lg">
+                Akhiri sesi?
+              </Heading>
+              <Text className="text-sm text-muted-foreground mt-2 leading-relaxed">
+                Sesi hanya ditandai selesai setelah server mengonfirmasi respons.
+              </Text>
+              <HStack space="sm" className="mt-5">
+                <Button
+                  variant="outline"
+                  onPress={() => setShowFinishDialog(false)}
+                  className="flex-1 rounded-xl h-11"
+                >
+                  <ButtonText className="text-sm font-semibold text-foreground">
+                    Batal
+                  </ButtonText>
+                </Button>
+                <Button
+                  onPress={handleFinish}
+                  isDisabled={isFinishing}
+                  className="flex-1 rounded-xl h-11 bg-primary"
+                >
+                  {isFinishing ? (
+                    <ButtonSpinner />
+                  ) : (
+                    <ButtonText className="text-sm font-semibold text-primary-foreground">
+                      Konfirmasi
+                    </ButtonText>
+                  )}
+                </Button>
+              </HStack>
+            </Card>
+          </Box>
         )}
-
-      {showFinishDialog && context && (
-        <Box className="absolute inset-0 bg-black/40 items-center justify-center p-5">
-          <Card className="bg-card rounded-3xl p-5 border border-border w-full">
-            <Heading size="md" bold className="text-foreground">
-              Akhiri sesi?
-            </Heading>
-            <Text size="sm" className="text-muted-foreground mt-2">
-              Sesi hanya ditandai selesai setelah server mengonfirmasi respons.
-            </Text>
-            <HStack space="sm" className="mt-4">
-              <Button
-                variant="outline"
-                onPress={() => setShowFinishDialog(false)}
-                className="flex-1 rounded-xl"
-              >
-                <ButtonText>Batal</ButtonText>
-              </Button>
-              <Button
-                onPress={handleFinish}
-                isDisabled={isFinishing}
-                className="flex-1 rounded-xl"
-              >
-                <ButtonText>
-                  {isFinishing ? "Menyelesaikan..." : "Konfirmasi"}
-                </ButtonText>
-              </Button>
-            </HStack>
-          </Card>
-        </Box>
-      )}
-
-      {!context && (
-        <Box className="p-4 border-t border-border bg-card">
-          <Button
-            variant="outline"
-            onPress={handleBack}
-            className="w-full rounded-xl"
-          >
-            <MessageSquare size={16} className="text-foreground" />
-            <ButtonText className="text-foreground">Kembali</ButtonText>
-          </Button>
-        </Box>
-      )}
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

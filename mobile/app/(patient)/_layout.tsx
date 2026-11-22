@@ -23,7 +23,10 @@ export default function PatientLayout() {
     (leafSegment === "triage" ||
       leafSegment === "assessment-result" ||
       leafSegment === "checkout" ||
-      leafSegment === "payment-regular");
+      leafSegment === "payment-regular" ||
+      leafSegment === "chat-room" ||
+      leafSegment === "overtime-modal" ||
+      leafSegment === "session-summary");
 
   const {
     data: patientProfile,
