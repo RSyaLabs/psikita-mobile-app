@@ -56,3 +56,25 @@ export function useCreateReply() {
     },
   });
 }
+
+export function useUpdatePost() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, content }: { id: string; content: string }) =>
+      communityService.updatePost(id, { content }),
+    onSuccess: (_data, { id }) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.community.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.community.detail(id) });
+    },
+  });
+}
+
+export function useDeletePost() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => communityService.deletePost(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.community.all });
+    },
+  });
+}

@@ -29,7 +29,9 @@ export default function PatientLayout() {
       leafSegment === "session-summary" ||
       leafSegment === "follow-ups" ||
       leafSegment === "history" ||
-      leafSegment === "refunds");
+      leafSegment === "refunds" ||
+      leafSegment === "community" ||
+      leafSegment === "community-detail");
 
   const {
     data: patientProfile,

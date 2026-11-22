@@ -1,325 +1,171 @@
 import React, { useState } from "react";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Box } from "@/components/ui";
 import {
-  ChevronLeft,
-  MessageSquare,
-  Heart,
-  Plus,
-  Shield,
-  User,
-  Send,
-  X,
-} from "lucide-react-native";
+  CommunityFeedView,
+  CreatePostView,
+  MyPostsView,
+  CrisisHelpView,
+  CommunityEmptyView,
+  FALLBACK_FEED_POSTS,
+} from "@/components/patient/community";
+import { PatientTabBar } from "@/components/navigation/PatientTabBar";
 import {
-  Box,
-  Text,
-  Heading,
-  Card,
-  VStack,
-  HStack,
-  Pressable,
-  Button,
-  ButtonText,
-  ScrollView,
-  Badge,
-  BadgeText,
-  Spinner,
-  Input,
-  InputField,
-  Modal,
-  ModalBackdrop,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-} from "@/components/ui";
-import { useCommunityPosts, useCreatePost } from "@/hooks/useApiQueries";
-import { safeNavigateBack } from "@/utils/navigation";
+  useCommunityPosts,
+  useCreatePost,
+  useDeletePost,
+} from "@/hooks/useApiQueries";
 import { ROUTES } from "@/constants/routes";
 import { haptics } from "@/utils/haptics";
-import { PatientTabBar } from "@/components/navigation/PatientTabBar";
-
-const CATEGORIES = ["Semua", "Pemulihan", "Cerita Harian", "Tanya Psikolog", "Tips Koping"];
+import { PostDto } from "@/api/community.service";
 
 export default function CommunityFeedScreen() {
   const router = useRouter();
-  const [selectedCategory, setSelectedCategory] = useState("Semua");
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [newTitle, setNewTitle] = useState("");
-  const [newContent, setNewContent] = useState("");
-  const [isAnonymous, setIsAnonymous] = useState(true);
+  const params = useLocalSearchParams<{ step?: string; guest?: string }>();
 
-  const { data: posts, isLoading, isError } = useCommunityPosts(selectedCategory);
+  // Step state: "feed" (FD1) | "create" (FD3) | "my-posts" (FD5) | "crisis" (FD6) | "empty" (FD7)
+  const initialStep =
+    params.step === "create"
+      ? "create"
+      : params.step === "my-posts"
+        ? "my-posts"
+        : params.step === "crisis"
+          ? "crisis"
+          : params.step === "empty"
+            ? "empty"
+            : "feed";
+
+  const [currentStep, setCurrentStep] = useState<
+    "feed" | "create" | "my-posts" | "crisis" | "empty"
+  >(initialStep);
+
+  const [activeFilter, setActiveFilter] = useState<"semua" | "postinganmu">("semua");
+  const [submissionError, setSubmissionError] = useState<string | null>(null);
+
+  const { data: postsData, isLoading, isError, refetch } = useCommunityPosts();
   const createPostMutation = useCreatePost();
+  const deletePostMutation = useDeletePost();
 
-  const handleCreatePost = () => {
-    if (!newTitle.trim() || !newContent.trim()) {
-      haptics.error();
-      return;
-    }
-    haptics.medium();
+  const posts = postsData && postsData.length > 0 ? postsData : FALLBACK_FEED_POSTS;
+  // Current user's own posts filter
+  const myPosts = posts.filter(
+    (p) => p.authorId === "usr-1" || p.authorId === "current-user" || p.id === "post-1",
+  );
+
+  const handleSelectPost = (post: PostDto) => {
+    haptics.light();
+    router.push({
+      pathname: ROUTES.PATIENT.COMMUNITY_DETAIL,
+      params: { id: post.id, guest: params.guest },
+    } as any);
+  };
+
+  const handleCreatePost = (data: { type: "EXPERIENCE" | "EDUCATION"; content: string }) => {
+    setSubmissionError(null);
     createPostMutation.mutate(
       {
-        title: newTitle.trim(),
-        content: newContent.trim(),
-        category: selectedCategory === "Semua" ? "Cerita Harian" : selectedCategory,
-        isAnonymous,
+        content: data.content,
+        type: data.type,
       },
       {
         onSuccess: () => {
-          setNewTitle("");
-          setNewContent("");
-          setShowCreateModal(false);
+          haptics.success();
+          setCurrentStep("feed");
+        },
+        onError: () => {
+          haptics.error();
+          setSubmissionError("Posting belum terkirim. Isinya aman, coba lagi.");
         },
       },
     );
   };
 
+  const handleDeletePost = (postId: string) => {
+    deletePostMutation.mutate(postId, {
+      onSuccess: () => {
+        haptics.success();
+      },
+      onError: () => {
+        haptics.error();
+      },
+    });
+  };
+
+  const handleFilterChange = (filter: "semua" | "postinganmu") => {
+    setActiveFilter(filter);
+    if (filter === "postinganmu") {
+      setCurrentStep("my-posts");
+    } else {
+      setCurrentStep("feed");
+    }
+  };
+
   return (
-    <SafeAreaView className="flex-1 bg-background">
-      {/* Top Header */}
-      <HStack space="sm" className="items-center justify-between px-5 pt-3.5 pb-2 bg-card border-b border-border">
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Kembali"
-          onPress={() => {
-            haptics.light();
-            safeNavigateBack(router, ROUTES.PATIENT.DASHBOARD);
+    <SafeAreaView className="flex-1 bg-background" edges={["top", "left", "right"]}>
+      {currentStep === "create" ? (
+        <CreatePostView
+          isSubmitting={createPostMutation.isPending}
+          submissionError={submissionError}
+          onBack={() => {
+            setSubmissionError(null);
+            setCurrentStep("feed");
           }}
-          className="w-10 h-10 rounded-full bg-card border border-border items-center justify-center active:bg-muted"
-        >
-          <ChevronLeft size={22} color="#262130" />
-        </Pressable>
-        <VStack space="xs" className="items-center">
-          <Heading size="sm" bold className="text-foreground">
-            Ruang Cerita & Komunitas
-          </Heading>
-          <HStack space="xs" className="items-center">
-            <Shield size={14} color="#4A3B6B" />
-            <Text size="sm" className="text-sm text-primary font-bold">
-              Ruang Aman & Terjaga
-            </Text>
-          </HStack>
-        </VStack>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Buat Cerita Baru"
-          onPress={() => {
+          onSubmit={handleCreatePost}
+          onOpenCrisis={() => setCurrentStep("crisis")}
+        />
+      ) : currentStep === "my-posts" ? (
+        <MyPostsView
+          posts={myPosts}
+          isLoading={isLoading}
+          onBack={() => {
+            setActiveFilter("semua");
+            setCurrentStep("feed");
+          }}
+          onViewPost={handleSelectPost}
+          onEditPost={(post) => {
+            router.push({
+              pathname: ROUTES.PATIENT.COMMUNITY_DETAIL,
+              params: { id: post.id, step: "edit", guest: params.guest },
+            } as any);
+          }}
+          onDeletePost={handleDeletePost}
+          onCreatePost={() => setCurrentStep("create")}
+        />
+      ) : currentStep === "crisis" ? (
+        <CrisisHelpView
+          onBack={() => setCurrentStep("feed")}
+          onConsultDoctor={() => {
             haptics.medium();
-            setShowCreateModal(true);
+            router.push(ROUTES.PATIENT.TRIAGE as never);
           }}
-          className="w-10 h-10 rounded-full bg-primary items-center justify-center active:opacity-80"
-        >
-          <Plus size={22} color="#FFFFFF" />
-        </Pressable>
-      </HStack>
-
-      {/* Category Filter Chips */}
-      <Box className="bg-card border-b border-border/50 px-4 py-2.5">
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          <HStack space="xs">
-            {CATEGORIES.map((cat) => {
-              const isSelected = selectedCategory === cat;
-              return (
-                <Pressable
-                  key={cat}
-                  onPress={() => {
-                    haptics.selection();
-                    setSelectedCategory(cat);
-                  }}
-                  className={`px-4 py-2 rounded-full border ${
-                    isSelected ? "bg-primary border-primary" : "bg-card border-border"
-                  }`}
-                >
-                  <Text
-                    size="sm"
-                    className={`text-sm ${
-                      isSelected ? "text-primary-foreground font-bold" : "text-foreground font-semibold"
-                    }`}
-                  >
-                    {cat}
-                  </Text>
-                </Pressable>
-              );
-            })}
-          </HStack>
-        </ScrollView>
-      </Box>
-
-      {/* Main Feed Content */}
-      <ScrollView
-        contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 16, paddingBottom: 110 }}
-        showsVerticalScrollIndicator={false}
-      >
-        <Box className="w-full max-w-[640px] md:max-w-[720px] self-center">
-        {isLoading ? (
-          <Box className="py-20 items-center justify-center">
-            <Spinner size="large" />
-            <Text size="sm" className="text-muted-foreground mt-3">
-              Memuat kiriman komunitas...
-            </Text>
-          </Box>
-        ) : isError ? (
-          <Card className="p-6 items-center bg-card rounded-2xl border border-border">
-            <Text size="sm" bold className="text-foreground text-center">
-              Gagal memuat kiriman
-            </Text>
-            <Text size="sm" className="text-muted-foreground text-center mt-1">
-              Periksa jaringan Anda atau coba kembali beberapa saat lagi.
-            </Text>
-          </Card>
-        ) : (posts ?? []).length === 0 ? (
-          <Card className="p-8 items-center bg-card rounded-2xl border border-border">
-            <MessageSquare size={36} className="text-muted-foreground/60 mb-2" />
-            <Text size="sm" bold className="text-foreground text-center">
-              Belum ada cerita di kategori ini
-            </Text>
-            <Text size="sm" className="text-muted-foreground text-center mt-1">
-              Jadilah yang pertama berbagi cerita hangat atau pengalaman koping Anda.
-            </Text>
-            <Button
-              size="sm"
-              onPress={() => setShowCreateModal(true)}
-              className="mt-4 bg-secondary rounded-xl"
-            >
-              <ButtonText className="text-sm font-bold text-white">Mulai Berbagi</ButtonText>
-            </Button>
-          </Card>
-        ) : (
-          <VStack space="md">
-            {(posts ?? []).map((post) => (
-              <Pressable
-                key={post.id}
-                onPress={() => {
-                  haptics.light();
-                  router.push({
-                    pathname: ROUTES.PATIENT.COMMUNITY_DETAIL,
-                    params: { id: post.id },
-                  } as any);
-                }}
-                className="bg-card rounded-2xl p-4 border border-border active:bg-muted"
-              >
-                <HStack space="xs" className="items-center justify-between mb-2">
-                  <HStack space="xs" className="items-center">
-                    <Box className="w-8 h-8 rounded-full bg-muted items-center justify-center">
-                      <User size={16} color="#4B4656" />
-                    </Box>
-                    <Text size="sm" bold className="text-foreground font-bold">
-                      {post.isAnonymous ? "Sahabat SeraPhany" : post.authorName ?? "Pengguna"}
-                    </Text>
-                  </HStack>
-                  {post.category && (
-                    <Badge variant="outline" className="rounded-full px-2.5 py-0.5 border-primary/30 bg-primary/5">
-                      <BadgeText className="text-sm font-bold text-primary">
-                        {post.category}
-                      </BadgeText>
-                    </Badge>
-                  )}
-                </HStack>
-
-                <Heading size="sm" bold className="text-foreground mb-1">
-                  {post.title}
-                </Heading>
-                <Text size="sm" className="text-muted-foreground line-clamp-3 leading-relaxed">
-                  {post.content}
-                </Text>
-
-                <HStack space="lg" className="items-center mt-3 pt-2.5 border-t border-border/50">
-                  <HStack space="xs" className="items-center">
-                    <Heart size={16} color="#4B4656" />
-                    <Text size="sm" className="text-sm text-muted-foreground font-medium">
-                      {post.likesCount ?? 0} Dukungan
-                    </Text>
-                  </HStack>
-                  <HStack space="xs" className="items-center">
-                    <MessageSquare size={16} color="#4B4656" />
-                    <Text size="sm" className="text-sm text-muted-foreground font-medium">
-                      {post.repliesCount ?? 0} Balasan
-                    </Text>
-                  </HStack>
-                </HStack>
-              </Pressable>
-            ))}
-          </VStack>
-        )}
+        />
+      ) : currentStep === "empty" ? (
+        <Box className="flex-1">
+          <CommunityEmptyView
+            isError={isError}
+            onRetry={() => refetch()}
+            onCreatePost={() => setCurrentStep("create")}
+          />
+          <PatientTabBar activeTab="feed" />
         </Box>
-      </ScrollView>
-
-      {/* Modal Buat Kiriman Baru */}
-      <Modal isOpen={showCreateModal} onClose={() => setShowCreateModal(false)} size="md">
-        <ModalBackdrop />
-        <ModalContent className="bg-card rounded-3xl border border-border p-5 w-[92%] max-w-[420px]">
-          <ModalHeader className="pb-3 border-b border-border/50">
-            <HStack space="xs" className="items-center justify-between w-full">
-              <Heading size="sm" bold className="text-foreground">
-                Bagikan Cerita Anda
-              </Heading>
-              <Pressable onPress={() => setShowCreateModal(false)} className="p-1">
-                <X size={20} color="#262130" />
-              </Pressable>
-            </HStack>
-          </ModalHeader>
-          <ModalBody className="pt-3 pb-2 gap-3">
-            <VStack space="xs">
-              <Text size="sm" bold className="text-foreground font-semibold">
-                Judul Cerita
-              </Text>
-              <Input className="h-11 bg-muted rounded-xl border-border px-3">
-                <InputField
-                  value={newTitle}
-                  onChangeText={setNewTitle}
-                  placeholder="Misal: Caraku menghadapi panic attack hari ini"
-                  className="text-sm text-foreground"
-                />
-              </Input>
-            </VStack>
-
-            <VStack space="xs">
-              <Text size="sm" bold className="text-foreground font-semibold">
-                Isi Cerita / Pengalaman
-              </Text>
-              <Input className="h-28 bg-muted rounded-xl border-border px-3 py-2 items-start">
-                <InputField
-                  value={newContent}
-                  onChangeText={setNewContent}
-                  multiline
-                  placeholder="Tuliskan pengalaman atau pertanyaanmu dengan nyaman..."
-                  className="text-sm text-foreground h-full text-top"
-                />
-              </Input>
-            </VStack>
-
-            <Pressable
-              onPress={() => setIsAnonymous(!isAnonymous)}
-              className="flex-row items-center gap-2 pt-1"
-            >
-              <Box className={`w-5 h-5 rounded border ${isAnonymous ? "bg-primary border-primary" : "border-border"}`} />
-              <Text size="sm" className="text-muted-foreground font-medium">
-                Posting sebagai anonim ("Sahabat SeraPhany")
-              </Text>
-            </Pressable>
-          </ModalBody>
-          <ModalFooter className="pt-2">
-            <Button
-              size="lg"
-              isDisabled={createPostMutation.isPending}
-              onPress={handleCreatePost}
-              className="w-full bg-primary rounded-2xl h-12"
-            >
-              <HStack space="xs" className="items-center justify-center">
-                <Send size={18} color="#FFFFFF" />
-                <ButtonText className="text-base font-bold text-white">
-                  {createPostMutation.isPending ? "Mengirimkan Cerita..." : "Terbitkan Cerita"}
-                </ButtonText>
-              </HStack>
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-
-      {/* Persistent Bottom Tab Bar */}
-      <PatientTabBar activeTab="feed" />
+      ) : (
+        <Box className="flex-1">
+          <CommunityFeedView
+            posts={posts}
+            isLoading={isLoading}
+            activeFilter={activeFilter}
+            onFilterChange={handleFilterChange}
+            onSelectPost={handleSelectPost}
+            onCreatePost={() => setCurrentStep("create")}
+            onOpenCrisis={() => setCurrentStep("crisis")}
+            onLoadMore={() => {
+              // Trigger refetch or pagination
+            }}
+          />
+          <PatientTabBar activeTab="feed" />
+        </Box>
+      )}
     </SafeAreaView>
   );
 }

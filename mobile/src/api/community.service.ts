@@ -100,6 +100,16 @@ export const communityService = {
     });
   },
 
+  updatePost: async (id: string, payload: { content: string }): Promise<{ message: string }> => {
+    return apiRequest<{ message: string }>(`/posts/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify({
+        content: payload.content.trim().slice(0, 280),
+      }),
+      adapter: (v) => v as { message: string },
+    });
+  },
+
   deletePost: async (id: string): Promise<void> => {
     await apiRequest<void>(`/posts/${id}`, {
       method: "DELETE",

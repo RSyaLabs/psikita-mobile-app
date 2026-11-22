@@ -4,4 +4,5 @@ export * from "./triage";
 export * from "./chat";
 export * from "./follow-ups";
 export * from "./history";
+export * from "./community";
 export * from "./DoctorDirectoryCard";
