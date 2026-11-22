@@ -39,11 +39,11 @@ export default function IndexGatewayScreen() {
                 <HStack space="sm" className="items-center">
                   <ShieldCheck size={20} color="#4A3B6B" />
                   <Heading size="md" className="text-[#262130] font-bold">
-                    1. Autentikasi & Verifikasi KYC
+                    1. Autentikasi & Verifikasi Identitas
                   </Heading>
                 </HStack>
                 <Text size="sm" className="text-[#555060] mt-1">
-                  Pendaftaran akun aman, verifikasi OTP, & verifikasi identitas e-KTP melalui SDK Didit.
+                  Pendaftaran akun aman, verifikasi OTP, & verifikasi identitas e-KTP untuk perlindungan rekam medis.
                 </Text>
               </Box>
 

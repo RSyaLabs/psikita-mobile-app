@@ -105,7 +105,7 @@ export default function AssessmentResultScreen() {
               <Toast nativeID={id} action="success">
                 <ToastTitle>Verifikasi Berhasil</ToastTitle>
                 <ToastDescription>
-                  Identitas resmi Anda telah terverifikasi via Didit KYC. Melanjutkan ke antrean matching...
+                  Identitas resmi Anda telah terverifikasi. Melanjutkan ke antrean pencocokan psikolog...
                 </ToastDescription>
               </Toast>
             ),
@@ -141,7 +141,7 @@ export default function AssessmentResultScreen() {
       const msg =
         err instanceof Error
           ? err.message
-          : "Gagal memulai sesi verifikasi Didit.";
+          : "Gagal memulai sesi verifikasi identitas.";
       toast.show({
         placement: "top",
         render: ({ id }) => (
@@ -411,7 +411,7 @@ export default function AssessmentResultScreen() {
         )}
       </Box>
 
-      {/* Modal Verifikasi Didit KYC */}
+      {/* Modal Verifikasi Identitas KYC */}
       <Modal isOpen={kycModalOpen} onClose={() => setKycModalOpen(false)}>
         <ModalBackdrop />
         <ModalContent className="max-w-[92%] p-5 rounded-3xl bg-card border border-border">
@@ -425,7 +425,7 @@ export default function AssessmentResultScreen() {
                   Verifikasi Identitas
                 </Heading>
                 <Text size="sm" className="text-muted-foreground">
-                  Didit KYC Resmi
+                  Keamanan Rekam Medis
                 </Text>
               </VStack>
               <ModalCloseButton />
@@ -434,16 +434,13 @@ export default function AssessmentResultScreen() {
           <ModalBody className="py-4">
             <VStack space="sm">
               <Text size="sm" className="text-foreground leading-relaxed">
-                Sebelum memulai pencocokan psikolog di sistem antrean, akun Anda wajib berstatus <Text bold className="text-primary">VERIFIED</Text>.
+                Sebelum memulai pencocokan psikolog di sistem antrean, akun Anda membutuhkan verifikasi e-KTP.
               </Text>
               <Box className="bg-muted p-3.5 rounded-2xl border border-border">
                 <Text size="sm" className="text-muted-foreground leading-relaxed">
-                  Jika belum diverifikasi, server akan menolak permintaan antrean matching dengan status <Text bold className="text-destructive">403 Forbidden</Text>.
+                  Verifikasi foto e-KTP dan pindai wajah berlangsung sekitar 3 menit untuk menjamin keselamatan dan kepatuhan medis.
                 </Text>
               </Box>
-              <Text size="sm" className="text-muted-foreground leading-relaxed">
-                Verifikasi berjalan secara native di dalam aplikasi melalui Didit Native SDK tanpa membuka browser external.
-              </Text>
             </VStack>
           </ModalBody>
           <ModalFooter className="flex-col gap-2 pt-3 border-t border-border">
@@ -456,7 +453,7 @@ export default function AssessmentResultScreen() {
                 <ButtonSpinner color="#FFFFFF" />
               ) : (
                 <ButtonText className="text-sm font-bold text-primary-foreground">
-                  Mulai Verifikasi Didit Sekarang
+                  Mulai Verifikasi Sekarang
                 </ButtonText>
               )}
             </Button>

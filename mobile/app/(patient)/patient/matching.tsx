@@ -72,7 +72,7 @@ export default function MatchingScreen() {
               <Toast nativeID={id} action="success">
                 <ToastTitle>Verifikasi Berhasil</ToastTitle>
                 <ToastDescription>
-                  Identitas Anda telah terverifikasi via Didit KYC. Menghubungkan ulang ke antrean matching...
+                  Identitas Anda telah terverifikasi. Menghubungkan ulang ke antrean pencarian psikolog...
                 </ToastDescription>
               </Toast>
             ),
@@ -99,7 +99,7 @@ export default function MatchingScreen() {
       const msg =
         err instanceof Error
           ? err.message
-          : "Gagal memulai sesi verifikasi Didit.";
+          : "Gagal memulai sesi verifikasi identitas.";
       toast.show({
         placement: "top",
         render: ({ id }) => (
@@ -212,13 +212,13 @@ export default function MatchingScreen() {
                 )}
                 <Heading size="sm" bold className="text-foreground">
                   {is403Forbidden
-                    ? "Akses Antrean Ditolak (403 Forbidden)"
+                    ? "Verifikasi Identitas Diperlukan"
                     : "Koneksi Terputus"}
                 </Heading>
               </HStack>
               <Text size="sm" className="text-muted-foreground leading-relaxed">
                 {is403Forbidden
-                  ? "Server menolak permintaan pencocokan psikolog karena akun Anda belum berstatus VERIFIED pada Didit KYC. Selesaikan verifikasi identitas resmi untuk masuk ke antrean matching."
+                  ? "Layanan pencocokan psikolog memerlukan akun yang terverifikasi. Selesaikan verifikasi identitas e-KTP untuk masuk ke antrean."
                   : "Posisi antreanmu tetap aman. Tidak perlu mengirim ulang jawabanmu."}
               </Text>
 
@@ -253,7 +253,7 @@ export default function MatchingScreen() {
                     <ButtonSpinner color="#FFFFFF" />
                   ) : (
                     <ButtonText className="text-primary-foreground font-bold text-sm">
-                      Mulai Verifikasi Didit Sekarang
+                      Mulai Verifikasi Sekarang
                     </ButtonText>
                   )}
                 </Button>

@@ -157,7 +157,7 @@ export default function PatientDashboard() {
       const msg =
         err instanceof Error
           ? err.message
-          : "Gagal memulai sesi verifikasi Didit.";
+          : "Gagal memulai sesi verifikasi identitas.";
       toast.show({
         placement: "top",
         render: ({ id }) => (
@@ -672,7 +672,7 @@ export default function PatientDashboard() {
       </Modal>
 
       {/* ========================================================
-       * MODAL VERIFIKASI DIDIT KYC (GATE MODAL)
+       * MODAL VERIFIKASI IDENTITAS KYC (GATE MODAL)
        * ======================================================== */}
       <Modal isOpen={kycModalOpen} onClose={() => setKycModalOpen(false)}>
         <ModalBackdrop />

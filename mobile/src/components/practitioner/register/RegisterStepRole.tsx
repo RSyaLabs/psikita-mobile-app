@@ -165,7 +165,7 @@ export function RegisterStepRole({
           <Box className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-3 flex-row items-center">
             <ShieldCheck size={18} color="#10B981" />
             <Text size="sm" className="font-semibold text-emerald-700 ml-2 flex-1">
-              Data identitas NIK & Nama terverifikasi Didit KYC
+              Data identitas NIK & Nama terverifikasi e-KTP
             </Text>
           </Box>
         )}

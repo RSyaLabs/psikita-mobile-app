@@ -146,7 +146,7 @@ export default function TriageScreen() {
               <Toast nativeID={id} action="success">
                 <ToastTitle>Verifikasi Berhasil</ToastTitle>
                 <ToastDescription>
-                  Identitas Anda telah terverifikasi via Didit KYC. Silakan tekan Lanjut untuk memproses triase klinis.
+                  Identitas Anda telah terverifikasi. Silakan tekan Lanjut untuk memproses triase klinis.
                 </ToastDescription>
               </Toast>
             ),
@@ -169,7 +169,7 @@ export default function TriageScreen() {
       });
     } catch (err: unknown) {
       haptics.error();
-      const msg = err instanceof Error ? err.message : "Gagal memulai sesi verifikasi Didit.";
+      const msg = err instanceof Error ? err.message : "Gagal memulai sesi verifikasi identitas.";
       toast.show({
         placement: "top",
         render: ({ id }) => (
@@ -362,7 +362,7 @@ export default function TriageScreen() {
         </ModalContent>
       </Modal>
 
-      {/* Didit KYC Gate Modal */}
+      {/* Verifikasi Identitas Gate Modal */}
       <Modal isOpen={kycModalOpen} onClose={() => setKycModalOpen(false)}>
         <ModalBackdrop />
         <ModalContent className="w-full max-w-[420px] p-5 rounded-3xl bg-card border border-border/80 shadow-lg">
@@ -376,7 +376,7 @@ export default function TriageScreen() {
                   Verifikasi Identitas
                 </Heading>
                 <Text size="sm" className="text-muted-foreground font-medium">
-                  Didit KYC Resmi
+                  Keamanan Rekam Medis
                 </Text>
               </VStack>
               <ModalCloseButton />
@@ -389,7 +389,7 @@ export default function TriageScreen() {
               </Text>
               <Box className="bg-muted p-3.5 rounded-2xl border border-border/60">
                 <Text size="sm" className="text-muted-foreground leading-relaxed">
-                  Jika belum diverifikasi, server akan menolak permintaan dengan status <Text bold className="text-destructive">403 Forbidden</Text>.
+                  Verifikasi e-KTP dan pindai wajah berlangsung sekitar 3 menit untuk melindungi privasi rekam medismu.
                 </Text>
               </Box>
             </VStack>
@@ -404,7 +404,7 @@ export default function TriageScreen() {
                 <ButtonSpinner color="#FFFFFF" />
               ) : (
                 <ButtonText className="text-sm font-bold text-primary-foreground">
-                  Mulai Verifikasi Didit Sekarang
+                  Mulai Verifikasi Sekarang
                 </ButtonText>
               )}
             </Button>
