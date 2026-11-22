@@ -1,26 +1,10 @@
 import React from "react";
 import {
-  AlertTriangle,
-  FileCheck,
-  ShieldAlert,
-  Calendar,
-  PhoneCall,
-  Clock,
-  X,
-  Bell,
-  CheckCircle2,
-  ArrowRight,
-  FileText,
-  Settings,
   HelpCircle,
+  X,
   BookOpen,
   Activity,
   Phone,
-  Share2,
-  Copy,
-  Camera,
-  Image as ImageIcon,
-  Hospital,
 } from "lucide-react-native";
 import {
   Box,
@@ -31,17 +15,12 @@ import {
   Pressable,
   Button,
   ButtonText,
-  ButtonIcon,
-  Badge,
-  BadgeText,
-  ScrollView,
   Modal,
   ModalBackdrop,
   ModalContent,
   ModalHeader,
   ModalBody,
 } from "@/components/ui";
-import { haptics } from "@/utils/haptics";
 
 
 /* -------------------------------------------------------------------------- */
@@ -134,7 +113,7 @@ export function PractitionerHelpModal({
             onPress={onClose}
             className="w-full border-border bg-card h-11 rounded-xl mt-3"
           >
-            <ButtonText className="text-xs font-semibold text-foreground">
+            <ButtonText className="text-sm font-semibold text-foreground">
               Tutup
             </ButtonText>
           </Button>

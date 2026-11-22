@@ -1,29 +1,6 @@
 import React from "react";
+import { X, FileCheck } from "lucide-react-native";
 import {
-  AlertTriangle,
-  FileCheck,
-  ShieldAlert,
-  Calendar,
-  PhoneCall,
-  Clock,
-  X,
-  Bell,
-  CheckCircle2,
-  ArrowRight,
-  FileText,
-  Settings,
-  HelpCircle,
-  BookOpen,
-  Activity,
-  Phone,
-  Share2,
-  Copy,
-  Camera,
-  Image as ImageIcon,
-  Hospital,
-} from "lucide-react-native";
-import {
-  Box,
   Text,
   Heading,
   VStack,
@@ -31,10 +8,6 @@ import {
   Pressable,
   Button,
   ButtonText,
-  ButtonIcon,
-  Badge,
-  BadgeText,
-  ScrollView,
   Modal,
   ModalBackdrop,
   ModalContent,
@@ -88,8 +61,8 @@ export function UploadDocsModal({
 
         <ModalBody className="pt-3 pb-1">
           <Text
-            size="xs"
-            className="text-muted-foreground mb-3 leading-relaxed"
+            size="sm"
+            className="text-muted-foreground mb-3 leading-relaxed text-sm"
           >
             Pilih dokumen legalitas berformat PDF yang masih berlaku dari
             penyimpanan perangkat Anda:

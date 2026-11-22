@@ -3,14 +3,9 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { KeyboardAvoidingView, Platform } from "react-native";
 import {
-  ShieldAlert,
-  Lock,
-} from "lucide-react-native";
-import {
   Box,
   Heading,
   Text,
-  VStack,
   HStack,
   Card,
   Button,
@@ -222,7 +217,7 @@ export default function ChatRoomScreen() {
           isOpen={isAssessmentOpen}
           practitionerName={practitionerName}
           onClose={() => setIsAssessmentOpen(false)}
-          onSubmitAnswers={(answers) => {
+          onSubmitAnswers={() => {
             setIsAssessmentCompleted(true);
             setIsAssessmentOpen(false);
             haptics.success();

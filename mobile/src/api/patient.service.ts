@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { apiRequest } from "./client";
 import {
-  noContentAdapter,
   paginatedAdapter,
   withQueryParams,
   type PaginatedResult,

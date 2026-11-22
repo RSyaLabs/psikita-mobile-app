@@ -1,5 +1,5 @@
 import React from "react";
-import { ArrowLeft, ChevronRight, AlertCircle, Calendar } from "lucide-react-native";
+import { ArrowLeft, ChevronRight, AlertCircle } from "lucide-react-native";
 import {
   Box,
   VStack,

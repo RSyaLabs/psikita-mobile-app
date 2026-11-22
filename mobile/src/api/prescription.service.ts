@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ApiError, apiRequest } from "./client";
+import { apiRequest } from "./client";
 import {
   collectionAdapter,
   paginatedAdapter,

@@ -113,7 +113,7 @@ const validatedBillingOrderContextSchema = z
  * before the private minter is called. The current contract has no such
  * response, so production never invokes this seam.
  */
-function adaptValidatedBillingOrderContext(
+export function adaptValidatedBillingOrderContext(
   value: unknown,
   validatedConsultationId: string,
 ): ServerPaymentContext {
@@ -183,7 +183,7 @@ const paymentSchema = z
   })
   .strict();
 
-const billingOrderSchema = z
+export const billingOrderSchema = z
   .object({
     orderType: z.enum(["INITIAL", "EXTENSION"]),
     durationMinutes: z.number().positive(),
@@ -195,7 +195,7 @@ const billingOrderSchema = z
   })
   .strict();
 
-const paymentRequestSchema = z
+export const paymentRequestSchema = z
   .object({
     methodType: z.enum(["E_WALLET", "VIRTUAL_ACCOUNT", "QRIS"]),
     channelCode: z.string().min(1),
@@ -205,7 +205,7 @@ const paymentRequestSchema = z
   })
   .strict();
 
-const paymentInputSchema = z
+export const paymentInputSchema = z
   .object({
     methodType: z.enum(["E_WALLET", "VIRTUAL_ACCOUNT", "QRIS"]),
     channelCode: z.string().min(1),
@@ -214,7 +214,7 @@ const paymentInputSchema = z
   })
   .strict();
 
-const bpjsEligibilityRequestSchema = z
+export const bpjsEligibilityRequestSchema = z
   .object({
     memberNumber: z.string().min(1),
   })

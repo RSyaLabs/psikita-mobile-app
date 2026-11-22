@@ -1,27 +1,5 @@
 import React from "react";
-import {
-  AlertTriangle,
-  FileCheck,
-  ShieldAlert,
-  Calendar,
-  PhoneCall,
-  Clock,
-  X,
-  Bell,
-  CheckCircle2,
-  ArrowRight,
-  FileText,
-  Settings,
-  HelpCircle,
-  BookOpen,
-  Activity,
-  Phone,
-  Share2,
-  Copy,
-  Camera,
-  Image as ImageIcon,
-  Hospital,
-} from "lucide-react-native";
+import { Clock, X } from "lucide-react-native";
 import {
   Box,
   Text,
@@ -31,10 +9,6 @@ import {
   Pressable,
   Button,
   ButtonText,
-  ButtonIcon,
-  Badge,
-  BadgeText,
-  ScrollView,
   Modal,
   ModalBackdrop,
   ModalContent,
@@ -139,7 +113,7 @@ export function PractitionerScheduleModal({
             }}
             className="w-full bg-secondary h-11 rounded-xl mt-3"
           >
-            <ButtonText className="text-xs font-bold text-secondary-foreground">
+            <ButtonText className="text-sm font-bold text-secondary-foreground">
               Simpan & Terapkan
             </ButtonText>
           </Button>

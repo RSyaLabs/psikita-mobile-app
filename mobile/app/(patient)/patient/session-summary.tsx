@@ -15,7 +15,6 @@ import {
   usePractitioner,
 } from "@/hooks/useApiQueries";
 import { haptics } from "@/utils/haptics";
-import { safeNavigateBack } from "@/utils/navigation";
 
 export default function SessionSummaryScreen() {
   const router = useRouter();

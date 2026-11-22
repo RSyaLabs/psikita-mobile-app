@@ -1,6 +1,6 @@
 import { createContext, useContext } from "react";
 import { z } from "zod";
-import { SERVER_ROLES, type ServerRole } from "@/constants/enums";
+import { SERVER_ROLES } from "@/constants/enums";
 import { ROUTES } from "@/constants/routes";
 import { decodeAccessToken } from "@/utils/jwt";
 import type { TokenResponseDto } from "@/types/api";
@@ -50,7 +50,7 @@ const serverUserSchema = z.object({
   role: serverRoleSchema,
   isActive: z.literal(true),
 });
-const serverSessionSchema = z.object({
+export const serverSessionSchema = z.object({
   accessToken: z.string().refine((token) => token.trim().length > 0),
   user: serverUserSchema,
 });

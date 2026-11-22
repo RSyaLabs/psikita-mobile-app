@@ -1,26 +1,9 @@
 import React from "react";
 import {
-  AlertTriangle,
-  FileCheck,
-  ShieldAlert,
-  Calendar,
-  PhoneCall,
-  Clock,
-  X,
   Bell,
+  X,
   CheckCircle2,
   ArrowRight,
-  FileText,
-  Settings,
-  HelpCircle,
-  BookOpen,
-  Activity,
-  Phone,
-  Share2,
-  Copy,
-  Camera,
-  Image as ImageIcon,
-  Hospital,
 } from "lucide-react-native";
 import {
   Box,
@@ -32,9 +15,6 @@ import {
   Button,
   ButtonText,
   ButtonIcon,
-  Badge,
-  BadgeText,
-  ScrollView,
   Modal,
   ModalBackdrop,
   ModalContent,
@@ -91,7 +71,7 @@ export function PractitionerNotifModal({
             <Box className="bg-muted p-3.5 rounded-2xl border border-border">
               <HStack space="xs" className="items-center mb-1">
                 <Box className="w-2 h-2 rounded-full bg-secondary" />
-                <Text size="xs" bold className="text-foreground">
+                <Text size="sm" bold className="text-foreground text-sm font-semibold">
                   {queueCount === undefined
                     ? "Jumlah antrian belum tersedia dari server"
                     : queueCount === 0
@@ -99,7 +79,7 @@ export function PractitionerNotifModal({
                       : `Permintaan triase server: ${queueCount}`}
                 </Text>
               </HStack>
-              <Text size="xs" className="text-muted-foreground leading-relaxed">
+              <Text size="sm" className="text-muted-foreground leading-relaxed text-sm">
                 Data yang tampil berasal dari antrian triase yang dimuat dari
                 server.
               </Text>
@@ -107,12 +87,12 @@ export function PractitionerNotifModal({
 
             <Box className="bg-muted p-3.5 rounded-2xl border border-border">
               <HStack space="xs" className="items-center mb-1">
-                <CheckCircle2 size={14} className="text-secondary" />
-                <Text size="xs" bold className="text-foreground">
+                <CheckCircle2 size={16} className="text-secondary" />
+                <Text size="sm" bold className="text-foreground text-sm font-semibold">
                   Rujukan SATUSEHAT Kemenkes
                 </Text>
               </HStack>
-              <Text size="xs" className="text-muted-foreground leading-relaxed">
+              <Text size="sm" className="text-muted-foreground leading-relaxed text-sm">
                 Detail sinkronisasi rekam medis belum tersedia dari server.
               </Text>
             </Box>
@@ -129,7 +109,7 @@ export function PractitionerNotifModal({
               }}
               className="w-full bg-secondary h-11 rounded-xl mt-2"
             >
-              <ButtonText className="text-xs font-bold text-secondary-foreground">
+              <ButtonText className="text-sm font-bold text-secondary-foreground">
                 {queueCount === undefined
                   ? "Status antrian belum tersedia"
                   : queueCount === 0

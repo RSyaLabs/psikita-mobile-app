@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { avatarService, AvatarResponseDto } from "@/api/avatar.service";
+import { avatarService } from "@/api/avatar.service";
 import { queryKeys } from "../useQueryKeys";
 
 export function useMyAvatar() {

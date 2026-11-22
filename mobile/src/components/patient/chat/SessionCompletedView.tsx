@@ -1,5 +1,5 @@
 import React from "react";
-import { Check, Clock, FileCheck } from "lucide-react-native";
+import { Check } from "lucide-react-native";
 import { Box, VStack, HStack, Heading, Text, Button, ButtonText, Pressable } from "@/components/ui";
 import { haptics } from "@/utils/haptics";
 

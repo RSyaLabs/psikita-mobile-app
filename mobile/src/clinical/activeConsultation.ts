@@ -1,9 +1,4 @@
 import { z } from "zod";
-import {
-  CONSULTATION_STATUSES,
-  type ConsultationStatus,
-} from "@/constants/enums";
-
 export { isConsultationStatus } from "@/constants/enums";
 export type { ConsultationStatus } from "@/constants/enums";
 

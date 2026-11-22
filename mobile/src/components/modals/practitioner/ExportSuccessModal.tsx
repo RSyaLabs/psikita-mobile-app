@@ -1,47 +1,15 @@
 import React from "react";
-import {
-  AlertTriangle,
-  FileCheck,
-  ShieldAlert,
-  Calendar,
-  PhoneCall,
-  Clock,
-  X,
-  Bell,
-  CheckCircle2,
-  ArrowRight,
-  FileText,
-  Settings,
-  HelpCircle,
-  BookOpen,
-  Activity,
-  Phone,
-  Share2,
-  Copy,
-  Camera,
-  Image as ImageIcon,
-  Hospital,
-} from "lucide-react-native";
+import { AlertTriangle } from "lucide-react-native";
 import {
   Box,
   Text,
   Heading,
-  VStack,
-  HStack,
-  Pressable,
   Button,
   ButtonText,
-  ButtonIcon,
-  Badge,
-  BadgeText,
-  ScrollView,
   Modal,
   ModalBackdrop,
   ModalContent,
-  ModalHeader,
-  ModalBody,
 } from "@/components/ui";
-import { haptics } from "@/utils/haptics";
 
 
 /* -------------------------------------------------------------------------- */
@@ -77,11 +45,11 @@ export function ExportSuccessModal({
           Ekspor belum tersedia
         </Heading>
         <Text
-          size="xs"
-          className="text-muted-foreground text-center mt-1.5 leading-relaxed"
+          size="sm"
+          className="text-muted-foreground text-center mt-1.5 leading-relaxed text-sm"
         >
           Tidak ada exporter native yang tervalidasi. Berkas{" "}
-          <Text size="xs" bold className="text-foreground">
+          <Text size="sm" bold className="text-foreground text-sm">
             {fileName}
           </Text>{" "}
           tidak dibuat.
@@ -92,7 +60,7 @@ export function ExportSuccessModal({
           onPress={onClose}
           className="w-full bg-secondary h-11 rounded-xl mt-4"
         >
-          <ButtonText className="text-xs font-bold text-secondary-foreground">
+          <ButtonText className="text-sm font-bold text-secondary-foreground">
             Selesai
           </ButtonText>
         </Button>

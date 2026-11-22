@@ -1,6 +1,6 @@
 import React from "react";
 import { ClipboardList, CheckCircle2 } from "lucide-react-native";
-import { Box, VStack, HStack, Heading, Text, Button, ButtonText, Pressable } from "@/components/ui";
+import { Box, VStack, HStack, Heading, Text, Button, ButtonText } from "@/components/ui";
 import { haptics } from "@/utils/haptics";
 
 export interface ChatAssessmentPromptCardProps {

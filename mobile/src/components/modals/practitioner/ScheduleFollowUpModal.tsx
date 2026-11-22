@@ -1,27 +1,5 @@
 import React from "react";
-import {
-  AlertTriangle,
-  FileCheck,
-  ShieldAlert,
-  Calendar,
-  PhoneCall,
-  Clock,
-  X,
-  Bell,
-  CheckCircle2,
-  ArrowRight,
-  FileText,
-  Settings,
-  HelpCircle,
-  BookOpen,
-  Activity,
-  Phone,
-  Share2,
-  Copy,
-  Camera,
-  Image as ImageIcon,
-  Hospital,
-} from "lucide-react-native";
+import { Calendar, X, Clock } from "lucide-react-native";
 import {
   Box,
   Text,
@@ -31,10 +9,6 @@ import {
   Pressable,
   Button,
   ButtonText,
-  ButtonIcon,
-  Badge,
-  BadgeText,
-  ScrollView,
   Modal,
   ModalBackdrop,
   ModalContent,
@@ -110,11 +84,11 @@ export function ScheduleFollowUpModal({
 
         <ModalBody className="pt-3 pb-1">
           <Text
-            size="xs"
-            className="text-muted-foreground mb-3 leading-relaxed"
+            size="sm"
+            className="text-muted-foreground mb-3 leading-relaxed text-sm"
           >
             Jadwalkan sesi evaluasi lanjutan untuk pasien{" "}
-            <Text size="xs" bold className="text-foreground">
+            <Text size="sm" bold className="text-foreground text-sm font-semibold">
               {patientName || "Pasien"}
             </Text>
             :
@@ -152,7 +126,7 @@ export function ScheduleFollowUpModal({
             onPress={onClose}
             className="w-full border-border bg-card h-11 rounded-xl"
           >
-            <ButtonText className="text-xs font-semibold text-foreground">
+            <ButtonText className="text-sm font-semibold text-foreground">
               Batal
             </ButtonText>
           </Button>

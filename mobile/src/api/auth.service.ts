@@ -9,7 +9,6 @@ import {
   RequestOtpDto,
   VerifyOtpDto,
   TokenResponseDto,
-  OtpVerifyResponseDto,
   RegisterResponseDto,
 } from "@/types/api";
 

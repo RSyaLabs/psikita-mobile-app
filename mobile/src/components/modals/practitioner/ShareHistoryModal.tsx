@@ -1,27 +1,5 @@
 import React from "react";
-import {
-  AlertTriangle,
-  FileCheck,
-  ShieldAlert,
-  Calendar,
-  PhoneCall,
-  Clock,
-  X,
-  Bell,
-  CheckCircle2,
-  ArrowRight,
-  FileText,
-  Settings,
-  HelpCircle,
-  BookOpen,
-  Activity,
-  Phone,
-  Share2,
-  Copy,
-  Camera,
-  Image as ImageIcon,
-  Hospital,
-} from "lucide-react-native";
+import { Share2, X, Copy } from "lucide-react-native";
 import {
   Box,
   Text,
@@ -32,9 +10,6 @@ import {
   Button,
   ButtonText,
   ButtonIcon,
-  Badge,
-  BadgeText,
-  ScrollView,
   Modal,
   ModalBackdrop,
   ModalContent,
@@ -126,7 +101,7 @@ export function ShareHistoryModal({
               onPress={onClose}
               className="w-full border-border bg-card h-11 rounded-xl mt-1"
             >
-              <ButtonText className="text-xs font-semibold text-foreground">
+              <ButtonText className="text-sm font-semibold text-foreground">
                 Tutup
               </ButtonText>
             </Button>

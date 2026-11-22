@@ -15,7 +15,6 @@ import {
   Pressable,
   Button,
   ButtonText,
-  ScrollView,
   Modal,
   ModalBackdrop,
   ModalContent,
