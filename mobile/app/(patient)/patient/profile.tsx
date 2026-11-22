@@ -14,6 +14,7 @@ import {
   LogOut,
   ChevronRight,
   Stethoscope,
+  Lock,
 } from "lucide-react-native";
 import { getInitials } from "@/utils/format";
 import { haptics } from "@/utils/haptics";
@@ -274,6 +275,25 @@ export default function ProfileScreen() {
                 <AppIcon icon={FileText} size={20} tone="primary" />
                 <Text size="sm" className="font-semibold text-foreground">
                   Rujukan rumah sakit
+                </Text>
+              </HStack>
+              <AppIcon icon={ChevronRight} size={18} tone="muted" />
+            </Pressable>
+
+            <Pressable
+              testID="btn-profile-security"
+              accessibilityRole="button"
+              accessibilityLabel="Kata sandi & keamanan"
+              onPress={() => {
+                haptics.light();
+                router.push(ROUTES.PATIENT.SECURITY as any);
+              }}
+              className="py-3 flex-row items-center justify-between border-t border-border active:opacity-80"
+            >
+              <HStack space="md" className="items-center">
+                <AppIcon icon={Lock} size={20} tone="primary" />
+                <Text size="sm" className="font-semibold text-foreground">
+                  Kata sandi & keamanan
                 </Text>
               </HStack>
               <AppIcon icon={ChevronRight} size={18} tone="muted" />

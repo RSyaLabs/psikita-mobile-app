@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { View } from "react-native";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ChevronLeft, Camera, CheckCircle2 } from "lucide-react-native";
@@ -27,10 +28,12 @@ import {
   EmergencyContactSection,
   BpjsIntegrationSection,
 } from "@/components/patient/edit-profile";
+import { PersonalDataView } from "@/components/patient/account";
 import {
   usePatientProfile,
   useUpdatePatientProfile,
   useMyAvatar,
+  useMyVerificationStatus,
 } from "@/hooks/useApiQueries";
 import { getInitials } from "@/utils/format";
 import { haptics } from "@/utils/haptics";
@@ -42,9 +45,15 @@ export default function EditProfileScreen() {
   const toast = useToast();
   const { data: profile } = usePatientProfile();
   const { data: avatarData } = useMyAvatar();
+  const { data: kycStatus } = useMyVerificationStatus();
+  const isKycVerified =
+    kycStatus?.status === "APPROVED" ||
+    kycStatus?.status === "VERIFIED" ||
+    profile?.status === "VERIFIED";
   const updateProfileMutation = useUpdatePatientProfile();
   const isLoading = updateProfileMutation.isPending;
 
+  const [tab, setTab] = useState<"data-diri" | "medis">("data-diri");
   const [fullName, setFullName] = useState(profile?.fullName || "");
   const [phone, setPhone] = useState(profile?.phoneNumber || "");
   const [nik, setNik] = useState(profile?.nik || "");
@@ -159,6 +168,83 @@ export default function EditProfileScreen() {
     );
   };
 
+  const tabPill = (
+    <View className="flex-row bg-stone-200/60 p-1 rounded-xl">
+      <Pressable
+        testID="tab-btn-data-diri"
+        accessibilityRole="tab"
+        accessibilityLabel="Tab Data Diri"
+        accessibilityState={{ selected: tab === "data-diri" }}
+        onPress={() => {
+          haptics.selection();
+          setTab("data-diri");
+        }}
+        className={`flex-1 py-2 items-center rounded-lg ${
+          tab === "data-diri" ? "bg-white shadow-sm" : ""
+        }`}
+      >
+        <Text
+          className={`text-sm font-bold ${
+            tab === "data-diri" ? "text-[#222222]" : "text-[#777777]"
+          }`}
+        >
+          Data Diri (AC1)
+        </Text>
+      </Pressable>
+      <Pressable
+        testID="tab-btn-data-medis"
+        accessibilityRole="tab"
+        accessibilityLabel="Tab Data Medis & BPJS"
+        accessibilityState={{ selected: tab === "medis" }}
+        onPress={() => {
+          haptics.selection();
+          setTab("medis");
+        }}
+        className={`flex-1 py-2 items-center rounded-lg ${
+          tab === "medis" ? "bg-white shadow-sm" : ""
+        }`}
+      >
+        <Text
+          className={`text-sm font-bold ${
+            tab === "medis" ? "text-[#222222]" : "text-[#777777]"
+          }`}
+        >
+          Data Medis & BPJS
+        </Text>
+      </Pressable>
+    </View>
+  );
+
+  if (tab === "data-diri") {
+    return (
+      <SafeAreaView className="flex-1 bg-[#FAF8F5]" edges={["top", "bottom"]}>
+        <PersonalDataView
+          initialData={{
+            fullName,
+            email: (profile as any)?.user?.email || "pasien@seraphany.id",
+            phone,
+            birthDate,
+          }}
+          isKycVerified={isKycVerified}
+          tabSlot={tabPill}
+          onBack={() => safeNavigateBack(router, ROUTES.PATIENT.PROFILE)}
+          onCancel={() => safeNavigateBack(router, ROUTES.PATIENT.PROFILE)}
+          onChangePhoto={() => setShowPhotoModal(true)}
+          onSave={(data) => {
+            setFullName(data.fullName);
+            setPhone(data.phone);
+            setBirthDate(data.birthDate);
+            handleSave();
+          }}
+        />
+        <ChangePhotoModal
+          isOpen={showPhotoModal}
+          onClose={() => setShowPhotoModal(false)}
+        />
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView className="flex-1 bg-background">
       {/* Header */}
@@ -182,6 +268,10 @@ export default function EditProfileScreen() {
         </Heading>
         <Box className="w-10" />
       </HStack>
+
+      <Box className="px-5 pt-1 pb-2">
+        {tabPill}
+      </Box>
 
       <ScrollView
         contentContainerStyle={{

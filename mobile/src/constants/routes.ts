@@ -34,6 +34,7 @@ export const ROUTES = {
     SELF_SCREENING: "/patient/self-screening",
     NOTIFICATIONS: "/patient/notifications",
     HELP: "/patient/help",
+    SECURITY: "/patient/security",
   },
   PRACTITIONER: {
     REGISTER: "/practitioner/register",
