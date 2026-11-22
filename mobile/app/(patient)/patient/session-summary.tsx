@@ -103,13 +103,37 @@ export default function SessionSummaryScreen() {
           onBack={() => setActiveView("completed")}
           onViewFullCarePlan={() => {
             haptics.selection();
-            router.push(ROUTES.PATIENT.PRESCRIPTION as any);
+            router.push({
+              pathname: ROUTES.PATIENT.FOLLOW_UPS,
+              params: {
+                consultationId: targetConsultationId,
+                step: "care-plan",
+                guest: guest || "true",
+              },
+            } as any);
           }}
           onViewFollowUpDetail={() => {
             haptics.selection();
-            router.push(ROUTES.PATIENT.FOLLOW_UPS as any);
+            router.push({
+              pathname: ROUTES.PATIENT.FOLLOW_UPS,
+              params: {
+                consultationId: targetConsultationId,
+                step: "recommendation",
+                guest: guest || "true",
+              },
+            } as any);
           }}
-          onSelectFollowUpSchedule={handleSelectFollowUpSchedule}
+          onSelectFollowUpSchedule={() => {
+            haptics.selection();
+            router.push({
+              pathname: ROUTES.PATIENT.FOLLOW_UPS,
+              params: {
+                consultationId: targetConsultationId,
+                step: "picker",
+                guest: guest || "true",
+              },
+            } as any);
+          }}
           onOpenCrisisHelp={() => setShowCrisisHelp(true)}
         />
       )}

@@ -1,152 +1,175 @@
-import React from "react";
-import { useRouter } from "expo-router";
+import React, { useState } from "react";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
-  ChevronLeft,
-  Calendar,
-  CheckCircle2,
-  User,
-} from "lucide-react-native";
-import {
-  Box,
-  Text,
-  Heading,
-  Card,
-  VStack,
-  HStack,
-  Pressable,
-  Button,
-  ButtonText,
-  ScrollView,
-  Badge,
-  BadgeText,
-  Spinner,
-} from "@/components/ui";
-import { useMyFollowUps, useBookFollowUp } from "@/hooks/useApiQueries";
-import { safeNavigateBack } from "@/utils/navigation";
+  CarePlanDetailView,
+  FollowUpSchedulePickerView,
+  FollowUpConfirmedView,
+  FollowUpRecommendationView,
+} from "@/components/patient/follow-ups";
+import { CrisisHelpModal } from "@/components/modals";
 import { ROUTES } from "@/constants/routes";
+import {
+  useCarePlan,
+  useActiveConsultation,
+  usePractitioner,
+  useMyFollowUps,
+} from "@/hooks/useApiQueries";
 import { haptics } from "@/utils/haptics";
+import { safeNavigateBack } from "@/utils/navigation";
 
 export default function FollowUpsScreen() {
   const router = useRouter();
-  const { data: followUps, isLoading, isError } = useMyFollowUps();
-  const bookFollowUpMutation = useBookFollowUp();
+  const {
+    consultationId: routeConsultationId,
+    step: initialStep,
+    guest,
+    date: routeDate,
+    time: routeTime,
+  } = useLocalSearchParams<{
+    consultationId?: string;
+    step?: string;
+    guest?: string;
+    date?: string;
+    time?: string;
+  }>();
+
+  const consultationId = Array.isArray(routeConsultationId)
+    ? routeConsultationId[0]
+    : routeConsultationId || "demo-session";
+
+  const consultation = useActiveConsultation(consultationId);
+  const context = consultation.context;
+  const targetConsultationId = context?.consultationId || consultationId;
+
+  const { data: carePlan } = useCarePlan(targetConsultationId);
+  const practitioner = usePractitioner(context?.practitionerId);
+  const practitionerName =
+    practitioner.data?.fullName || "Dr. Sarah Jenkins, Sp.KJ";
+
+  // Map care plan interventions from API into UI tasks
+  const carePlanTasks =
+    carePlan?.interventions && carePlan.interventions.length > 0
+      ? carePlan.interventions.map((item, idx) => ({
+          id: `task-${idx + 1}`,
+          title: item.title,
+          frequency: item.description,
+          completed: idx === 0,
+        }))
+      : undefined;
+
+  // View state: 'care-plan' (Screen 48), 'picker' (Screen 49), 'confirmed' (Screen 50), 'recommendation' (Screen 51)
+  const [currentStep, setCurrentStep] = useState<
+    "care-plan" | "picker" | "confirmed" | "recommendation"
+  >(
+    initialStep === "care-plan"
+      ? "care-plan"
+      : initialStep === "confirmed"
+        ? "confirmed"
+        : initialStep === "recommendation"
+          ? "recommendation"
+          : "picker",
+  );
+
+  const [confirmedSchedule, setConfirmedSchedule] = useState({
+    date: routeDate || "Rabu, 18 November 2026",
+    time: routeTime || "10.00 WIB",
+  });
+
+  const [showCrisisHelp, setShowCrisisHelp] = useState(false);
+
+  const handleBackToResults = () => {
+    haptics.light();
+    router.push({
+      pathname: ROUTES.PATIENT.SESSION_SUMMARY,
+      params: {
+        consultationId: targetConsultationId,
+        step: "result",
+        guest: guest || "true",
+      },
+    } as any);
+  };
+
+  const handleProceedToCheckout = (selectedDate: string, selectedTime: string) => {
+    haptics.selection();
+    setConfirmedSchedule({
+      date: selectedDate,
+      time: `${selectedTime} WIB`,
+    });
+    // In demo / test flow, can advance directly to confirmed or checkout
+    setCurrentStep("confirmed");
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-background">
-      {/* Top Header */}
-      <HStack space="sm" className="items-center justify-between px-5 pt-3.5 pb-2 bg-card border-b border-border">
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Kembali"
-          onPress={() => {
-            haptics.light();
-            safeNavigateBack(router, ROUTES.PATIENT.DASHBOARD);
-          }}
-          className="w-10 h-10 rounded-full bg-card border border-border items-center justify-center active:bg-muted"
-        >
-          <ChevronLeft size={22} color="#262130" />
-        </Pressable>
-        <Heading size="sm" bold className="text-foreground">
-          Sesi Kontrol & Lanjutan
-        </Heading>
-        <Box className="w-10" />
-      </HStack>
-
-      <ScrollView
-        contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 16, paddingBottom: 40 }}
-        showsVerticalScrollIndicator={false}
+      <SafeAreaView
+        edges={[]}
+        className="flex-1 max-w-[640px] md:max-w-[720px] self-center w-full"
       >
-        <Box className="bg-primary/10 rounded-2xl p-4 border border-primary/20 mb-4">
-          <HStack space="xs" className="items-center mb-1">
-            <CheckCircle2 size={18} color="#4A3B6B" />
-            <Text size="sm" bold className="text-foreground font-bold">
-              Pemantauan Klinis Berkelanjutan
-            </Text>
-          </HStack>
-          <Text size="sm" className="text-muted-foreground leading-relaxed">
-            Daftar sesi kontrol yang direkomendasikan oleh psikolog untuk memantau progres terapi dan evaluasi kondisi mental Anda secara rutin.
-          </Text>
-        </Box>
-
-        {isLoading ? (
-          <Box className="py-20 items-center justify-center">
-            <Spinner size="large" />
-            <Text size="sm" className="text-muted-foreground mt-3">
-              Memuat jadwal kontrol...
-            </Text>
-          </Box>
-        ) : isError ? (
-          <Card className="p-6 items-center bg-card rounded-2xl border border-border">
-            <Text size="sm" bold className="text-foreground text-center">
-              Gagal memuat jadwal kontrol
-            </Text>
-          </Card>
-        ) : (followUps ?? []).length === 0 ? (
-          <Card className="p-8 items-center bg-card rounded-2xl border border-border">
-            <Calendar size={36} className="text-muted-foreground/60 mb-2" />
-            <Text size="sm" bold className="text-foreground text-center">
-              Belum ada rekomendasi kontrol
-            </Text>
-            <Text size="sm" className="text-muted-foreground text-center mt-1">
-              Rekomendasi sesi lanjutan akan muncul setelah sesi konseling selesai dan dokter menetapkan jadwal kontrol.
-            </Text>
-          </Card>
-        ) : (
-          <VStack space="sm">
-            {(followUps ?? []).map((fu) => (
-              <Card key={fu.id} className="bg-card rounded-2xl p-4 border border-border">
-                <HStack space="xs" className="items-center justify-between mb-2">
-                  <Badge
-                    variant={fu.status === "SCHEDULED" ? "default" : "secondary"}
-                    className="rounded-full px-2.5 py-0.5"
-                  >
-                    <BadgeText className="text-sm font-bold text-white uppercase">
-                      {fu.status === "SCHEDULED" ? "Terjadwal" : "Menunggu Booking"}
-                    </BadgeText>
-                  </Badge>
-                  <Text size="sm" className="text-muted-foreground font-medium">
-                    Interval: {fu.recommendedIntervalDays} hari
-                  </Text>
-                </HStack>
-
-                <Heading size="sm" bold className="text-foreground mb-1">
-                  {fu.reason || "Evaluasi Pemulihan & Rencana Terapi"}
-                </Heading>
-
-                {fu.notes && (
-                  <Text size="sm" className="text-muted-foreground mt-1 mb-2 font-normal">
-                    Catatan dokter: {fu.notes}
-                  </Text>
-                )}
-
-                <HStack space="sm" className="items-center justify-between mt-3 pt-3 border-t border-border/50">
-                  <HStack space="xs" className="items-center">
-                    <User size={16} color="#4B4656" />
-                    <Text size="sm" className="text-sm text-muted-foreground font-medium">
-                      {fu.practitionerName ?? "Psikolog SeraPhany"}
-                    </Text>
-                  </HStack>
-                  {fu.status !== "SCHEDULED" && (
-                    <Button
-                      size="sm"
-                      onPress={() => {
-                        haptics.medium();
-                        router.push(ROUTES.PATIENT.DOCTORS);
-                      }}
-                      className="bg-primary px-4 py-2 rounded-xl h-auto"
-                    >
-                      <ButtonText className="text-sm font-bold text-white">
-                        Pilih Jadwal
-                      </ButtonText>
-                    </Button>
-                  )}
-                </HStack>
-              </Card>
-            ))}
-          </VStack>
+        {/* Screen 48: Rencana Perawatan */}
+        {currentStep === "care-plan" && (
+          <CarePlanDetailView
+            practitionerName={practitionerName}
+            validUntil="29 November 2026"
+            tasks={carePlanTasks}
+            reminderSchedule="Setiap hari · 08.00 & 20.00 WIB"
+            onSelectSchedule={() => setCurrentStep("picker")}
+            onBackToResults={handleBackToResults}
+            onOpenCrisisHelp={() => setShowCrisisHelp(true)}
+          />
         )}
-      </ScrollView>
+
+        {/* Screen 49: Pilih Jadwal Lanjutan */}
+        {currentStep === "picker" && (
+          <FollowUpSchedulePickerView
+            practitionerName={practitionerName}
+            sessionDuration="50 menit"
+            onProceedToCheckout={handleProceedToCheckout}
+            onDismiss={handleBackToResults}
+          />
+        )}
+
+        {/* Screen 50: Jadwal Lanjutan Terkonfirmasi */}
+        {currentStep === "confirmed" && (
+          <FollowUpConfirmedView
+            practitionerName={practitionerName}
+            scheduledTime={`${confirmedSchedule.date} · ${confirmedSchedule.time}`}
+            consultationFormat="Konsultasi Chat"
+            totalPaid="Rp 150.000"
+            rescheduleDeadline="2 jam"
+            onAddToCalendar={() => haptics.success()}
+            onViewMySchedule={() => {
+              haptics.selection();
+              router.push(ROUTES.PATIENT.HISTORY as any);
+            }}
+            onBackToHome={() => {
+              haptics.selection();
+              safeNavigateBack(router, ROUTES.PATIENT.DASHBOARD);
+            }}
+          />
+        )}
+
+        {/* Screen 51: Detail Rekomendasi Sesi Lanjutan */}
+        {currentStep === "recommendation" && (
+          <FollowUpRecommendationView
+            practitionerName={practitionerName}
+            sessionDate="22 November 2026"
+            clinicalReason="Memerlukan evaluasi penerapan teknik relaksasi diafragma 4-7-8 secara konsisten dan pemantauan penurunan gejala kecemasan mingguan."
+            durationLabel="50 menit"
+            formatLabel="Chat / Video"
+            validUntil="29 November 2026"
+            estimatedFee="Rp 150.000"
+            onProceedToSchedule={() => setCurrentStep("picker")}
+            onDismiss={handleBackToResults}
+          />
+        )}
+
+        {/* Emergency Crisis Help Modal */}
+        <CrisisHelpModal
+          isOpen={showCrisisHelp}
+          onClose={() => setShowCrisisHelp(false)}
+        />
+      </SafeAreaView>
     </SafeAreaView>
   );
 }
