@@ -11,7 +11,4 @@ export * from "./practitioner/PractitionerNotifModal";
 export * from "./practitioner/PractitionerSettingsModal";
 export * from "./practitioner/PractitionerScheduleModal";
 export * from "./practitioner/PractitionerHelpModal";
-export * from "./practitioner/ShareHistoryModal";
-export * from "./practitioner/ScheduleFollowUpModal";
-export * from "./practitioner/ExportSuccessModal";
 export * from "./practitioner/UploadDocsModal";
