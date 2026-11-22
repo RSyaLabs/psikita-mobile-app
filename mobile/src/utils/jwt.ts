@@ -26,7 +26,7 @@ const claimsSchema = z.object({
   exp: z.number().optional(),
 });
 
-export type AccessTokenClaims = z.infer<typeof claimsSchema>;
+type AccessTokenClaims = z.infer<typeof claimsSchema>;
 
 export function decodeAccessToken(token: string): AccessTokenClaims | null {
   if (typeof token !== "string") return null;
