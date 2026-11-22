@@ -17,12 +17,12 @@ import {
   ServerPaymentContext,
 } from "@/types/api";
 
-export const paymentMethodMoneySchema = z.object({
+const paymentMethodMoneySchema = z.object({
   amount: z.number().int().nonnegative(),
   currency: z.literal("IDR"),
 });
 
-export const paymentMethodItemSchema = z.object({
+const paymentMethodItemSchema = z.object({
   key: z.string().min(1),
   name: z.string().min(1),
   methodType: z.string().min(1),
@@ -35,7 +35,7 @@ export const paymentMethodItemSchema = z.object({
   disabledReason: z.string().nullable().optional(),
 });
 
-export const paymentMethodGroupSchema = z.object({
+const paymentMethodGroupSchema = z.object({
   groupName: z.string().min(1),
   methodType: z.string().min(1),
   methods: z.array(paymentMethodItemSchema),
@@ -109,7 +109,7 @@ const validatedBillingOrderContextSchema = z
 
 
 /** Accepts only a context already branded by an API adapter. */
-export function serverPaymentContextFromApiResponse(
+function serverPaymentContextFromApiResponse(
   value: unknown,
 ): ServerPaymentContext | undefined {
   if (isServerPaymentContext(value)) {
@@ -162,7 +162,7 @@ const paymentSchema = z
   })
   .strict();
 
-export const billingOrderSchema = z
+const billingOrderSchema = z
   .object({
     orderType: z.enum(["INITIAL", "EXTENSION"]),
     durationMinutes: z.number().positive(),
@@ -174,7 +174,7 @@ export const billingOrderSchema = z
   })
   .strict();
 
-export const paymentRequestSchema = z
+const paymentRequestSchema = z
   .object({
     methodType: z.enum(["E_WALLET", "VIRTUAL_ACCOUNT", "QRIS"]),
     channelCode: z.string().min(1),
@@ -184,7 +184,7 @@ export const paymentRequestSchema = z
   })
   .strict();
 
-export const paymentInputSchema = z
+const paymentInputSchema = z
   .object({
     methodType: z.enum(["E_WALLET", "VIRTUAL_ACCOUNT", "QRIS"]),
     channelCode: z.string().min(1),
@@ -193,7 +193,7 @@ export const paymentInputSchema = z
   })
   .strict();
 
-export const bpjsEligibilityRequestSchema = z
+const bpjsEligibilityRequestSchema = z
   .object({
     memberNumber: z.string().min(1),
   })
@@ -326,7 +326,7 @@ const paymentAdapter = (
 };
 
 /** Validates a payment response without minting or authorizing a context. */
-export function parsePaymentResponse(
+function parsePaymentResponse(
   value: unknown,
   expectedContextId: string,
 ): PaymentResponseDto {

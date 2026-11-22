@@ -14,26 +14,22 @@ const DEFAULT_FAQS: FaqItem[] = [
   {
     id: "faq-1",
     question: "Bagaimana cara kerja pencocokan psikolog?",
-    answer:
-      "Sistem mencocokkan keluhan klinis, preferensi bahasa, dan jadwal Anda dengan psikolog klinis berizin resmi (SIPPK). Anda akan menerima notifikasi segera setelah praktisi yang sesuai ditugaskan.",
+    answer: "Sistem mencocokkan keluhan klinis, preferensi bahasa, dan jadwal Anda dengan psikolog klinis berizin resmi (SIPPK). Anda akan menerima notifikasi segera setelah praktisi yang sesuai ditugaskan.",
   },
   {
     id: "faq-2",
     question: "Pembayaranku belum terkonfirmasi",
-    answer:
-      "Pembayaran instan via Virtual Account dan QRIS diverifikasi otomatis dalam 1–5 menit. Jika status belum berubah setelah 10 menit, gunakan tombol Cek Status atau hubungi tim bantuan kami dengan bukti bayar.",
+    answer: "Pembayaran instan via Virtual Account dan QRIS diverifikasi otomatis dalam 1–5 menit. Jika status belum berubah setelah 10 menit, gunakan tombol Cek Status atau hubungi tim bantuan kami dengan bukti bayar.",
   },
   {
     id: "faq-3",
     question: "Kenapa verifikasi identitasku ditolak?",
-    answer:
-      "Penolakan verifikasi umumnya terjadi jika foto KTP buram, terdapat pantulan cahaya yang menutupi NIK/nama, atau dokumen terpotong. Pastikan identitas terbaca jelas dengan pencahayaan memadai.",
+    answer: "Penolakan verifikasi umumnya terjadi jika foto KTP buram, terdapat pantulan cahaya yang menutupi NIK/nama, atau dokumen terpotong. Pastikan identitas terbaca jelas dengan pencahayaan memadai.",
   },
   {
     id: "faq-4",
     question: "Bagaimana datamu dijaga?",
-    answer:
-      "Data rekam medis Anda dilindungi enkripsi end-to-end berstandar UU Perlindungan Data Pribadi (UU PDP). Isi konsultasi dan asesmen bersifat rahasia dan hanya dapat diakses oleh Anda dan tenaga profesional yang bertugas.",
+    answer: "Data rekam medis Anda dilindungi enkripsi end-to-end berstandar UU Perlindungan Data Pribadi (UU PDP). Isi konsultasi dan asesmen bersifat rahasia dan hanya dapat diakses oleh Anda dan tenaga profesional yang bertugas.",
   },
 ];
 
@@ -60,43 +56,42 @@ export function HelpCenterView({
   const filteredFaqs = useMemo(() => {
     if (!searchQuery.trim()) return faqs;
     const query = searchQuery.toLowerCase().trim();
-    return faqs.filter(
-      (f) =>
-        f.question.toLowerCase().includes(query) ||
-        f.answer.toLowerCase().includes(query)
-    );
+    return faqs.filter((f) => f.question.toLowerCase().includes(query) || f.answer.toLowerCase().includes(query));
   }, [faqs, searchQuery]);
 
   const toggleFaq = (id: string) => {
     haptics.selection();
     setExpandedFaqIds((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
+      next.has(id) ? next.delete(id) : next.add(id);
       return next;
     });
   };
 
-  const handleSupportChat = () => {
-    haptics.selection();
-    if (onContactSupport) {
-      onContactSupport();
-    } else {
-      Linking.openURL("https://wa.me/6281119255772").catch(() => {});
-    }
-  };
-
-  const handleEmail = () => {
-    haptics.selection();
-    if (onSendEmail) {
-      onSendEmail();
-    } else {
-      Linking.openURL(`mailto:${supportEmail}`).catch(() => {});
-    }
-  };
+  const contactChannels = [
+    {
+      id: "support",
+      icon: MessageSquare,
+      title: "Hubungi Tim Support",
+      subtitle: "Balasan di dalam aplikasi",
+      testID: "btn-contact-support",
+      onPress: () => {
+        haptics.selection();
+        onContactSupport ? onContactSupport() : Linking.openURL("https://wa.me/6281119255772").catch(() => {});
+      },
+    },
+    {
+      id: "email",
+      icon: Mail,
+      title: "Kirim email",
+      subtitle: supportEmail,
+      testID: "btn-contact-email",
+      onPress: () => {
+        haptics.selection();
+        onSendEmail ? onSendEmail() : Linking.openURL(`mailto:${supportEmail}`).catch(() => {});
+      },
+    },
+  ];
 
   return (
     <ScrollView
@@ -105,26 +100,19 @@ export function HelpCenterView({
       showsVerticalScrollIndicator={false}
       testID="help-center-scroll"
     >
-      {/* Top Header */}
       <View className="flex-row items-center gap-1 -ml-3">
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Kembali"
           testID="btn-help-back"
-          onPress={() => {
-            haptics.light();
-            onBack?.();
-          }}
+          onPress={() => { haptics.light(); onBack?.(); }}
           className="w-11 h-11 items-center justify-center rounded-full active:bg-stone-200/50"
         >
           <AppIcon icon={ChevronLeft} size={24} tone="foreground" />
         </Pressable>
-        <Text className="text-[17px] font-bold text-[#222222]">
-          Pusat bantuan
-        </Text>
+        <Text className="text-[17px] font-bold text-[#222222]">Pusat bantuan</Text>
       </View>
 
-      {/* Search Input Bar */}
       <View className="flex-row items-center h-[52px] border-[1.5px] border-[#333333] rounded-[24px] px-4 bg-white">
         <AppIcon icon={Search} size={20} tone="muted" />
         <TextInput
@@ -138,28 +126,18 @@ export function HelpCenterView({
         />
       </View>
 
-      {/* Section: PERTANYAAN UMUM */}
       <View className="gap-2.5">
-        <Text className="text-sm font-bold tracking-wider text-[#555555]">
-          PERTANYAAN UMUM
-        </Text>
+        <Text className="text-sm font-bold tracking-wider text-[#555555]">PERTANYAAN UMUM</Text>
         <View className="border-[1.5px] border-[#333333] rounded-xl bg-white overflow-hidden">
           {filteredFaqs.length === 0 ? (
             <View className="p-4 items-center justify-center min-h-[80px]">
-              <Text className="text-sm text-[#555555]">
-                Tidak ada pertanyaan yang cocok dengan pencarian.
-              </Text>
+              <Text className="text-sm text-[#555555]">Tidak ada pertanyaan yang cocok dengan pencarian.</Text>
             </View>
           ) : (
             filteredFaqs.map((faq, idx) => {
               const isExpanded = expandedFaqIds.has(faq.id);
               return (
-                <View
-                  key={faq.id}
-                  className={
-                    idx > 0 ? "border-t border-dashed border-[#999999]" : ""
-                  }
-                >
+                <View key={faq.id} className={idx > 0 ? "border-t border-dashed border-[#999999]" : ""}>
                   <Pressable
                     testID={`faq-item-toggle-${faq.id}`}
                     accessibilityRole="button"
@@ -167,23 +145,12 @@ export function HelpCenterView({
                     onPress={() => toggleFaq(faq.id)}
                     className="flex-row items-center justify-between min-h-[56px] px-4 py-3 active:bg-stone-50"
                   >
-                    <Text className="flex-1 mr-2.5 text-[15px] font-semibold text-[#222222]">
-                      {faq.question}
-                    </Text>
-                    <AppIcon
-                      icon={isExpanded ? ChevronUp : ChevronDown}
-                      size={18}
-                      tone="muted"
-                    />
+                    <Text className="flex-1 mr-2.5 text-[15px] font-semibold text-[#222222]">{faq.question}</Text>
+                    <AppIcon icon={isExpanded ? ChevronUp : ChevronDown} size={18} tone="muted" />
                   </Pressable>
                   {isExpanded && (
-                    <View
-                      testID={`faq-item-answer-${faq.id}`}
-                      className="px-4 pb-3.5 pt-0"
-                    >
-                      <Text className="text-sm leading-relaxed text-[#555555]">
-                        {faq.answer}
-                      </Text>
+                    <View testID={`faq-item-answer-${faq.id}`} className="px-4 pb-3.5 pt-0">
+                      <Text className="text-sm leading-relaxed text-[#555555]">{faq.answer}</Text>
                     </View>
                   )}
                 </View>
@@ -193,73 +160,40 @@ export function HelpCenterView({
         </View>
       </View>
 
-      {/* Section: MASIH BUTUH BANTUAN? */}
       <View className="gap-2.5">
-        <Text className="text-sm font-bold tracking-wider text-[#555555]">
-          MASIH BUTUH BANTUAN?
-        </Text>
+        <Text className="text-sm font-bold tracking-wider text-[#555555]">MASIH BUTUH BANTUAN?</Text>
         <View className="border-[1.5px] border-[#333333] rounded-xl bg-white overflow-hidden">
-          {/* Helpdesk Chat */}
-          <Pressable
-            testID="btn-contact-support"
-            accessibilityRole="button"
-            accessibilityLabel="Hubungi Tim Support"
-            onPress={handleSupportChat}
-            className="flex-row items-center justify-between min-h-[60px] px-4 py-2.5 active:bg-stone-50"
-          >
-            <View className="flex-row items-center flex-1 mr-2.5">
-              <View className="w-8 h-8 rounded-full bg-purple-100 items-center justify-center mr-3">
-                <AppIcon icon={MessageSquare} size={16} tone="primary" />
-              </View>
-              <View className="flex-1">
-                <Text className="text-[15px] font-bold text-[#222222]">
-                  Hubungi Tim Support
-                </Text>
-                <Text className="text-sm text-[#555555] mt-0.5">
-                  Balasan di dalam aplikasi
-                </Text>
-              </View>
+          {contactChannels.map((channel, idx) => (
+            <View key={channel.id}>
+              {idx > 0 && <View className="border-t border-dashed border-[#999999]" />}
+              <Pressable
+                testID={channel.testID}
+                accessibilityRole="button"
+                accessibilityLabel={channel.title}
+                onPress={channel.onPress}
+                className="flex-row items-center justify-between min-h-[60px] px-4 py-2.5 active:bg-stone-50"
+              >
+                <View className="flex-row items-center flex-1 mr-2.5">
+                  <View className="w-8 h-8 rounded-full bg-purple-100 items-center justify-center mr-3">
+                    <AppIcon icon={channel.icon} size={16} tone="primary" />
+                  </View>
+                  <View className="flex-1">
+                    <Text className="text-[15px] font-bold text-[#222222]">{channel.title}</Text>
+                    <Text className="text-sm text-[#555555] mt-0.5">{channel.subtitle}</Text>
+                  </View>
+                </View>
+                <AppIcon icon={ChevronRight} size={18} tone="muted" />
+              </Pressable>
             </View>
-            <AppIcon icon={ChevronRight} size={18} tone="muted" />
-          </Pressable>
-
-          <View className="border-t border-dashed border-[#999999]" />
-
-          {/* Email Support */}
-          <Pressable
-            testID="btn-contact-email"
-            accessibilityRole="button"
-            accessibilityLabel="Kirim email"
-            onPress={handleEmail}
-            className="flex-row items-center justify-between min-h-[60px] px-4 py-2.5 active:bg-stone-50"
-          >
-            <View className="flex-row items-center flex-1 mr-2.5">
-              <View className="w-8 h-8 rounded-full bg-purple-100 items-center justify-center mr-3">
-                <AppIcon icon={Mail} size={16} tone="primary" />
-              </View>
-              <View className="flex-1">
-                <Text className="text-[15px] font-bold text-[#222222]">
-                  Kirim email
-                </Text>
-                <Text className="text-sm text-[#555555] mt-0.5">
-                  {supportEmail}
-                </Text>
-              </View>
-            </View>
-            <AppIcon icon={ChevronRight} size={18} tone="muted" />
-          </Pressable>
+          ))}
         </View>
       </View>
 
-      {/* Emergency Crisis Contact Button */}
       <Pressable
         testID="btn-emergency-crisis"
         accessibilityRole="button"
         accessibilityLabel="Butuh bantuan segera? Lihat kontak darurat"
-        onPress={() => {
-          haptics.medium();
-          onEmergencyCrisis?.();
-        }}
+        onPress={() => { haptics.medium(); onEmergencyCrisis?.(); }}
         className="min-h-[52px] border-[2.5px] border-[#222222] rounded-xl items-center justify-center px-4 py-2 active:bg-stone-100 mt-2"
       >
         <Text className="text-[15px] font-bold text-[#222222] text-center">

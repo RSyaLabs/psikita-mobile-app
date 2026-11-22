@@ -329,5 +329,4 @@ export function AuthLoadingState() {
   );
 }
 
-export { AuthContext };
 export type { AppRole, AuthAttempt, AuthContextValue, AuthUser };

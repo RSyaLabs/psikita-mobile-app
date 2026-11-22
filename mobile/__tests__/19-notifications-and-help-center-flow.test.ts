@@ -77,8 +77,7 @@ describe("19. Notifications & Patient Help Center Flow (Wireframe Screens 67-69)
 
       // Verify that paymentAndSession cannot be toggled off
       expect(content).toContain('if (key === "paymentAndSession") return;');
-      expect(content).toContain("disabled={true}");
-      expect(content).toContain("value={true}");
+      expect(content).toContain("locked: true");
     });
   });
 

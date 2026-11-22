@@ -5,7 +5,6 @@ import {
   RefundRequestView,
   RefundStatusView,
 } from "@/components/patient/history";
-import { PatientSupportModal } from "@/components/modals";
 import { useRequestRefundMutation, useRefundCaseQuery } from "@/hooks/useApiQueries";
 import { ROUTES } from "@/constants/routes";
 import { haptics } from "@/utils/haptics";
@@ -22,7 +21,6 @@ export default function PatientRefundsScreen() {
   const [currentStep, setCurrentStep] = useState<"request" | "status">(
     params.step === "status" ? "status" : "request",
   );
-  const [isSupportModalOpen, setIsSupportModalOpen] = useState(false);
   const [referenceNumber, setReferenceNumber] = useState(
     params.caseId || "REF-20261122-8921",
   );
@@ -86,16 +84,13 @@ export default function PatientRefundsScreen() {
               : "Rp 150.000"
           }
           onBack={handleReturnToSessions}
-          onContactSupport={() => setIsSupportModalOpen(true)}
+          onContactSupport={() => {
+            haptics.selection();
+            router.push(ROUTES.PATIENT.HELP as any);
+          }}
           onReturnToSessions={handleReturnToSessions}
         />
       )}
-
-      {/* Support / Help Modal */}
-      <PatientSupportModal
-        isOpen={isSupportModalOpen}
-        onClose={() => setIsSupportModalOpen(false)}
-      />
     </SafeAreaView>
   );
 }

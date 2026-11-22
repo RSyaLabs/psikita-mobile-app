@@ -32,8 +32,6 @@ import {
   ScrollView,
 } from "@/components/ui";
 import {
-  PatientFaqModal,
-  PatientSupportModal,
   PatientPrivacyModal,
 } from "@/components/modals";
 import { AppIcon } from "@/components/common/AppIcon";
@@ -91,8 +89,6 @@ export default function ProfileScreen() {
     }
   };
 
-  const [showHelpModal, setShowHelpModal] = useState(false);
-  const [showCsModal, setShowCsModal] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
 
   const patientName = patient?.fullName || "Pasien";
@@ -345,7 +341,7 @@ export default function ProfileScreen() {
             <Pressable
               onPress={() => {
                 haptics.light();
-                setShowCsModal(true);
+                router.push(ROUTES.PATIENT.HELP as any);
               }}
               className="py-3 flex-row items-center justify-between border-t border-border active:opacity-80"
             >
@@ -395,16 +391,6 @@ export default function ProfileScreen() {
       <PatientTabBar activeTab="akun" />
 
       {/* Modals */}
-      <PatientFaqModal
-        isOpen={showHelpModal}
-        onClose={() => setShowHelpModal(false)}
-      />
-
-      <PatientSupportModal
-        isOpen={showCsModal}
-        onClose={() => setShowCsModal(false)}
-      />
-
       <PatientPrivacyModal
         isOpen={showPrivacyModal}
         onClose={() => setShowPrivacyModal(false)}

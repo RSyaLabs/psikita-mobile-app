@@ -8,14 +8,14 @@ import {
   RequestRefundCaseDto,
 } from "@/types/api";
 
-export const refundQuoteSchema = z.object({
+const refundQuoteSchema = z.object({
   amount: z.number().int().nonnegative(),
   currency: z.literal("IDR"),
   deductions: z.number().int().nonnegative().optional(),
   netRefund: z.number().int().nonnegative(),
 });
 
-export const refundCaseStatusSchema = z.enum([
+const refundCaseStatusSchema = z.enum([
   "REQUESTED",
   "UNDER_REVIEW",
   "APPROVED",
@@ -56,7 +56,7 @@ export const refundCaseListSchema = z.object({
   limit: z.number().int().positive(),
 });
 
-export const refundDestinationItemSchema = z.object({
+const refundDestinationItemSchema = z.object({
   type: z.enum(["BANK", "E_WALLET"]),
   code: z.string().min(1),
   name: z.string().min(1),

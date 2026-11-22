@@ -9,7 +9,6 @@ import {
   type SessionItem,
 } from "@/components/patient/history";
 import { PatientTabBar } from "@/components/navigation/PatientTabBar";
-import { PatientSupportModal } from "@/components/modals";
 import { usePatientConsultations } from "@/hooks/useApiQueries";
 import { ROUTES } from "@/constants/routes";
 import { haptics } from "@/utils/haptics";
@@ -24,7 +23,6 @@ export default function HistoryScreen() {
   const [currentView, setCurrentView] = useState<"list" | "detail" | "upcoming">(initialView);
   const [activeTab, setActiveTab] = useState<"berlangsung" | "selesai">("berlangsung");
   const [selectedSession, setSelectedSession] = useState<SessionItem | null>(null);
-  const [isSupportModalOpen, setIsSupportModalOpen] = useState(false);
 
   const consultations = usePatientConsultations();
   const sessionData = consultations.data ?? [];
@@ -154,15 +152,12 @@ export default function HistoryScreen() {
               params: { consultationId: "pending-order" },
             } as never);
           }}
-          onContactSupport={() => setIsSupportModalOpen(true)}
+          onContactSupport={() => {
+            haptics.selection();
+            router.push(ROUTES.PATIENT.HELP as any);
+          }}
         />
       )}
-
-      {/* Support / Help Modal */}
-      <PatientSupportModal
-        isOpen={isSupportModalOpen}
-        onClose={() => setIsSupportModalOpen(false)}
-      />
     </SafeAreaView>
   );
 }

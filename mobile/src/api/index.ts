@@ -10,7 +10,6 @@ export * from "./payment.service";
 export * from "./refund.service";
 export * from "./payout.service";
 export * from "./practitioner.service";
-export * from "./ledger.service";
 export * from "./community.service";
 export * from "./careplan.service";
 export * from "./followup.service";

@@ -3,9 +3,7 @@ export * from "./CrisisHelpModal";
 export * from "./ChangePhotoModal";
 
 // Patient modals
-export * from "./patient/PatientSupportModal";
 export * from "./patient/PatientPrivacyModal";
-export * from "./patient/PatientFaqModal";
 export * from "./patient/PharmacyPartnerModal";
 
 // Practitioner modals
