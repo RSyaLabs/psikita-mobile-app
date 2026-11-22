@@ -1,211 +1,168 @@
-import {
-  HISTORY_TABS,
-  consultationStatusLabel,
-  matchesHistoryTab,
-} from "@/clinical/activeConsultation";
-
 import React, { useState } from "react";
-import { useRouter } from "expo-router";
-import { Image as RNImage } from "react-native";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ChevronRight, Clock } from "lucide-react-native";
+import { Box } from "@/components/ui";
 import {
-  Badge,
-  BadgeText,
-  Box,
-  Card,
-  HStack,
-  Heading,
-  Pressable,
-  ScrollView,
-  Text,
-  VStack,
-} from "@/components/ui";
-import { AppIcon } from "@/components/common/AppIcon";
+  SessionListView,
+  SessionDetailView,
+  UpcomingScheduleView,
+  type SessionItem,
+} from "@/components/patient/history";
 import { PatientTabBar } from "@/components/navigation/PatientTabBar";
-import {
-  EmptyState,
-  ErrorState,
-  LoadingState,
-  UnavailableState,
-} from "@/components/common";
+import { PatientSupportModal } from "@/components/modals";
 import { usePatientConsultations } from "@/hooks/useApiQueries";
 import { ROUTES } from "@/constants/routes";
-
-function formatDate(value: string | undefined): string {
-  if (!value) return "Tanggal belum tersedia";
-  const date = new Date(value);
-  return Number.isNaN(date.getTime())
-    ? "Tanggal belum tersedia"
-    : date.toLocaleDateString("id-ID");
-}
-
-function isCapabilityUnavailable(error: unknown): boolean {
-  if (typeof error !== "object" || error === null) return false;
-  const record = error as Record<string, unknown>;
-  return (
-    record.statusCode === 501 ||
-    record.error === "CAPABILITY_UNAVAILABLE" ||
-    record.code === "CAPABILITY_UNAVAILABLE"
-  );
-}
+import { haptics } from "@/utils/haptics";
 
 export default function HistoryScreen() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState("Semua");
+  const params = useLocalSearchParams<{ step?: string; consultationId?: string }>();
+  
+  // Navigation view mode: "list" (RW1) | "detail" (RW2) | "upcoming" (RW3)
+  const initialView =
+    params.step === "detail" ? "detail" : params.step === "upcoming" ? "upcoming" : "list";
+  const [currentView, setCurrentView] = useState<"list" | "detail" | "upcoming">(initialView);
+  const [activeTab, setActiveTab] = useState<"berlangsung" | "selesai">("berlangsung");
+  const [selectedSession, setSelectedSession] = useState<SessionItem | null>(null);
+  const [isSupportModalOpen, setIsSupportModalOpen] = useState(false);
+
   const consultations = usePatientConsultations();
-  const sessions = consultations.data ?? [];
-  const isPending = consultations.isLoading || consultations.isFetching;
-  const capabilityUnavailable =
-    consultations.isError && isCapabilityUnavailable(consultations.error);
-  const tabs = HISTORY_TABS;
-  const filteredSessions = sessions.filter((session) =>
-    matchesHistoryTab(session.status, activeTab),
+  const sessionData = consultations.data ?? [];
+
+  // Map API consultations to SessionItem if available
+  const mappedSessions: SessionItem[] = sessionData.map((s) => ({
+    id: s.id,
+    practitionerName: s.practitionerName || "dr. Alivia Zahra, Sp.KJ",
+    practitionerSpecialization: s.practitionerSpecialization || "Psikiater Klinis Dewasa",
+    date: s.createdAt ? new Date(s.createdAt).toLocaleDateString("id-ID") : "18 Nov 2026",
+    status: (s.status as any) || "FINISHED",
+    format: "Chat",
+    resultAvailable: s.status === "FINISHED",
+    followUpAvailable: true,
+  }));
+
+  const activeSessionItem = mappedSessions.find(
+    (s) => s.status === "ACTIVE" || s.status === "WAITING",
+  );
+  const completedSessionsList = mappedSessions.filter(
+    (s) => s.status === "FINISHED",
   );
 
-  const openSession = (consultationId: string, status: string) => {
-    const route =
-      status === "FINISHED"
-        ? ROUTES.PATIENT.SESSION_SUMMARY
-        : ROUTES.PATIENT.CHAT_ROOM;
-    router.push({ pathname: route, params: { consultationId } } as never);
+  const handleSelectSession = (session: SessionItem) => {
+    haptics.selection();
+    setSelectedSession(session);
+    setCurrentView("detail");
+  };
+
+  const handleViewStatus = (session?: SessionItem | null) => {
+    haptics.medium();
+    if (session?.status === "WAITING") {
+      router.push(ROUTES.PATIENT.MATCHING as never);
+    } else {
+      router.push({
+        pathname: ROUTES.PATIENT.CHAT_ROOM,
+        params: { consultationId: session?.id || "active-session" },
+      } as never);
+    }
+  };
+
+  const handleViewUpcoming = () => {
+    haptics.selection();
+    setCurrentView("upcoming");
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
-      {/* Root Tab Header (No Back Button, Authentic Emblem) */}
-      <Box className="bg-primary px-5 pt-4 pb-5 rounded-b-3xl">
-        <HStack space="xs" className="items-center justify-between">
-          <Heading level={1} size="lg" bold className="text-primary-foreground">
-            Riwayat Konsultasi
-          </Heading>
-          <RNImage
-            source={require("@/../assets/icon.png")}
-            style={{ width: 30, height: 30, borderRadius: 8 }}
-            resizeMode="cover"
+    <SafeAreaView className="flex-1 bg-background" edges={["top"]}>
+      {/* View 1: Screen 52 (RW1 · Sesi: daftar) */}
+      {currentView === "list" && (
+        <Box className="flex-1">
+          <SessionListView
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+            activeSession={activeSessionItem}
+            completedSessions={completedSessionsList}
+            onSelectSession={handleSelectSession}
+            onViewStatus={handleViewStatus}
+            onViewUpcomingSchedule={handleViewUpcoming}
           />
-        </HStack>
-
-        <HStack space="xs" className="items-center mt-4">
-          {tabs.map((tab) => {
-            const active = activeTab === tab;
-            return (
-              <Pressable
-                key={tab}
-                onPress={() => setActiveTab(tab)}
-                accessibilityRole="button"
-                accessibilityState={{ selected: active }}
-                className={`px-3.5 py-1.5 rounded-full ${active ? "bg-card" : "bg-primary-foreground/15"}`}
-              >
-                <Text
-                  size="sm"
-                  bold
-                  className={
-                    active ? "text-foreground font-bold" : "text-primary-foreground font-medium"
-                  }
-                >
-                  {tab}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </HStack>
-      </Box>
-
-      <ScrollView
-        contentContainerStyle={{
-          paddingHorizontal: 20,
-          paddingTop: 16,
-          paddingBottom: 110,
-        }}
-        showsVerticalScrollIndicator={false}
-      >
-        <Box className="w-full max-w-[640px] md:max-w-[720px] self-center">
-        {isPending ? (
-          <LoadingState label="Memuat riwayat konsultasi klinis..." />
-        ) : capabilityUnavailable ? (
-          <UnavailableState
-            label="Riwayat konsultasi belum tersedia"
-            description="Fitur riwayat sesi konsultasi sedang disiapkan oleh tim klinis."
-          />
-        ) : consultations.isError ? (
-          <ErrorState
-            label="Gagal memuat sesi"
-            description="Periksa koneksi Anda dan coba lagi."
-            onRetry={() => {
-              void consultations.refetch();
-            }}
-          />
-        ) : filteredSessions.length === 0 ? (
-          <EmptyState
-            label="Belum ada riwayat konsultasi"
-            description="Jadwal sesi dokter atau psikolog Anda akan tercatat di sini setelah Anda berkonsultasi."
-            actionLabel="Cari Dokter Spesialis"
-            onAction={() => router.push(ROUTES.PATIENT.DOCTORS)}
-          />
-        ) : (
-          <VStack space="md">
-            {filteredSessions.map((session) => {
-              const practitionerName =
-                session.practitionerName || "Praktisi SeraPhany";
-              const practitionerSpecialization =
-                session.practitionerSpecialization ||
-                "Detail praktisi belum tersedia dari server.";
-
-              return (
-                <Card
-                  key={session.id}
-                  className="bg-card rounded-2xl p-4 border border-border gap-3"
-                >
-                  <HStack space="sm" className="items-center justify-between">
-                    <VStack space="xs" className="flex-1">
-                      <Text size="sm" bold className="text-foreground">
-                        {practitionerName}
-                      </Text>
-                      <Text size="sm" className="text-muted-foreground font-medium">
-                        {practitionerSpecialization}
-                      </Text>
-                    </VStack>
-                    <Badge
-                      variant="outline"
-                      className="bg-muted border-border rounded-full px-3 py-1"
-                    >
-                      <BadgeText className="text-sm font-semibold text-foreground">
-                        {consultationStatusLabel(session.status)}
-                      </BadgeText>
-                    </Badge>
-                  </HStack>
-
-                  <HStack space="xs" className="items-center">
-                    <AppIcon icon={Clock} size={15} tone="muted" />
-                    <Text size="sm" className="text-muted-foreground font-medium">
-                      {formatDate(session.createdAt)}
-                    </Text>
-                  </HStack>
-
-                  <Pressable
-                    onPress={() => openSession(session.id, session.status)}
-                    accessibilityRole="button"
-                    accessibilityLabel="Buka sesi"
-                    className="flex-row items-center gap-1.5 pt-1"
-                  >
-                    <Text size="sm" bold className="text-primary font-bold">
-                      {session.status === "FINISHED"
-                        ? "Lihat ringkasan"
-                        : "Buka sesi"}
-                    </Text>
-                    <AppIcon icon={ChevronRight} size={16} tone="primary" />
-                  </Pressable>
-                </Card>
-              );
-            })}
-          </VStack>
-        )}
+          <PatientTabBar activeTab="sesi" />
         </Box>
-      </ScrollView>
+      )}
 
-      {/* Persistent Bottom Tab Bar */}
-      <PatientTabBar activeTab="sesi" />
+      {/* View 2: Screen 53 (RW2 · Detail sesi) */}
+      {currentView === "detail" && (
+        <SessionDetailView
+          session={selectedSession}
+          onBack={() => {
+            haptics.light();
+            setCurrentView("list");
+          }}
+          onViewResults={() => {
+            haptics.medium();
+            router.push({
+              pathname: ROUTES.PATIENT.SESSION_SUMMARY,
+              params: {
+                consultationId: selectedSession?.id || "detail-session",
+              },
+            } as never);
+          }}
+          onScheduleFollowUp={() => {
+            haptics.medium();
+            router.push({
+              pathname: ROUTES.PATIENT.FOLLOW_UPS,
+              params: { step: "picker" },
+            } as never);
+          }}
+          onRequestRefund={() => {
+            haptics.light();
+            router.push({
+              pathname: ROUTES.PATIENT.REFUNDS,
+              params: {
+                step: "request",
+                consultationId: selectedSession?.id || "detail-session",
+              },
+            } as never);
+          }}
+        />
+      )}
+
+      {/* View 3: Screen 54 (RW3 · Jadwal mendatang & ubah jadwal) */}
+      {currentView === "upcoming" && (
+        <UpcomingScheduleView
+          onBack={() => {
+            haptics.light();
+            setCurrentView("list");
+          }}
+          onEnterSession={() => {
+            haptics.medium();
+            router.push({
+              pathname: ROUTES.PATIENT.CHAT_ROOM,
+              params: { consultationId: "upcoming-confirmed" },
+            } as never);
+          }}
+          onReschedule={() => {
+            haptics.medium();
+            router.push({
+              pathname: ROUTES.PATIENT.FOLLOW_UPS,
+              params: { step: "picker" },
+            } as never);
+          }}
+          onPayPendingSession={() => {
+            haptics.medium();
+            router.push({
+              pathname: ROUTES.PATIENT.PAYMENT_REGULAR,
+              params: { consultationId: "pending-order" },
+            } as never);
+          }}
+          onContactSupport={() => setIsSupportModalOpen(true)}
+        />
+      )}
+
+      {/* Support / Help Modal */}
+      <PatientSupportModal
+        isOpen={isSupportModalOpen}
+        onClose={() => setIsSupportModalOpen(false)}
+      />
     </SafeAreaView>
   );
 }

@@ -27,7 +27,9 @@ export default function PatientLayout() {
       leafSegment === "chat-room" ||
       leafSegment === "overtime-modal" ||
       leafSegment === "session-summary" ||
-      leafSegment === "follow-ups");
+      leafSegment === "follow-ups" ||
+      leafSegment === "history" ||
+      leafSegment === "refunds");
 
   const {
     data: patientProfile,
