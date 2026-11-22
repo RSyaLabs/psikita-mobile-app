@@ -6,7 +6,7 @@
  * from Man-in-the-Middle (MITM) attacks with compromised or untrusted CAs.
  */
 
-export interface PinItem {
+interface PinItem {
   digest: "SHA-256";
   spkiPin: string;
   description: string;

@@ -1,8 +1,4 @@
 import { z } from "zod";
-export { isConsultationStatus } from "@/constants/enums";
-export type { ConsultationStatus } from "@/constants/enums";
-
-
 import { ApiError, asRecordOrUndefined } from "@/api/response";
 import {
   clearTrustedConsultationContexts,
@@ -24,7 +20,7 @@ const ACTIVE_CONSULTATION_STATUSES = [
   "CANCELLED",
 ] as const;
 
-export type ActiveConsultationStatus =
+type ActiveConsultationStatus =
   (typeof ACTIVE_CONSULTATION_STATUSES)[number];
 
 const activeConsultationSchema = z

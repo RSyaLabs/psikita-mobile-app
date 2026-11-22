@@ -17,7 +17,7 @@ import {
 } from "@/components/ui";
 import { haptics } from "@/utils/haptics";
 
-export interface InSessionQuestion {
+interface InSessionQuestion {
   id: string;
   question: string;
 }

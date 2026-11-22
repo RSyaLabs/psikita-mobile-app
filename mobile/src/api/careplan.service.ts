@@ -1,6 +1,6 @@
 import { apiRequest } from "./client";
 
-export interface CarePlanIntervention {
+interface CarePlanIntervention {
   title: string;
   description: string;
   frequency?: string;

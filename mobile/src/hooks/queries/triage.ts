@@ -36,19 +36,6 @@ export function useWaitingRoomStatus() {
   });
 }
 
-/**
- * Hook to query triage queue for practitioners with Smart Jittered Polling
- */
-export function useTriageQueue() {
-  return useQuery({
-    queryKey: queryKeys.triage.queue(),
-    queryFn: ({ signal }) =>
-      callWithSignal(triageService.getTriageQueue, signal),
-    refetchInterval: () => getJitteredInterval(15000), // 13-17s dengan jitter
-    refetchIntervalInBackground: false,
-  });
-}
-
 export function useTriageAssessment(id?: string) {
   const normalizedId = id?.trim() || "";
   return useQuery({

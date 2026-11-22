@@ -68,16 +68,6 @@ export function useUpdatePatientProfile() {
 }
 
 /**
- * Hook to retrieve all finished consultation results for authenticated patient
- */
-export function usePatientResults() {
-  return useQuery({
-    queryKey: [...queryKeys.patient.all, "results"] as const,
-    queryFn: ({ signal }) => patientService.getMyResults(signal),
-  });
-}
-
-/**
  * Hook to retrieve specific consultation result detail
  */
 export function usePatientResultDetail(consultationId?: string) {

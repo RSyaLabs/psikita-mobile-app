@@ -2,7 +2,7 @@ import { z } from "zod";
 import { apiRequest, ApiError } from "./client";
 import { zodAdapter } from "./response";
 
-export const identityVerificationSessionSchema = z.object({
+const identityVerificationSessionSchema = z.object({
   sessionId: z.string().min(1),
   sessionToken: z.string().optional().default(""),
   url: z.string().min(1),
@@ -13,7 +13,7 @@ export type IdentityVerificationSessionDto = z.infer<
   typeof identityVerificationSessionSchema
 >;
 
-export const verifiedIdentitySchema = z.object({
+const verifiedIdentitySchema = z.object({
   nik: z.string().nullable().optional(),
   fullName: z.string().nullable().optional(),
   firstName: z.string().nullable().optional(),
@@ -21,9 +21,7 @@ export const verifiedIdentitySchema = z.object({
   birthDate: z.string().nullable().optional(),
 });
 
-export type VerifiedIdentityDto = z.infer<typeof verifiedIdentitySchema>;
-
-export const identityVerificationStatusSchema = z
+const identityVerificationStatusSchema = z
   .object({
     status: z.string().optional().default("NOT_STARTED"),
     sessionId: z.string().nullable().optional(),

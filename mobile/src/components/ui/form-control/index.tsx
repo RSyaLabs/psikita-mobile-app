@@ -174,82 +174,10 @@ const FormControlHelperText = React.forwardRef<
   );
 });
 
-type IFormControlErrorProps = React.ComponentProps<typeof UIFormControl.Error> &
-  VariantProps<typeof formControlErrorStyle> & { className?: string };
-
-const FormControlError = React.forwardRef<
-  React.ComponentRef<typeof UIFormControl.Error>,
-  IFormControlErrorProps
->(function FormControlError({ className, ...props }, ref) {
-  return (
-    <UIFormControl.Error
-      ref={ref}
-      accessibilityRole="alert"
-      accessibilityLiveRegion="polite"
-      {...props}
-      className={formControlErrorStyle({ class: className })}
-    />
-  );
-});
-
-type IFormControlErrorTextProps = React.ComponentProps<
-  typeof UIFormControl.Error.Text
-> &
-  VariantProps<typeof formControlErrorTextStyle> & { className?: string };
-
-const FormControlErrorText = React.forwardRef<
-  React.ComponentRef<typeof UIFormControl.Error.Text>,
-  IFormControlErrorTextProps
->(function FormControlErrorText({ className, ...props }, ref) {
-  return (
-    <UIFormControl.Error.Text
-      ref={ref}
-      {...props}
-      className={formControlErrorTextStyle({ class: className })}
-    />
-  );
-});
-
-type IFormControlErrorIconProps = React.ComponentProps<
-  typeof UIFormControl.Error.Icon
-> &
-  VariantProps<typeof formControlErrorIconStyle> & {
-    className?: string;
-    as?: any;
-    size?: string | number;
-  };
-
-const FormControlErrorIcon = React.forwardRef<
-  React.ComponentRef<typeof UIFormControl.Error.Icon>,
-  IFormControlErrorIconProps
->(function FormControlErrorIcon(
-  { className, as: AsComp, size = 14, ...props },
-  ref,
-) {
-  if (AsComp) {
-    return (
-      <AsComp
-        className={formControlErrorIconStyle({ class: className })}
-        size={size}
-      />
-    );
-  }
-  return (
-    <UIFormControl.Error.Icon
-      ref={ref}
-      {...props}
-      className={formControlErrorIconStyle({ class: className })}
-    />
-  );
-});
-
 export {
   FormControl,
   FormControlLabel,
   FormControlLabelText,
   FormControlHelper,
   FormControlHelperText,
-  FormControlError,
-  FormControlErrorText,
-  FormControlErrorIcon,
 };

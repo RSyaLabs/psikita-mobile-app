@@ -238,39 +238,8 @@ const ButtonIcon = React.forwardRef<
     />
   );
 });
-type IButtonGroupProps = React.ComponentPropsWithoutRef<typeof UIButton.Group> &
-  VariantProps<typeof buttonGroupStyle>;
-const ButtonGroup = React.forwardRef<
-  React.ElementRef<typeof UIButton.Group>,
-  IButtonGroupProps
->(
-  (
-    {
-      className,
-      space = "md",
-      isAttached = false,
-      flexDirection = "column",
-      ...props
-    },
-    ref,
-  ) => {
-    return (
-      <UIButton.Group
-        className={buttonGroupStyle({
-          class: className,
-          space,
-          isAttached,
-          flexDirection,
-        })}
-        {...props}
-        ref={ref}
-      />
-    );
-  },
-);
 Button.displayName = "Button";
 ButtonText.displayName = "ButtonText";
 ButtonSpinner.displayName = "ButtonSpinner";
 ButtonIcon.displayName = "ButtonIcon";
-ButtonGroup.displayName = "ButtonGroup";
-export { Button, ButtonText, ButtonSpinner, ButtonIcon, ButtonGroup };
+export { Button, ButtonText, ButtonSpinner, ButtonIcon };

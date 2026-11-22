@@ -60,33 +60,3 @@ export function useNearestFacilities(params?: {
     staleTime: 60 * 60 * 1000,
   });
 }
-
-/**
- * Hook to get digital referral letter details
- */
-export function useReferralLetter(referralId?: string) {
-  return useQuery({
-    queryKey: [...queryKeys.referrals.all, "letter", referralId ?? ""] as const,
-    queryFn: ({ signal }) =>
-      prescriptionService.getReferralLetter(referralId!, signal),
-    enabled: Boolean(referralId),
-  });
-}
-
-/**
- * Hook to get medication suggestions based on diagnosis
- */
-export function useMedicationSuggestions(
-  diagnosisCode?: string,
-  patientId?: string,
-) {
-  return useQuery({
-    queryKey: ["medications", "suggestions", diagnosisCode, patientId] as const,
-    queryFn: ({ signal }) =>
-      prescriptionService.getMedicationSuggestions(
-        { diagnosisCode: diagnosisCode!, patientId },
-        signal,
-      ),
-    enabled: Boolean(diagnosisCode),
-  });
-}

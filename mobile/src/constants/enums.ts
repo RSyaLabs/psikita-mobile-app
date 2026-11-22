@@ -49,22 +49,6 @@ export const CONSULTATION_STATUSES = [
 
 export type ConsultationStatus = (typeof CONSULTATION_STATUSES)[number];
 
-/** True when the value is one the server can actually send. */
-export function isServerRole(value: unknown): value is ServerRole {
-  return (
-    typeof value === "string" &&
-    (SERVER_ROLES as readonly string[]).includes(value)
-  );
-}
-
-/** True when the value is one the server can actually send. */
-export function isPractitionerType(value: unknown): value is PractitionerType {
-  return (
-    typeof value === "string" &&
-    (PRACTITIONER_TYPES as readonly string[]).includes(value)
-  );
-}
-
 /** True when the value is one ConsultationResponseDto.status can be. */
 export function isConsultationStatus(
   value: unknown,

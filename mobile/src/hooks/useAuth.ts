@@ -50,17 +50,13 @@ const serverUserSchema = z.object({
   role: serverRoleSchema,
   isActive: z.literal(true),
 });
-export const serverSessionSchema = z.object({
-  accessToken: z.string().refine((token) => token.trim().length > 0),
-  user: serverUserSchema,
-});
 
 export type ValidatedServerSession = {
   accessToken: string;
   user: AuthUser;
 };
 
-export function appRoleFromServerRole(role: unknown): AppRole | null {
+function appRoleFromServerRole(role: unknown): AppRole | null {
   switch (role) {
     case "USER":
       return "patient";

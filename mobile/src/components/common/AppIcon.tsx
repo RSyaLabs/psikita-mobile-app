@@ -1,7 +1,7 @@
 import React from "react";
 import { LucideIcon, LucideProps } from "lucide-react-native";
 
-export type IconTone =
+type IconTone =
   | "primary"
   | "foreground"
   | "muted"
@@ -49,5 +49,3 @@ export const AppIcon = React.memo(function AppIcon({
     />
   );
 });
-
-export default AppIcon;

@@ -9,21 +9,11 @@ import type { PractitionerResponseDto } from "@/types/api";
 import type { PractitionerType } from "@/constants/enums";
 import type { PageParams } from "../useQueryKeys";
 import { isTerminalConsultationStatus } from "@/clinical/activeConsultation"; 
-export type PatientListParams = PageParams & {
-  fullName?: string;
-};
 
 export type PractitionerListParams = PageParams & {
   type?: PractitionerType;
   verificationStatus?: "PENDING" | "VERIFIED" | "REJECTED";
   availabilityStatus?: "AVAILABLE" | "ON_LEAVE" | "SUSPENDED" | "INACTIVE";
-};
-
-export type LedgerListParams = PageParams & {
-  type?: string;
-  name?: string;
-  referenceId?: string;
-  status?: string;
 };
 
 export type PrescriptionListParams = PageParams & {
@@ -42,10 +32,6 @@ export function toCompatibleListResult<T>(
   result: PaginatedResult<T>,
 ): CompatibleListResult<T> {
   return { ...result, total: result.meta.totalItems };
-}
-
-export function toListData<T>(result: T[] | PaginatedResult<T>): T[] {
-  return Array.isArray(result) ? result : result.data;
 }
 
 export function callWithSignal<TResult>(

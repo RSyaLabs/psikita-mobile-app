@@ -1,7 +1,7 @@
 import { vars } from "nativewind";
 
 // Raw color values - update these and they sync everywhere
-export const colors = {
+const colors = {
   light: {
     "--primary": "74 59 107", // #4a3b6b (Sera Calibrated Brand Purple - Deep, Calm, High Contrast)
     "--primary-foreground": "255 255 255",

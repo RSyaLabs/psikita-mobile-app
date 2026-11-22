@@ -62,8 +62,7 @@ export function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-/** For values that must be an object; a non-object is a contract violation. */
-export function asRecordOrThrow(value: unknown): Record<string, unknown> {
+function asRecordOrThrow(value: unknown): Record<string, unknown> {
   if (!isRecord(value)) {
     throw new Error("Expected an object response");
   }
@@ -117,7 +116,7 @@ export function collectionAdapter<T>(
   };
 }
 
-export interface PaginatedMeta {
+interface PaginatedMeta {
   itemCount: number;
   totalItems: number;
   itemsPerPage: number;

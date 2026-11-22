@@ -20,8 +20,6 @@ export * from "./queries/careplan";
 export * from "./queries/followup";
 export * from "./queries/cdss";
 export * from "./queries/avatar";
-export * from "./queries/psychometrics";
 export * from "./queries/diagnosis-codes";
 export * from "./queries/identity-verification";
 export * from "./queries/prefetch";
-export { queryKeys } from "./useQueryKeys";

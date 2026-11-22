@@ -202,31 +202,12 @@ const AlertDialogFooter = React.forwardRef<
   );
 });
 
-type IAlertDialogCloseButtonProps = React.ComponentPropsWithoutRef<
-  typeof UIAlertDialog.CloseButton
-> &
-  VariantProps<typeof alertDialogCloseButtonStyle> & { className?: string };
-
-const AlertDialogCloseButton = React.forwardRef<
-  React.ElementRef<typeof UIAlertDialog.CloseButton>,
-  IAlertDialogCloseButtonProps
->(({ className, ...props }, ref) => {
-  return (
-    <UIAlertDialog.CloseButton
-      ref={ref}
-      {...props}
-      className={alertDialogCloseButtonStyle({ class: className })}
-    />
-  );
-});
-
 AlertDialog.displayName = "AlertDialog";
 AlertDialogBackdrop.displayName = "AlertDialogBackdrop";
 AlertDialogContent.displayName = "AlertDialogContent";
 AlertDialogHeader.displayName = "AlertDialogHeader";
 AlertDialogBody.displayName = "AlertDialogBody";
 AlertDialogFooter.displayName = "AlertDialogFooter";
-AlertDialogCloseButton.displayName = "AlertDialogCloseButton";
 
 export {
   AlertDialog,
@@ -235,5 +216,4 @@ export {
   AlertDialogHeader,
   AlertDialogBody,
   AlertDialogFooter,
-  AlertDialogCloseButton,
 };

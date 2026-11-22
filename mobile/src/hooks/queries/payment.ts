@@ -37,20 +37,6 @@ export function usePaymentMethods(amount?: number, currency = "IDR") {
 }
 
 /**
- * Mutation hook untuk membuat billing order resmi dari server.
- */
-export function useCreateBillingOrder() {
-  return useMutation<
-    BillingOrderResponseDto,
-    Error,
-    { consultationId: string; dto: CreateBillingOrderDto }
-  >({
-    mutationFn: ({ consultationId, dto }) =>
-      paymentService.createBillingOrder(consultationId, dto),
-  });
-}
-
-/**
  * The current consultation contract has no payment-context field. This hook
  * returns only a context already branded by the API adapter, plus its query
  * state; route values are never promoted to server provenance.

@@ -70,7 +70,7 @@ function getErrorMetadata(error: unknown): ErrorMetadata {
   };
 }
 
-export const queryClient = new QueryClient({
+const queryClient = new QueryClient({
   queryCache: new QueryCache({
     onError: (error, query) => {
       // Menangkap error level kueri secara terpusat

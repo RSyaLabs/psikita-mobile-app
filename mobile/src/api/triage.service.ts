@@ -2,7 +2,6 @@ import { z } from "zod";
 import { ApiError, apiRequest } from "./client";
 import { arrayAdapter, requireServerId } from "./response";
 import {
-  assessmentResultSchema,
   validateAssessmentResult,
 } from "@/clinical/assessment";
 import { SubmitTriageDto, TriageResponseDto } from "@/types/api";
@@ -82,5 +81,3 @@ export const triageService = {
     });
   },
 };
-
-export { assessmentResultSchema };

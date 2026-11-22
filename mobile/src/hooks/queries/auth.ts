@@ -14,10 +14,8 @@ import {
   TokenResponseDto,
   PasswordLoginDto,
   PasswordRegisterDto,
-  GoogleLoginDto,
   CreatePractitionerDto,
   RequestOtpDto,
-  VerifyOtpDto,
 } from "@/types/api";
 import {
   queryKeys,
@@ -129,12 +127,6 @@ export function useLogin() {
   );
 }
 
-export function useGoogleLogin() {
-  return useAuthLoginMutation((dto: GoogleLoginDto) =>
-    authService.loginWithGoogle(dto),
-  );
-}
-
 /**
  * Mutation hook for Patient Registration
  */
@@ -165,38 +157,5 @@ export function useRegisterPractitioner() {
 export function useRequestOtp() {
   return useMutation({
     mutationFn: (dto: RequestOtpDto) => authService.requestOtp(dto),
-  });
-}
-
-/**
- * Mutation hook for verifying an OTP code
- */
-export function useVerifyOtp() {
-  return useMutation({
-    mutationFn: (dto: VerifyOtpDto) => authService.verifyOtp(dto),
-  });
-}
-
-/**
- * Mutation hook for requesting password reset email
- */
-export function useForgotPassword() {
-  return useMutation({
-    mutationFn: (email: string) => authService.forgotPassword(email),
-  });
-}
-
-/**
- * Mutation hook for resetting password with token
- */
-export function useResetPassword() {
-  return useMutation({
-    mutationFn: ({
-      token,
-      newPassword,
-    }: {
-      token: string;
-      newPassword: string;
-    }) => authService.resetPassword(token, newPassword),
   });
 }

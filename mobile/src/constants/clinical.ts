@@ -1,4 +1,4 @@
-export const ICD_10_DESCRIPTION_MAP = {
+const ICD_10_DESCRIPTION_MAP = {
   "F41.1": "Gangguan kecemasan menyeluruh",
   "F32.0": "Episode depresif ringan",
   "F43.2": "Gangguan penyesuaian",

@@ -111,4 +111,4 @@ Toast.displayName = "Toast";
 ToastTitle.displayName = "ToastTitle";
 ToastDescription.displayName = "ToastDescription";
 
-export { Toast, ToastTitle, ToastDescription, useToast, ToastProvider };
+export { Toast, ToastTitle, ToastDescription, useToast };

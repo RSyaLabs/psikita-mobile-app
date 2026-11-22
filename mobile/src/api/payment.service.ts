@@ -107,27 +107,6 @@ const validatedBillingOrderContextSchema = z
   })
   .strict();
 
-/**
- * Private adapter seam for a future documented billing-order response. The
- * response's consultation ID must match the already-validated consultation
- * before the private minter is called. The current contract has no such
- * response, so production never invokes this seam.
- */
-export function adaptValidatedBillingOrderContext(
-  value: unknown,
-  validatedConsultationId: string,
-): ServerPaymentContext {
-  const response = validatedBillingOrderContextSchema.parse(value);
-  if (response.consultationId !== validatedConsultationId.trim()) {
-    throw new Error(
-      "Billing-order context does not belong to the consultation",
-    );
-  }
-  return mintServerPaymentContext({
-    consultationId: response.consultationId,
-    billingOrderId: response.orderId,
-  });
-}
 
 /** Accepts only a context already branded by an API adapter. */
 export function serverPaymentContextFromApiResponse(
@@ -232,7 +211,7 @@ const paymentStatusMap: Record<
   CANCELLED: "CANCEL",
 };
 
-export const BPJS_ELIGIBILITY_ACCEPTED: BpjsEligibilityDto = Object.freeze({
+const BPJS_ELIGIBILITY_ACCEPTED: BpjsEligibilityDto = Object.freeze({
   accepted: true,
   eligibility: "UNKNOWN",
 });

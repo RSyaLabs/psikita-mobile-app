@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, Text, VStack } from "@/components/ui";
 
-export type MessageRole = "PRACTITIONER" | "PATIENT" | "SYSTEM" | "UNKNOWN";
+type MessageRole = "PRACTITIONER" | "PATIENT" | "SYSTEM" | "UNKNOWN";
 
 export interface ChatMessageItem {
   id: string;

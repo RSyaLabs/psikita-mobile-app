@@ -13,7 +13,7 @@ import {
 } from "@/components/ui";
 import { haptics } from "@/utils/haptics";
 
-export interface DateOption {
+interface DateOption {
   id: string;
   dayName: string;
   dayNumber: string;

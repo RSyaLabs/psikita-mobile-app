@@ -32,8 +32,8 @@ import {
 } from "@/hooks/useAuth";
 import type { TokenResponseDto } from "@/types/api";
 
-export const AUTH_USER_STORAGE_KEY = "seraphany_auth_user";
-export const AUTH_SESSION_VERSION = 1 as const;
+const AUTH_USER_STORAGE_KEY = "seraphany_auth_user";
+const AUTH_SESSION_VERSION = 1 as const;
 
 const persistedSessionSchema = z.object({
   version: z.literal(AUTH_SESSION_VERSION),
@@ -319,8 +319,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
-export default AuthProvider;
-
 export function AuthLoadingState() {
   return (
     <LoadingState
@@ -332,4 +330,4 @@ export function AuthLoadingState() {
 }
 
 export { AuthContext };
-export type { AppRole, AuthAttempt, AuthContextValue, AuthStatus, AuthUser };
+export type { AppRole, AuthAttempt, AuthContextValue, AuthUser };

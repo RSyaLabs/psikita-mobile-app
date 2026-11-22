@@ -11,12 +11,9 @@ import type { ResponseAdapter } from "./response";
 
 export {
   ApiError,
-  healthAdapter,
   noContentAdapter,
-  parseApiData,
   zodAdapter,
 } from "./response";
-export type { ResponseAdapter } from "./response";
 
 export const API_BASE_URL =
   process.env.EXPO_PUBLIC_API_BASE_URL ||
@@ -35,7 +32,7 @@ export function onSessionExpired(handler: (() => void) | null): void {
   sessionExpiredHandler = handler;
 }
 
-export function notifySessionExpired(): void {
+function notifySessionExpired(): void {
   sessionExpiredHandler?.();
 }
 
@@ -53,9 +50,6 @@ const enqueueTokenStorage = (operation: () => Promise<void>) => {
     lastTokenStorageFailure = error;
   });
 };
-
-/** True when a token write to secure storage has failed since the last success. */
-export const hasTokenStorageFailed = (): boolean => lastTokenStorageFailure !== null;
 
 const hydrateAccessToken = async () => {
   const readEpoch = tokenEpoch;

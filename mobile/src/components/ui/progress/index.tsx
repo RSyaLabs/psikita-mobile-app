@@ -11,7 +11,7 @@ import { cssInterop } from "nativewind";
 import type { VariantProps } from "@gluestack-ui/utils/nativewind-utils";
 
 const SCOPE = "PROGRESS";
-export const UIProgress = createProgress({
+const UIProgress = createProgress({
   Root: withStyleContext(View, SCOPE),
   FilledTrack: View,
 });

@@ -1,15 +1,6 @@
 import React from "react";
-import { Server, AlertTriangle } from "lucide-react-native";
-import {
-  Badge,
-  BadgeIcon,
-  BadgeText,
-  Card,
-  HStack,
-  Heading,
-  Text,
-  VStack,
-} from "@/components/ui";
+import { AlertTriangle } from "lucide-react-native";
+import { Badge, BadgeIcon, BadgeText } from "@/components/ui";
 
 export interface BackendIntegrationBadgeProps {
   endpoint?: string;
@@ -35,63 +26,5 @@ export function BackendIntegrationBadge({
         {endpoint ? `${badgeText} • ${endpoint}` : badgeText}
       </BadgeText>
     </Badge>
-  );
-}
-
-export interface BackendIntegrationBannerProps {
-  endpoint?: string;
-  badgeText?: string;
-  title?: string;
-  description?: string;
-  className?: string;
-  testID?: string;
-}
-
-export function BackendIntegrationBanner({
-  endpoint,
-  badgeText = "Tahap Integrasi Backend",
-  title = "Pratinjau Antarmuka QA",
-  description = "Fitur langsung dari server belum tersedia. Antarmuka ditampilkan lengkap untuk evaluasi alur tim QA dan spesifikasi endpoint tim backend.",
-  className = "",
-  testID,
-}: BackendIntegrationBannerProps) {
-  return (
-    <Card
-      testID={testID}
-      accessible
-      accessibilityRole="alert"
-      accessibilityLabel={`${badgeText}: ${title}`}
-      accessibilityHint={description}
-      className={`bg-warning/10 border border-warning/30 rounded-2xl p-4 gap-2.5 ${className}`}
-    >
-      <HStack space="sm" className="items-center justify-between">
-        <Badge
-          variant="outline"
-          className="border-warning/50 bg-card rounded-full px-3 py-1"
-        >
-          <BadgeIcon as={AlertTriangle} color="#D97706" style={{ marginRight: 4 }} />
-          <BadgeText className="text-sm font-bold text-warning">
-            {badgeText}
-          </BadgeText>
-        </Badge>
-        {endpoint ? (
-          <HStack space="xs" className="items-center bg-card px-2.5 py-1 rounded-md border border-warning/30">
-            <Server size={14} color="#4B4656" />
-            <Text size="sm" bold className="text-muted-foreground font-semibold">
-              {endpoint}
-            </Text>
-          </HStack>
-        ) : null}
-      </HStack>
-
-      <VStack space="xs">
-        <Heading size="sm" bold className="text-foreground">
-          {title}
-        </Heading>
-        <Text size="sm" className="text-muted-foreground leading-relaxed">
-          {description}
-        </Text>
-      </VStack>
-    </Card>
   );
 }

@@ -4,7 +4,6 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import {
-  patientService,
   practitionerService,
 } from "@/api";
 import {
@@ -21,7 +20,6 @@ import {
  */
 
 import {
-  PatientListParams,
   PractitionerListParams,
   PractitionerListResult,
   toCompatibleListResult,
@@ -122,18 +120,5 @@ export function usePractitioner(id?: string) {
       id ? callWithSignal(practitionerService.getById, signal, id) : null,
     enabled: !!id,
     staleTime: 10 * 60 * 1000,
-  });
-}
-
-/**
- * Hook to retrieve paginated list of patients (admin)
- */
-export function usePatients(params?: PatientListParams) {
-  return useQuery({
-    queryKey: queryKeys.patient.list(params),
-    queryFn: async ({ signal }) =>
-      toCompatibleListResult(
-        await callWithSignal(patientService.getPatients, signal, params),
-      ),
   });
 }

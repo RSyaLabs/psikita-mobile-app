@@ -131,32 +131,9 @@ const AvatarImage = React.forwardRef<
   );
 });
 
-type IAvatarGroupProps = React.ComponentPropsWithoutRef<typeof UIAvatar.Group> &
-  VariantProps<typeof avatarGroupStyle>;
-
-const AvatarGroup = React.forwardRef<
-  React.ComponentRef<typeof UIAvatar.Group>,
-  IAvatarGroupProps
->(function AvatarGroup({ className, ...props }, ref) {
-  return (
-    <UIAvatar.Group
-      ref={ref}
-      {...props}
-      className={avatarGroupStyle({
-        class: className,
-      })}
-    />
-  );
-});
-
-// Alias for shadcn compatibility
-const AvatarFallback = AvatarFallbackText;
-
 export {
   Avatar,
   AvatarBadge,
-  AvatarFallback,
   AvatarFallbackText,
-  AvatarGroup,
   AvatarImage,
 };

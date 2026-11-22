@@ -5,7 +5,7 @@ import {
   SavePayoutBankAccountDto,
 } from "@/types/api";
 
-export const PAYOUT_QUERY_KEYS = {
+const PAYOUT_QUERY_KEYS = {
   bankAccount: ["payout", "bankAccount", "me"] as const,
 };
 

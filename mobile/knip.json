@@ -1,0 +1,25 @@
+{
+  "$schema": "https://unpkg.com/knip@5/overview/configuration-schema.json",
+  "entry": [
+    "app/**/*.{ts,tsx}",
+    "scripts/**/*.{ts,js}",
+    "__tests__/**/*.{ts,tsx}"
+  ],
+  "project": [
+    "app/**/*.{ts,tsx}",
+    "src/**/*.{ts,tsx}",
+    "scripts/**/*.{ts,js}",
+    "__tests__/**/*.{ts,tsx}"
+  ],
+  "ignore": [
+    "src/types/api.ts"
+  ],
+  "ignoreDependencies": [
+    "expo-updates",
+    "expo-system-ui",
+    "babel-preset-expo"
+  ],
+  "ignoreBinaries": [
+    "knip"
+  ]
+}
