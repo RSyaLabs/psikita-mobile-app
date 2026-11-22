@@ -9,9 +9,9 @@ export default function PractitionerLayout() {
   const router = useRouter();
   const segments = useSegments();
   const { status, user, hasRole, homeRoute } = useAuth();
-  const isPublicRegistration =
-    segments[segments.length - 1] === "register";
-  const redirectRoute = isPublicRegistration
+  const isPublicPreview =
+    Boolean(__DEV__) || segments[segments.length - 1] === "register";
+  const redirectRoute = isPublicPreview
     ? null
     : status === "loading"
       ? null
@@ -27,7 +27,7 @@ export default function PractitionerLayout() {
     }
   }, [redirectRoute, router]);
 
-  if (!isPublicRegistration && (status === "loading" || redirectRoute)) {
+  if (!isPublicPreview && (status === "loading" || redirectRoute)) {
     return <AuthLoadingState />;
   }
 

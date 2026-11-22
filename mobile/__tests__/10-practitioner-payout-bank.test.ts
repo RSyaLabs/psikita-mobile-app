@@ -6,6 +6,10 @@ import {
   payoutBankAccountStatusSchema,
   savePayoutBankAccountSchema,
 } from "../src/api/payout.service";
+import {
+  usePayoutBankAccountQuery,
+  useSavePayoutBankAccountMutation,
+} from "../src/hooks/queries/payout";
 import { setAuthTokens, ApiError } from "../src/api/client";
 import { secureStorage } from "../src/utils/storage";
 
@@ -185,6 +189,13 @@ describe("10. Practitioner Payout Bank Status & Zero Transfer Authority Suite (R
       expect(maskAccountNumber("1234")).toBe("1234");
       expect(maskAccountNumber("")).toBe("");
       expect(maskAccountNumber(undefined)).toBe("");
+    });
+  });
+
+  describe("Practitioner Payout React Query Hooks", () => {
+    it("should export query and mutation hooks for practitioner bank account", () => {
+      expect(typeof usePayoutBankAccountQuery).toBe("function");
+      expect(typeof useSavePayoutBankAccountMutation).toBe("function");
     });
   });
 });

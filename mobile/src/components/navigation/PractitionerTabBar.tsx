@@ -1,6 +1,12 @@
 import React from "react";
 import { useRouter } from "expo-router";
-import { LayoutDashboard, Calendar, User } from "lucide-react-native";
+import {
+  LayoutDashboard,
+  MessageSquare,
+  Briefcase,
+  Wallet,
+  User,
+} from "lucide-react-native";
 import { HStack, Text, Pressable } from "@/components/ui";
 import { AppIcon } from "@/components/common/AppIcon";
 import { PractitionerTab } from "@/types";
@@ -20,12 +26,24 @@ const PRACTITIONER_TABS = [
   {
     id: "sesi" as PractitionerTab,
     label: "Sesi",
-    route: ROUTES.PRACTITIONER.HISTORY,
-    icon: Calendar,
+    route: ROUTES.PRACTITIONER.CHAT,
+    icon: MessageSquare,
   },
   {
-    id: "profil" as PractitionerTab,
-    label: "Profil",
+    id: "kasus" as PractitionerTab,
+    label: "Kasus",
+    route: ROUTES.PRACTITIONER.WAR_ROOM,
+    icon: Briefcase,
+  },
+  {
+    id: "pendapatan" as PractitionerTab,
+    label: "Pendapatan",
+    route: ROUTES.PRACTITIONER.HISTORY,
+    icon: Wallet,
+  },
+  {
+    id: "akun" as PractitionerTab,
+    label: "Akun",
     route: ROUTES.PRACTITIONER.PROFILE,
     icon: User,
   },
