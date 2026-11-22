@@ -329,7 +329,7 @@ export default function ProfileScreen() {
             <Pressable
               onPress={() => {
                 haptics.light();
-                setShowHelpModal(true);
+                router.push(ROUTES.PATIENT.HELP as any);
               }}
               className="py-3 flex-row items-center justify-between active:opacity-80"
             >

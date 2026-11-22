@@ -32,7 +32,9 @@ export default function PatientLayout() {
       leafSegment === "refunds" ||
       leafSegment === "community" ||
       leafSegment === "community-detail" ||
-      (leafSegment as string) === "self-screening");
+      (leafSegment as string) === "self-screening" ||
+      (leafSegment as string) === "notifications" ||
+      (leafSegment as string) === "help");
 
   const {
     data: patientProfile,
@@ -106,6 +108,9 @@ export default function PatientLayout() {
       <Stack.Screen name="patient/community" />
       <Stack.Screen name="patient/community-detail" />
       <Stack.Screen name="patient/follow-ups" />
+      <Stack.Screen name="patient/self-screening" />
+      <Stack.Screen name="patient/notifications" />
+      <Stack.Screen name="patient/help" />
     </Stack>
   );
 }

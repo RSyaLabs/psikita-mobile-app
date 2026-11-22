@@ -215,17 +215,7 @@ export default function PatientDashboard() {
               <Pressable
                 onPress={() => {
                   haptics.light();
-                  toast.show({
-                    placement: "top",
-                    render: ({ id }) => (
-                      <Toast nativeID={id} action="info">
-                        <ToastTitle>Notifikasi</ToastTitle>
-                        <ToastDescription>
-                          Tidak ada notifikasi baru saat ini.
-                        </ToastDescription>
-                      </Toast>
-                    ),
-                  });
+                  router.push(ROUTES.PATIENT.NOTIFICATIONS as any);
                 }}
                 accessibilityRole="button"
                 accessibilityLabel="Notifikasi"
