@@ -19,13 +19,13 @@ export interface CrisisHelpViewProps {
   onConsultDoctor: () => void;
 }
 
-export interface CrisisContact {
+interface CrisisContact {
   name: string;
   description: string;
   phone: string;
 }
 
-export const VERIFIED_CRISIS_HOTLINES: CrisisContact[] = [
+const VERIFIED_CRISIS_HOTLINES: CrisisContact[] = [
   {
     name: "Layanan Sejiwa (Kemenkes RI)",
     description: "Hotline kesehatan jiwa bebas pulsa 24 jam",

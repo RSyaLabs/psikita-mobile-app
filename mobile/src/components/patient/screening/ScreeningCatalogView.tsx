@@ -60,7 +60,7 @@ export const FALLBACK_INSTRUMENTS: PsychometricInstrumentDto[] = [
   },
 ];
 
-export const FALLBACK_HISTORY: ScreeningHistoryItem[] = [
+const FALLBACK_HISTORY: ScreeningHistoryItem[] = [
   {
     id: "hist-1",
     code: "DASS-21",
