@@ -55,13 +55,14 @@ describe("19. Notifications & Patient Help Center Flow (Wireframe Screens 67-69)
 
       expect(content).toContain("PENGINGAT");
       expect(content).toContain("Pengingat jadwal sesi");
-      expect(content).toContain("[1 jam sebelumnya]");
+      expect(content).toContain("Dikirim 1 jam sebelum sesi dimulai");
       expect(content).toContain("Pengingat rencana perawatan");
-      expect(content).toContain("[hari · jam]");
+      expect(content).toContain("Notifikasi berkala sesuai jadwal kontrol");
 
       expect(content).toContain("LAINNYA");
       expect(content).toContain("Edukasi & tips");
-      expect(content).toContain("Maks. [N] per minggu");
+      expect(content).toContain("Maksimal 2 ringkasan per minggu");
+      expect(content).not.toContain("Maks. [N] per minggu");
 
       expect(content).toContain(
         'Layar kunci hanya menampilkan "Ada pembaruan", tanpa detail medis.'

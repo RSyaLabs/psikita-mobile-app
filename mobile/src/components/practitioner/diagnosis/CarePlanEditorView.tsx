@@ -197,7 +197,7 @@ export function CarePlanEditorView({
           </Text>
           <Input className="h-[52px] rounded-xl border border-border bg-card px-4">
             <InputField
-              placeholder="[tanggal]"
+              placeholder="Contoh: 2026-12-15 atau 30 hari ke depan"
               value={validUntil}
               onChangeText={setValidUntil}
               className="text-foreground text-sm"

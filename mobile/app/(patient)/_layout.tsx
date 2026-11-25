@@ -10,7 +10,6 @@ import { AuthLoadingState } from "@/providers/AuthProvider";
 import { useAuth } from "@/hooks/useAuth";
 import { ROUTES } from "@/constants/routes";
 import { usePatientProfile } from "@/hooks/useApiQueries";
-import { ApiError } from "@/api/client";
 
 export default function PatientLayout() {
   const router = useRouter();
@@ -28,6 +27,7 @@ export default function PatientLayout() {
       leafSegment === "profile" ||
       leafSegment === "edit-profile" ||
       leafSegment === "triage" ||
+      leafSegment === "matching" ||
       leafSegment === "assessment-result" ||
       leafSegment === "checkout" ||
       leafSegment === "payment-regular" ||
@@ -47,16 +47,9 @@ export default function PatientLayout() {
 
   const isPublicPreview = isPublicGuestRoute;
 
-  const {
-    data: patientProfile,
-    isError: isProfileError,
-    error: profileError,
-  } = usePatientProfile();
-
-  const isProfileNotFound =
-    isProfileError &&
-    profileError instanceof ApiError &&
-    profileError.statusCode === 404;
+  const { data: patientProfile } = usePatientProfile({
+    enabled: !isPublicPreview && status === "authenticated" && hasRole("patient"),
+  });
 
   const authRedirectRoute = isPublicPreview
     ? null
@@ -120,6 +113,7 @@ export default function PatientLayout() {
       <Stack.Screen name="patient/community-detail" />
       <Stack.Screen name="patient/follow-ups" />
       <Stack.Screen name="patient/self-screening" />
+      <Stack.Screen name="patient/refunds" />
       <Stack.Screen name="patient/notifications" />
       <Stack.Screen name="patient/help" />
       <Stack.Screen name="patient/security" />

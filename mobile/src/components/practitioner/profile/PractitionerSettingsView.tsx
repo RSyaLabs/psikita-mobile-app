@@ -28,7 +28,7 @@ export const PractitionerSettingsView = React.memo(function PractitionerSettings
   const [notifPayoutStatus, setNotifPayoutStatus] = useState(true);
   const [notifBankUpdate, setNotifBankUpdate] = useState(true);
   const [language] = useState("Indonesia");
-  const [notificationSound] = useState("[Bawaan]");
+  const [notificationSound] = useState("Nada Bawaan Sistem");
 
   const caseItems = [
     { title: "Kasus baru masuk", desc: "Wajib saat siap menerima kasus", val: notifNewCase, toggle: () => setNotifNewCase((v) => !v) },

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ShieldCheck } from "lucide-react-native";
@@ -108,23 +108,38 @@ export default function TriageScreen() {
   const isAssessment = mode === "assessment" || isGuest;
 
   // Step state: 0 = Intro (Screen 24), 1..5 = Questions (Screen 25), 6 = Review (Screen 26), 7 = Confirmation (Screen 27)
-  const initialStep = step ? parseInt(step, 10) : 0;
-  const [currentStep, setCurrentStep] = useState<number>(
-    isNaN(initialStep) ? 0 : Math.min(Math.max(initialStep, 0), 7),
-  );
+  const parseStepParam = (rawStep?: string): number => {
+    if (rawStep === "review") return 6;
+    if (rawStep === "emergency") return 0;
+    const parsed = rawStep ? parseInt(rawStep, 10) : 0;
+    return isNaN(parsed) ? 0 : Math.min(Math.max(parsed, 0), 7);
+  };
+  const [currentStep, setCurrentStep] = useState<number>(() => parseStepParam(step));
+  const [submittedTriageId, setSubmittedTriageId] = useState<string | undefined>(undefined);
 
-  const [answers, setAnswers] = useState<Record<string, string>>({
-    question_1: "Beberapa hari",
-    question_2: "Beberapa hari",
-    question_3: "Sering, hampir tiap minggu",
-    question_4: "Beberapa hari",
-    question_5: "Beberapa hari",
-  });
+  const [answers, setAnswers] = useState<Record<string, string>>((): Record<string, string> =>
+    isGuest && step === "review"
+      ? {
+          question_1: "Beberapa hari",
+          question_2: "Beberapa hari",
+          question_3: "Sering, hampir tiap minggu",
+          question_4: "Beberapa hari",
+          question_5: "Beberapa hari",
+        }
+      : {},
+  );
 
   const [kycModalOpen, setKycModalOpen] = useState(false);
   const [isKycLaunching, setIsKycLaunching] = useState(false);
-  const [emergencyModalOpen, setEmergencyModalOpen] = useState(false);
+  const [emergencyModalOpen, setEmergencyModalOpen] = useState(step === "emergency");
   const [exitModalOpen, setExitModalOpen] = useState(false);
+
+  useEffect(() => {
+    setCurrentStep(parseStepParam(step));
+    if (step === "emergency") {
+      setEmergencyModalOpen(true);
+    }
+  }, [step]);
 
   const submitTriageMutation = useSubmitTriage();
   const startKycMutation = useStartDiditVerification();
@@ -211,6 +226,7 @@ export default function TriageScreen() {
       {
         onSuccess: (data) => {
           haptics.success();
+          setSubmittedTriageId(data.id);
           if (isAssessment) {
             router.push({
               pathname: ROUTES.PATIENT.ASSESSMENT_RESULT,
@@ -230,15 +246,28 @@ export default function TriageScreen() {
             setKycModalOpen(true);
             return;
           }
-          haptics.medium();
-          if (isAssessment) {
+          if (isGuest) {
+            haptics.medium();
             router.push({
               pathname: ROUTES.PATIENT.ASSESSMENT_RESULT,
-              params: { guest: isGuest ? "true" : "false", mode: "assessment" },
+              params: { guest: "true", mode: "assessment" },
             } as never);
-          } else {
-            setCurrentStep(7);
+            return;
           }
+          haptics.error();
+          toast.show({
+            placement: "top",
+            render: ({ id }) => (
+              <Toast nativeID={id} action="error">
+                <ToastTitle>Gagal Mengirim Triase</ToastTitle>
+                <ToastDescription>
+                  {err instanceof ApiError
+                    ? err.message
+                    : "Terjadi kendala jaringan saat mengirim jawaban."}
+                </ToastDescription>
+              </Toast>
+            ),
+          });
         },
       },
     );
@@ -299,7 +328,16 @@ export default function TriageScreen() {
           {/* SCREEN 27: Jawaban Triase Diterima */}
           {currentStep === 7 && (
             <TriageSuccessStep
-              onGoToMatching={() => router.push(ROUTES.PATIENT.MATCHING as never)}
+              onGoToMatching={() =>
+                router.push(
+                  (submittedTriageId
+                    ? {
+                        pathname: ROUTES.PATIENT.MATCHING,
+                        params: { triageId: submittedTriageId },
+                      }
+                    : ROUTES.PATIENT.MATCHING) as never,
+                )
+              }
               onOpenEmergency={() => setEmergencyModalOpen(true)}
             />
           )}

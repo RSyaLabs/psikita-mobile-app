@@ -167,7 +167,7 @@ export function CreatePostView({
               />
             </Box>
             <Text size="sm" className="text-sm text-muted-foreground text-right pr-1">
-              [{content.length}] / 280
+              {content.length} / 280
             </Text>
           </VStack>
 

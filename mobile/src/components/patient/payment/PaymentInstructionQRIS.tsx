@@ -4,6 +4,7 @@ import {
   Box,
   Text,
   Heading,
+  Image,
   VStack,
   HStack,
   Pressable,
@@ -25,6 +26,7 @@ export interface PaymentInstructionQRISProps {
 
 export function PaymentInstructionQRIS({
   amount = 151050,
+  qrCodeUrl,
   deadlineText = "22 Nov, 12:00",
   onPaid,
   onChangeMethod,
@@ -83,12 +85,23 @@ export function PaymentInstructionQRIS({
             <Box
               className={`${
                 zoomed ? "w-[280px] h-[280px]" : "w-[220px] h-[220px]"
-              } border-2 border-dashed border-border rounded-2xl bg-muted/40 items-center justify-center p-4`}
+              } border-2 border-dashed border-border rounded-2xl bg-muted/40 items-center justify-center p-4 overflow-hidden`}
             >
-              <QrCode size={zoomed ? 160 : 120} color="#4A3B6B" />
-              <Text size="sm" className="text-center text-muted-foreground mt-2 font-medium">
-                Dibuat khusus untuk pesanan ini
-              </Text>
+              {qrCodeUrl ? (
+                <Image
+                  source={{ uri: qrCodeUrl }}
+                  alt="Kode QRIS Pembayaran"
+                  className={zoomed ? "w-[240px] h-[240px]" : "w-[180px] h-[180px]"}
+                  resizeMode="contain"
+                />
+              ) : (
+                <>
+                  <QrCode size={zoomed ? 160 : 120} color="#4A3B6B" />
+                  <Text size="sm" className="text-center text-muted-foreground mt-2 font-medium">
+                    Dibuat khusus untuk pesanan ini
+                  </Text>
+                </>
+              )}
             </Box>
 
             {/* QR Actions */}

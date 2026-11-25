@@ -86,50 +86,8 @@ export default function IndexGatewayScreen() {
     );
   }
 
-  // Screen 2: MS1 · Halaman Awal
-  if (isPublicPreview) {
-    return (
-      <SafeAreaView className="flex-1 bg-[#FAF8F5] justify-between px-6 py-8">
-        <Box className="flex-1 items-center justify-center">
-          <Box className="w-24 h-24 rounded-3xl overflow-hidden items-center justify-center bg-white border border-[#EBE7E0] shadow-sm mb-6">
-            <Image
-              source={require("../assets/icon.png")}
-              style={{ width: 76, height: 76 }}
-              resizeMode="contain"
-            />
-          </Box>
-          <Heading size="2xl" bold className="text-[#262130] tracking-tight text-center">
-            SeraPhany
-          </Heading>
-          <Text size="md" className="text-[#75618E] text-center mt-2 max-w-xs">
-            Ruang aman untuk bercerita dan mendapatkan bantuan psikologis terpercaya.
-          </Text>
-        </Box>
-
-        <VStack space="md" className="w-full max-w-sm pb-4">
-          <Button
-            className="w-full bg-[#4A3B6B] rounded-xl py-3.5"
-            onPress={() => router.push(ROUTES.AUTH.LOGIN as any)}
-          >
-            <ButtonText className="text-white font-semibold text-center text-base">
-              Masuk dengan Akun
-            </ButtonText>
-          </Button>
-          <Button
-            variant="outline"
-            className="w-full border-[#4A3B6B] rounded-xl py-3.5"
-            onPress={() => router.push(ROUTES.AUTH.REGISTER as any)}
-          >
-            <ButtonText className="text-[#4A3B6B] font-semibold text-center text-base">
-              Daftar Pasien Baru
-            </ButtonText>
-          </Button>
-        </VStack>
-      </SafeAreaView>
-    );
-  }
-
-  if (status === "loading") {
+  // Screen 2: MS1 · Halaman Awal (shown for public preview OR unauthenticated landing)
+  if (!isPublicPreview && status === "loading") {
     return (
       <View
         className="flex-1 items-center justify-center bg-background px-6"
@@ -162,10 +120,48 @@ export default function IndexGatewayScreen() {
     );
   }
 
-  if (isAuthenticated && user) {
+  if (!isPublicPreview && isAuthenticated && user) {
     const targetRoute = getHomeRouteForRole(user.role);
     return <Redirect href={targetRoute as any} />;
   }
 
-  return <Redirect href={ROUTES.AUTH.LOGIN as any} />;
+  return (
+    <SafeAreaView className="flex-1 bg-[#FAF8F5] justify-between px-6 py-8">
+      <Box className="flex-1 items-center justify-center">
+        <Box className="w-24 h-24 rounded-3xl overflow-hidden items-center justify-center bg-white border border-[#EBE7E0] shadow-sm mb-6">
+          <Image
+            source={require("../assets/icon.png")}
+            style={{ width: 76, height: 76 }}
+            resizeMode="contain"
+          />
+        </Box>
+        <Heading size="2xl" bold className="text-[#262130] tracking-tight text-center">
+          SeraPhany
+        </Heading>
+        <Text size="md" className="text-[#75618E] text-center mt-2 max-w-xs">
+          Ruang aman untuk bercerita dan mendapatkan bantuan psikologis terpercaya.
+        </Text>
+      </Box>
+
+      <VStack space="md" className="w-full max-w-sm self-center pb-4">
+        <Button
+          className="w-full bg-[#4A3B6B] rounded-xl py-3.5"
+          onPress={() => router.push(ROUTES.AUTH.LOGIN as any)}
+        >
+          <ButtonText className="text-white font-semibold text-center text-base">
+            Masuk dengan Akun
+          </ButtonText>
+        </Button>
+        <Button
+          variant="outline"
+          className="w-full border-[#4A3B6B] rounded-xl py-3.5"
+          onPress={() => router.push(ROUTES.AUTH.REGISTER as any)}
+        >
+          <ButtonText className="text-[#4A3B6B] font-semibold text-center text-base">
+            Daftar Pasien Baru
+          </ButtonText>
+        </Button>
+      </VStack>
+    </SafeAreaView>
+  );
 }

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Alert } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ArrowLeft, Lock } from "lucide-react-native";
@@ -12,6 +13,7 @@ import {
   HStack,
   Pressable,
   Button,
+  ButtonSpinner,
   ButtonText,
   ScrollView,
 } from "@/components/ui";
@@ -22,6 +24,11 @@ import {
 } from "@/components/patient/payment";
 import { haptics } from "@/utils/haptics";
 import { safeNavigateBack } from "@/utils/navigation";
+import {
+  paymentService,
+  createBillingOrderIdempotencyKey,
+} from "@/api/payment.service";
+import { ApiError } from "@/api/client";
 import {
   usePractitioner,
   useValidatedServerPaymentContext,
@@ -46,18 +53,33 @@ export default function CheckoutScreen() {
     doctorAvatar?: string;
     slot?: string;
     consultationId?: string;
+    overtime?: string;
+    guest?: string;
   }>();
 
+  const isGuest = params.guest === "true";
   const doctorId = Array.isArray(params.doctorId)
     ? params.doctorId[0]
     : params.doctorId;
   const consultationId = Array.isArray(params.consultationId)
     ? params.consultationId[0]
     : params.consultationId;
+  const overtimeMinutes = Array.isArray(params.overtime)
+    ? Number(params.overtime[0])
+    : Number(params.overtime);
+  const durationMinutes =
+    Number.isFinite(overtimeMinutes) && overtimeMinutes > 0
+      ? overtimeMinutes
+      : 60;
+  const orderType =
+    Number.isFinite(overtimeMinutes) && overtimeMinutes > 0
+      ? "EXTENSION"
+      : "INITIAL";
 
   const { data: remoteDoctor } = usePractitioner(doctorId);
   const paymentContextQuery = useValidatedServerPaymentContext(consultationId);
   const serverContext = paymentContextQuery?.context;
+  const billingOrder = paymentContextQuery?.billingOrder;
   const isContextLoading = paymentContextQuery?.isLoading ?? false;
   const isContextFetching = paymentContextQuery?.isFetching ?? false;
   const isContextError = paymentContextQuery?.isError ?? false;
@@ -67,8 +89,15 @@ export default function CheckoutScreen() {
   const [promoDiscount, setPromoDiscount] = useState<number>(0);
   const [selectedMethod, setSelectedMethod] = useState<string>("va-bca");
   const [selectedItem, setSelectedItem] = useState<PaymentMethodItemDto | null>(null);
+  const [isCreatingOrder, setIsCreatingOrder] = useState<boolean>(false);
 
-  const basePrice = 150000;
+  const basePrice =
+    billingOrder?.grossAmount ??
+    (orderType === "EXTENSION"
+      ? durationMinutes === 15
+        ? 25000
+        : 45000
+      : 150000);
   const paymentMethodsQuery = usePaymentMethods(basePrice, "IDR");
 
   const doctorName =
@@ -88,41 +117,81 @@ export default function CheckoutScreen() {
     (Array.isArray(params.doctorAvatar)
       ? params.doctorAvatar[0]
       : params.doctorAvatar) ||
-    "https://images.unsplash.com/photo-1551313461-ed3a91934aff?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3ODkwNzA0MDh8&ixlib=rb-4.1.0&q=80&w=1080";
+    "";
 
   const contextReady =
-    (paymentContextQuery?.isSuccess ?? Boolean(serverContext)) &&
-    !(paymentContextQuery?.isFetching ?? false) &&
-    !(paymentContextQuery?.isError ?? false);
+    isGuest ||
+    ((paymentContextQuery?.isSuccess ?? Boolean(serverContext)) &&
+      !(paymentContextQuery?.isFetching ?? false) &&
+      !(paymentContextQuery?.isError ?? false));
   const paymentCapability = getCapability("payment");
-  const bpjsCapability = getCapability("bpjsEligibility");
   const paymentEnabled =
-    paymentCapability === "live" &&
-    contextReady &&
-    Boolean(serverContext);
-  const bpjsEnabled =
-    bpjsCapability === "live" &&
-    contextReady &&
-    Boolean(serverContext);
+    isGuest ||
+    (paymentCapability === "live" &&
+      contextReady &&
+      Boolean(serverContext || consultationId));
   const paymentUnavailable =
-    paymentCapability === "unavailable" ||
-    (!isContextLoading &&
-      !isContextFetching &&
-      !isContextError &&
-      !contextReady);
+    !isGuest &&
+    (paymentCapability === "unavailable" ||
+      (!isContextLoading &&
+        !isContextFetching &&
+        !isContextError &&
+        !consultationId &&
+        !serverContext));
 
-  const adminFee = selectedItem?.fee?.amount ?? (selectedMethod === "qris" ? 1050 : selectedMethod === "shopeepay" ? 1500 : 4000);
-  const totalAmount = Math.max(0, basePrice - promoDiscount + adminFee);
+  const effectiveDiscount = billingOrder?.discountAmount ?? promoDiscount;
+  const adminFee =
+    selectedItem?.fee?.amount ??
+    (selectedMethod === "qris" ? 1050 : selectedMethod === "shopeepay" ? 1500 : 4000);
+  const totalAmount = Math.max(0, basePrice - effectiveDiscount + adminFee);
 
-  const handleApplyPromo = (code: string) => {
-    if (code.toUpperCase() === "SERAHEMAT" || code.toUpperCase() === "SEHAT2026") {
-      setAppliedPromo(code.toUpperCase());
-      setPromoDiscount(25000);
+  const handleApplyPromo = async (code: string) => {
+    const cleanCode = code.trim().toUpperCase();
+    if (!cleanCode) return;
+
+    if (isGuest) {
+      if (cleanCode === "SERAHEMAT" || cleanCode === "SEHAT2026") {
+        setAppliedPromo(cleanCode);
+        setPromoDiscount(25000);
+        haptics.success();
+      } else {
+        haptics.error();
+        Alert.alert("Kode Promo Tidak Valid", "Gunakan kode promo resmi yang tersedia.");
+      }
+      return;
+    }
+
+    if (!consultationId) {
+      haptics.error();
+      Alert.alert("Konsultasi Belum Siap", "Kode promo hanya dapat dicek untuk sesi aktif.");
+      return;
+    }
+
+    try {
+      const preview = await paymentService.previewBillingOrder(consultationId, {
+        orderType,
+        durationMinutes,
+        payerType: "SELF_PAY",
+        discountCode: cleanCode,
+        gatewayChannel: selectedItem?.channelCode,
+      });
+      if (preview.discountEligible === false) {
+        haptics.error();
+        Alert.alert(
+          "Promo Tidak Berlaku",
+          String(preview.discountIneligibilityReason || "Kode promo tidak memenuhi syarat pesanan ini."),
+        );
+        return;
+      }
+      setAppliedPromo(cleanCode);
+      setPromoDiscount(Number(preview.discountAmount) || 0);
       haptics.success();
-    } else {
-      setAppliedPromo(code.toUpperCase());
-      setPromoDiscount(10000);
-      haptics.success();
+    } catch (err: unknown) {
+      haptics.error();
+      Alert.alert(
+        "Gagal Memeriksa Promo",
+        err instanceof ApiError ? err.message : "Kode promo tidak valid atau gagal diverifikasi.",
+      );
     }
   };
 
@@ -132,13 +201,63 @@ export default function CheckoutScreen() {
     haptics.selection();
   };
 
-  const handlePay = () => {
-    if (!paymentEnabled || !serverContext) {
-      // In development / demo when serverContext not minted, allow proceeding with fallback params
-      haptics.medium();
-    } else {
-      haptics.medium();
+  const handlePay = async () => {
+    if (paymentCapability === "unavailable" && !isGuest) {
+      haptics.error();
+      return;
     }
+
+    let targetConsultationId = serverContext?.consultationId || consultationId;
+    if (!isGuest) {
+      if (!targetConsultationId) {
+        haptics.error();
+        Alert.alert(
+          "ID Konsultasi Tidak Ditemukan",
+          "Silakan mulai alur konsultasi atau pilih dokter terlebih dahulu.",
+        );
+        return;
+      }
+
+      if (!serverContext) {
+        setIsCreatingOrder(true);
+        try {
+          const practitionerType =
+            remoteDoctor?.type === "PSYCHIATRIST" ? "PSYCHIATRIST" : "PSYCHOLOGIST";
+          const idempotencyKey = createBillingOrderIdempotencyKey(targetConsultationId, {
+            orderType,
+            durationMinutes,
+            payerType: "SELF_PAY",
+            practitionerType,
+            discountCode: appliedPromo,
+          });
+          const created = await paymentService.createBillingOrder(targetConsultationId, {
+            orderType,
+            durationMinutes,
+            payerType: "SELF_PAY",
+            practitionerType,
+            discountCode: appliedPromo,
+            gatewayChannel: selectedItem?.channelCode,
+            idempotencyKey,
+          });
+          targetConsultationId = created.consultationId;
+          await refetchContext?.();
+        } catch (err: unknown) {
+          haptics.error();
+          Alert.alert(
+            "Gagal Membuat Tagihan",
+            err instanceof ApiError
+              ? err.message
+              : "Tidak dapat membuat tagihan pembayaran ke server.",
+          );
+          setIsCreatingOrder(false);
+          return;
+        } finally {
+          setIsCreatingOrder(false);
+        }
+      }
+    }
+
+    haptics.medium();
 
     // Determine target payment mode from selected method
     let targetMode = "va";
@@ -157,12 +276,13 @@ export default function CheckoutScreen() {
     router.push({
       pathname: ROUTES.PATIENT.PAYMENT_REGULAR,
       params: {
-        consultationId: serverContext?.consultationId || consultationId || "demo-consultation-id",
+        consultationId: targetConsultationId || (isGuest ? "demo-consultation-id" : ""),
         doctorName,
         method: selectedMethod,
         mode: targetMode,
         channelCode: selectedItem?.channelCode || selectedMethod,
         total: String(totalAmount),
+        ...(isGuest ? { guest: "true" } : {}),
       },
     } as any);
   };
@@ -206,7 +326,7 @@ export default function CheckoutScreen() {
             doctorRole={doctorRole}
             doctorAvatar={doctorAvatar}
             serviceFee={basePrice}
-            discount={promoDiscount}
+            discount={effectiveDiscount}
             adminFee={adminFee}
             total={totalAmount}
           />
@@ -214,7 +334,7 @@ export default function CheckoutScreen() {
           {/* Section Kode Promo (Wireframe Screen 33) */}
           <PaymentPromoCodeInput
             appliedCode={appliedPromo}
-            discountAmount={promoDiscount}
+            discountAmount={effectiveDiscount}
             onApplyPromo={handleApplyPromo}
             onRemovePromo={handleRemovePromo}
           />
@@ -226,7 +346,7 @@ export default function CheckoutScreen() {
             selectedMethod={selectedMethod}
             onSelectMethod={setSelectedMethod}
             onSelectKey={setSelectedItem}
-            paymentEnabled={paymentEnabled || true}
+            paymentEnabled={paymentEnabled}
             isLoading={paymentMethodsQuery.isLoading}
           />
 
@@ -261,12 +381,19 @@ export default function CheckoutScreen() {
 
         <Button
           size="lg"
-          onPress={handlePay}
+          disabled={isCreatingOrder || (!paymentEnabled && !isGuest)}
+          onPress={() => {
+            void handlePay();
+          }}
           className="w-full h-[52px] bg-primary rounded-xl flex-row items-center justify-center active:opacity-90 max-w-[640px] md:max-w-[720px] self-center"
         >
-          <ButtonText className="text-primary-foreground font-bold text-sm">
-            Bayar
-          </ButtonText>
+          {isCreatingOrder ? (
+            <ButtonSpinner color="#FFFFFF" />
+          ) : (
+            <ButtonText className="text-primary-foreground font-bold text-sm">
+              Bayar
+            </ButtonText>
+          )}
         </Button>
       </Box>
     </SafeAreaView>

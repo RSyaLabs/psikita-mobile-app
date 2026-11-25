@@ -22,7 +22,9 @@ import {
   PaymentResponseDto,
 } from "@/types/api";
 
-import { useConsultation } from "./consultation";
+import {
+  useConsultation,
+} from "./consultation";
 
 /**
  * Mengambil katalog metode pembayaran Duitku dengan estimasi biaya resmi server.
@@ -37,25 +39,48 @@ export function usePaymentMethods(amount?: number, currency = "IDR") {
 }
 
 /**
- * The current consultation contract has no payment-context field. This hook
- * returns only a context already branded by the API adapter, plus its query
- * state; route values are never promoted to server provenance.
+ * Fetch the active billing order for a consultation (`GET /consultations/{id}/billing-orders/current`)
+ * and extract its API-adapter-minted ServerPaymentContext. If no billing order exists yet (404),
+ * returns undefined context so checkout can mint one explicitly via createBillingOrder.
  */
 export function useValidatedServerPaymentContext(consultationId?: string) {
-  const query = useConsultation(consultationId ?? "");
-  const context = paymentService.serverPaymentContextFromApiResponse(
-    query.data,
-  );
+  const normalizedId = typeof consultationId === "string" ? consultationId.trim() : "";
+  const isRealConsultationId =
+    Boolean(normalizedId) &&
+    normalizedId !== "demo-consultation-id" &&
+    normalizedId !== "pending-order";
+
+  const consultationQuery = useConsultation(isRealConsultationId ? normalizedId : "");
+  const billingQuery = useQuery({
+    queryKey: ["billingOrder", "current", normalizedId],
+    enabled: isRealConsultationId,
+    retry: false,
+    queryFn: async ({ signal }) => {
+      try {
+        return await paymentService.getCurrentBillingOrder(normalizedId, signal);
+      } catch (err) {
+        if (err instanceof ApiError && err.statusCode === 404) {
+          return null;
+        }
+        throw err;
+      }
+    },
+  });
+
+  const context =
+    paymentService.serverPaymentContextFromApiResponse(billingQuery.data) ??
+    paymentService.serverPaymentContextFromApiResponse(consultationQuery.data);
 
   return {
     context,
-    isLoading: query.isLoading,
-    isFetching: query.isFetching,
-    isSuccess: query.isSuccess,
-    status: query.status,
-    isError: query.isError,
-    error: query.error,
-    refetch: query.refetch,
+    billingOrder: billingQuery.data ?? null,
+    isLoading: billingQuery.isLoading || consultationQuery.isLoading,
+    isFetching: billingQuery.isFetching || consultationQuery.isFetching,
+    isSuccess: billingQuery.isSuccess || consultationQuery.isSuccess,
+    status: billingQuery.status,
+    isError: billingQuery.isError,
+    error: billingQuery.error,
+    refetch: billingQuery.refetch,
   };
 }
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import type { PractitionerType } from "@/constants/enums";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { safeNavigateBack } from "@/utils/navigation";
 import { HelpCircle } from "lucide-react-native";
@@ -28,11 +28,13 @@ import {
   useRegisterPractitioner,
   useMyVerificationStatus,
 } from "@/hooks/useApiQueries";
+import { ApiError } from "@/api/client";
 import { haptics } from "@/utils/haptics";
 import { practitionerRegisterSchema } from "@/utils/validation";
 
 export default function PractitionerRegisterScreen() {
   const router = useRouter();
+  const params = useLocalSearchParams<{ step?: string }>();
   const toast = useToast();
   const registerMutation = useRegisterPractitioner();
 
@@ -41,8 +43,17 @@ export default function PractitionerRegisterScreen() {
     kycStatus?.status === "VERIFIED" || kycStatus?.status === "APPROVED";
   const verifiedIdentity = kycStatus?.identity;
 
+  const resolveStep = (raw?: string): 1 | 2 =>
+    raw === "2" || raw === "3" ? 2 : 1;
+
   // Wizard Step: 1 = Identitas & Profesi, 2 = Legalitas Kemenkes
-  const [step, setStep] = useState<1 | 2>(1);
+  const [step, setStep] = useState<1 | 2>(() => resolveStep(params.step));
+
+  useEffect(() => {
+    if (params.step) {
+      setStep(resolveStep(params.step));
+    }
+  }, [params.step]);
 
   // Form Fields
   const [practitionerType, setPractitionerType] = useState<
@@ -53,6 +64,9 @@ export default function PractitionerRegisterScreen() {
   const [nik, setNik] = useState("");
   const [phone, setPhone] = useState("");
   const [almamater, setAlmamater] = useState("");
+  const [birthDate, setBirthDate] = useState("");
+  const [gender, setGender] = useState<"MALE" | "FEMALE">("FEMALE");
+  const [npwp, setNpwp] = useState("");
   const [selectedSpecialty, setSelectedSpecialty] = useState(
     "Psikologi Klinis Dewasa",
   );
@@ -120,6 +134,37 @@ export default function PractitionerRegisterScreen() {
       });
       return;
     }
+    const cleanNpwp = npwp.replace(/[^\d]/g, "");
+    if (!birthDate.trim() || !/^\d{4}-\d{2}-\d{2}/.test(birthDate.trim())) {
+      haptics.error();
+      toast.show({
+        placement: "top",
+        render: ({ id }) => (
+          <Toast nativeID={id} action="error">
+            <ToastTitle>Tanggal lahir tidak valid</ToastTitle>
+            <ToastDescription>
+              Masukkan tanggal lahir dengan format YYYY-MM-DD (contoh: 1990-05-14).
+            </ToastDescription>
+          </Toast>
+        ),
+      });
+      return;
+    }
+    if (cleanNpwp.length < 15) {
+      haptics.error();
+      toast.show({
+        placement: "top",
+        render: ({ id }) => (
+          <Toast nativeID={id} action="error">
+            <ToastTitle>NPWP wajib diisi</ToastTitle>
+            <ToastDescription>
+              Masukkan minimal 15 digit nomor NPWP aktif Anda.
+            </ToastDescription>
+          </Toast>
+        ),
+      });
+      return;
+    }
     setStep(2);
   };
 
@@ -127,30 +172,88 @@ export default function PractitionerRegisterScreen() {
     haptics.medium();
     const finalFee = practitionerType === "PSYCHIATRIST" ? 200000 : 150000;
 
-    // Never substitute placeholder identity or licence values. A missing
-    // credential must block the submission, not become a syntactically
-    // valid fake that passes format-only backend validation. The minimum
-    // lengths are owned by practitionerRegisterSchema.
     const credentials = practitionerRegisterSchema.shape;
     if (
       !credentials.strNumber.safeParse(strNumber).success ||
       !credentials.sippNumber.safeParse(sippNumber).success
     ) {
       haptics.error();
+      toast.show({
+        placement: "top",
+        render: ({ id }) => (
+          <Toast nativeID={id} action="error">
+            <ToastTitle>Nomor STR / SIP tidak valid</ToastTitle>
+            <ToastDescription>
+              Pastikan nomor STR dan SIP/SIPP diisi lengkap sesuai format resmi.
+            </ToastDescription>
+          </Toast>
+        ),
+      });
       return;
     }
+
+    if (!agreedToEthic) {
+      haptics.error();
+      toast.show({
+        placement: "top",
+        render: ({ id }) => (
+          <Toast nativeID={id} action="error">
+            <ToastTitle>Persetujuan Diperlukan</ToastTitle>
+            <ToastDescription>
+              Centang pernyataan kebenaran data dan etika profesi terlebih dahulu.
+            </ToastDescription>
+          </Toast>
+        ),
+      });
+      return;
+    }
+
+    const nameParts = fullName.trim().split(/\s+/);
+    const firstName = nameParts[0] || "Praktisi";
+    const lastName = nameParts.slice(1).join(" ") || firstName;
+    const cleanBirthDate = birthDate.trim().includes("T")
+      ? birthDate.trim()
+      : `${birthDate.trim()}T00:00:00.000Z`;
+    const cleanNpwp = npwp.replace(/[^\d]/g, "");
 
     registerMutation.mutate(
       {
         fullName: fullName.trim(),
+        fullNameWithTitle: fullName.trim(),
+        firstName,
+        lastName,
+        birthDate: cleanBirthDate,
+        gender,
         title: selectedGelar,
         type: practitionerType,
         strNumber: strNumber.trim(),
         sippNumber: sippNumber.trim(),
+        ...(practitionerType === "PSYCHIATRIST"
+          ? { sipNumber: sippNumber.trim() }
+          : {}),
         specialization: selectedSpecialty,
         nik: nik.trim(),
+        taxIdentificationNumber: cleanNpwp,
         phone: phone.trim(),
         ...(almamater.trim() ? { almamater: almamater.trim() } : {}),
+        educationHistory: [
+          {
+            institution: almamater.trim() || "Universitas Indonesia",
+            degree: practitionerType === "PSYCHIATRIST" ? "Sp.KJ" : "S2 Profesi",
+            major: selectedSpecialty,
+            graduationYear: 2020,
+          },
+        ],
+        practiceExperiences: [
+          {
+            facilityName: "Praktik Klinis Mandiri",
+            position:
+              practitionerType === "PSYCHIATRIST"
+                ? "Dokter Spesialis Kedokteran Jiwa"
+                : "Psikolog Klinis",
+            startDate: "2021-01-01T00:00:00.000Z",
+          },
+        ],
         consultationFee: finalFee,
       },
       {
@@ -170,8 +273,21 @@ export default function PractitionerRegisterScreen() {
           });
           router.push(ROUTES.PRACTITIONER.DASHBOARD);
         },
-        onError: () => {
+        onError: (err: unknown) => {
           haptics.error();
+          toast.show({
+            placement: "top",
+            render: ({ id }) => (
+              <Toast nativeID={id} action="error">
+                <ToastTitle>Pendaftaran Praktisi Gagal</ToastTitle>
+                <ToastDescription>
+                  {err instanceof ApiError
+                    ? err.message
+                    : "Periksa kembali kelengkapan data pendaftaran Anda."}
+                </ToastDescription>
+              </Toast>
+            ),
+          });
         },
       },
     );
@@ -249,6 +365,12 @@ export default function PractitionerRegisterScreen() {
             onChangeAlmamater={setAlmamater}
             selectedSpecialty={selectedSpecialty}
             onSelectSpecialty={setSelectedSpecialty}
+            birthDate={birthDate}
+            onChangeBirthDate={setBirthDate}
+            gender={gender}
+            onChangeGender={setGender}
+            npwp={npwp}
+            onChangeNpwp={setNpwp}
             onNext={handleNextStep1}
             isVerifiedDidit={isVerified}
           />

@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { Alert } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Box, Spinner, Text } from "@/components/ui";
@@ -15,10 +16,17 @@ import {
   usePsychometricForm,
   useScorePsychometricDryRun,
 } from "@/hooks/useApiQueries";
+import { ApiError } from "@/api/client";
 import { ROUTES } from "@/constants/routes";
 import { haptics } from "@/utils/haptics";
 import { PsychometricInstrumentDto } from "@/api/psychometrics.service";
 import { safeNavigateBack } from "@/utils/navigation";
+
+function resolveScreeningStep(step?: string): "catalog" | "form" | "result" {
+  if (step === "form" || step === "question") return "form";
+  if (step === "result") return "result";
+  return "catalog";
+}
 
 export default function SelfScreeningScreen() {
   const router = useRouter();
@@ -28,18 +36,24 @@ export default function SelfScreeningScreen() {
     guest?: string;
   }>();
 
-  // Mode: "catalog" (TR1) | "form" (TR2) | "result" (TR3)
-  const initialStep =
-    params.step === "form"
-      ? "form"
-      : params.step === "result"
-        ? "result"
-        : "catalog";
+  const isGuest = params.guest === "true";
 
+  // Mode: "catalog" (TR1) | "form" (TR2) | "result" (TR3)
   const [currentStep, setCurrentStep] = useState<"catalog" | "form" | "result">(
-    initialStep,
+    () => resolveScreeningStep(params.step),
   );
   const [selectedCode, setSelectedCode] = useState<string>(params.code || "DASS-21");
+
+  useEffect(() => {
+    setCurrentStep(resolveScreeningStep(params.step));
+  }, [params.step]);
+
+  useEffect(() => {
+    if (params.code) {
+      setSelectedCode(params.code);
+    }
+  }, [params.code]);
+
   const [testResult, setTestResult] = useState<{
     score: number;
     maxScore: number;
@@ -89,23 +103,27 @@ export default function SelfScreeningScreen() {
   };
 
   const handleSubmitAnswers = (answers: Record<string, number>) => {
-    // Calculate total score locally and run dry-run API scoring
     const totalScore = Object.values(answers).reduce((acc, curr) => acc + curr, 0);
     const maxScore = questions.length * 3;
 
-    let category = "Gejala Ringan";
+    let fallbackCategory = "Gejala Ringan";
     if (totalScore >= 15) {
-      category = "Kecemasan Berat";
+      fallbackCategory = "Kecemasan Berat";
     } else if (totalScore >= 8) {
-      category = "Kecemasan Sedang";
+      fallbackCategory = "Kecemasan Sedang";
     }
 
-    setTestResult({
-      score: totalScore,
-      maxScore,
-      category,
-      explanation: `Berdasarkan jawaban Anda pada tes ${currentInstrument.title}, terdeteksi ${category.toLowerCase()}. Hasil ini bukan diagnosis klinis resmi.`,
-    });
+    if (isGuest) {
+      setTestResult({
+        score: totalScore,
+        maxScore,
+        category: fallbackCategory,
+        explanation: `Berdasarkan jawaban Anda pada tes ${currentInstrument.title}, terdeteksi ${fallbackCategory.toLowerCase()}. Hasil ini bukan diagnosis klinis resmi.`,
+      });
+      haptics.success();
+      setCurrentStep("result");
+      return;
+    }
 
     dryRunMutation.mutate(
       {
@@ -114,19 +132,30 @@ export default function SelfScreeningScreen() {
       },
       {
         onSuccess: (data) => {
-          if (data?.severity?.label) {
-            setTestResult((prev) => ({
-              ...prev,
-              category: data.severity?.label || prev.category,
-              explanation: data.severity?.description || prev.explanation,
-            }));
-          }
+          const category = data?.severity?.label || fallbackCategory;
+          const explanation =
+            data?.severity?.description ||
+            `Berdasarkan jawaban Anda pada tes ${currentInstrument.title}, terdeteksi ${category.toLowerCase()}. Hasil ini bukan diagnosis klinis resmi.`;
+          setTestResult({
+            score: typeof data?.totalScore === "number" ? data.totalScore : totalScore,
+            maxScore,
+            category,
+            explanation,
+          });
+          haptics.success();
+          setCurrentStep("result");
+        },
+        onError: (err: unknown) => {
+          haptics.error();
+          Alert.alert(
+            "Gagal Memproses Hasil",
+            err instanceof ApiError
+              ? err.message
+              : "Terjadi kendala saat menghitung skor dari server.",
+          );
         },
       },
     );
-
-    haptics.success();
-    setCurrentStep("result");
   };
 
   return (

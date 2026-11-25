@@ -1,5 +1,5 @@
 import React from "react";
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   ArrowLeft,
@@ -41,21 +41,59 @@ import {
   useStartDiditVerification,
 } from "@/hooks/useApiQueries";
 import { launchDiditVerification } from "@/services/didit-kyc";
+import { matchingService } from "@/api";
 import { ApiError } from "@/api/client";
 import { haptics } from "@/utils/haptics";
 import { safeNavigateBack } from "@/utils/navigation";
 
 export default function MatchingScreen() {
   const router = useRouter();
+  const params = useLocalSearchParams<{ state?: string; guest?: string }>();
   const toast = useToast();
+  const isGuest = params.guest === "true";
   const waitingRoom = useWaitingRoomStatus();
   const createConsultation = useCreateConsultation();
   const startKycMutation = useStartDiditVerification();
   const [isKycLaunching, setIsKycLaunching] = React.useState(false);
+  const [isCancelling, setIsCancelling] = React.useState(false);
 
   const is403Forbidden =
     waitingRoom.error instanceof ApiError &&
     waitingRoom.error.statusCode === 403;
+  const is404NotFound =
+    waitingRoom.error instanceof ApiError &&
+    waitingRoom.error.statusCode === 404;
+
+  const handleCancelMatching = async () => {
+    if (isGuest || !room?.matchingRequestId) {
+      safeNavigateBack(router, ROUTES.PATIENT.DASHBOARD);
+      return;
+    }
+    setIsCancelling(true);
+    haptics.medium();
+    try {
+      await matchingService.cancelMatchingRequest(room.matchingRequestId);
+      haptics.success();
+      safeNavigateBack(router, ROUTES.PATIENT.DASHBOARD);
+    } catch (err: unknown) {
+      haptics.error();
+      toast.show({
+        placement: "top",
+        render: ({ id }) => (
+          <Toast nativeID={id} action="error">
+            <ToastTitle>Gagal Membatalkan Pencarian</ToastTitle>
+            <ToastDescription>
+              {err instanceof ApiError
+                ? err.message
+                : "Terjadi kendala saat membatalkan antrean."}
+            </ToastDescription>
+          </Toast>
+        ),
+      });
+    } finally {
+      setIsCancelling(false);
+    }
+  };
 
   const handleLaunchDidit = async () => {
     haptics.selection();
@@ -115,7 +153,9 @@ export default function MatchingScreen() {
   };
 
   const room = waitingRoom.data;
-  const isMatched = room?.status === "MATCHED";
+  const showMatchedPreview = isGuest && params.state === "matched";
+  const showOfflinePreview = isGuest && params.state === "offline";
+  const isMatched = room?.status === "MATCHED" || showMatchedPreview;
   const canRequestConsultation = Boolean(
     !waitingRoom.isError &&
       isMatched &&
@@ -187,7 +227,7 @@ export default function MatchingScreen() {
           showsVerticalScrollIndicator={false}
         >
           {/* Loading State */}
-          {waitingRoom.isLoading && (
+          {waitingRoom.isLoading && !showMatchedPreview && !showOfflinePreview && !isGuest && (
             <VStack space="md" className="items-center py-10">
               <Box className="w-24 h-24 rounded-full bg-primary/10 items-center justify-center mb-3 border border-primary/20">
                 <Clock size={36} color="#4A3B6B" />
@@ -201,28 +241,34 @@ export default function MatchingScreen() {
             </VStack>
           )}
 
-          {/* Error State (Wireframe Screen 31: Koneksi Terputus) */}
-          {waitingRoom.isError && (
+          {/* Error State (Wireframe Screen 31: Koneksi Terputus / 403 KYC / 404 Belum Mengantre) */}
+          {((waitingRoom.isError && !isGuest) || showOfflinePreview) && !showMatchedPreview && (
             <Card className="bg-card rounded-xl p-5 border border-border/80 shadow-xs gap-3 my-4">
               <HStack space="sm" className="items-center">
                 {is403Forbidden ? (
                   <ShieldAlert size={22} color="#DC2626" />
+                ) : is404NotFound && !showOfflinePreview ? (
+                  <Clock size={22} color="#4A3B6B" />
                 ) : (
                   <WifiOff size={22} color="#D97706" />
                 )}
                 <Heading size="sm" bold className="text-foreground">
                   {is403Forbidden
                     ? "Verifikasi Identitas Diperlukan"
-                    : "Koneksi Terputus"}
+                    : is404NotFound && !showOfflinePreview
+                      ? "Belum Ada Pencarian Aktif"
+                      : "Koneksi Terputus"}
                 </Heading>
               </HStack>
               <Text size="sm" className="text-muted-foreground leading-relaxed">
                 {is403Forbidden
                   ? "Layanan pencocokan psikolog memerlukan akun yang terverifikasi. Selesaikan verifikasi identitas e-KTP untuk masuk ke antrean."
-                  : "Posisi antreanmu tetap aman. Tidak perlu mengirim ulang jawabanmu."}
+                  : is404NotFound && !showOfflinePreview
+                    ? "Kamu belum memiliki permintaan pencarian psikolog aktif di ruang tunggu. Mulai asesmen singkat untuk mencocokkan psikolog yang tepat."
+                    : "Posisi antreanmu tetap aman. Tidak perlu mengirim ulang jawabanmu."}
               </Text>
 
-              {!is403Forbidden && (
+              {!is403Forbidden && (!is404NotFound || showOfflinePreview) && (
                 <VStack space="xs" className="my-1 bg-muted/60 p-3.5 rounded-xl border border-border/60">
                   <Text size="sm" bold className="text-foreground uppercase tracking-wider mb-1">
                     COBA PERIKSA:
@@ -257,6 +303,16 @@ export default function MatchingScreen() {
                     </ButtonText>
                   )}
                 </Button>
+              ) : is404NotFound && !showOfflinePreview ? (
+                <Button
+                  size="sm"
+                  onPress={() => router.push(ROUTES.PATIENT.TRIAGE as never)}
+                  className="mt-2 rounded-xl bg-primary py-2.5 h-11 flex-row items-center justify-center shadow-xs"
+                >
+                  <ButtonText className="text-primary-foreground font-bold text-sm">
+                    Mulai Triase Sekarang
+                  </ButtonText>
+                </Button>
               ) : (
                 <Button
                   variant="default"
@@ -273,7 +329,7 @@ export default function MatchingScreen() {
           )}
 
           {/* Searching / Waiting Room State (Wireframe Screen 29) */}
-          {!waitingRoom.isLoading && !waitingRoom.isError && !isMatched && (
+          {(isGuest || (!waitingRoom.isLoading && !waitingRoom.isError)) && !isMatched && !showOfflinePreview && (
             <VStack space="lg" className="items-center py-4">
               {/* Visual Pulse */}
               <Box className="w-36 h-36 rounded-full bg-primary/10 items-center justify-center border-4 border-primary/20 my-2">
@@ -381,18 +437,23 @@ export default function MatchingScreen() {
               <Button
                 variant="outline"
                 size="lg"
-                onPress={() => safeNavigateBack(router, ROUTES.PATIENT.DASHBOARD)}
+                disabled={isCancelling}
+                onPress={handleCancelMatching}
                 className="w-full mt-3 rounded-xl border-border/80 bg-card h-12 flex-row items-center justify-center"
               >
-                <ButtonText className="text-foreground font-semibold text-sm">
-                  Batalkan Pencarian
-                </ButtonText>
+                {isCancelling ? (
+                  <ButtonSpinner color="#4A3B6B" />
+                ) : (
+                  <ButtonText className="text-foreground font-semibold text-sm">
+                    Batalkan Pencarian
+                  </ButtonText>
+                )}
               </Button>
             </VStack>
           )}
 
           {/* Matched State (Wireframe Screen 32: Psikolog Ditemukan) */}
-          {!waitingRoom.isLoading && !waitingRoom.isError && isMatched && (
+          {(showMatchedPreview || (!waitingRoom.isLoading && !waitingRoom.isError && isMatched)) && (
             <VStack space="lg" className="py-2">
               <Box className="w-20 h-20 rounded-full bg-emerald-500/10 border-2 border-emerald-500/30 items-center justify-center self-center my-2">
                 <UserCheck size={36} color="#059669" />

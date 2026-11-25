@@ -28,7 +28,7 @@
       "supportsTablet": true,
       "bundleIdentifier": "id.seraphany.app",
       "infoPlist": {
-        "NSCameraUsageDescription": "SeraPhany memerlukan akses kamera untuk verifikasi identitas resmi (Didit KYC).",
+        "NSCameraUsageDescription": "SeraPhany memerlukan akses kamera untuk verifikasi identitas resmi e-KTP.",
         "NSAppTransportSecurity": {
           "NSPinnedDomains": {
             "api.staging.seraphany.id": {

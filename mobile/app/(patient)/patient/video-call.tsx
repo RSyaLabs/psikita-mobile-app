@@ -20,17 +20,17 @@ import {
   AlertDialogContent,
   AlertDialogFooter,
   AlertDialogHeader,
+  Badge,
+  BadgeText,
   Box,
   Button,
   ButtonText,
   HStack,
   Heading,
-  Image,
   Pressable,
   Text,
   VStack,
 } from "@/components/ui";
-import { BackendIntegrationBadge } from "@/components/common";
 import { ROUTES } from "@/constants/routes";
 import { useActiveConsultation, useIceServers } from "@/hooks/useApiQueries";
 import { haptics } from "@/utils/haptics";
@@ -69,7 +69,14 @@ export default function VideoCallScreen() {
   const handleEndCall = () => {
     setShowEndModal(false);
     haptics.heavy();
-    router.replace(ROUTES.PATIENT.RATING as never);
+    router.replace(
+      (context?.consultationId
+        ? {
+            pathname: ROUTES.PATIENT.RATING,
+            params: { consultationId: context.consultationId },
+          }
+        : ROUTES.PATIENT.RATING) as never,
+    );
   };
 
   return (
@@ -88,7 +95,7 @@ export default function VideoCallScreen() {
           <Box className="w-2.5 h-2.5 rounded-full bg-secondary" />
           <VStack space="xs">
             <Text size="sm" bold className="text-primary-foreground">
-              Belum ada praktisi
+              {context ? "Praktisi Sesi Aktif" : "Menunggu Praktisi"}
             </Text>
             <HStack space="xs" className="items-center">
               <ShieldCheck size={14} color="#FFFFFF" />
@@ -104,55 +111,59 @@ export default function VideoCallScreen() {
 
         <Box className="bg-primary/80 px-3 py-1.5 rounded-xl border border-primary-foreground/20">
           <Text size="sm" bold className="text-primary-foreground">
-            Durasi belum tersedia
+            {consultation.data?.durationMinutes ? `${consultation.data.durationMinutes} mnt` : "Sesi Video"}
           </Text>
         </Box>
       </Box>
 
-      {/* WebRTC ICE Server Integration Notice Bar */}
+      {/* Video Connection Status Pill */}
       <Box className="absolute top-20 left-4 right-4 z-20 items-center">
-        <BackendIntegrationBadge
-          endpoint="GET /rooms/:roomId/ice-servers"
-          badgeText={
-            iceConfig?.iceServers
-              ? `STUN/TURN Terhubung (${iceConfig.iceServers.length} server)`
+        <Badge
+          variant="outline"
+          className="border-primary-foreground/30 bg-card/90 rounded-full px-3 py-1"
+        >
+          <BadgeText className="text-sm font-semibold text-foreground">
+            {iceConfig?.iceServers
+              ? `Koneksi Video Aman (${iceConfig.iceServers.length} jalur)`
               : isLoadingIce
-                ? "Menghubungkan ICE Server..."
-                : "Sesi WebRTC Terenkripsi"
-          }
-          className="bg-card/90"
-        />
+                ? "Menghubungkan Koneksi Video..."
+                : "Sesi Video Terenkripsi"}
+          </BadgeText>
+        </Badge>
       </Box>
 
       {/* Main Remote Video Viewport (Doctor) */}
-      <Box className="flex-1 relative overflow-hidden justify-center items-center">
-        <Image
-          source={{
-            uri: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=800&auto=format&fit=crop&q=80",
-          }}
-          alt="Video Feed Dokter"
-          className="w-full h-full"
-          resizeMode="cover"
-        />
+      <Box className="flex-1 relative overflow-hidden justify-center items-center bg-[#262130]">
+        <VStack space="md" className="items-center px-6">
+          <Box className="w-24 h-24 rounded-full bg-secondary/20 border-2 border-secondary/50 items-center justify-center">
+            <Video size={40} color="#EAE5E0" />
+          </Box>
+          <Heading size="lg" bold className="text-white text-center">
+            {context ? "Menunggu Aliran Video Praktisi" : "Ruang Video Siap"}
+          </Heading>
+          <Text size="sm" className="text-white/75 text-center max-w-xs">
+            {iceConfig?.iceServers
+              ? "Jalur panggilan video terenkripsi aktif dan siap terhubung."
+              : "Menghubungkan jalur video langsung dengan praktisi Anda."}
+          </Text>
+        </VStack>
 
         <Box className="absolute bottom-28 left-5 bg-primary/85 px-3 py-1.5 rounded-xl flex-row items-center gap-2 border border-primary-foreground/20">
           <Volume2 size={16} color="#FFFFFF" />
           <Text size="sm" bold className="text-primary-foreground font-semibold">
-            Sesi video belum tersedia
+            {iceConfig?.iceServers ? "Audio & ICE Server Siap" : "Menyiapkan audio sesi"}
           </Text>
         </Box>
 
         {/* Patient Floating Self View (PiP) */}
         <Box className="absolute top-28 right-4 w-28 h-40 bg-primary rounded-2xl overflow-hidden border-2 border-primary-foreground/30 z-20">
           {isVideoOn ? (
-            <Image
-              source={{
-                uri: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=300&auto=format&fit=crop&q=80",
-              }}
-              alt="Video Pasien"
-              className="w-full h-full"
-              resizeMode="cover"
-            />
+            <Box className="w-full h-full items-center justify-center bg-[#372B53]">
+              <Video size={26} color="#EAE5E0" />
+              <Text size="sm" className="text-primary-foreground/90 font-medium mt-1">
+                Kamera Anda
+              </Text>
+            </Box>
           ) : (
             <Box className="w-full h-full items-center justify-center bg-primary">
               <VideoOff size={24} color="#CFC8D8" />

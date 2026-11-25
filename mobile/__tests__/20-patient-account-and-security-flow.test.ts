@@ -45,18 +45,19 @@ describe("20. Tahap 13: Akun & Keamanan Pasien (Screens 70–73) Flow Suite", ()
       expect(content).toContain("Data diri");
       expect(content).toContain("Ganti foto");
       expect(content).toContain("Nama lengkap");
-      expect(content).toContain("[nama sesuai identitas]");
+      expect(content).toContain("Contoh: Sinta Maharani");
       expect(content).toContain("Terkunci setelah verifikasi identitas.");
       expect(content).toContain("Email");
-      expect(content).toContain("[nama@email.com]");
+      expect(content).toContain("nama@email.com");
       expect(content).toContain("Terverifikasi");
       expect(content).toContain("Nomor telepon");
-      expect(content).toContain("[+62 ...]");
+      expect(content).toContain("+62 812-3456-7890");
       expect(content).toContain("Tanggal lahir");
-      expect(content).toContain("[dd/mm/yyyy]");
+      expect(content).toContain("DD/MM/YYYY");
       expect(content).toContain(
-        "Kolom wajib dan aturan validasi dari server. Belum ditetapkan.",
+        "Data disimpan aman ke profil pasien dan disesuaikan dengan identitas terverifikasi Anda.",
       );
+      expect(content).not.toContain("Belum ditetapkan");
       expect(content).toContain("Simpan");
       expect(content).toContain("Batal");
     });
@@ -92,11 +93,11 @@ describe("20. Tahap 13: Akun & Keamanan Pasien (Screens 70–73) Flow Suite", ()
       expect(content).toContain("Masuk dengan kode OTP");
       expect(content).toContain("Akun Google");
       expect(content).toContain("PERANGKAT AKTIF");
-      expect(content).toContain("[Perangkat ini]");
-      expect(content).toContain("[Lokasi] · aktif sekarang");
-      expect(content).toContain("[Perangkat lain]");
-      expect(content).toContain("[Lokasi] · [waktu]");
+      expect(content).toContain("Perangkat saat ini");
+      expect(content).toContain("Sesi aktif sekarang");
+      expect(content).toContain("Perangkat lain yang masuk");
       expect(content).toContain("Keluar ›");
+      expect(content).not.toContain("[Perangkat ini]");
       expect(content).toContain("Keluar dari Semua Perangkat");
       expect(content).toContain("ZONA SENSITIF");
       expect(content).toContain("Hapus akun");
@@ -128,7 +129,8 @@ describe("20. Tahap 13: Akun & Keamanan Pasien (Screens 70–73) Flow Suite", ()
       expect(content).toContain("Kata sandi saat ini");
       expect(content).toContain("Masukkan kata sandi saat ini");
       expect(content).toContain("Kata sandi baru");
-      expect(content).toContain("Minimal [N] karakter");
+      expect(content).toContain("Minimal 8 karakter");
+      expect(content).not.toContain("Minimal [N] karakter");
       expect(content).toContain("Ulangi kata sandi baru");
       expect(content).toContain("Ketik ulang");
       expect(content).toContain(
@@ -164,13 +166,14 @@ describe("20. Tahap 13: Akun & Keamanan Pasien (Screens 70–73) Flow Suite", ()
       expect(content).toContain("Hapus akun");
       expect(content).toContain("Hapus akunmu?");
       expect(content).toContain(
-        "Tindakan ini tidak bisa dibatalkan. Isi di bawah ini ditentukan kebijakan data dan hukum, bukan di sini.",
+        "Tindakan ini tidak bisa dibatalkan. Permintaan penghapusan akun dijadwalkan dalam 30 hari sesuai kebijakan privasi dan hukum yang berlaku.",
       );
       expect(content).toContain("Kamu tidak bisa masuk lagi dengan akun ini.");
-      expect(content).toContain("[Data yang dihapus, sesuai kebijakan]");
+      expect(content).toContain("Profil pribadi, preferensi, dan sesi masuk akan dihapus permanen setelah masa tunggu 30 hari.");
       expect(content).toContain(
-        "[Data yang tetap disimpan sesuai kewajiban hukum]",
+        "Riwayat transaksi dan rekam medis klinis disimpan sesuai kewajiban hukum layanan kesehatan.",
       );
+      expect(content).not.toContain("bukan di sini");
       expect(content).toContain(
         "Ada konsultasi atau pembayaran yang berjalan? Selesaikan dulu. Server bisa menolak penghapusan sampai semuanya beres.",
       );

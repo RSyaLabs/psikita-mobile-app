@@ -178,10 +178,10 @@ export function InSessionAssessmentModal({
               })}
             </VStack>
 
-            {/* Server Score Disclaimer */}
+            {/* Clinical Privacy Notice */}
             <Box className="border border-dashed border-[#75618E] rounded-2xl p-4 bg-muted/40 mt-2">
               <Text className="text-sm text-muted-foreground leading-relaxed">
-                Pertanyaan dan skor dari server. Belum ditetapkan.
+                Jawaban dan skor akan langsung dikirim ke praktisi secara aman selama sesi berlangsung.
               </Text>
             </Box>
           </ScrollView>

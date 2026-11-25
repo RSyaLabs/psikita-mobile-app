@@ -127,7 +127,7 @@ export function RefundRequestView({
         <Textarea className="w-full rounded-xl border-[1.5px] border-border bg-card p-3 min-h-[100px]">
           <TextareaInput
             testID="input-refund-details"
-            placeholder="[Jelaskan apa yang terjadi]"
+            placeholder="Jelaskan kendala atau alasan pengajuan Anda"
             placeholderTextColor="#75618E"
             value={details}
             onChangeText={setDetails}

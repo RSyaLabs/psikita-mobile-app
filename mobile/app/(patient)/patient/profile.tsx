@@ -66,11 +66,16 @@ export default function ProfileScreen() {
   const isKycStarting = startKycMutation.isPending;
   const isKycVerified =
     kycStatus?.status === "APPROVED" || kycStatus?.status === "VERIFIED";
-  const { signOut } = useAuth();
+  const { user, signOut } = useAuth();
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
 
-  const patientName = patient?.fullName || "Sinta Maharani";
-  const patientEmail = patient?.email || "nama@email.com";
+  const isGuestPreview = params.guest === "true";
+  const fallbackNameFromEmail = user?.email?.split("@")[0];
+  const patientName =
+    patient?.fullName ||
+    (isGuestPreview ? "Sinta Maharani" : fallbackNameFromEmail || "Pasien SeraPhany");
+  const patientEmail =
+    user?.email || (isGuestPreview ? "sinta.maharani@email.com" : "Akun terverifikasi");
   const rmNumber = patient?.medicalRecordNumber || "Belum tersedia";
 
   const handleStartRealKyc = async () => {

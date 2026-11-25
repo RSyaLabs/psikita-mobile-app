@@ -32,7 +32,7 @@ import {
 } from "@/components/ui";
 import { OtpDigitInput } from "@/components/auth";
 import { haptics } from "@/utils/haptics";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth, parseServerSession, getHomeRouteForRole } from "@/hooks/useAuth";
 import { authService } from "@/api/auth.service";
 import { setAuthTokens, ApiError } from "@/api/client";
 
@@ -68,6 +68,15 @@ export default function ResetPasswordScreen() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [resendMsg, setResendMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (params.token) {
+      setOtp(params.token);
+      setStep("new_password");
+    } else if (params.mode !== "reset" && !params.token) {
+      setStep("otp");
+    }
+  }, [params.token, params.mode]);
 
   // Resend Countdown Timer
   useEffect(() => {
@@ -134,9 +143,13 @@ export default function ResetPasswordScreen() {
       haptics.success();
 
       if (!isResetMode) {
-        // Alur Wireframe MS4: OTP Login Langsung Masuk ke Dashboard
+        // Alur Wireframe MS4: OTP Login Langsung Masuk ke Dashboard sesuai peran akun
         await acceptSession(tokens);
-        router.replace(ROUTES.PATIENT.DASHBOARD as any);
+        const parsedSession = parseServerSession(tokens);
+        const targetHome = parsedSession
+          ? getHomeRouteForRole(parsedSession.user.role)
+          : ROUTES.PATIENT.DASHBOARD;
+        router.replace(targetHome as any);
       } else {
         // Alur Reset Sandi: Lanjut ke Langkah 2 Buat Sandi Baru
         await setAuthTokens(tokens);

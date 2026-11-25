@@ -19,6 +19,7 @@ export interface DailyAvailabilityViewProps {
     schedules: DaySchedule[];
   }) => void;
   initialReady?: boolean;
+  initialSchedules?: DaySchedule[];
 }
 
 const DEFAULT_SCHEDULES: DaySchedule[] = [
@@ -42,11 +43,15 @@ export const DailyAvailabilityView = React.memo(function DailyAvailabilityView({
   onEditDay,
   onSave,
   initialReady = true,
+  initialSchedules,
 }: DailyAvailabilityViewProps) {
   const [isReady, setIsReady] = useState(initialReady);
   const [chatEnabled, setChatEnabled] = useState(true);
   const [videoEnabled, setVideoEnabled] = useState(false);
-  const [schedules] = useState<DaySchedule[]>(DEFAULT_SCHEDULES);
+  const schedules =
+    initialSchedules && initialSchedules.length > 0
+      ? initialSchedules
+      : DEFAULT_SCHEDULES;
 
   const handleSave = () => {
     haptics.success();
@@ -84,7 +89,7 @@ export const DailyAvailabilityView = React.memo(function DailyAvailabilityView({
                     </Box>
                     <VStack>
                       <Text size="md" bold className="text-foreground">{item.day}</Text>
-                      <Text size="sm" className="text-muted-foreground">[{item.hours}]</Text>
+                      <Text size="sm" className="text-muted-foreground">{item.hours}</Text>
                     </VStack>
                   </HStack>
                   <HStack space="xs" className="items-center">

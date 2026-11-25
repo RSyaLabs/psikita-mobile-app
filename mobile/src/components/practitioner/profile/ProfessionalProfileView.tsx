@@ -74,14 +74,14 @@ export const ProfessionalProfileView = React.memo(function ProfessionalProfileVi
           <VStack space="xs">
             <Text size="sm" bold className="text-foreground font-semibold">Nama tampilan</Text>
             <Input className="border border-border rounded-xl h-12 bg-card">
-              <InputField value={displayName} onChangeText={setDisplayName} placeholder="[nama beserta gelar]" className="text-foreground text-base px-3" />
+              <InputField value={displayName} onChangeText={setDisplayName} placeholder="Nama lengkap beserta gelar profesi" className="text-foreground text-base px-3" />
             </Input>
           </VStack>
 
           <VStack space="xs">
             <Text size="sm" bold className="text-foreground font-semibold">Bio singkat</Text>
             <Textarea className="border border-border rounded-xl bg-card min-h-[96px] p-3">
-              <TextareaInput value={bio} onChangeText={setBio} placeholder="[Perkenalan singkat untuk pasien]" className="text-foreground text-sm font-normal" />
+              <TextareaInput value={bio} onChangeText={setBio} placeholder="Perkenalan singkat mengenai pengalaman dan fokus layanan Anda" className="text-foreground text-sm font-normal" />
             </Textarea>
           </VStack>
 

@@ -60,7 +60,10 @@ describe("Tahap 14.3: Diagnosis Klinis, Editor Rencana Perawatan & Tindak Lanjut
       expect(content).toContain("Tidak diperlukan");
       expect(content).toContain("Rujukan ke profesional lain");
       expect(content).toContain("Resep dari dokter terkait");
-      expect(content).toContain("Opsi dan kode diagnosis dari server. Belum ditetapkan.");
+      expect(content).toContain(
+        "Diagnosis dan tindak lanjut klinis tercatat aman sesuai standar klasifikasi ICD-10.",
+      );
+      expect(content).not.toContain("Belum ditetapkan");
       expect(content).toContain("Simpan");
       expect(content).toContain("Batal");
     });

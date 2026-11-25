@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { Alert } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Box, Spinner, Text } from "@/components/ui";
+import { Box, Button, ButtonText, Spinner, Text } from "@/components/ui";
 import {
   CommunityDetailView,
   EditPostView,
@@ -15,6 +16,7 @@ import {
   useUpdatePost,
   useDeletePost,
 } from "@/hooks/useApiQueries";
+import { useAuth } from "@/hooks/useAuth";
 import { safeNavigateBack } from "@/utils/navigation";
 import { ROUTES } from "@/constants/routes";
 import { haptics } from "@/utils/haptics";
@@ -22,26 +24,37 @@ import { PostDto } from "@/api/community.service";
 
 export default function CommunityDetailScreen() {
   const router = useRouter();
+  const { user } = useAuth();
   const params = useLocalSearchParams<{ id?: string; step?: string; guest?: string }>();
-  const postId = params.id || "post-1";
+  const isGuest = params.guest === "true";
+  const postId = params.id || (isGuest ? "post-1" : "");
 
   const [currentMode, setCurrentMode] = useState<"detail" | "edit">(
     params.step === "edit" ? "edit" : "detail",
   );
 
+  useEffect(() => {
+    setCurrentMode(params.step === "edit" ? "edit" : "detail");
+  }, [params.step]);
+
   const { data: postData, isLoading: isPostLoading } = useCommunityPostDetail(postId);
-  const { data: repliesData, isLoading: isRepliesLoading } = useCommunityReplies(postId);
+  const { data: repliesData } = useCommunityReplies(postId);
   const createReplyMutation = useCreateReply();
   const updatePostMutation = useUpdatePost();
   const deletePostMutation = useDeletePost();
 
-  // Find fallback post if API returns null
-  const post: PostDto =
+  const post: PostDto | undefined =
     postData ??
-    FALLBACK_FEED_POSTS.find((p) => p.id === postId) ??
-    FALLBACK_FEED_POSTS[0];
+    (isGuest
+      ? (FALLBACK_FEED_POSTS.find((p) => p.id === postId) ?? FALLBACK_FEED_POSTS[0])
+      : undefined);
 
-  const replies = repliesData && repliesData.length > 0 ? repliesData : FALLBACK_REPLIES;
+  const replies =
+    repliesData && repliesData.length > 0
+      ? repliesData
+      : isGuest
+        ? FALLBACK_REPLIES
+        : [];
 
   const handleSendReply = (content: string) => {
     createReplyMutation.mutate(
@@ -55,6 +68,7 @@ export default function CommunityDetailScreen() {
         },
         onError: () => {
           haptics.error();
+          Alert.alert("Gagal Mengirim Balasan", "Balasan Anda belum terkirim ke server.");
         },
       },
     );
@@ -73,6 +87,7 @@ export default function CommunityDetailScreen() {
         },
         onError: () => {
           haptics.error();
+          Alert.alert("Gagal Menyimpan Perubahan", "Perubahan postingan belum tersimpan.");
         },
       },
     );
@@ -86,6 +101,7 @@ export default function CommunityDetailScreen() {
       },
       onError: () => {
         haptics.error();
+        Alert.alert("Gagal Menghapus Postingan", "Coba hapus kembali beberapa saat lagi.");
       },
     });
   };
@@ -99,6 +115,20 @@ export default function CommunityDetailScreen() {
             Membuka posting...
           </Text>
         </Box>
+      ) : !post ? (
+        <Box className="flex-1 items-center justify-center px-6 gap-4">
+          <Text size="md" bold className="text-foreground text-center">
+            Postingan tidak ditemukan atau telah dihapus.
+          </Text>
+          <Button
+            className="bg-primary rounded-xl px-6 h-11"
+            onPress={() => safeNavigateBack(router, ROUTES.PATIENT.COMMUNITY)}
+          >
+            <ButtonText className="text-primary-foreground font-semibold text-sm">
+              Kembali ke Komunitas
+            </ButtonText>
+          </Button>
+        </Box>
       ) : currentMode === "edit" ? (
         <EditPostView
           post={post}
@@ -110,7 +140,7 @@ export default function CommunityDetailScreen() {
         <CommunityDetailView
           post={post}
           replies={replies}
-          currentUserId="usr-1"
+          currentUserId={user?.id || (isGuest ? "usr-1" : "")}
           isSendingReply={createReplyMutation.isPending}
           onBack={() => safeNavigateBack(router, ROUTES.PATIENT.COMMUNITY)}
           onSendReply={handleSendReply}

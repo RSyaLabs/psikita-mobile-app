@@ -12,7 +12,8 @@
     "__tests__/**/*.{ts,tsx}"
   ],
   "ignore": [
-    "src/types/api.ts"
+    "src/types/api.ts",
+    "src/components/ui/**"
   ],
   "ignoreDependencies": [
     "expo-updates",

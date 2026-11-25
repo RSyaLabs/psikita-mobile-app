@@ -37,14 +37,14 @@ const SECTIONS = [
   {
     title: "PENGINGAT",
     items: [
-      { key: "sessionReminder" as const, title: "Pengingat jadwal sesi", subtitle: "[1 jam sebelumnya]", testID: "switch-session-reminder", locked: false },
-      { key: "carePlanReminder" as const, title: "Pengingat rencana perawatan", subtitle: "[hari · jam]", testID: "switch-care-plan-reminder", locked: false },
+      { key: "sessionReminder" as const, title: "Pengingat jadwal sesi", subtitle: "Dikirim 1 jam sebelum sesi dimulai", testID: "switch-session-reminder", locked: false },
+      { key: "carePlanReminder" as const, title: "Pengingat rencana perawatan", subtitle: "Notifikasi berkala sesuai jadwal kontrol", testID: "switch-care-plan-reminder", locked: false },
     ],
   },
   {
     title: "LAINNYA",
     items: [
-      { key: "educationAndTips" as const, title: "Edukasi & tips", subtitle: "Maks. [N] per minggu", testID: "switch-education-tips", locked: false },
+      { key: "educationAndTips" as const, title: "Edukasi & tips", subtitle: "Maksimal 2 ringkasan per minggu", testID: "switch-education-tips", locked: false },
     ],
   },
 ];

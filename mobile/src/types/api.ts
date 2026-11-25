@@ -409,10 +409,31 @@ export interface BillingOrderResponseDto {
   currency: string;
   paymentStatus: string;
   claimStatus?: string;
-  paymentId?: string;
-  expiresAt?: string;
+  gatewayChannel?: unknown;
+  paymentId?: string | null;
+  expiresAt?: string | null;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface BillingOrderPreviewResponseDto {
+  consultationId: string;
+  orderType: string;
+  payerType: string;
+  durationMinutes: number;
+  currency: string;
+  baseAmount: number;
+  discountAmount: number;
+  discountCode?: string;
+  discountEligible: boolean;
+  discountIneligibilityReason?: string;
+  netAmount: number;
+  gatewayChannel?: string;
+  estimatedGatewayFee?: number;
+  estimatedTotalPayable?: number;
+  estimate: boolean;
+  estimateExpiresAt: string;
+  effectivePolicyVersion: string;
 }
 
 export interface PaymentMethodMoneyDto {
@@ -564,6 +585,7 @@ export interface PaymentResponseDto {
   transactionStatus: PaymentTransactionStatus;
   paymentType?: string;
   grossAmount: number;
+  vaNumber?: string;
   qrCodeUrl?: string;
   paymentUrl?: string;
   expiryTime?: string;
@@ -581,19 +603,35 @@ export interface BpjsEligibilityDto {
 
 export interface CreatePractitionerDto {
   fullName: string;
+  fullNameWithTitle?: string;
   title: string;
   strNumber: string;
   sippNumber: string;
+  sipNumber?: string;
   specialization: string;
   type: PractitionerType;
   firstName?: string;
   lastName?: string;
   birthDate?: string;
+  address?: string;
   gender?: string;
   nik?: string;
+  taxIdentificationNumber?: string;
   phone?: string;
   almamater?: string;
   consultationFee?: number;
+  educationHistory?: Array<{
+    institution: string;
+    degree: string;
+    major: string;
+    graduationYear: number;
+  }>;
+  practiceExperiences?: Array<{
+    facilityName: string;
+    position: string;
+    startDate: string;
+    endDate?: string;
+  }>;
 }
 
 export interface PractitionerEducationDto {

@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { Alert } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Box } from "@/components/ui";
@@ -19,6 +20,7 @@ import {
   useDiagnosisCodes,
   useCreateCarePlan,
 } from "@/hooks/useApiQueries";
+import { ApiError } from "@/api/client";
 import { haptics, safeNavigateBack } from "@/utils";
 
 type DiagnosisView =
@@ -32,10 +34,18 @@ export default function DiagnosisScreen() {
   const params = useLocalSearchParams<{
     view?: DiagnosisView;
     consultationId?: string;
+    guest?: string;
   }>();
 
+  const isGuest = params.guest === "true";
   const initialView: DiagnosisView = params.view || "complete-result";
   const [activeView, setActiveView] = useState<DiagnosisView>(initialView);
+
+  useEffect(() => {
+    if (params.view) {
+      setActiveView(params.view);
+    }
+  }, [params.view]);
 
   const routeConsultationId = Array.isArray(params.consultationId)
     ? params.consultationId[0]
@@ -51,70 +61,111 @@ export default function DiagnosisScreen() {
 
   // State for clinical decisions
   const [diagnosis, setDiagnosis] = useState(
-    "F41.1 Generalized Anxiety Disorder dengan insomnia sekunder",
+    isGuest ? "F41.1 Generalized Anxiety Disorder dengan insomnia sekunder" : "",
   );
   const [prescriptionOption, setPrescriptionOption] =
     useState<PrescriptionOption>("none");
-  const [carePlanTasks, setCarePlanTasks] = useState<CarePlanTask[]>([
-    {
-      id: "task-1",
-      title: "Latihan pernapasan 4-7-8",
-      frequency: "2x sehari, pagi dan sebelum tidur",
-    },
-    {
-      id: "task-2",
-      title: "Jurnal kecemasan harian",
-      frequency: "1x sehari saat merasa cemas",
-    },
-  ]);
+  const [carePlanTasks, setCarePlanTasks] = useState<CarePlanTask[]>(
+    isGuest
+      ? [
+          {
+            id: "task-1",
+            title: "Latihan pernapasan 4-7-8",
+            frequency: "2x sehari, pagi dan sebelum tidur",
+          },
+          {
+            id: "task-2",
+            title: "Jurnal kecemasan harian",
+            frequency: "1x sehari saat merasa cemas",
+          },
+        ]
+      : [],
+  );
   const [carePlanValidUntil, setCarePlanValidUntil] =
-    useState("30 hari ke depan");
+    useState(isGuest ? "30 hari ke depan" : "");
 
-  const handleSubmitResult = (data: {
+  const handleSubmitResult = async (data: {
     advice: string;
     needFollowUp: boolean;
   }) => {
-    haptics.success();
-    if (context) {
-      soapMutation.mutate({
+    if (isGuest) {
+      haptics.success();
+      router.push({
+        pathname: ROUTES.PRACTITIONER.HISTORY,
+        params: { consultationId: routeConsultationId, guest: "true" },
+      } as never);
+      return;
+    }
+
+    if (!context) {
+      haptics.error();
+      Alert.alert(
+        "Sesi Tidak Ditemukan",
+        "Buka halaman ini dari ruang konsultasi aktif agar hasil klinis dapat dikirim ke pasien.",
+      );
+      return;
+    }
+
+    try {
+      await soapMutation.mutateAsync({
         context,
         dto: {
-          subjective: "Keluhan kecemasan dan insomnia 3 minggu terakhir.",
-          objective: "Afek terbatas, tanda vital stabil.",
-          assessment: diagnosis,
+          subjective: "Keluhan pasien selama sesi konsultasi.",
+          objective: "Evaluasi klinis selama sesi berlangsung.",
+          assessment: diagnosis.trim() || "Evaluasi Klinis",
           plan: data.advice,
-          icd10Code: "F41.1",
-          icd10Description: "Generalized anxiety disorder",
+          icd10Code: diagnosis.trim().split(/\s+/)[0] || undefined,
+          icd10Description: diagnosis.trim() || undefined,
         },
       });
-      finishMutation.mutate(context);
+      await finishMutation.mutateAsync(context);
+      haptics.success();
+      router.push({
+        pathname: ROUTES.PRACTITIONER.HISTORY,
+        params: { consultationId: context.consultationId },
+      } as never);
+    } catch (err: unknown) {
+      haptics.error();
+      Alert.alert(
+        "Gagal Mengirim Hasil Sesi",
+        err instanceof ApiError
+          ? err.message
+          : "Catatan klinis belum tersimpan ke server. Silakan coba lagi.",
+      );
     }
-    router.push({
-      pathname: ROUTES.PRACTITIONER.HISTORY,
-      params: { consultationId: routeConsultationId },
-    } as never);
   };
 
-  const handleSaveCarePlan = (data: {
+  const handleSaveCarePlan = async (data: {
     tasks: CarePlanTask[];
     validUntil: string;
   }) => {
     haptics.light();
     setCarePlanTasks(data.tasks);
     setCarePlanValidUntil(data.validUntil);
-    if (context && data.tasks.length > 0) {
-      carePlanMutation.mutate({
-        consultationId: context.consultationId,
-        payload: {
-          goals: ["Mengurangi kecemasan dan memperbaiki pola tidur"],
-          interventions: data.tasks.map((t) => ({
-            title: t.title,
-            description: t.frequency,
-            frequency: t.frequency,
-          })),
-          targetReviewDate: new Date(Date.now() + 30 * 86400000).toISOString(),
-        },
-      });
+    if (!isGuest && context && data.tasks.length > 0) {
+      try {
+        await carePlanMutation.mutateAsync({
+          consultationId: context.consultationId,
+          payload: {
+            goals: ["Pemantauan progres dan kepatuhan intervensi pasien"],
+            interventions: data.tasks.map((t) => ({
+              title: t.title,
+              description: t.frequency,
+              frequency: t.frequency,
+            })),
+            targetReviewDate: new Date(Date.now() + 30 * 86400000).toISOString(),
+          },
+        });
+      } catch (err: unknown) {
+        haptics.error();
+        Alert.alert(
+          "Gagal Menyimpan Care Plan",
+          err instanceof ApiError
+            ? err.message
+            : "Rencana perawatan belum tersimpan ke server.",
+        );
+        return;
+      }
     }
     setActiveView("complete-result");
   };
@@ -124,7 +175,7 @@ export default function DiagnosisScreen() {
       <Box className="flex-1">
         {activeView === "complete-result" && (
           <CompleteSessionResultView
-            patientName="Siti Rahma"
+            patientName={isGuest ? "Siti Rahma" : "Pasien Sesi"}
             initialDiagnosis={diagnosis}
             hasCarePlan={carePlanTasks.length > 0}
             onOpenClinicalDecision={() => setActiveView("clinical-decision")}

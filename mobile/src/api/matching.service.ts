@@ -293,4 +293,21 @@ export const matchingService = {
       signal,
     });
   },
+
+  /** Cancel a pending matching request for the patient. */
+  async cancelMatchingRequest(
+    matchingRequestId: string,
+  ): Promise<MatchingResponseDto> {
+    const normalizedId = requireServerId(
+      matchingRequestId,
+      "matchingRequestId",
+    );
+    return apiRequest<MatchingResponseDto>(
+      `/matching-requests/${encodeURIComponent(normalizedId)}/cancel`,
+      {
+        method: "POST",
+        adapter: matchingResponseAdapter(normalizedId),
+      },
+    );
+  },
 };

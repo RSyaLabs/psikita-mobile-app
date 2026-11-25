@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { Alert } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Box } from "@/components/ui";
@@ -16,29 +17,51 @@ import {
   useCreatePost,
   useDeletePost,
 } from "@/hooks/useApiQueries";
+import { useAuth } from "@/hooks/useAuth";
 import { ROUTES } from "@/constants/routes";
 import { haptics } from "@/utils/haptics";
 import { PostDto } from "@/api/community.service";
 
+type CommunityStep = "feed" | "create" | "my-posts" | "crisis" | "empty";
+
+function resolveCommunityStep(params: {
+  step?: string;
+  action?: string;
+  tab?: string;
+}): CommunityStep {
+  if (params.action === "create" || params.step === "create") return "create";
+  if (params.step === "my-posts") return "my-posts";
+  if (
+    params.step === "crisis" ||
+    params.tab === "crisis" ||
+    params.tab === "krisis"
+  ) {
+    return "crisis";
+  }
+  if (params.step === "empty") return "empty";
+  return "feed";
+}
+
 export default function CommunityFeedScreen() {
   const router = useRouter();
-  const params = useLocalSearchParams<{ step?: string; guest?: string }>();
+  const { user } = useAuth();
+  const params = useLocalSearchParams<{
+    step?: string;
+    action?: string;
+    tab?: string;
+    guest?: string;
+  }>();
+
+  const isGuest = params.guest === "true";
 
   // Step state: "feed" (FD1) | "create" (FD3) | "my-posts" (FD5) | "crisis" (FD6) | "empty" (FD7)
-  const initialStep =
-    params.step === "create"
-      ? "create"
-      : params.step === "my-posts"
-        ? "my-posts"
-        : params.step === "crisis"
-          ? "crisis"
-          : params.step === "empty"
-            ? "empty"
-            : "feed";
+  const [currentStep, setCurrentStep] = useState<CommunityStep>(() =>
+    resolveCommunityStep(params),
+  );
 
-  const [currentStep, setCurrentStep] = useState<
-    "feed" | "create" | "my-posts" | "crisis" | "empty"
-  >(initialStep);
+  useEffect(() => {
+    setCurrentStep(resolveCommunityStep(params));
+  }, [params.step, params.action, params.tab]);
 
   const [activeFilter, setActiveFilter] = useState<"semua" | "postinganmu">("semua");
   const [submissionError, setSubmissionError] = useState<string | null>(null);
@@ -47,10 +70,14 @@ export default function CommunityFeedScreen() {
   const createPostMutation = useCreatePost();
   const deletePostMutation = useDeletePost();
 
-  const posts = postsData && postsData.length > 0 ? postsData : FALLBACK_FEED_POSTS;
-  // Current user's own posts filter
-  const myPosts = posts.filter(
-    (p) => p.authorId === "usr-1" || p.authorId === "current-user" || p.id === "post-1",
+  const posts =
+    postsData && postsData.length > 0
+      ? postsData
+      : isGuest
+        ? FALLBACK_FEED_POSTS
+        : [];
+  const myPosts = posts.filter((p) =>
+    user?.id ? p.authorId === user.id : isGuest && p.authorId === "usr-1",
   );
 
   const handleSelectPost = (post: PostDto) => {
@@ -88,6 +115,10 @@ export default function CommunityFeedScreen() {
       },
       onError: () => {
         haptics.error();
+        Alert.alert(
+          "Gagal Menghapus",
+          "Postingan tidak dapat dihapus saat ini. Silakan coba lagi.",
+        );
       },
     });
   };
@@ -140,7 +171,7 @@ export default function CommunityFeedScreen() {
             router.push(ROUTES.PATIENT.TRIAGE as never);
           }}
         />
-      ) : currentStep === "empty" ? (
+      ) : currentStep === "empty" || (!isGuest && !isLoading && posts.length === 0) ? (
         <Box className="flex-1">
           <CommunityEmptyView
             isError={isError}
@@ -160,7 +191,7 @@ export default function CommunityFeedScreen() {
             onCreatePost={() => setCurrentStep("create")}
             onOpenCrisis={() => setCurrentStep("crisis")}
             onLoadMore={() => {
-              // Trigger refetch or pagination
+              void refetch();
             }}
           />
           <PatientTabBar activeTab="feed" />

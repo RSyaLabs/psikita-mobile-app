@@ -123,7 +123,7 @@ export function BankAccountFormView({
           </Text>
           <Input className="h-[52px] rounded-xl border border-border bg-card px-4">
             <InputField
-              placeholder="[nomor rekening]"
+              placeholder="Contoh: 8274012345"
               value={accountNumber}
               onChangeText={setAccountNumber}
               keyboardType="numeric"
@@ -139,7 +139,7 @@ export function BankAccountFormView({
           </Text>
           <Input className="h-[52px] rounded-xl border border-border bg-card px-4">
             <InputField
-              placeholder="[sesuai KTP]"
+              placeholder="Nama lengkap sesuai buku tabungan & KTP"
               value={accountName}
               onChangeText={setAccountName}
               className="text-foreground text-sm"
@@ -150,10 +150,10 @@ export function BankAccountFormView({
           </Text>
         </VStack>
 
-        {/* Server Policy Notice */}
+        {/* Bank Validation Notice */}
         <Box className="border border-dashed border-border rounded-xl p-3.5 bg-muted/30">
           <Text size="sm" className="text-muted-foreground leading-relaxed">
-            Daftar bank dan aturan validasi dari server. Belum ditetapkan.
+            Data rekening akan divalidasi oleh sistem pencairan dana sebelum transfer diproses.
           </Text>
         </Box>
       </ScrollView>

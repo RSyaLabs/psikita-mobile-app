@@ -96,7 +96,10 @@ describe("Tahap 14.2: Ruang Sesi Praktisi, Asesmen & Catatan Sesi (Screens 81–
       expect(content).toContain("GAD-7 (Kecemasan)");
       expect(content).toContain("PHQ-9 (Depresi)");
       expect(content).toContain("DASS-21 (Depresi, Cemas, Stres)");
-      expect(content).toContain("Daftar instrumen dari server. Belum ditetapkan.");
+      expect(content).toContain(
+        "Instrumen klinis terstandar dikirimkan ke pasien dan hasilnya tersimpan pada rekam konsultasi.",
+      );
+      expect(content).not.toContain("Belum ditetapkan");
       expect(content).toContain("Kirim ke Pasien");
       expect(content).toContain("Batal");
     });

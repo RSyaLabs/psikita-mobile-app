@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { Alert } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
@@ -6,6 +7,7 @@ import {
   RefundStatusView,
 } from "@/components/patient/history";
 import { useRequestRefundMutation, useRefundCaseQuery } from "@/hooks/useApiQueries";
+import { ApiError } from "@/api/client";
 import { ROUTES } from "@/constants/routes";
 import { haptics } from "@/utils/haptics";
 
@@ -16,44 +18,78 @@ export default function PatientRefundsScreen() {
     consultationId?: string;
     paymentId?: string;
     caseId?: string;
+    guest?: string;
   }>();
+
+  const isGuest = params.guest === "true";
 
   const [currentStep, setCurrentStep] = useState<"request" | "status">(
     params.step === "status" ? "status" : "request",
   );
   const [referenceNumber, setReferenceNumber] = useState(
-    params.caseId || "REF-20261122-8921",
+    params.caseId || (isGuest ? "REF-20261122-8921" : ""),
   );
   const [submissionDate, setSubmissionDate] = useState("Hari ini · 14:15 WIB");
+
+  useEffect(() => {
+    setCurrentStep(params.step === "status" ? "status" : "request");
+  }, [params.step]);
+
+  useEffect(() => {
+    if (params.caseId) {
+      setReferenceNumber(params.caseId);
+    }
+  }, [params.caseId]);
 
   const requestMutation = useRequestRefundMutation();
   const { data: refundDetail } = useRefundCaseQuery(params.caseId);
 
-  const handleSubmitRefund = async (reason: string, details: string) => {
-    try {
-      const paymentId = params.paymentId || "01HXYZ789012345678901234AB";
-      const idempotencyKey = `refund-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
-
-      // Attempt server mutation if valid 26-char paymentId provided
-      if (paymentId.length === 26) {
-        try {
-          const res = await requestMutation.mutateAsync({
-            paymentId,
-            idempotencyKey,
-          });
-          if (res?.id) {
-            setReferenceNumber(res.id);
-          }
-        } catch (serverErr) {
-          // Gracefully continue to preview status in offline/mock mode
-        }
-      }
-
-      setSubmissionDate("Hari ini · " + new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) + " WIB");
+  const handleSubmitRefund = async (_reason: string, _details: string) => {
+    if (isGuest) {
+      setSubmissionDate(
+        "Hari ini · " +
+          new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) +
+          " WIB",
+      );
       haptics.success();
       setCurrentStep("status");
-    } catch (err) {
+      return;
+    }
+
+    const paymentId = params.paymentId;
+    if (!paymentId || paymentId.length !== 26) {
       haptics.error();
+      Alert.alert(
+        "ID Pembayaran Tidak Valid",
+        "Silakan buka pengajuan pengembalian dana langsung dari rincian transaksi atau riwayat sesi.",
+      );
+      return;
+    }
+
+    try {
+      const idempotencyKey = `refund-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
+      const res = await requestMutation.mutateAsync({
+        paymentId,
+        idempotencyKey,
+      });
+      if (res?.id) {
+        setReferenceNumber(res.id);
+      }
+      setSubmissionDate(
+        "Hari ini · " +
+          new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) +
+          " WIB",
+      );
+      haptics.success();
+      setCurrentStep("status");
+    } catch (err: unknown) {
+      haptics.error();
+      Alert.alert(
+        "Gagal Mengajukan Pengembalian Dana",
+        err instanceof ApiError
+          ? err.message
+          : "Terjadi kendala saat mengirim pengajuan ke server.",
+      );
     }
   };
 

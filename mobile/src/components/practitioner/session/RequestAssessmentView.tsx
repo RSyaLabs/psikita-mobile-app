@@ -102,7 +102,7 @@ export function RequestAssessmentView({
 
         <Box className="border border-dashed border-border rounded-xl p-3.5 bg-muted/40">
           <Text size="sm" className="text-muted-foreground leading-relaxed">
-            Daftar instrumen dari server. Belum ditetapkan.
+            Instrumen klinis terstandar dikirimkan ke pasien dan hasilnya tersimpan pada rekam konsultasi.
           </Text>
         </Box>
       </ScrollView>

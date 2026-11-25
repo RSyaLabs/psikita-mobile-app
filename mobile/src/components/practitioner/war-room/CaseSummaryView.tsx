@@ -80,7 +80,7 @@ export function CaseSummaryView({
         </View>
         <View className="border-t border-dashed border-[#999999] gap-1 p-3.5">
           <Text className="text-sm text-[#555555]">Format layanan</Text>
-          <Text className="text-[15px] text-[#222222]">[Chat / Video]</Text>
+          <Text className="text-[15px] text-[#222222]">Chat atau Panggilan Video</Text>
         </View>
       </View>
 

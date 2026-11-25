@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
@@ -28,6 +28,7 @@ export default function SessionSummaryScreen() {
     guest?: string;
   }>();
 
+  const isGuest = guest === "true";
   const consultationId = Array.isArray(routeConsultationId)
     ? routeConsultationId[0]
     : routeConsultationId;
@@ -46,26 +47,35 @@ export default function SessionSummaryScreen() {
   );
   const [showCrisisHelp, setShowCrisisHelp] = useState(false);
 
+  useEffect(() => {
+    setActiveView(initialStep === "result" ? "result" : "completed");
+  }, [initialStep]);
+
   const note = notesQuery.data?.[0];
   const practitioner = usePractitioner(context?.practitionerId);
   const practitionerName =
     resultDetail?.practitionerName ||
     practitioner.data?.fullName ||
-    "Dr. Sarah Jenkins, Sp.KJ";
+    (isGuest ? "Dr. Sarah Jenkins, Sp.KJ" : "Psikolog Sesi");
 
   const doctorAdvice =
     resultDetail?.patientFacingAdvice ||
     note?.soap?.plan ||
     note?.soapData?.plan ||
-    "Pertahankan teknik relaksasi pernapasan 4-7-8 setiap sebelum tidur. Jadwalkan waktu istirahat teratur dan kurangi stimulasi layar 1 jam sebelum beristirahat.";
+    (isGuest
+      ? "Pertahankan teknik relaksasi pernapasan 4-7-8 setiap sebelum tidur. Jadwalkan waktu istirahat teratur dan kurangi stimulasi layar 1 jam sebelum beristirahat."
+      : "Catatan klinis sedang disiapkan oleh praktisi Anda.");
 
   const carePlanList: string[] =
     carePlan?.interventions?.map((i) => i.title || i.description) ||
-    carePlan?.goals || [
-      "Latihan pernapasan diafragma 10 menit setiap pagi dan malam",
-      "Jurnal harian pemicu rasa cemas dan catatan pola tidur",
-      "Jalan kaki santai 20 menit saat sore hari tanpa gawai",
-    ];
+    carePlan?.goals ||
+    (isGuest
+      ? [
+          "Latihan pernapasan diafragma 10 menit setiap pagi dan malam",
+          "Jurnal harian pemicu rasa cemas dan catatan pola tidur",
+          "Jalan kaki santai 20 menit saat sore hari tanpa gawai",
+        ]
+      : ["Belum ada tugas perawatan lanjutan yang ditetapkan."]);
 
   const handleBackToHome = () => {
     haptics.light();
@@ -76,7 +86,10 @@ export default function SessionSummaryScreen() {
     haptics.selection();
     router.push({
       pathname: ROUTES.PATIENT.FOLLOW_UPS,
-      params: { consultationId: targetConsultationId, guest: guest || "true" },
+      params: {
+        consultationId: targetConsultationId,
+        ...(isGuest ? { guest: "true" } : {}),
+      },
     } as any);
   };
 
@@ -95,11 +108,21 @@ export default function SessionSummaryScreen() {
       ) : (
         /* Screen 47: Hasil Konsultasi */
         <ConsultationResultView
-          dateLabel="22 November 2026"
+          dateLabel={
+            note?.createdAt
+              ? new Date(note.createdAt).toLocaleDateString("id-ID", {
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                })
+              : isGuest
+                ? "22 November 2026"
+                : "Sesi Terbaru"
+          }
           practitionerName={practitionerName}
           doctorNotes={doctorAdvice}
           carePlanItems={carePlanList}
-          followUpDeadline="29 November 2026"
+          followUpDeadline="Dalam 7 hari ke depan"
           onBack={() => setActiveView("completed")}
           onViewFullCarePlan={() => {
             haptics.selection();
@@ -108,7 +131,7 @@ export default function SessionSummaryScreen() {
               params: {
                 consultationId: targetConsultationId,
                 step: "care-plan",
-                guest: guest || "true",
+                ...(isGuest ? { guest: "true" } : {}),
               },
             } as any);
           }}
@@ -119,7 +142,7 @@ export default function SessionSummaryScreen() {
               params: {
                 consultationId: targetConsultationId,
                 step: "recommendation",
-                guest: guest || "true",
+                ...(isGuest ? { guest: "true" } : {}),
               },
             } as any);
           }}
@@ -130,7 +153,7 @@ export default function SessionSummaryScreen() {
               params: {
                 consultationId: targetConsultationId,
                 step: "picker",
-                guest: guest || "true",
+                ...(isGuest ? { guest: "true" } : {}),
               },
             } as any);
           }}

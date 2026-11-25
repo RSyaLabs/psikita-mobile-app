@@ -257,7 +257,7 @@ export function CommunityDetailView({
         </HStack>
         <Box className="max-w-[640px] w-full self-center pt-1.5 pr-2">
           <Text size="sm" className="text-sm text-muted-foreground text-right">
-            [{replyInput.length}] / 280
+            {replyInput.length} / 280
           </Text>
         </Box>
       </Box>

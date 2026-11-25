@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { SessionOvertimeSheet } from "@/components/patient/chat";
+import { useActiveConsultation, usePractitioner } from "@/hooks/useApiQueries";
 import { ROUTES } from "@/constants/routes";
 import { safeNavigateBack } from "@/utils/navigation";
 
@@ -11,6 +12,13 @@ export default function OvertimeModalScreen() {
     consultationId?: string;
     guest?: string;
   }>();
+
+  const isGuest = guest === "true";
+  const consultation = useActiveConsultation(consultationId);
+  const practitioner = usePractitioner(consultation.context?.practitionerId);
+  const practitionerName =
+    practitioner.data?.fullName ||
+    (isGuest ? "Dr. Sarah Jenkins, Sp.KJ" : "Psikolog Sesi");
 
   const [isOpen, setIsOpen] = useState(true);
 
@@ -24,9 +32,9 @@ export default function OvertimeModalScreen() {
     router.push({
       pathname: ROUTES.PATIENT.CHECKOUT,
       params: {
-        consultationId: consultationId || "demo-consultation",
+        consultationId: consultationId || (isGuest ? "demo-consultation" : ""),
         overtime: String(minutes),
-        guest: guest || "true",
+        ...(isGuest ? { guest: "true" } : {}),
       },
     } as any);
   };
@@ -36,8 +44,8 @@ export default function OvertimeModalScreen() {
     router.push({
       pathname: ROUTES.PATIENT.SESSION_SUMMARY,
       params: {
-        consultationId: consultationId || "demo-consultation",
-        guest: guest || "true",
+        consultationId: consultationId || (isGuest ? "demo-consultation" : ""),
+        ...(isGuest ? { guest: "true" } : {}),
       },
     } as any);
   };
@@ -47,7 +55,7 @@ export default function OvertimeModalScreen() {
       <SessionOvertimeSheet
         isOpen={isOpen}
         timeRemaining="05:00"
-        practitionerName="Dr. Sarah Jenkins, Sp.KJ"
+        practitionerName={practitionerName}
         rate15Label="Rp 25.000"
         rate30Label="Rp 45.000"
         onClose={handleClose}

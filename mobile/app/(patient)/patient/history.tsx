@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { Alert } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Box } from "@/components/ui";
@@ -15,8 +16,16 @@ import { haptics } from "@/utils/haptics";
 
 export default function HistoryScreen() {
   const router = useRouter();
-  const params = useLocalSearchParams<{ step?: string; consultationId?: string }>();
-  
+  const params = useLocalSearchParams<{
+    step?: string;
+    consultationId?: string;
+    id?: string;
+    guest?: string;
+  }>();
+
+  const isGuest = params.guest === "true";
+  const requestedId = params.consultationId || params.id;
+
   // Navigation view mode: "list" (RW1) | "detail" (RW2) | "upcoming" (RW3)
   const initialView =
     params.step === "detail" ? "detail" : params.step === "upcoming" ? "upcoming" : "list";
@@ -24,20 +33,35 @@ export default function HistoryScreen() {
   const [activeTab, setActiveTab] = useState<"berlangsung" | "selesai">("berlangsung");
   const [selectedSession, setSelectedSession] = useState<SessionItem | null>(null);
 
+  useEffect(() => {
+    setCurrentView(
+      params.step === "detail" ? "detail" : params.step === "upcoming" ? "upcoming" : "list",
+    );
+  }, [params.step]);
+
   const consultations = usePatientConsultations();
   const sessionData = consultations.data ?? [];
 
   // Map API consultations to SessionItem if available
   const mappedSessions: SessionItem[] = sessionData.map((s) => ({
     id: s.id,
-    practitionerName: s.practitionerName || "dr. Alivia Zahra, Sp.KJ",
-    practitionerSpecialization: s.practitionerSpecialization || "Psikiater Klinis Dewasa",
-    date: s.createdAt ? new Date(s.createdAt).toLocaleDateString("id-ID") : "18 Nov 2026",
+    practitionerName: s.practitionerName || "Praktisi SeraPhany",
+    practitionerSpecialization: s.practitionerSpecialization || "Psikolog / Psikiater",
+    date: s.createdAt ? new Date(s.createdAt).toLocaleDateString("id-ID") : "-",
     status: (s.status as any) || "FINISHED",
     format: "Chat",
     resultAvailable: s.status === "FINISHED",
     followUpAvailable: true,
   }));
+
+  useEffect(() => {
+    if (requestedId && mappedSessions.length > 0) {
+      const found = mappedSessions.find((s) => s.id === requestedId);
+      if (found) {
+        setSelectedSession(found);
+      }
+    }
+  }, [requestedId, mappedSessions]);
 
   const activeSessionItem = mappedSessions.find(
     (s) => s.status === "ACTIVE" || s.status === "WAITING",
@@ -56,11 +80,16 @@ export default function HistoryScreen() {
     haptics.medium();
     if (session?.status === "WAITING") {
       router.push(ROUTES.PATIENT.MATCHING as never);
-    } else {
+    } else if (session?.id || isGuest) {
       router.push({
         pathname: ROUTES.PATIENT.CHAT_ROOM,
-        params: { consultationId: session?.id || "active-session" },
+        params: {
+          consultationId: session?.id || "active-session",
+          ...(isGuest ? { guest: "true" } : {}),
+        },
       } as never);
+    } else {
+      Alert.alert("Sesi Belum Tersedia", "Pilih sesi aktif terlebih dahulu.");
     }
   };
 
@@ -100,7 +129,8 @@ export default function HistoryScreen() {
             router.push({
               pathname: ROUTES.PATIENT.SESSION_SUMMARY,
               params: {
-                consultationId: selectedSession?.id || "detail-session",
+                consultationId: selectedSession?.id || requestedId || (isGuest ? "detail-session" : ""),
+                ...(isGuest ? { guest: "true" } : {}),
               },
             } as never);
           }}
@@ -135,21 +165,33 @@ export default function HistoryScreen() {
             haptics.medium();
             router.push({
               pathname: ROUTES.PATIENT.CHAT_ROOM,
-              params: { consultationId: "upcoming-confirmed" },
+              params: {
+                consultationId:
+                  selectedSession?.id || activeSessionItem?.id || requestedId || (isGuest ? "upcoming-confirmed" : ""),
+                ...(isGuest ? { guest: "true" } : {}),
+              },
             } as never);
           }}
           onReschedule={() => {
             haptics.medium();
             router.push({
               pathname: ROUTES.PATIENT.FOLLOW_UPS,
-              params: { step: "picker" },
+              params: {
+                step: "picker",
+                ...(selectedSession?.id ? { consultationId: selectedSession.id } : {}),
+                ...(isGuest ? { guest: "true" } : {}),
+              },
             } as never);
           }}
           onPayPendingSession={() => {
             haptics.medium();
             router.push({
               pathname: ROUTES.PATIENT.PAYMENT_REGULAR,
-              params: { consultationId: "pending-order" },
+              params: {
+                consultationId:
+                  selectedSession?.id || activeSessionItem?.id || requestedId || (isGuest ? "pending-order" : ""),
+                ...(isGuest ? { guest: "true" } : {}),
+              },
             } as never);
           }}
           onContactSupport={() => {

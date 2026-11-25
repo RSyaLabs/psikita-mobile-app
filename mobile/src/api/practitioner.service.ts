@@ -67,6 +67,7 @@ const practitionerApiSchema = z.object({
   userId: z.string(),
   type: z.preprocess(uppercased, z.enum(PRACTITIONER_TYPES)),
   fullName: z.string().optional(),
+  fullNameWithTitle: z.string().optional(),
   title: z.string().optional(),
   specialization: z.string().optional(),
   avatar: z.string().optional(),
@@ -111,20 +112,16 @@ const practitionerAdapter = (value: unknown): PractitionerResponseDto => {
   const isPsychiatrist = practitioner.type === "PSYCHIATRIST";
   const psychiatristProfile = practitioner.psychiatristProfile;
   const psychologistProfile = practitioner.psychologistProfile;
-  const sippNumber = isPsychiatrist
-    ? psychiatristProfile?.sipNumber
-    : psychologistProfile?.sippNumber;
-  if (!sippNumber) {
-    throw new Error(
-      "Documented practitioner profile is missing its registration number",
-    );
-  }
+  const sippNumber =
+    (isPsychiatrist
+      ? psychiatristProfile?.sipNumber
+      : psychologistProfile?.sippNumber) ?? "";
 
   return {
     id: practitioner.id,
     userId: practitioner.userId,
-    fullName: practitioner.fullName,
-    title: practitioner.title,
+    fullName: practitioner.fullName || practitioner.fullNameWithTitle,
+    title: practitioner.title || practitioner.fullNameWithTitle,
     specialization: practitioner.specialization,
     avatar: practitioner.avatar,
     consultationFee: practitioner.consultationFee,
@@ -161,17 +158,78 @@ export const practitionerService = {
   async createProfile(
     dto: CreatePractitionerDto,
   ): Promise<PractitionerResponseDto> {
-    const payload = { ...dto };
+    const payload: Record<string, unknown> = { ...dto };
     if ((!payload.firstName || !payload.lastName) && (payload as any).fullName) {
       const parts = ((payload as any).fullName as string).trim().split(/\s+/);
       payload.firstName = payload.firstName || parts[0] || "Praktisi";
       payload.lastName = payload.lastName || parts.slice(1).join(" ") || parts[0] || "Baru";
+    }
+    if (!payload.fullNameWithTitle && (payload as any).fullName) {
+      payload.fullNameWithTitle = (payload as any).fullName;
+    }
+    if (!payload.sipNumber && dto.type === "PSYCHIATRIST" && dto.sippNumber) {
+      payload.sipNumber = dto.sippNumber;
     }
 
     return apiRequest<PractitionerResponseDto>("/practitioner", {
       method: "POST",
       body: JSON.stringify(payload),
       adapter: practitionerAdapter,
+    });
+  },
+
+  /**
+   * Perbarui profil praktisi yang terdaftar
+   */
+  async updateProfile(
+    practitionerId: string,
+    dto: Partial<CreatePractitionerDto>,
+  ): Promise<PractitionerResponseDto> {
+    const id = requireServerId(practitionerId, "practitionerId");
+    return apiRequest<PractitionerResponseDto>(`/practitioner/${encodeURIComponent(id)}`, {
+      method: "PUT",
+      body: JSON.stringify(dto),
+      adapter: practitionerAdapter,
+    });
+  },
+
+  /**
+   * Ambil jadwal mingguan praktisi saat ini
+   */
+  async getMySchedules(signal?: AbortSignal): Promise<{
+    schedules: Array<{
+      id: string;
+      dayOfWeek: number;
+      startTime: string;
+      endTime: string;
+      timezone: string;
+      isActive: boolean;
+      type: string;
+    }>;
+    exceptions: Array<Record<string, unknown>>;
+  }> {
+    return apiRequest("/practitioner/me/schedules", {
+      method: "GET",
+      signal,
+    });
+  },
+
+  /**
+   * Perbarui jadwal ketersediaan mingguan praktisi saat ini
+   */
+  async replaceMyWeeklySchedules(
+    schedules: Array<{
+      type: "WAR_ROOM_DUTY" | "BOOKABLE_SLOT";
+      dayOfWeek: number;
+      startTime: string;
+      endTime: string;
+      timezone: string;
+      isActive?: boolean;
+    }>,
+  ): Promise<unknown> {
+    return apiRequest("/practitioner/me/schedules", {
+      method: "PUT",
+      body: JSON.stringify({ schedules }),
     });
   },
 

@@ -13,7 +13,7 @@ interface CaseAcceptedViewProps {
 }
 
 export function CaseAcceptedView({
-  patientName = "[Nama Pasien]",
+  patientName = "Pasien SeraPhany",
   isPaid = false,
   onViewPatientContext,
   onEnterSession,

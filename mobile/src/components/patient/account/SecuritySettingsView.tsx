@@ -10,6 +10,8 @@ interface SecuritySettingsViewProps {
   onLogoutOtherDevice?: (deviceId: string) => void;
   onLogoutAllDevices?: () => void;
   onDeleteAccount?: () => void;
+  activeSessionCount?: number;
+  isRevoking?: boolean;
 }
 
 export function SecuritySettingsView({
@@ -18,11 +20,13 @@ export function SecuritySettingsView({
   onLogoutOtherDevice,
   onLogoutAllDevices,
   onDeleteAccount,
+  activeSessionCount,
+  isRevoking = false,
 }: SecuritySettingsViewProps) {
   const loginMethods = [
-    { id: "pwd", title: "Ubah kata sandi", subtitle: "Terakhir diubah 12 Okt 2026", action: onChangePassword, testID: "btn-goto-change-password" },
-    { id: "otp", title: "Masuk dengan kode OTP", subtitle: "Aktif" },
-    { id: "google", title: "Akun Google", subtitle: "Terhubung" },
+    { id: "pwd", title: "Ubah kata sandi", subtitle: "Kelola kata sandi akun Anda", action: onChangePassword, testID: "btn-goto-change-password" },
+    { id: "otp", title: "Masuk dengan kode OTP", subtitle: "Aktif melalui email terdaftar" },
+    { id: "google", title: "Akun Google", subtitle: "Tersedia saat masuk aplikasi" },
   ];
 
   return (
@@ -73,20 +77,29 @@ export function SecuritySettingsView({
         <Text className="text-sm font-bold tracking-wider text-[#555555]">PERANGKAT AKTIF</Text>
         <View className="border-[1.5px] border-[#333333] rounded-xl bg-white overflow-hidden">
           <View className="min-h-[64px] px-4 py-2.5 justify-center">
-            <Text className="text-[15px] font-bold text-[#222222]">[Perangkat ini]</Text>
-            <Text className="text-sm text-[#555555] mt-0.5">[Lokasi] · aktif sekarang</Text>
+            <Text className="text-[15px] font-bold text-[#222222]">Perangkat saat ini</Text>
+            <Text className="text-sm text-[#555555] mt-0.5">
+              {typeof activeSessionCount === "number"
+                ? `Sesi aktif sekarang (${activeSessionCount} total sesi)`
+                : "Sesi aktif sekarang"}
+            </Text>
           </View>
           <View className="border-t border-dashed border-[#999999]" />
           <View className="flex-row items-center justify-between min-h-[64px] px-4 py-2.5">
             <View className="flex-1 mr-2.5">
-              <Text className="text-[15px] font-bold text-[#222222]">[Perangkat lain]</Text>
-              <Text className="text-sm text-[#555555] mt-0.5">[Lokasi] · [waktu]</Text>
+              <Text className="text-[15px] font-bold text-[#222222]">Perangkat lain yang masuk</Text>
+              <Text className="text-sm text-[#555555] mt-0.5">
+                {typeof activeSessionCount === "number" && activeSessionCount > 1
+                  ? `${activeSessionCount - 1} sesi lain terhubung ke akun Anda`
+                  : "Akhiri semua sesi perangkat lain"}
+              </Text>
             </View>
             <Pressable
               accessibilityRole="button"
               accessibilityLabel="Keluar dari perangkat lain"
               testID="btn-logout-other-device"
-              onPress={() => { haptics.medium(); onLogoutOtherDevice?.("dev-2"); }}
+              disabled={isRevoking}
+              onPress={() => { haptics.medium(); onLogoutOtherDevice?.("other-sessions"); }}
               className="py-1.5 px-2 active:opacity-70"
             >
               <Text className="text-sm font-semibold text-[#222222]">Keluar ›</Text>

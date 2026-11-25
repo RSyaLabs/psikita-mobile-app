@@ -104,7 +104,7 @@ export function ClinicalDecisionView({
 
           <Textarea className="rounded-xl border border-border bg-card p-3 min-h-[110px]">
             <TextareaInput
-              placeholder="[Tulis asesmen profesional]"
+              placeholder="Tulis asesmen klinis dan temuan sesi"
               value={diagnosis}
               onChangeText={setDiagnosis}
               className="text-foreground text-sm leading-relaxed"
@@ -148,10 +148,10 @@ export function ClinicalDecisionView({
           </VStack>
         </VStack>
 
-        {/* Server Notice */}
+        {/* Clinical Record Notice */}
         <Box className="border border-dashed border-border rounded-xl p-3.5 bg-muted/30">
           <Text size="sm" className="text-muted-foreground leading-relaxed">
-            Opsi dan kode diagnosis dari server. Belum ditetapkan.
+            Diagnosis dan tindak lanjut klinis tercatat aman sesuai standar klasifikasi ICD-10.
           </Text>
         </Box>
       </ScrollView>

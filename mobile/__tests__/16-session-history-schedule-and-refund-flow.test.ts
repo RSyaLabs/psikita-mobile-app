@@ -144,7 +144,8 @@ describe("Tahap 9: Riwayat Konsultasi, Ubah Jadwal & Pengembalian Dana (Screens 
     it("should provide textarea for short description", () => {
       expect(content).toContain("Ceritakan singkat");
       expect(content).toContain("testID=\"input-refund-details\"");
-      expect(content).toContain("[Jelaskan apa yang terjadi]");
+      expect(content).toContain("Jelaskan kendala atau alasan pengajuan Anda");
+      expect(content).not.toContain("[Jelaskan apa yang terjadi]");
     });
 
     it("should display server price disclaimer notice", () => {

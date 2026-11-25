@@ -58,12 +58,12 @@ export function DeleteAccountView({
       <View className="border-[2.5px] border-[#222222] rounded-[14px] p-4 gap-2 bg-white">
         <Text className="text-[22px] font-bold text-[#222222]">Hapus akunmu?</Text>
         <Text className="text-[15px] leading-relaxed text-[#333333]">
-          Tindakan ini tidak bisa dibatalkan. Isi di bawah ini ditentukan kebijakan data dan hukum, bukan di sini.
+          Tindakan ini tidak bisa dibatalkan. Permintaan penghapusan akun dijadwalkan dalam 30 hari sesuai kebijakan privasi dan hukum yang berlaku.
         </Text>
       </View>
 
       <View className="gap-2 px-1">
-        {["Kamu tidak bisa masuk lagi dengan akun ini.", "[Data yang dihapus, sesuai kebijakan]", "[Data yang tetap disimpan sesuai kewajiban hukum]"].map((item, idx) => (
+        {["Kamu tidak bisa masuk lagi dengan akun ini.", "Profil pribadi, preferensi, dan sesi masuk akan dihapus permanen setelah masa tunggu 30 hari.", "Riwayat transaksi dan rekam medis klinis disimpan sesuai kewajiban hukum layanan kesehatan."].map((item, idx) => (
           <View key={idx} className="flex-row items-start gap-2">
             <Text className="text-[15px] text-[#333333]">•</Text>
             <Text className="flex-1 text-[15px] leading-relaxed text-[#333333]">{item}</Text>

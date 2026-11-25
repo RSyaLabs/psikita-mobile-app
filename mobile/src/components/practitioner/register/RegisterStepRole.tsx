@@ -39,6 +39,12 @@ export interface RegisterStepRoleProps {
   onChangeAlmamater: (val: string) => void;
   selectedSpecialty: string;
   onSelectSpecialty: (val: string) => void;
+  birthDate?: string;
+  onChangeBirthDate?: (val: string) => void;
+  gender?: "MALE" | "FEMALE";
+  onChangeGender?: (val: "MALE" | "FEMALE") => void;
+  npwp?: string;
+  onChangeNpwp?: (val: string) => void;
   onNext: () => void;
   isVerifiedDidit?: boolean;
 }
@@ -64,6 +70,12 @@ export function RegisterStepRole({
   onChangeAlmamater,
   selectedSpecialty,
   onSelectSpecialty,
+  birthDate = "",
+  onChangeBirthDate,
+  gender = "FEMALE",
+  onChangeGender,
+  npwp = "",
+  onChangeNpwp,
   onNext,
   isVerifiedDidit,
 }: RegisterStepRoleProps) {
@@ -260,6 +272,82 @@ export function RegisterStepRole({
             />
           </Input>
         </FormControl>
+
+        {onChangeBirthDate && (
+          <FormControl>
+            <FormControlLabel>
+              <FormControlLabelText className="text-sm font-semibold text-foreground">
+                Tanggal Lahir (YYYY-MM-DD)
+              </FormControlLabelText>
+            </FormControlLabel>
+            <Input className="bg-background rounded-xl px-3.5 h-12 border-border">
+              <InputField
+                placeholder="cth: 1990-05-14"
+                value={birthDate}
+                onChangeText={onChangeBirthDate}
+                className="text-sm text-foreground placeholder:text-muted-foreground"
+              />
+            </Input>
+          </FormControl>
+        )}
+
+        {onChangeGender && (
+          <VStack space="xs">
+            <Text size="sm" className="text-sm font-semibold text-foreground mb-1">
+              Jenis Kelamin
+            </Text>
+            <HStack space="sm">
+              {[
+                { val: "FEMALE" as const, label: "Perempuan" },
+                { val: "MALE" as const, label: "Laki-laki" },
+              ].map((g) => (
+                <Pressable
+                  key={g.val}
+                  onPress={() => {
+                    haptics.selection();
+                    onChangeGender(g.val);
+                  }}
+                  className={`flex-1 py-2.5 rounded-xl border items-center ${
+                    gender === g.val
+                      ? "bg-primary/10 border-primary"
+                      : "bg-card border-border"
+                  }`}
+                >
+                  <Text
+                    size="sm"
+                    className={
+                      gender === g.val
+                        ? "text-primary font-bold"
+                        : "text-foreground font-medium"
+                    }
+                  >
+                    {g.label}
+                  </Text>
+                </Pressable>
+              ))}
+            </HStack>
+          </VStack>
+        )}
+
+        {onChangeNpwp && (
+          <FormControl>
+            <FormControlLabel>
+              <FormControlLabelText className="text-sm font-semibold text-foreground">
+                Nomor NPWP (15/16 Digit)
+              </FormControlLabelText>
+            </FormControlLabel>
+            <Input className="bg-background rounded-xl px-3.5 h-12 border-border">
+              <InputField
+                placeholder="cth: 092542943407000"
+                keyboardType="number-pad"
+                maxLength={16}
+                value={npwp}
+                onChangeText={onChangeNpwp}
+                className="text-sm text-foreground placeholder:text-muted-foreground"
+              />
+            </Input>
+          </FormControl>
+        )}
 
         {/* Pilihan Spesialisasi Chips */}
         <VStack space="xs">

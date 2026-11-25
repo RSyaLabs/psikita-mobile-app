@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { KeyboardAvoidingView, Platform } from "react-native";
+import { Alert, KeyboardAvoidingView, Platform } from "react-native";
 import {
   Box,
   Heading,
@@ -63,10 +63,12 @@ export default function ChatRoomScreen() {
 
   // Local message state for immediate user interactivity
   const [localMessages, setLocalMessages] = useState<ChatMessageItem[]>([]);
+  const isGuest = guest === "true";
 
   const practitioner = usePractitioner(context?.practitionerId);
   const practitionerName =
-    practitioner.data?.fullName || "Dr. Sarah Jenkins, Sp.KJ";
+    practitioner.data?.fullName ||
+    (isGuest ? "Dr. Sarah Jenkins, Sp.KJ" : "Psikolog Sesi");
 
   const handleBack = () => {
     haptics.light();
@@ -74,6 +76,14 @@ export default function ChatRoomScreen() {
   };
 
   const handleSendMessage = (text: string) => {
+    if (!isGuest) {
+      haptics.error();
+      Alert.alert(
+        "Layanan Chat Real-Time Belum Tersambung",
+        "Koneksi pesan langsung sedang disiapkan. Gunakan sesi video atau segarkan percakapan secara berkala.",
+      );
+      return;
+    }
     const newMessage: ChatMessageItem = {
       id: "msg-" + Date.now(),
       senderRole: "PATIENT",
@@ -150,7 +160,22 @@ export default function ChatRoomScreen() {
   const displayMessages =
     serverMessages.length > 0
       ? [...serverMessages, ...localMessages]
-      : [...defaultMessages, ...localMessages];
+      : isGuest
+        ? [...defaultMessages, ...localMessages]
+        : [
+            {
+              id: "system-empty",
+              senderRole: "SYSTEM" as const,
+              content: "Belum ada riwayat pesan pada sesi konsultasi ini.",
+            },
+            ...localMessages,
+          ];
+
+  const remainingLabel = consultation.data?.durationMinutes
+    ? `${consultation.data.durationMinutes}:00`
+    : isGuest
+      ? "32:10"
+      : "--:--";
 
   return (
     <SafeAreaView className="flex-1 bg-background">
@@ -161,16 +186,34 @@ export default function ChatRoomScreen() {
         {/* Screen 43: Canonical Chat Header */}
         <ChatHeaderBar
           practitionerName={practitionerName}
-          timeRemaining="32:10"
+          timeRemaining={remainingLabel}
           onBack={handleBack}
           onOpenOvertime={() => setIsOvertimeOpen(true)}
           onVoiceCall={() => {
             haptics.selection();
-            router.push(ROUTES.PATIENT.VIDEO_CALL as any);
+            router.push(
+              (context?.consultationId || consultationId
+                ? {
+                    pathname: ROUTES.PATIENT.VIDEO_CALL,
+                    params: {
+                      consultationId: context?.consultationId || consultationId,
+                    },
+                  }
+                : ROUTES.PATIENT.VIDEO_CALL) as any,
+            );
           }}
           onVideoCall={() => {
             haptics.selection();
-            router.push(ROUTES.PATIENT.VIDEO_CALL as any);
+            router.push(
+              (context?.consultationId || consultationId
+                ? {
+                    pathname: ROUTES.PATIENT.VIDEO_CALL,
+                    params: {
+                      consultationId: context?.consultationId || consultationId,
+                    },
+                  }
+                : ROUTES.PATIENT.VIDEO_CALL) as any,
+            );
           }}
         />
 

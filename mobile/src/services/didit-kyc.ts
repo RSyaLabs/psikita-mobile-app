@@ -218,7 +218,7 @@ export async function launchDiditVerification(
   }
 
   const noTokenError = new Error(
-    "Data sesi Didit tidak valid: sessionToken dan url tidak ditemukan.",
+    "Data sesi verifikasi identitas tidak valid: sessionToken dan url tidak ditemukan.",
   );
   options?.onError?.(noTokenError);
   return {

@@ -81,7 +81,7 @@ export function TaxProfileAgreementView({
           </Text>
           <Input className="h-[52px] rounded-xl border border-border bg-card px-4">
             <InputField
-              placeholder="[nomor NPWP]"
+              placeholder="Contoh: 092542943407000"
               value={npwp}
               onChangeText={setNpwp}
               keyboardType="numeric"
@@ -97,7 +97,7 @@ export function TaxProfileAgreementView({
           </Text>
           <Input className="h-[52px] rounded-xl border border-border bg-card px-4">
             <InputField
-              placeholder="[sesuai ketentuan]"
+              placeholder="Contoh: WP Pribadi (PPh 21)"
               value={taxStatus}
               onChangeText={setTaxStatus}
               className="text-foreground text-sm"
@@ -126,15 +126,15 @@ export function TaxProfileAgreementView({
               className="text-foreground underline"
               onPress={onOpenTerms}
             >
-              [baca]
+              Baca ketentuan
             </Text>
           </Text>
         </HStack>
 
-        {/* Server Policy Notice */}
+        {/* Tax Policy Notice */}
         <Box className="border border-dashed border-border rounded-xl p-3.5 bg-muted/30">
           <Text size="sm" className="text-muted-foreground leading-relaxed">
-            Kolom pajak dan teks perjanjian dari kebijakan. Belum ditetapkan.
+            Pemotongan pajak pencairan diterapkan otomatis sesuai ketentuan PPh Pasal 21 yang berlaku.
           </Text>
         </Box>
       </ScrollView>

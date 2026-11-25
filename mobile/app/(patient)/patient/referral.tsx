@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Alert, Share } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
@@ -146,13 +147,39 @@ export default function ReferralScreen() {
         {/* Save CTA */}
         <Button
           size="lg"
-          onPress={() => haptics.medium()}
+          onPress={async () => {
+            haptics.medium();
+            if (!referral) {
+              Alert.alert(
+                "Surat Rujukan Belum Tersedia",
+                "Belum ada surat rujukan yang diterbitkan oleh praktisi untuk konsultasi ini.",
+              );
+              return;
+            }
+            try {
+              await Share.share({
+                title: `Surat Rujukan ${referralNumber}`,
+                message: [
+                  "SURAT RUJUKAN MEDIS SERAPHANY",
+                  `Nomor Rujukan: ${referralNumber}`,
+                  `Rumah Sakit Tujuan: ${hospitalName}`,
+                  `Poliklinik: ${department}`,
+                  `Diagnosis ICD-10: ${diagnosisIcd}`,
+                ].join("\n"),
+              });
+            } catch {
+              Alert.alert(
+                "Gagal Membagikan",
+                "Tidak dapat membuka menu simpan atau bagikan dokumen.",
+              );
+            }
+          }}
           accessibilityLabel="Unduh surat rujukan digital"
           className="w-full h-[50px] bg-primary rounded-xl flex-row items-center justify-center gap-2 mb-3.5 active:opacity-90"
         >
           <ButtonIcon as={Download} color="#FFFFFF" />
           <ButtonText className="text-white font-semibold text-sm">
-            Unduh Surat Rujukan PDF
+            Simpan / Bagikan Surat Rujukan
           </ButtonText>
         </Button>
 

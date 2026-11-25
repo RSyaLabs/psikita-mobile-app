@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { KeyboardAvoidingView, Platform, Linking } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { ROUTES } from "@/constants/routes";
@@ -37,6 +37,16 @@ export default function ForgotPasswordScreen() {
   const requestOtpMutation = useRequestOtp();
   const [email, setEmail] = useState(params.email ?? "");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    setMode(params.mode === "reset" ? "reset" : "otp");
+  }, [params.mode]);
+
+  useEffect(() => {
+    if (params.email) {
+      setEmail(params.email);
+    }
+  }, [params.email]);
 
   const isLoading = requestOtpMutation.isPending;
 

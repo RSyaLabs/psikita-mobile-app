@@ -112,8 +112,9 @@ describe("Tahap 7: Ruang Konsultasi Chat & Asesmen dalam Sesi (Screens 43-47)", 
       expect(content).toContain("Lebih dari separuh hari");
       expect(content).toContain("Hampir setiap hari");
       expect(content).toContain(
-        "Pertanyaan dan skor dari server. Belum ditetapkan.",
+        "Jawaban dan skor akan langsung dikirim ke praktisi secara aman selama sesi berlangsung.",
       );
+      expect(content).not.toContain("Belum ditetapkan");
       expect(content).toContain("Lanjut");
       expect(content).toContain("Kembali ke chat");
     });

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Alert } from "react-native";
@@ -27,9 +27,17 @@ export type WarRoomView =
 
 export default function WarRoomScreen() {
   const router = useRouter();
-  const params = useLocalSearchParams<{ view?: WarRoomView; offerId?: string }>();
+  const params = useLocalSearchParams<{ view?: WarRoomView; offerId?: string; caseId?: string; guest?: string }>();
+  const isGuest = params.guest === "true";
   const [view, setView] = useState<WarRoomView>(params.view || "offers");
   const [selectedOffer, setSelectedOffer] = useState<MatchingOfferItem | null>(null);
+  const [acceptedConsultationId, setAcceptedConsultationId] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    if (params.view) {
+      setView(params.view);
+    }
+  }, [params.view]);
 
   const offersQuery = useMatchingOffers();
   const claimMutation = useClaimMatching();
@@ -44,13 +52,17 @@ export default function WarRoomScreen() {
           return {
             id: item.matchingRequestId || `srv-${idx}`,
             urgency: (isUrgent ? "Mendesak" : isModerate ? "Sedang" : "Terjadwal") as "Mendesak" | "Sedang" | "Terjadwal",
-            remainingTime: "02:10",
-            chiefComplaint: item.brief?.chiefComplaint || "Kecemasan · Gangguan tidur",
-            functionalImpact: item.brief?.summaryText || "Sulit tidur hampir setiap minggu, mulai mengganggu pekerjaan.",
-            waitingMinutes: 6,
+            remainingTime: item.deadlineAt
+              ? new Date(item.deadlineAt).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })
+              : "02:10",
+            chiefComplaint: item.brief?.chiefComplaint || "Konsultasi Klinis",
+            functionalImpact: item.brief?.summaryText || "Membutuhkan asesmen dan pendampingan psikologis.",
+            waitingMinutes: 5,
           };
         })
-      : undefined;
+      : isGuest
+        ? undefined
+        : [];
 
   const handleSelectOffer = (offer: MatchingOfferItem) => {
     setSelectedOffer(offer);
@@ -59,25 +71,33 @@ export default function WarRoomScreen() {
 
   const handleAcceptCase = () => {
     haptics.medium();
-    if (selectedOffer?.id && !selectedOffer.id.startsWith("off-")) {
-      claimMutation.mutate(selectedOffer.id, {
-        onSuccess: () => {
-          haptics.success();
-          setView("accepted");
-        },
-        onError: (err: any) => {
-          haptics.error();
-          if (err?.message?.includes("expired")) {
-            setView("expired");
-          } else {
-            setView("taken");
-          }
-        },
-      });
-    } else {
-      // Demo / offline transition
+    if (isGuest) {
       setView("accepted");
+      return;
     }
+
+    if (!selectedOffer?.id || selectedOffer.id.startsWith("off-")) {
+      haptics.error();
+      Alert.alert("Kasus Tidak Valid", "Pilih penawaran kasus aktif dari antrean server.");
+      setView("offers");
+      return;
+    }
+
+    claimMutation.mutate(selectedOffer.id, {
+      onSuccess: (res) => {
+        haptics.success();
+        setAcceptedConsultationId(res?.consultationId || res?.activeConsultation?.consultationId);
+        setView("accepted");
+      },
+      onError: (err: any) => {
+        haptics.error();
+        if (err?.message?.toLowerCase().includes("expired")) {
+          setView("expired");
+        } else {
+          setView("taken");
+        }
+      },
+    });
   };
 
   return (
@@ -100,14 +120,23 @@ export default function WarRoomScreen() {
 
       {view === "accepted" && (
         <CaseAcceptedView
-          patientName="Anindya Putri"
-          isPaid={false}
+          patientName={isGuest ? "Anindya Putri" : "Pasien Terdaftar"}
+          isPaid={Boolean(acceptedConsultationId)}
           onViewPatientContext={() => {
-            Alert.alert("Konteks Klinis Pasien", "Membuka drawer konteks klinis pasien di ruang sesi.", [
-              { text: "OK", onPress: () => router.push(ROUTES.PRACTITIONER.CHAT as any) },
-            ]);
+            router.push({
+              pathname: ROUTES.PRACTITIONER.CHAT,
+              params: {
+                view: "context",
+                ...(acceptedConsultationId ? { consultationId: acceptedConsultationId } : {}),
+              },
+            } as any);
           }}
-          onEnterSession={() => router.push(ROUTES.PRACTITIONER.CHAT as any)}
+          onEnterSession={() =>
+            router.push({
+              pathname: ROUTES.PRACTITIONER.CHAT,
+              params: acceptedConsultationId ? { consultationId: acceptedConsultationId } : {},
+            } as any)
+          }
           onBackToCases={() => setView("my-cases")}
         />
       )}

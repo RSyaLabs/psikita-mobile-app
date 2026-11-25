@@ -59,4 +59,27 @@ export const payoutService = {
       adapter: zodAdapter(payoutBankAccountStatusSchema),
     });
   },
+
+  /**
+   * Kirim data NPWP profil pajak praktisi (PUT /payout/tax-profile/me).
+   */
+  async submitTaxProfile(dto: { npwp: string }): Promise<void> {
+    const cleanedNpwp = dto.npwp.replace(/[^\d]/g, "");
+    if (cleanedNpwp.length < 15) {
+      throw new Error("Nomor NPWP minimal 15 digit.");
+    }
+    await apiRequest<void>("/payout/tax-profile/me", {
+      method: "PUT",
+      body: JSON.stringify({ npwp: cleanedNpwp }),
+    });
+  },
+
+  /**
+   * Setujui perjanjian pencairan insentif praktisi (POST /payout/agreements/accept).
+   */
+  async acceptPayoutAgreement(): Promise<void> {
+    await apiRequest<void>("/payout/agreements/accept", {
+      method: "POST",
+    });
+  },
 };

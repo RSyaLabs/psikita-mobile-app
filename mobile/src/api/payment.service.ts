@@ -63,11 +63,28 @@ export const billingOrderResponseSchema = z.object({
   currency: z.literal("IDR"),
   paymentStatus: z.string(),
   claimStatus: z.string().optional(),
-  paymentId: z.string().optional(),
-  expiresAt: z.string().optional(),
+  gatewayChannel: z.unknown().nullable().optional(),
+  paymentId: z.string().nullable().optional(),
+  expiresAt: z.string().nullable().optional(),
   createdAt: z.string(),
   updatedAt: z.string(),
 });
+
+export interface BrandedBillingOrderDto extends BillingOrderResponseDto {
+  serverPaymentContext: ServerPaymentContext;
+}
+
+function billingOrderWithContextAdapter(value: unknown): BrandedBillingOrderDto {
+  const parsed = zodAdapter(billingOrderResponseSchema)(value);
+  const serverPaymentContext = mintServerPaymentContext({
+    consultationId: parsed.consultationId,
+    billingOrderId: parsed.id,
+  });
+  return {
+    ...parsed,
+    serverPaymentContext,
+  };
+}
 
 const serverPaymentContextSchema = z
   .object({
@@ -316,6 +333,12 @@ const paymentAdapter = (
     transactionStatus: paymentStatusMap[payment.status],
     paymentType: instruction?.methodType ?? payment.contextType,
     grossAmount: payment.amount,
+    vaNumber:
+      instruction &&
+      instruction.methodType === "VIRTUAL_ACCOUNT" &&
+      "accountNumber" in instruction
+        ? instruction.accountNumber
+        : undefined,
     paymentUrl:
       instruction && "checkoutUrl" in instruction
         ? instruction.checkoutUrl
@@ -411,34 +434,115 @@ export const paymentService = {
   },
 
   /**
+   * Fetch current active billing order for a consultation and mint validated context.
+   */
+  async getCurrentBillingOrder(
+    consultationId: string,
+    signal?: AbortSignal,
+  ): Promise<BrandedBillingOrderDto> {
+    assertCapabilityLive("payment");
+    const normalizedConsultationId = requireContextValue(
+      consultationId,
+      "consultationId",
+    );
+    return apiRequest<BrandedBillingOrderDto>(
+      `/consultations/${encodeURIComponent(normalizedConsultationId)}/billing-orders/current`,
+      {
+        method: "GET",
+        signal,
+        adapter: billingOrderWithContextAdapter,
+      },
+    );
+  },
+
+  /**
+   * Preview server-side fee breakdown and discount eligibility for a consultation order.
+   */
+  async previewBillingOrder(
+    consultationId: string,
+    dto: {
+      orderType: "INITIAL" | "EXTENSION" | "FOLLOW_UP";
+      durationMinutes: number;
+      payerType?: "SELF_PAY" | "BPJS";
+      discountCode?: string;
+      gatewayChannel?: string;
+    },
+  ): Promise<Record<string, any>> {
+    assertCapabilityLive("payment");
+    const normalizedConsultationId = requireContextValue(
+      consultationId,
+      "consultationId",
+    );
+    return apiRequest<Record<string, any>>(
+      `/consultations/${encodeURIComponent(normalizedConsultationId)}/billing-orders/preview`,
+      {
+        method: "POST",
+        body: JSON.stringify(dto),
+        adapter: (v) => (isRecord(v) ? v : {}),
+      },
+    );
+  },
+
+  /**
    * Create a billing order. Returns the server-issued BillingOrderResponseDto
-   * and mints a validated ServerPaymentContext.
+   * and attaches a minted, validated ServerPaymentContext.
    */
   async createBillingOrder(
     consultationId: string,
     dto: CreateBillingOrderDto,
-  ): Promise<BillingOrderResponseDto> {
+  ): Promise<BrandedBillingOrderDto> {
     assertCapabilityLive("payment");
     const normalizedConsultationId = requireContextValue(
       consultationId,
       "consultationId",
     );
 
-    const response = await apiRequest<BillingOrderResponseDto>(
+    return apiRequest<BrandedBillingOrderDto>(
       `/consultations/${encodeURIComponent(normalizedConsultationId)}/billing-orders`,
       {
         method: "POST",
         body: JSON.stringify(dto),
-        adapter: zodAdapter(billingOrderResponseSchema),
+        adapter: billingOrderWithContextAdapter,
       },
     );
+  },
 
-    mintServerPaymentContext({
-      consultationId: response.consultationId,
-      billingOrderId: response.id,
-    });
+  /**
+   * Fetch current status of an existing payment from backend.
+   */
+  async getPaymentStatus(
+    paymentId: string,
+    contextId: string,
+    signal?: AbortSignal,
+  ): Promise<PaymentResponseDto> {
+    assertCapabilityLive("payment");
+    const normalizedPaymentId = requireContextValue(paymentId, "paymentId");
+    return apiRequest<PaymentResponseDto>(
+      `/payments/${encodeURIComponent(normalizedPaymentId)}`,
+      {
+        method: "GET",
+        signal,
+        adapter: (value) => parsePaymentResponse(value, contextId),
+      },
+    );
+  },
 
-    return response;
+  /**
+   * Request backend to actively synchronize payment status with Duitku gateway.
+   */
+  async syncPaymentStatus(
+    paymentId: string,
+    contextId: string,
+  ): Promise<PaymentResponseDto> {
+    assertCapabilityLive("payment");
+    const normalizedPaymentId = requireContextValue(paymentId, "paymentId");
+    return apiRequest<PaymentResponseDto>(
+      `/payments/${encodeURIComponent(normalizedPaymentId)}/sync`,
+      {
+        method: "POST",
+        adapter: (value) => parsePaymentResponse(value, contextId),
+      },
+    );
   },
 
   /**

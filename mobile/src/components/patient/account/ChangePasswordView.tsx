@@ -29,6 +29,11 @@ export function ChangePasswordView({
       setErrorMsg("Semua kolom kata sandi wajib diisi.");
       return;
     }
+    if (newPass.trim().length < 8) {
+      haptics.error();
+      setErrorMsg("Kata sandi baru minimal 8 karakter.");
+      return;
+    }
     if (newPass !== confirmPass) {
       haptics.error();
       setErrorMsg("Konfirmasi kata sandi tidak cocok.");
@@ -76,7 +81,7 @@ export function ChangePasswordView({
       <View className="gap-1.5">
         <Text className="text-[15px] font-semibold text-[#222222]">Kata sandi baru</Text>
         <TextInput
-          placeholder="Minimal [N] karakter"
+          placeholder="Minimal 8 karakter"
           placeholderTextColor="#777777"
           secureTextEntry
           value={newPass}

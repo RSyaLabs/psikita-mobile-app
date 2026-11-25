@@ -94,7 +94,10 @@ describe("Tahap 14.4: Pendapatan, Rekening Bank & Pajak Praktisi (Screens 93–9
       expect(content).toContain("NPWP");
       expect(content).toContain("Status pajak");
       expect(content).toContain("Saya menyetujui perjanjian pencairan");
-      expect(content).toContain("Kolom pajak dan teks perjanjian dari kebijakan. Belum ditetapkan.");
+      expect(content).toContain(
+        "Pemotongan pajak pencairan diterapkan otomatis sesuai ketentuan PPh Pasal 21 yang berlaku.",
+      );
+      expect(content).not.toContain("Belum ditetapkan");
       expect(content).toContain("Simpan");
       expect(content).toContain("Nanti saja");
     });
@@ -112,7 +115,10 @@ describe("Tahap 14.4: Pendapatan, Rekening Bank & Pajak Praktisi (Screens 93–9
       expect(content).toContain("Nomor rekening");
       expect(content).toContain("Nama pemilik rekening");
       expect(content).toContain("Tidak bisa diedit setelah diverifikasi.");
-      expect(content).toContain("Daftar bank dan aturan validasi dari server. Belum ditetapkan.");
+      expect(content).toContain(
+        "Data rekening akan divalidasi oleh sistem pencairan dana sebelum transfer diproses.",
+      );
+      expect(content).not.toContain("Belum ditetapkan");
       expect(content).toContain("Simpan Rekening");
       expect(content).toContain("Batal");
     });

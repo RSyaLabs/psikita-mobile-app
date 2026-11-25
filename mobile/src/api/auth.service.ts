@@ -240,8 +240,36 @@ export const authService = {
   async resetPassword(token: string, newPassword: string): Promise<void> {
     await apiRequest<void>("/auth/password/reset", {
       method: "POST",
-      body: JSON.stringify({ token, newPassword }),
+      body: JSON.stringify({ token, password: newPassword }),
       skipAuth: true,
+      adapter: noContentAdapter,
+    });
+  },
+
+  /**
+   * Jadwalkan penghapusan akun (30 hari sesuai kebijakan backend)
+   */
+  async deleteMyAccount(): Promise<{ message: string; scheduledDeletionAt?: string }> {
+    return apiRequest<{ message: string; scheduledDeletionAt?: string }>("/user/me", {
+      method: "DELETE",
+    });
+  },
+
+  /**
+   * Ambil daftar sesi aktif milik pengguna saat ini
+   */
+  async getMySessions(): Promise<{ userId: string; sessions: string[]; count: number }> {
+    return apiRequest<{ userId: string; sessions: string[]; count: number }>("/auth/sessions", {
+      method: "GET",
+    });
+  },
+
+  /**
+   * Akhiri seluruh sesi aktif milik pengguna
+   */
+  async revokeAllUserSessions(userId: string): Promise<void> {
+    await apiRequest<void>(`/user/${encodeURIComponent(userId)}/sessions`, {
+      method: "DELETE",
       adapter: noContentAdapter,
     });
   },

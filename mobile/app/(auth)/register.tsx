@@ -90,22 +90,40 @@ export default function RegisterScreen() {
         ? mailPrefix.slice(0, 24)
         : `user_${Date.now().toString().slice(-6)}`;
 
-    try {
+    const attemptRegister = async (candidateUsername: string) => {
       await registerMutation.mutateAsync({
-        username: cleanUsername,
-        fullName: trimmedName,
+        username: candidateUsername,
         email: trimmedEmail,
         password,
       });
+    };
 
+    try {
+      await attemptRegister(cleanUsername);
       haptics.success();
       setRegisteredEmail(trimmedEmail);
     } catch (err: unknown) {
+      if (
+        err instanceof ApiError &&
+        err.statusCode === 409 &&
+        err.message.toLowerCase().includes("username")
+      ) {
+        try {
+          const suffix = Math.random().toString(36).slice(2, 6);
+          await attemptRegister(`${cleanUsername.slice(0, 19)}_${suffix}`);
+          haptics.success();
+          setRegisteredEmail(trimmedEmail);
+          return;
+        } catch (retryErr: unknown) {
+          err = retryErr;
+        }
+      }
+
       haptics.error();
       if (err instanceof ApiError) {
         if (err.statusCode === 409) {
           setErrorMsg(
-            "Alamat email ini sudah terdaftar. Silakan gunakan email lain atau masuk.",
+            "Alamat email atau username ini sudah terdaftar. Silakan gunakan akun lain atau masuk.",
           );
         } else {
           setErrorMsg(err.message || "Gagal melakukan pendaftaran akun.");
