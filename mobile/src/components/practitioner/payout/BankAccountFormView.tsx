@@ -37,8 +37,8 @@ const SUPPORTED_BANKS = [
 
 export function BankAccountFormView({
   initialBankCode = "BCA",
-  initialAccountNumber = "8274012345",
-  initialAccountName = "Dr. Sarah Sp.KJ",
+  initialAccountNumber = "",
+  initialAccountName = "",
   isVerified = false,
   onSave,
   onCancel,

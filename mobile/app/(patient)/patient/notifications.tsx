@@ -41,7 +41,7 @@ export default function NotificationsScreen() {
     <SafeAreaView edges={["top", "bottom"]} className="flex-1 bg-[#FAF8F5]">
       {currentView === "list" ? (
         <NotificationListView
-          items={params.guest === "true" ? undefined : []}
+          items={[]}
           onBack={handleBack}
           onOpenSettings={() => setCurrentView("settings")}
           onSelectNotification={handleSelectNotification}

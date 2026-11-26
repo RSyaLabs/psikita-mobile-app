@@ -85,9 +85,7 @@ describe("Tahap 7: Ruang Konsultasi Chat & Asesmen dalam Sesi (Screens 43-47)", 
 
     it("should verify chat-room.tsx connects the components, default dialogue, and finish dialog", () => {
       const content = fs.readFileSync(chatRoomScreenFile, "utf-8");
-      expect(content).toContain("Sesi dimulai. Percakapan ini privat.");
-      expect(content).toContain("Halo Sinta, terima kasih sudah datang");
-      expect(content).toContain("Akhir-akhir ini saya susah tidur");
+      expect(content).toContain("Belum ada riwayat pesan pada sesi konsultasi ini.");
       expect(content).toContain("ChatHeaderBar");
       expect(content).toContain("ChatMessageBubble");
       expect(content).toContain("ChatAssessmentPromptCard");

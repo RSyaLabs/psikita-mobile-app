@@ -122,30 +122,6 @@ export default function ChatRoomScreen() {
     });
   };
 
-  // Wireframe canonical conversation
-  const defaultMessages: ChatMessageItem[] = [
-    {
-      id: "system-1",
-      senderRole: "SYSTEM",
-      content: "Sesi dimulai. Percakapan ini privat.",
-    },
-    {
-      id: "doc-1",
-      senderRole: "PRACTITIONER",
-      content:
-        "Halo Sinta, terima kasih sudah datang. Boleh ceritakan apa yang paling mengganggumu belakangan ini?",
-      timestamp: "10:00",
-    },
-    {
-      id: "pat-1",
-      senderRole: "PATIENT",
-      content: "Akhir-akhir ini saya susah tidur karena cemas.",
-      statusLabel: "Terkirim",
-      timestamp: "10:02",
-    },
-  ];
-
-  // Render server messages if available, or default Wireframe conversation
   const serverMessages: ChatMessageItem[] =
     messagesQuery.data?.map((m) => ({
       id: m.id,
@@ -158,22 +134,18 @@ export default function ChatRoomScreen() {
   const displayMessages =
     serverMessages.length > 0
       ? [...serverMessages, ...localMessages]
-      : isGuest
-        ? [...defaultMessages, ...localMessages]
-        : [
-            {
-              id: "system-empty",
-              senderRole: "SYSTEM" as const,
-              content: "Belum ada riwayat pesan pada sesi konsultasi ini.",
-            },
-            ...localMessages,
-          ];
+      : [
+          {
+            id: "system-empty",
+            senderRole: "SYSTEM" as const,
+            content: "Belum ada riwayat pesan pada sesi konsultasi ini.",
+          },
+          ...localMessages,
+        ];
 
   const remainingLabel = consultation.data?.durationMinutes
     ? `${consultation.data.durationMinutes}:00`
-    : isGuest
-      ? "32:10"
-      : "--:--";
+    : "--:--";
 
   return (
     <SafeAreaView className="flex-1 bg-background">

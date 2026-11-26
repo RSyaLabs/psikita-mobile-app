@@ -70,7 +70,7 @@ export function PractitionerDashboardView({
         <View className="flex-row items-center justify-between">
           <Text className="text-sm font-bold tracking-wider text-[#222222]">PERLU TINDAKAN</Text>
           <View className="border-[1.5px] border-[#333333] rounded-xl px-2.5 py-0.5">
-            <Text className="text-sm font-semibold text-[#222222]">1 sesi</Text>
+            <Text className="text-sm font-semibold text-[#222222]">Periksa</Text>
           </View>
         </View>
         <Text className="text-[17px] font-bold text-[#222222]">Hasil sesi belum dikirim</Text>
@@ -91,8 +91,8 @@ export function PractitionerDashboardView({
       {/* New Offers Waiting Card */}
       <View className="flex-row items-center justify-between border-[1.5px] border-[#333333] rounded-[14px] p-4 bg-white">
         <View className="flex-1 mr-3 gap-0.5">
-          <Text className="text-[16px] font-bold text-[#222222]">3 kasus baru menunggu</Text>
-          <Text className="text-sm text-[#555555]">Terdekat berakhir dalam 02:10</Text>
+          <Text className="text-[16px] font-bold text-[#222222]">Penawaran kasus baru</Text>
+          <Text className="text-sm text-[#555555]">Periksa permintaan konsultasi masuk dari pasien</Text>
         </View>
         <Pressable
           accessibilityRole="button"
@@ -110,14 +110,14 @@ export function PractitionerDashboardView({
         <Text className="text-sm font-bold tracking-wider text-[#555555]">JADWAL BERIKUTNYA</Text>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Jadwal berikutnya: 15:30 Sesi lanjutan Budi Pratama"
+          accessibilityLabel="Lihat jadwal sesi mendatang"
           testID="btn-next-schedule"
           onPress={() => { haptics.selection(); onOpenNextSession?.(); }}
           className="flex-row items-center justify-between min-h-[60px] border-[1.5px] border-[#333333] rounded-[14px] px-4 py-2.5 bg-white active:bg-stone-50"
         >
           <View className="flex-1 mr-2">
-            <Text className="text-[15px] font-bold text-[#222222]">15:30 · Sesi lanjutan</Text>
-            <Text className="text-sm text-[#555555] mt-0.5">Budi Pratama</Text>
+            <Text className="text-[15px] font-bold text-[#222222]">Jadwal sesi mendatang</Text>
+            <Text className="text-sm text-[#555555] mt-0.5">Ketuk untuk membuka daftar sesi aktif</Text>
           </View>
           <AppIcon icon={ChevronRight} size={18} tone="foreground" />
         </Pressable>

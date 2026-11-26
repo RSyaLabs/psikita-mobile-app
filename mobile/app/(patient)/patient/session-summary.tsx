@@ -62,20 +62,12 @@ export default function SessionSummaryScreen() {
     resultDetail?.patientFacingAdvice ||
     note?.soap?.plan ||
     note?.soapData?.plan ||
-    (isGuest
-      ? "Pertahankan teknik relaksasi pernapasan 4-7-8 setiap sebelum tidur. Jadwalkan waktu istirahat teratur dan kurangi stimulasi layar 1 jam sebelum beristirahat."
-      : "Catatan klinis sedang disiapkan oleh praktisi Anda.");
+    "Catatan klinis sedang disiapkan oleh praktisi Anda.";
 
   const carePlanList: string[] =
     carePlan?.interventions?.map((i) => i.title || i.description) ||
     carePlan?.goals ||
-    (isGuest
-      ? [
-          "Latihan pernapasan diafragma 10 menit setiap pagi dan malam",
-          "Jurnal harian pemicu rasa cemas dan catatan pola tidur",
-          "Jalan kaki santai 20 menit saat sore hari tanpa gawai",
-        ]
-      : ["Belum ada tugas perawatan lanjutan yang ditetapkan."]);
+    ["Belum ada tugas perawatan lanjutan yang ditetapkan."];
 
   const handleBackToHome = () => {
     haptics.light();
@@ -115,9 +107,7 @@ export default function SessionSummaryScreen() {
                   month: "long",
                   year: "numeric",
                 })
-              : isGuest
-                ? "22 November 2026"
-                : "Sesi Terbaru"
+              : "Sesi Terbaru"
           }
           practitionerName={practitionerName}
           doctorNotes={doctorAdvice}

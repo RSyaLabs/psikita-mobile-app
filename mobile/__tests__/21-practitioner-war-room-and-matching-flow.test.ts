@@ -36,11 +36,11 @@ describe("21. Tahap 14.1: Practitioner Dashboard, War Room & Matching Suite (Scr
       expect(content).toContain("Siap menerima kasus");
       expect(content).toContain("Kasus baru hanya masuk saat ini aktif.");
       expect(content).toContain("PERLU TINDAKAN");
-      expect(content).toContain("1 sesi");
+      expect(content).toContain("Periksa");
       expect(content).toContain("Hasil sesi belum dikirim");
       expect(content).toContain("Selesaikan Hasil");
-      expect(content).toContain("3 kasus baru menunggu");
-      expect(content).toContain("Terdekat berakhir dalam 02:10");
+      expect(content).toContain("Penawaran kasus baru");
+      expect(content).toContain("Periksa permintaan konsultasi masuk dari pasien");
       expect(content).toContain("JADWAL BERIKUTNYA");
       expect(content).toContain("Pendapatan bulan ini:");
     });
