@@ -19,7 +19,7 @@ export interface ProfessionalProfileViewProps {
 }
 
 export const ProfessionalProfileView = React.memo(function ProfessionalProfileView({
-  initialName = "dr. Sarah Wijaya, Sp.KJ",
+  initialName = "",
   initialBio = "Psikiater klinis berlisensi dengan minat khusus pada gangguan kecemasan, depresi, dan manajemen stres berbasis bukti klinis.",
   initialSpecialties = ["Kecemasan", "Tidur"],
   strExpiryDate = "15 Agu 2027",

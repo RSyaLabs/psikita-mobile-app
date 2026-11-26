@@ -75,7 +75,7 @@ export function PractitionerDashboardView({
         </View>
         <Text className="text-[17px] font-bold text-[#222222]">Hasil sesi belum dikirim</Text>
         <Text className="text-sm leading-relaxed text-[#555555]">
-          Anindya Putri · selesai pukul 14:00. Pasien belum menerima hasil sampai kamu mengirimnya.
+          Selesaikan dan kirim ringkasan hasil sesi agar pasien dapat segera menerimanya.
         </Text>
         <Pressable
           accessibilityRole="button"

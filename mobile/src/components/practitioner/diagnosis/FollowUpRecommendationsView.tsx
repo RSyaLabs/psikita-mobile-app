@@ -27,29 +27,8 @@ export interface FollowUpRecommendationsViewProps {
   onSelectFollowUp?: (id: string) => void;
 }
 
-const DEFAULT_ITEMS: FollowUpItem[] = [
-  {
-    id: "fu-1",
-    patientName: "Siti Rahma",
-    statusText: "Dipesan · 25 Nov 2026, 14:00",
-    badgeLabel: "Dipesan",
-  },
-  {
-    id: "fu-2",
-    patientName: "Budi Santoso",
-    statusText: "Belum dipesan · berlaku sampai 30 Nov 2026",
-    badgeLabel: "Menunggu",
-  },
-  {
-    id: "fu-3",
-    patientName: "Dewi Lestari",
-    statusText: "Kedaluwarsa",
-    badgeLabel: "Habis",
-  },
-];
-
 export function FollowUpRecommendationsView({
-  items = DEFAULT_ITEMS,
+  items = [],
   onBack,
   onSelectFollowUp,
 }: FollowUpRecommendationsViewProps) {

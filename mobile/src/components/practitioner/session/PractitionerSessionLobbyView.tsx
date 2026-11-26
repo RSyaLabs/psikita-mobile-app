@@ -13,6 +13,11 @@ import {
 } from "@/components/ui";
 
 export interface PractitionerSessionLobbyViewProps {
+  pendingResult?: {
+    id: string;
+    patientName: string;
+    finishedTime: string;
+  } | null;
   onEnterSession: (consultationId: string) => void;
   onCompleteResult: (consultationId: string) => void;
   onViewPendingPayment?: (consultationId: string) => void;
@@ -21,6 +26,7 @@ export interface PractitionerSessionLobbyViewProps {
 type SessionFilter = "today" | "upcoming" | "completed";
 
 export function PractitionerSessionLobbyView({
+  pendingResult = null,
   onEnterSession,
   onCompleteResult,
   onViewPendingPayment,
@@ -102,31 +108,39 @@ export function PractitionerSessionLobbyView({
         <Heading size="sm" bold className="text-muted-foreground uppercase tracking-wider">
           PERLU TINDAKAN
         </Heading>
-        <Card className="border-2 border-foreground rounded-2xl p-4 bg-card gap-2">
-          <HStack className="justify-between items-center">
-            <Box className="border border-foreground rounded-xl px-2.5 py-0.5 bg-muted">
-              <Text size="sm" bold className="text-foreground">
-                Hasil belum dikirim
-              </Text>
-            </Box>
+        {!pendingResult ? (
+          <Box className="border border-border rounded-2xl bg-card p-4">
             <Text size="sm" className="text-muted-foreground">
-              Selesai 11:30
+              Belum ada hasil sesi yang menunggu penyelesaian.
             </Text>
-          </HStack>
+          </Box>
+        ) : (
+          <Card className="border-2 border-foreground rounded-2xl p-4 bg-card gap-2">
+            <HStack className="justify-between items-center">
+              <Box className="border border-foreground rounded-xl px-2.5 py-0.5 bg-muted">
+                <Text size="sm" bold className="text-foreground">
+                  Hasil belum dikirim
+                </Text>
+              </Box>
+              <Text size="sm" className="text-muted-foreground">
+                Selesai {pendingResult.finishedTime}
+              </Text>
+            </HStack>
 
-          <Text size="md" bold className="text-foreground">
-            Budi Santoso
-          </Text>
+            <Text size="md" bold className="text-foreground">
+              {pendingResult.patientName}
+            </Text>
 
-          <Button
-            className="h-[52px] w-full rounded-xl bg-foreground"
-            onPress={() => onCompleteResult("pending-result-consultation-1")}
-          >
-            <ButtonText className="text-background font-semibold">
-              Selesaikan Hasil
-            </ButtonText>
-          </Button>
-        </Card>
+            <Button
+              className="h-[52px] w-full rounded-xl bg-foreground"
+              onPress={() => onCompleteResult(pendingResult.id)}
+            >
+              <ButtonText className="text-background font-semibold">
+                Selesaikan Hasil
+              </ButtonText>
+            </Button>
+          </Card>
+        )}
       </VStack>
 
       {/* Jadwal */}
@@ -134,46 +148,10 @@ export function PractitionerSessionLobbyView({
         <Heading size="sm" bold className="text-muted-foreground uppercase tracking-wider">
           JADWAL
         </Heading>
-        <Box className="border border-border rounded-2xl bg-card overflow-hidden">
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Masuk sesi Siti Rahma"
-            onPress={() => onEnterSession("active-consultation-siti")}
-            className="flex-row items-center justify-between p-4 min-h-[68px] active:bg-muted/50"
-          >
-            <VStack space="xs" className="flex-1 pr-2">
-              <Text size="md" bold className="text-foreground">
-                14:00 · Siti Rahma
-              </Text>
-              <Text size="sm" className="text-muted-foreground">
-                Sesi lanjutan · Chat
-              </Text>
-            </VStack>
-            <Text size="sm" bold className="text-foreground">
-              Masuk ›
-            </Text>
-          </Pressable>
-
-          <Box className="border-t border-dashed border-border" />
-
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Lihat jadwal Ahmad Fauzi"
-            onPress={() => onViewPendingPayment?.("pending-payment-consultation-2")}
-            className="flex-row items-center justify-between p-4 min-h-[68px] active:bg-muted/50"
-          >
-            <VStack space="xs" className="flex-1 pr-2">
-              <Text size="md" bold className="text-foreground">
-                16:30 · Ahmad Fauzi
-              </Text>
-              <Text size="sm" className="text-muted-foreground">
-                Menunggu pasien membayar
-              </Text>
-            </VStack>
-            <Text size="sm" bold className="text-foreground">
-              Lihat ›
-            </Text>
-          </Pressable>
+        <Box className="border border-border rounded-2xl bg-card p-4">
+          <Text size="sm" className="text-muted-foreground">
+            Belum ada jadwal sesi mendatang hari ini.
+          </Text>
         </Box>
       </VStack>
 

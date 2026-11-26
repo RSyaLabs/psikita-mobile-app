@@ -33,6 +33,7 @@ export interface SessionListViewProps {
   onTabChange: (tab: "berlangsung" | "selesai") => void;
   activeSession?: SessionItem | null;
   completedSessions?: SessionItem[];
+  isGuest?: boolean;
   onSelectSession: (session: SessionItem) => void;
   onViewStatus: (session?: SessionItem | null) => void;
   onViewUpcomingSchedule: () => void;
@@ -43,46 +44,13 @@ export function SessionListView({
   onTabChange,
   activeSession,
   completedSessions = [],
+  isGuest = false,
   onSelectSession,
   onViewStatus,
   onViewUpcomingSchedule,
 }: SessionListViewProps) {
-  const defaultActiveSession: SessionItem = activeSession ?? {
-    id: "consultation-active-1",
-    practitionerName: "dr. Alivia Zahra, Sp.KJ",
-    practitionerSpecialization: "Psikiater Klinis Dewasa",
-    date: "Hari ini · 14:00 WIB",
-    status: "ACTIVE",
-    format: "Chat",
-    resultAvailable: false,
-    followUpAvailable: false,
-  };
-
-  const defaultCompletedSessions: SessionItem[] =
-    completedSessions.length > 0
-      ? completedSessions
-      : [
-          {
-            id: "consultation-comp-1",
-            practitionerName: "dr. Rian Pratama, Sp.KJ",
-            practitionerSpecialization: "Psikiater Adiksi & Mood",
-            date: "18 Nov 2026",
-            status: "FINISHED",
-            format: "Chat",
-            resultAvailable: true,
-            followUpAvailable: false,
-          },
-          {
-            id: "consultation-comp-2",
-            practitionerName: "Siti Rahma, M.Psi., Psikolog",
-            practitionerSpecialization: "Psikolog Klinis Dewasa",
-            date: "04 Nov 2026",
-            status: "FINISHED",
-            format: "Video Call",
-            resultAvailable: true,
-            followUpAvailable: true,
-          },
-        ];
+  const defaultActiveSession: SessionItem | null = activeSession ?? null;
+  const defaultCompletedSessions: SessionItem[] = completedSessions;
 
   return (
     <ScrollView
@@ -155,48 +123,58 @@ export function SessionListView({
             BERLANGSUNG
           </Text>
 
-          {/* Active Consultation Card (Wireframe RW1) */}
-          <Card
-            testID="active-consultation-card"
-            className="border-[2.5px] border-foreground rounded-2xl p-4 bg-card gap-2.5"
-          >
-            <HStack space="sm" className="items-center justify-between">
-              <Badge
-                variant="outline"
-                className="border-2 border-foreground rounded-full px-2.5 py-0.5 bg-card"
-              >
-                <BadgeText className="text-foreground text-sm font-bold">
-                  {defaultActiveSession.status === "WAITING" ? "Mencari psikolog" : "Sesi berjalan"}
-                </BadgeText>
-              </Badge>
-              <Text size="sm" className="text-muted-foreground">
-                Dimulai {defaultActiveSession.date}
-              </Text>
-            </HStack>
-
-            <VStack space="xs">
-              <Text size="md" bold className="text-foreground text-base font-bold">
-                {defaultActiveSession.status === "WAITING" ? "Konsultasi baru" : defaultActiveSession.practitionerName}
+          {!defaultActiveSession ? (
+            <Card className="border-[1.5px] border-border rounded-2xl p-4 bg-card gap-1.5">
+              <Text size="md" bold className="text-foreground font-bold">
+                Belum ada sesi berlangsung
               </Text>
               <Text size="sm" className="text-muted-foreground">
-                {defaultActiveSession.status === "WAITING"
-                  ? "Posisi antreanmu aman."
-                  : defaultActiveSession.practitionerSpecialization || "Sesi aktif di ruang konsultasi."}
+                Sesi konsultasi aktif atau antrean pencocokan psikolog akan tampil di sini.
               </Text>
-            </VStack>
-
-            <Button
-              testID="btn-lihat-status"
-              variant="outline"
-              size="lg"
-              onPress={() => onViewStatus(defaultActiveSession)}
-              className="h-[52px] w-full rounded-xl border-[1.5px] border-foreground mt-1"
+            </Card>
+          ) : (
+            <Card
+              testID="active-consultation-card"
+              className="border-[2.5px] border-foreground rounded-2xl p-4 bg-card gap-2.5"
             >
-              <ButtonText className="text-foreground text-base font-semibold">
-                Lihat Status
-              </ButtonText>
-            </Button>
-          </Card>
+              <HStack space="sm" className="items-center justify-between">
+                <Badge
+                  variant="outline"
+                  className="border-2 border-foreground rounded-full px-2.5 py-0.5 bg-card"
+                >
+                  <BadgeText className="text-foreground text-sm font-bold">
+                    {defaultActiveSession.status === "WAITING" ? "Mencari psikolog" : "Sesi berjalan"}
+                  </BadgeText>
+                </Badge>
+                <Text size="sm" className="text-muted-foreground">
+                  Dimulai {defaultActiveSession.date}
+                </Text>
+              </HStack>
+
+              <VStack space="xs">
+                <Text size="md" bold className="text-foreground text-base font-bold">
+                  {defaultActiveSession.status === "WAITING" ? "Konsultasi baru" : defaultActiveSession.practitionerName}
+                </Text>
+                <Text size="sm" className="text-muted-foreground">
+                  {defaultActiveSession.status === "WAITING"
+                    ? "Posisi antreanmu aman."
+                    : defaultActiveSession.practitionerSpecialization || "Sesi aktif di ruang konsultasi."}
+                </Text>
+              </VStack>
+
+              <Button
+                testID="btn-lihat-status"
+                variant="outline"
+                size="lg"
+                onPress={() => onViewStatus(defaultActiveSession)}
+                className="h-[52px] w-full rounded-xl border-[1.5px] border-foreground mt-1"
+              >
+                <ButtonText className="text-foreground text-base font-semibold">
+                  Lihat Status
+                </ButtonText>
+              </Button>
+            </Card>
+          )}
         </VStack>
       )}
 
@@ -207,36 +185,44 @@ export function SessionListView({
         </Text>
 
         <Card className="border-[1.5px] border-border rounded-xl bg-card overflow-hidden">
-          {defaultCompletedSessions.map((session, index) => {
-            const hasDivider = index > 0;
-            return (
-              <Pressable
-                key={session.id}
-                testID={`session-item-${session.id}`}
-                onPress={() => onSelectSession(session)}
-                accessibilityRole="button"
-                accessibilityLabel={`Lihat detail sesi dengan ${session.practitionerName}`}
-                className={`flex-row items-center justify-between min-h-[68px] px-4 py-3 ${
-                  hasDivider ? "border-t border-dashed border-border" : ""
-                }`}
-              >
-                <VStack space="xs" className="flex-1 pr-3">
-                  <Text size="md" bold className="text-foreground text-[15px] font-bold">
-                    {session.practitionerName}
-                  </Text>
-                  <Text size="sm" className="text-muted-foreground text-sm">
-                    {session.date} · {session.followUpAvailable ? "Tindak lanjut tersedia" : "Hasil tersedia"}
-                  </Text>
-                </VStack>
-                <HStack space="xs" className="items-center">
-                  <Text size="sm" bold className="text-foreground font-semibold">
-                    Lihat
-                  </Text>
-                  <AppIcon icon={ChevronRight} size={16} tone="foreground" />
-                </HStack>
-              </Pressable>
-            );
-          })}
+          {defaultCompletedSessions.length === 0 ? (
+            <Box className="p-4">
+              <Text size="sm" className="text-muted-foreground">
+                Belum ada riwayat sesi konsultasi yang selesai.
+              </Text>
+            </Box>
+          ) : (
+            defaultCompletedSessions.map((session, index) => {
+              const hasDivider = index > 0;
+              return (
+                <Pressable
+                  key={session.id}
+                  testID={`session-item-${session.id}`}
+                  onPress={() => onSelectSession(session)}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Lihat detail sesi dengan ${session.practitionerName}`}
+                  className={`flex-row items-center justify-between min-h-[68px] px-4 py-3 ${
+                    hasDivider ? "border-t border-dashed border-border" : ""
+                  }`}
+                >
+                  <VStack space="xs" className="flex-1 pr-3">
+                    <Text size="md" bold className="text-foreground text-[15px] font-bold">
+                      {session.practitionerName}
+                    </Text>
+                    <Text size="sm" className="text-muted-foreground text-sm">
+                      {session.date} · {session.followUpAvailable ? "Tindak lanjut tersedia" : "Hasil tersedia"}
+                    </Text>
+                  </VStack>
+                  <HStack space="xs" className="items-center">
+                    <Text size="sm" bold className="text-foreground font-semibold">
+                      Lihat
+                    </Text>
+                    <AppIcon icon={ChevronRight} size={16} tone="foreground" />
+                  </HStack>
+                </Pressable>
+              );
+            })
+          )}
         </Card>
       </VStack>
 

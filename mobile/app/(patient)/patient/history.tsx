@@ -108,6 +108,7 @@ export default function HistoryScreen() {
             onTabChange={setActiveTab}
             activeSession={activeSessionItem}
             completedSessions={completedSessionsList}
+            isGuest={isGuest}
             onSelectSession={handleSelectSession}
             onViewStatus={handleViewStatus}
             onViewUpcomingSchedule={handleViewUpcoming}

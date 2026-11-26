@@ -25,7 +25,7 @@ export interface AssessmentAnswersViewProps {
 
 export function AssessmentAnswersView({
   instrumentName = "GAD-7 (Kecemasan)",
-  patientName = "Siti Rahma",
+  patientName = "Pasien Sesi",
   completionTime = "10 menit lalu",
   totalScore = "14 / 21",
   interpretation = "Kecemasan Sedang",

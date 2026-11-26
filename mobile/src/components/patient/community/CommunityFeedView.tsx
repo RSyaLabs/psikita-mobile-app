@@ -26,46 +26,6 @@ export interface CommunityFeedViewProps {
   onLoadMore?: () => void;
 }
 
-export const FALLBACK_FEED_POSTS: PostDto[] = [
-  {
-    id: "post-1",
-    authorId: "usr-1",
-    authorName: "Rian Pratama",
-    title: "Mengatasi cemas sebelum tidur",
-    content: "Dulu sering overthinking setiap malam sebelum tidur sampai dada sesak. Setelah menerapkan latihan pernapasan 4-7-8 secara rutin 10 menit, perlahan pikiran terasa jauh lebih tenang dan detak jantung melambat.",
-    category: "PENGALAMAN",
-    isAnonymous: false,
-    likesCount: 14,
-    repliesCount: 3,
-    createdAt: "2 jam yang lalu",
-  },
-  {
-    id: "post-2",
-    authorId: "usr-2",
-    authorName: "dr. Alivia Zahra, Sp.KJ",
-    authorRole: "Psikiater",
-    title: "Mengenal Burnout vs Kelelahan Biasa",
-    content: "Burnout ditandai oleh kelelahan emosional mendalam, sinisme terhadap pekerjaan atau relasi, dan perasaan tidak berdaya. Istirahat 1 hari saja seringkali tidak cukup; dibutuhkan restrukturisasi beban dan boundaries.",
-    category: "EDUKASI",
-    isAnonymous: false,
-    likesCount: 28,
-    repliesCount: 6,
-    createdAt: "5 jam yang lalu",
-  },
-  {
-    id: "post-3",
-    authorId: "usr-3",
-    authorName: "Anonim",
-    title: "Menghadapi masa sulit saat ini",
-    content: "Beberapa hari ini rasanya sangat berat dan melelahkan. Jika kamu juga merasa kewalahan atau butuh pertolongan darurat, jangan ragu untuk menghubungi layanan krisis atau profesional.",
-    category: "PENGALAMAN",
-    isAnonymous: true,
-    likesCount: 9,
-    repliesCount: 2,
-    createdAt: "1 hari yang lalu",
-  },
-];
-
 export function CommunityFeedView({
   posts,
   isLoading = false,
@@ -76,7 +36,7 @@ export function CommunityFeedView({
   onOpenCrisis,
   onLoadMore,
 }: CommunityFeedViewProps) {
-  const displayPosts = posts && posts.length > 0 ? posts : FALLBACK_FEED_POSTS;
+  const displayPosts = posts ?? [];
 
   return (
     <ScrollView

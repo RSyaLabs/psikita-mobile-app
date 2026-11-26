@@ -23,7 +23,7 @@ export interface PatientContextViewProps {
 }
 
 export function PatientContextView({
-  patientName = "Siti Rahma",
+  patientName = "Pasien Sesi",
   patientBio = "28 tahun · Perempuan · Pasien baru",
   chiefComplaint = "Kecemasan, gangguan tidur",
   functionalImpact = "Sulit konsentrasi kerja & insomnia",

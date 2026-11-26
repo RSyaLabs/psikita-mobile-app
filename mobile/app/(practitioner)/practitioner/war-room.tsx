@@ -120,7 +120,7 @@ export default function WarRoomScreen() {
 
       {view === "accepted" && (
         <CaseAcceptedView
-          patientName={isGuest ? "Anindya Putri" : "Pasien Terdaftar"}
+          patientName="Pasien Terdaftar"
           isPaid={Boolean(acceptedConsultationId)}
           onViewPatientContext={() => {
             router.push({

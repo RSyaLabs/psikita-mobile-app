@@ -26,9 +26,7 @@ export default function PatientRefundsScreen() {
   const [currentStep, setCurrentStep] = useState<"request" | "status">(
     params.step === "status" ? "status" : "request",
   );
-  const [referenceNumber, setReferenceNumber] = useState(
-    params.caseId || (isGuest ? "REF-20261122-8921" : ""),
-  );
+  const [referenceNumber, setReferenceNumber] = useState(params.caseId || "");
   const [submissionDate, setSubmissionDate] = useState("Hari ini · 14:15 WIB");
 
   useEffect(() => {

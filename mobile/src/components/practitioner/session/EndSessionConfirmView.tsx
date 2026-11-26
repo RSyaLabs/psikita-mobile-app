@@ -22,7 +22,7 @@ export interface EndSessionConfirmViewProps {
 }
 
 export function EndSessionConfirmView({
-  patientName = "Siti Rahma",
+  patientName = "Pasien Sesi",
   elapsedDuration = "27:50",
   remainingDuration = "32:10",
   onConfirmEndAndFillResults,

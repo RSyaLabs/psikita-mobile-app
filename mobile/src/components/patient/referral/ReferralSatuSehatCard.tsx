@@ -10,7 +10,7 @@ interface ReferralSatuSehatCardProps {
 
 export function ReferralSatuSehatCard({
   bpjsBridgeStatus = "Tersambung P-Care / V-Claim",
-  satuSehatId = "SS-REF-2026-99120",
+  satuSehatId = "Belum tersedia",
 }: ReferralSatuSehatCardProps) {
   return (
     <Card className="bg-card rounded-2xl p-4 mb-3.5 border border-border">

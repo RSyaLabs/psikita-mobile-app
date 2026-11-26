@@ -29,7 +29,7 @@ export function RefundStatusView({
   onBack,
   onContactSupport,
   onReturnToSessions,
-  referenceNumber = "REF-20261122-8921",
+  referenceNumber = "-",
   submissionDate = "Hari ini · 14:15 WIB",
   requestedAmount = "Rp 150.000",
 }: RefundStatusViewProps) {

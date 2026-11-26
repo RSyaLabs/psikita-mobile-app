@@ -22,7 +22,7 @@ export interface PractitionerAccountHubViewProps {
 }
 
 export const PractitionerAccountHubView = React.memo(function PractitionerAccountHubView({
-  fullName = "dr. Sarah Wijaya, Sp.KJ",
+  fullName = "Mitra Praktisi",
   title = "Psikiater Klinis",
   avatarUrl,
   strExpiryDate = "31 Des 2027",

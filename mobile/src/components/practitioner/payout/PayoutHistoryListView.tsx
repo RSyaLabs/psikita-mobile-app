@@ -28,35 +28,8 @@ export interface PayoutHistoryListViewProps {
   onBack: () => void;
 }
 
-const DEFAULT_PAYOUTS: PayoutHistoryItem[] = [
-  {
-    id: "payout-1",
-    period: "1 - 15 Nov 2026",
-    amount: "Rp 2.450.000",
-    statusText: "Rp 2.450.000 · Sudah dibayar",
-    badgeText: "✓",
-    status: "PAID",
-  },
-  {
-    id: "payout-2",
-    period: "16 - 31 Okt 2026",
-    amount: "Rp 2.300.000",
-    statusText: "Rp 2.300.000 · Diproses",
-    badgeText: "Diproses",
-    status: "PROCESSING",
-  },
-  {
-    id: "payout-3",
-    period: "1 - 15 Okt 2026",
-    amount: "Rp 1.850.000",
-    statusText: "Rp 1.850.000 · Gagal: periksa rekening",
-    badgeText: "Gagal ›",
-    status: "FAILED",
-  },
-];
-
 export function PayoutHistoryListView({
-  items = DEFAULT_PAYOUTS,
+  items = [],
   onSelectPayout,
   onOpenBankSettings,
   onOpenHelp,

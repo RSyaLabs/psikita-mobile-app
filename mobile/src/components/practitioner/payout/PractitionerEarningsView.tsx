@@ -26,14 +26,14 @@ export interface PractitionerEarningsViewProps {
 }
 
 export function PractitionerEarningsView({
-  transferredAmount = "Rp 4.750.000",
-  recordedAmount = "Rp 1.250.000",
-  withheldAmount = "Rp 500.000",
-  eligibleAmount = "Rp 3.000.000",
-  paidAmount = "Rp 4.750.000",
-  bankStatusLabel = "Menunggu verifikasi ›",
+  transferredAmount = "Rp 0",
+  recordedAmount = "Rp 0",
+  withheldAmount = "Rp 0",
+  eligibleAmount = "Rp 0",
+  paidAmount = "Rp 0",
+  bankStatusLabel = "Belum diatur ›",
   taxStatusLabel = "Belum dilengkapi ›",
-  payoutAgreed = true,
+  payoutAgreed = false,
   onOpenBankAccount,
   onOpenTaxProfile,
   onOpenPayoutHistory,

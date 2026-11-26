@@ -18,43 +18,8 @@ interface MyCasesListViewProps {
   onGoToNewOffers?: () => void;
 }
 
-const DEFAULT_MY_CASES: MyCaseItem[] = [
-  {
-    id: "case-1",
-    patientName: "Anindya Putri",
-    complaint: "Kecemasan",
-    statusText: "sesi berlangsung",
-    actionText: "Sesi ›",
-    actionType: "session",
-  },
-  {
-    id: "case-2",
-    patientName: "Budi Pratama",
-    complaint: "Gangguan tidur",
-    statusText: "menunggu bayar",
-    actionText: "Lihat ›",
-    actionType: "view",
-  },
-  {
-    id: "case-3",
-    patientName: "Citra Dewi",
-    complaint: "Tekanan kerja",
-    statusText: "hasil belum dikirim",
-    actionText: "Isi ›",
-    actionType: "fill",
-  },
-  {
-    id: "case-4",
-    patientName: "Dimas Anggara",
-    complaint: "Kelelahan emosional",
-    statusText: "tindak lanjut dijadwalkan",
-    actionText: "Lihat ›",
-    actionType: "follow-up",
-  },
-];
-
 export function MyCasesListView({
-  cases = DEFAULT_MY_CASES,
+  cases = [],
   onOpenSession,
   onOpenDiagnosis,
   onGoToNewOffers,

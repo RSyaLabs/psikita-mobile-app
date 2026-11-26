@@ -66,9 +66,7 @@ export default function ChatRoomScreen() {
   const isGuest = guest === "true";
 
   const practitioner = usePractitioner(context?.practitionerId);
-  const practitionerName =
-    practitioner.data?.fullName ||
-    (isGuest ? "Dr. Sarah Jenkins, Sp.KJ" : "Psikolog Sesi");
+  const practitionerName = practitioner.data?.fullName || "Psikolog Sesi";
 
   const handleBack = () => {
     haptics.light();

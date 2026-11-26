@@ -27,6 +27,7 @@ export interface ScreeningHistoryItem {
 export interface ScreeningCatalogViewProps {
   instruments?: PsychometricInstrumentDto[];
   history?: ScreeningHistoryItem[];
+  isGuest?: boolean;
   onBack: () => void;
   onSelectInstrument: (instrument: PsychometricInstrumentDto) => void;
   onViewHistoryItem: (item: ScreeningHistoryItem) => void;
@@ -60,30 +61,9 @@ export const FALLBACK_INSTRUMENTS: PsychometricInstrumentDto[] = [
   },
 ];
 
-const FALLBACK_HISTORY: ScreeningHistoryItem[] = [
-  {
-    id: "hist-1",
-    code: "DASS-21",
-    testName: "DASS-21 (Kecemasan)",
-    category: "Kecemasan Sedang",
-    score: 12,
-    maxScore: 42,
-    date: "18 Nov 2026",
-  },
-  {
-    id: "hist-2",
-    code: "PHQ-9",
-    testName: "PHQ-9 (Depresi)",
-    category: "Gejala Minimal",
-    score: 3,
-    maxScore: 27,
-    date: "10 Nov 2026",
-  },
-];
-
 export function ScreeningCatalogView({
   instruments,
-  history,
+  history = [],
   onBack,
   onSelectInstrument,
   onViewHistoryItem,
@@ -91,7 +71,7 @@ export function ScreeningCatalogView({
 }: ScreeningCatalogViewProps) {
   const displayInstruments =
     instruments && instruments.length > 0 ? instruments : FALLBACK_INSTRUMENTS;
-  const displayHistory = history && history.length > 0 ? history : FALLBACK_HISTORY;
+  const displayHistory = history;
 
   return (
     <VStack className="flex-1 bg-background">
@@ -182,34 +162,42 @@ export function ScreeningCatalogView({
             </Text>
 
             <Box className="border-[1.5px] border-border rounded-xl bg-card overflow-hidden">
-              {displayHistory.map((item, idx) => (
-                <Pressable
-                  key={item.id}
-                  accessibilityRole="button"
-                  accessibilityLabel={`Riwayat ${item.testName}`}
-                  onPress={() => {
-                    haptics.light();
-                    onViewHistoryItem(item);
-                  }}
-                  className={`flex-row items-center justify-between p-3.5 min-h-[60px] active:bg-muted ${
-                    idx > 0 ? "border-t border-border" : ""
-                  }`}
-                >
-                  <VStack space="xs" className="flex-1 pr-2">
-                    <Text size="sm" bold className="text-sm font-semibold text-foreground">
-                      {item.testName}
-                    </Text>
-                    <Text size="sm" className="text-sm text-muted-foreground">
-                      {item.category} · {item.date}
-                    </Text>
-                  </VStack>
-                  <HStack className="items-center gap-1">
-                    <Text size="sm" bold className="text-sm font-semibold text-primary">
-                      Lihat ›
-                    </Text>
-                  </HStack>
-                </Pressable>
-              ))}
+              {displayHistory.length === 0 ? (
+                <Box className="p-4">
+                  <Text size="sm" className="text-muted-foreground">
+                    Belum ada riwayat tes mandiri. Mulai salah satu tes di atas untuk melihat hasilmu di sini.
+                  </Text>
+                </Box>
+              ) : (
+                displayHistory.map((item, idx) => (
+                  <Pressable
+                    key={item.id}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Riwayat ${item.testName}`}
+                    onPress={() => {
+                      haptics.light();
+                      onViewHistoryItem(item);
+                    }}
+                    className={`flex-row items-center justify-between p-3.5 min-h-[60px] active:bg-muted ${
+                      idx > 0 ? "border-t border-border" : ""
+                    }`}
+                  >
+                    <VStack space="xs" className="flex-1 pr-2">
+                      <Text size="sm" bold className="text-sm font-semibold text-foreground">
+                        {item.testName}
+                      </Text>
+                      <Text size="sm" className="text-sm text-muted-foreground">
+                        {item.category} · {item.date}
+                      </Text>
+                    </VStack>
+                    <HStack className="items-center gap-1">
+                      <Text size="sm" bold className="text-sm font-semibold text-primary">
+                        Lihat ›
+                      </Text>
+                    </HStack>
+                  </Pressable>
+                ))
+              )}
             </Box>
           </VStack>
 

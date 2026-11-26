@@ -24,7 +24,7 @@ export interface SessionDisconnectedViewProps {
 }
 
 export function SessionDisconnectedView({
-  patientName = "Siti Rahma",
+  patientName = "Pasien Sesi",
   remainingTime = "28:40",
   onReconnect,
   onHelp,

@@ -29,7 +29,7 @@ export function PayoutDetailView({
   amount = "Rp 2.300.000",
   statusLabel = "Diproses",
   period = "16 - 31 Okt 2026",
-  referenceNumber = "PAY-202611-0042",
+  referenceNumber = "-",
   includedSessionsCount = 12,
   deductionsAmount = "Rp 150.000",
   bankAccountMasked = "BCA ••••8821",

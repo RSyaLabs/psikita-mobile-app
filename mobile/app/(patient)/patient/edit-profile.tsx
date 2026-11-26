@@ -122,8 +122,8 @@ export default function EditProfileScreen() {
     <SafeAreaView className="flex-1 bg-[#FAF8F5]" edges={["top", "bottom"]}>
       <PersonalDataView
         initialData={{
-          fullName: profile?.fullName || (isGuest ? "Sinta Maharani" : ""),
-          email: user?.email || (isGuest ? "sinta.maharani@email.com" : ""),
+          fullName: profile?.fullName || "",
+          email: user?.email || "",
           phone: profile?.phoneNumber || "",
           birthDate: formatBirthDateForDisplay(profile?.birthDate),
         }}

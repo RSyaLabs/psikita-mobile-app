@@ -9,7 +9,6 @@ import {
   MyPostsView,
   CrisisHelpView,
   CommunityEmptyView,
-  FALLBACK_FEED_POSTS,
 } from "@/components/patient/community";
 import { PatientTabBar } from "@/components/navigation/PatientTabBar";
 import {
@@ -70,15 +69,8 @@ export default function CommunityFeedScreen() {
   const createPostMutation = useCreatePost();
   const deletePostMutation = useDeletePost();
 
-  const posts =
-    postsData && postsData.length > 0
-      ? postsData
-      : isGuest
-        ? FALLBACK_FEED_POSTS
-        : [];
-  const myPosts = posts.filter((p) =>
-    user?.id ? p.authorId === user.id : isGuest && p.authorId === "usr-1",
-  );
+  const posts = postsData ?? [];
+  const myPosts = posts.filter((p) => (user?.id ? p.authorId === user.id : false));
 
   const handleSelectPost = (post: PostDto) => {
     haptics.light();

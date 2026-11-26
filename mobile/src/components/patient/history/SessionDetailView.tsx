@@ -32,15 +32,39 @@ export function SessionDetailView({
   onScheduleFollowUp,
   onRequestRefund,
 }: SessionDetailViewProps) {
-  const currentSession: SessionItem = session ?? {
-    id: "consultation-detail-1",
-    practitionerName: "dr. Alivia Zahra, Sp.KJ",
-    practitionerSpecialization: "Spesialis Kedokteran Jiwa (Psikiater)",
-    date: "18 Nov 2026 · 14:00 WIB",
-    status: "FINISHED",
-    format: "Chat Interaktif",
-    resultAvailable: true,
-  };
+  if (!session) {
+    return (
+      <ScrollView
+        className="flex-1 bg-background"
+        contentContainerStyle={{ paddingHorizontal: 24, paddingTop: 16, paddingBottom: 40, gap: 18 }}
+        showsVerticalScrollIndicator={false}
+      >
+        <HStack space="xs" className="items-center -ml-3">
+          <Pressable
+            testID="btn-back-detail"
+            onPress={onBack}
+            accessibilityRole="button"
+            accessibilityLabel="Kembali ke daftar sesi"
+            className="w-11 h-11 items-center justify-center rounded-full"
+          >
+            <AppIcon icon={ArrowLeft} size={24} tone="foreground" />
+          </Pressable>
+          <Text size="md" bold className="text-foreground text-[17px] font-bold">
+            Detail sesi
+          </Text>
+        </HStack>
+        <Card className="border-[1.5px] border-border rounded-2xl p-5 bg-card gap-2">
+          <Text size="md" bold className="text-foreground">
+            Detail sesi belum tersedia
+          </Text>
+          <Text size="sm" className="text-muted-foreground">
+            Pilih sesi dari daftar riwayat untuk melihat ringkasan lengkapnya.
+          </Text>
+        </Card>
+      </ScrollView>
+    );
+  }
+  const currentSession: SessionItem = session;
 
   return (
     <ScrollView

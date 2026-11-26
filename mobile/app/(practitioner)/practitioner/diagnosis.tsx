@@ -60,29 +60,11 @@ export default function DiagnosisScreen() {
   const { data: _serverIcdCodes } = useDiagnosisCodes({ system: "ICD10" });
 
   // State for clinical decisions
-  const [diagnosis, setDiagnosis] = useState(
-    isGuest ? "F41.1 Generalized Anxiety Disorder dengan insomnia sekunder" : "",
-  );
+  const [diagnosis, setDiagnosis] = useState("");
   const [prescriptionOption, setPrescriptionOption] =
     useState<PrescriptionOption>("none");
-  const [carePlanTasks, setCarePlanTasks] = useState<CarePlanTask[]>(
-    isGuest
-      ? [
-          {
-            id: "task-1",
-            title: "Latihan pernapasan 4-7-8",
-            frequency: "2x sehari, pagi dan sebelum tidur",
-          },
-          {
-            id: "task-2",
-            title: "Jurnal kecemasan harian",
-            frequency: "1x sehari saat merasa cemas",
-          },
-        ]
-      : [],
-  );
-  const [carePlanValidUntil, setCarePlanValidUntil] =
-    useState(isGuest ? "30 hari ke depan" : "");
+  const [carePlanTasks, setCarePlanTasks] = useState<CarePlanTask[]>([]);
+  const [carePlanValidUntil, setCarePlanValidUntil] = useState("");
 
   const handleSubmitResult = async (data: {
     advice: string;
@@ -175,7 +157,7 @@ export default function DiagnosisScreen() {
       <Box className="flex-1">
         {activeView === "complete-result" && (
           <CompleteSessionResultView
-            patientName={isGuest ? "Siti Rahma" : "Pasien Sesi"}
+            patientName="Pasien Sesi"
             initialDiagnosis={diagnosis}
             hasCarePlan={carePlanTasks.length > 0}
             onOpenClinicalDecision={() => setActiveView("clinical-decision")}

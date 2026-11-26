@@ -62,9 +62,7 @@ describe("21. Tahap 14.1: Practitioner Dashboard, War Room & Matching Suite (Scr
       expect(content).toContain("Siap");
       expect(content).toContain("Data lengkap pasien baru terlihat setelah kamu menerima kasus.");
       expect(content).toContain("Mendesak");
-      expect(content).toContain("02:10");
-      expect(content).toContain("Kecemasan · Gangguan tidur");
-      expect(content).toContain("Sulit tidur hampir setiap minggu, mulai mengganggu pekerjaan.");
+      expect(content).toContain("offers = []");
       expect(content).toContain("Kasus lain sudah diambil psikolog lain dan dihapus dari daftar.");
       expect(content).toContain("Kembali ke Beranda");
     });
@@ -175,9 +173,7 @@ describe("21. Tahap 14.1: Practitioner Dashboard, War Room & Matching Suite (Scr
       expect(content).toContain("Semua kasus yang kamu pegang.");
       expect(content).toContain("Aktif");
       expect(content).toContain("Selesai");
-      expect(content).toContain("Sesi ›");
-      expect(content).toContain("Isi ›");
-      expect(content).toContain("Lihat ›");
+      expect(content).toContain("cases = []");
       expect(content).toContain("Kasus baru ada di");
       expect(content).toContain("Kasus lanjutan tidak dicocokkan ulang.");
     });

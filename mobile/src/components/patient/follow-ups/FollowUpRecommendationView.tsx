@@ -26,7 +26,7 @@ export interface FollowUpRecommendationViewProps {
 }
 
 export function FollowUpRecommendationView({
-  practitionerName = "Dr. Sarah Jenkins, Sp.KJ",
+  practitionerName = "Psikolog Pendamping",
   sessionDate = "22 November 2026",
   clinicalReason = "Memerlukan evaluasi penerapan teknik relaksasi diafragma 4-7-8 secara konsisten dan pemantauan penurunan gejala kecemasan mingguan.",
   durationLabel = "50 menit",

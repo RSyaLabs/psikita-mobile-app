@@ -193,6 +193,7 @@ export default function SelfScreeningScreen() {
       ) : (
         <ScreeningCatalogView
           instruments={instruments}
+          isGuest={isGuest}
           onBack={() => safeNavigateBack(router, ROUTES.PATIENT.DASHBOARD)}
           onSelectInstrument={handleSelectInstrument}
           onViewHistoryItem={handleViewHistoryItem}

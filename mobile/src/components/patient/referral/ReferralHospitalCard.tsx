@@ -69,25 +69,25 @@ export function ReferralHospitalCard({
 
         {/* Doctor & Date */}
         <HStack space="md" className="justify-between pt-2 border-t border-border">
-          <VStack space="xs">
+          <VStack space="xs" className="flex-1 pr-2">
             <Text size="sm" className="text-muted-foreground font-medium">
               Dokter Perujuk
             </Text>
             <HStack space="xs" className="items-center">
               <AppIcon icon={User} size={15} tone="muted" />
-              <Text size="sm" bold className="text-foreground font-semibold">
+              <Text size="sm" bold className="text-foreground font-semibold flex-1">
                 {doctorName}
               </Text>
             </HStack>
           </VStack>
 
-          <VStack space="xs" className="items-end">
+          <VStack space="xs" className="flex-1 items-end pl-2">
             <Text size="sm" className="text-muted-foreground font-medium">
               Masa Berlaku
             </Text>
-            <HStack space="xs" className="items-center">
+            <HStack space="xs" className="items-center justify-end">
               <AppIcon icon={Clock} size={15} tone="muted" />
-              <Text size="sm" bold className="text-foreground font-semibold">
+              <Text size="sm" bold className="text-foreground font-semibold text-right shrink">
                 {validityPeriod}
               </Text>
             </HStack>

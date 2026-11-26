@@ -28,7 +28,7 @@ export interface FollowUpSchedulePickerViewProps {
 }
 
 export function FollowUpSchedulePickerView({
-  practitionerName = "Dr. Sarah Jenkins, Sp.KJ",
+  practitionerName = "Psikolog Pendamping",
   sessionDuration = "50 menit",
   onProceedToCheckout,
   onDismiss,

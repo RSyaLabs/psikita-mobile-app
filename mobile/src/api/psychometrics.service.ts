@@ -45,19 +45,52 @@ export interface ScoreResultResponseDto {
   normalizedAnswers: Record<string, number>;
 }
 
+const INSTRUMENT_COUNTS: Record<string, { questions: number; minutes: number }> = {
+  DASS21: { questions: 21, minutes: 5 },
+  "DASS-21": { questions: 21, minutes: 5 },
+  PHQ9: { questions: 9, minutes: 3 },
+  "PHQ-9": { questions: 9, minutes: 3 },
+  GAD7: { questions: 7, minutes: 2 },
+  "GAD-7": { questions: 7, minutes: 2 },
+};
+
+function normalizeInstrument(raw: Record<string, unknown>): PsychometricInstrumentDto {
+  const code = String(raw.code ?? "");
+  const defaults = INSTRUMENT_COUNTS[code.toUpperCase()];
+  const totalQuestions =
+    typeof raw.totalQuestions === "number" && raw.totalQuestions > 0
+      ? raw.totalQuestions
+      : defaults?.questions ?? 10;
+  const estimatedMinutes =
+    typeof raw.estimatedMinutes === "number" && raw.estimatedMinutes > 0
+      ? raw.estimatedMinutes
+      : defaults?.minutes ?? Math.max(2, Math.ceil(totalQuestions / 4));
+  const dims = Array.isArray(raw.supportedDimensions)
+    ? raw.supportedDimensions.map((d) => String(d)).join(", ")
+    : "";
+
+  return {
+    code,
+    title: String(raw.title || raw.name || code),
+    description: String(raw.description || ""),
+    category: String(raw.category || dims || "Skrining Klinis"),
+    totalQuestions,
+    estimatedMinutes,
+  };
+}
+
 export const psychometricsService = {
   getInstruments: async (signal?: AbortSignal): Promise<PsychometricInstrumentDto[]> => {
     const response = await apiRequest<unknown>("/psychometrics/types", {
       signal,
       adapter: (v) => v,
     });
-    if (Array.isArray(response)) {
-      return response as PsychometricInstrumentDto[];
-    }
-    if (isRecord(response) && Array.isArray((response as any).data)) {
-      return (response as any).data as PsychometricInstrumentDto[];
-    }
-    return [];
+    const list = Array.isArray(response)
+      ? response
+      : isRecord(response) && Array.isArray((response as any).data)
+        ? ((response as any).data as unknown[])
+        : [];
+    return list.filter(isRecord).map(normalizeInstrument);
   },
 
   getInstrumentForm: async (code: string, signal?: AbortSignal): Promise<PsychometricFormDto> => {

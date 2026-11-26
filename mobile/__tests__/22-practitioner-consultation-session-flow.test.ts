@@ -44,7 +44,7 @@ describe("Tahap 14.2: Ruang Sesi Praktisi, Asesmen & Catatan Sesi (Screens 81–
       expect(content).toContain("Hasil belum dikirim");
       expect(content).toContain("Selesaikan Hasil");
       expect(content).toContain("JADWAL");
-      expect(content).toContain("Masuk ›");
+      expect(content).toContain("Belum ada jadwal sesi mendatang hari ini.");
       expect(content).toContain("Sesi berpindah ke Selesai setelah hasil terkirim.");
     });
   });

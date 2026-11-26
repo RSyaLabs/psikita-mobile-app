@@ -111,8 +111,7 @@ export default function PractitionerProfileScreen() {
   }, [isGuest, user]);
 
   const fullName =
-    profile?.fullName ||
-    (isGuest ? "dr. Sarah Wijaya, Sp.KJ" : user?.email?.split("@")[0] || "Mitra Praktisi");
+    profile?.fullName || user?.email?.split("@")[0] || "Mitra Praktisi";
   const title =
     profile?.title ||
     (profile?.type === "PSYCHIATRIST" ? "Psikiater Klinis" : "Psikolog Klinis");

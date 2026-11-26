@@ -33,7 +33,7 @@ export interface CompleteSessionResultViewProps {
 }
 
 export function CompleteSessionResultView({
-  patientName = "Siti Rahma",
+  patientName = "Pasien Sesi",
   initialDiagnosis = "F41.1 Generalized Anxiety Disorder dengan insomnia sekunder",
   initialAdvice = "Latih teknik relaksasi pernapasan saat menjelang tidur. Batasi paparan layar gawai 1 jam sebelum istirahat malam.",
   initialNeedFollowUp = true,

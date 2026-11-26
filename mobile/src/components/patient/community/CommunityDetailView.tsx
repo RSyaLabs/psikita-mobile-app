@@ -27,23 +27,6 @@ export interface CommunityDetailViewProps {
   onConsultDoctor: () => void;
 }
 
-export const FALLBACK_REPLIES: PostReplyDto[] = [
-  {
-    id: "rep-1",
-    authorId: "usr-4",
-    authorName: "Maya Sari",
-    content: "Terima kasih sudah berbagi! Teknik 4-7-8 ini juga sangat membantu saya saat panik mendadak.",
-    createdAt: "1 jam yang lalu",
-  },
-  {
-    id: "rep-2",
-    authorId: "usr-5",
-    authorName: "Budi Santoso",
-    content: "Apakah teknik pernapasan ini aman dilakukan setiap hari sebelum tidur?",
-    createdAt: "30 menit yang lalu",
-  },
-];
-
 export function CommunityDetailView({
   post,
   replies,
@@ -57,7 +40,7 @@ export function CommunityDetailView({
 }: CommunityDetailViewProps) {
   const [replyInput, setReplyInput] = useState("");
   const isAuthor = !currentUserId || currentUserId === post.authorId || post.authorId === "current-user";
-  const displayReplies = replies && replies.length > 0 ? replies : FALLBACK_REPLIES;
+  const displayReplies = replies ?? [];
   const categoryLabel = (post.category || "PENGALAMAN").toUpperCase();
 
   const handleSend = () => {

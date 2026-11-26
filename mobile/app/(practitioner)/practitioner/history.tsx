@@ -191,8 +191,8 @@ export default function PractitionerHistoryScreen() {
         {activeView === "bank-account" && (
           <BankAccountFormView
             initialBankCode={bankData?.bankCode || "BCA"}
-            initialAccountNumber={bankData?.accountNumber || (isGuest ? "8274012345" : "")}
-            initialAccountName={bankData?.accountName || (isGuest ? "Dr. Sarah Sp.KJ" : "")}
+            initialAccountNumber={bankData?.accountNumber || ""}
+            initialAccountName={bankData?.accountName || ""}
             isVerified={bankData?.status === "VERIFIED"}
             onSave={(data) => {
               void handleSaveBank(data);

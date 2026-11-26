@@ -56,7 +56,7 @@ export default function SessionSummaryScreen() {
   const practitionerName =
     resultDetail?.practitionerName ||
     practitioner.data?.fullName ||
-    (isGuest ? "Dr. Sarah Jenkins, Sp.KJ" : "Psikolog Sesi");
+    "Psikolog Sesi";
 
   const doctorAdvice =
     resultDetail?.patientFacingAdvice ||

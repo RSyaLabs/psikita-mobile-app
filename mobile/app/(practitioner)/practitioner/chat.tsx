@@ -75,7 +75,7 @@ export default function PractitionerChatScreen() {
 
   const currentPatientName =
     consultationsQuery.data?.find((c) => c.id === activeConsultationId)?.patientName ||
-    (isGuest ? "Siti Rahma" : "Pasien Sesi");
+    "Pasien Sesi";
 
   const handleEnterSession = (id: string) => {
     haptics.light();

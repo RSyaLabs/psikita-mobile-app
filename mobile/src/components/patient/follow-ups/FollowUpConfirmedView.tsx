@@ -26,7 +26,7 @@ export interface FollowUpConfirmedViewProps {
 }
 
 export function FollowUpConfirmedView({
-  practitionerName = "Dr. Sarah Jenkins, Sp.KJ",
+  practitionerName = "Psikolog Pendamping",
   scheduledTime = "Rabu, 18 November 2026 · 10.00 WIB",
   consultationFormat = "Konsultasi Chat",
   totalPaid = "Rp 150.000",

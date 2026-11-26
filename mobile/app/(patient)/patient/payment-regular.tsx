@@ -365,7 +365,7 @@ export default function PaymentRegularScreen() {
       {/* Screen 40: Invoice */}
       {activeMode === "invoice" && (
         <PaymentInvoiceView
-          invoiceNumber={paymentResult?.id || (isGuest ? "INV-20261122-0042" : "-")}
+          invoiceNumber={paymentResult?.id || "-"}
           dateText={
             paymentResult?.createdAt
               ? new Date(paymentResult.createdAt).toLocaleString("id-ID")

@@ -54,7 +54,7 @@ const LIKERT_OPTIONS = [
 
 export function InSessionAssessmentModal({
   isOpen,
-  practitionerName = "Dr. Sarah Jenkins, Sp.KJ",
+  practitionerName = "Psikolog Sesi",
   questions = DEFAULT_QUESTIONS,
   onClose,
   onSubmitAnswers,

@@ -6,8 +6,6 @@ import { Box, Button, ButtonText, Spinner, Text } from "@/components/ui";
 import {
   CommunityDetailView,
   EditPostView,
-  FALLBACK_FEED_POSTS,
-  FALLBACK_REPLIES,
 } from "@/components/patient/community";
 import {
   useCommunityPostDetail,
@@ -43,18 +41,8 @@ export default function CommunityDetailScreen() {
   const updatePostMutation = useUpdatePost();
   const deletePostMutation = useDeletePost();
 
-  const post: PostDto | undefined =
-    postData ??
-    (isGuest
-      ? (FALLBACK_FEED_POSTS.find((p) => p.id === postId) ?? FALLBACK_FEED_POSTS[0])
-      : undefined);
-
-  const replies =
-    repliesData && repliesData.length > 0
-      ? repliesData
-      : isGuest
-        ? FALLBACK_REPLIES
-        : [];
+  const post: PostDto | undefined = postData ?? undefined;
+  const replies = repliesData ?? [];
 
   const handleSendReply = (content: string) => {
     createReplyMutation.mutate(

@@ -31,7 +31,7 @@ export interface SessionOvertimeSheetProps {
 export function SessionOvertimeSheet({
   isOpen,
   timeRemaining = "05:00",
-  practitionerName = "Dr. Sarah Jenkins, Sp.KJ",
+  practitionerName = "Psikolog Sesi",
   rate15Label = "Rp —",
   rate30Label = "Rp —",
   onClose,

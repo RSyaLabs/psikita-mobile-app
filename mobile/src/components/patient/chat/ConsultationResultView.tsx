@@ -28,7 +28,7 @@ export interface ConsultationResultViewProps {
 
 export function ConsultationResultView({
   dateLabel = "22 November 2026",
-  practitionerName = "Dr. Sarah Jenkins, Sp.KJ",
+  practitionerName = "Psikolog Sesi",
   doctorNotes = "Pertahankan teknik relaksasi pernapasan 4-7-8 setiap sebelum tidur. Jadwalkan waktu istirahat teratur dan kurangi stimulasi layar 1 jam sebelum beristirahat.",
   carePlanItems = [
     "Latihan pernapasan diafragma 10 menit setiap pagi dan malam",

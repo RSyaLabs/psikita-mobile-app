@@ -63,13 +63,8 @@ describe("Tahap 14.5: Ketersediaan, Jam Praktik, Akun & Profil Profesional (Scre
       expect(content).toContain("Jadwal");
       expect(content).toContain("Minggu ini");
       expect(content).toContain("Bulan ini");
-      expect(content).toContain("SENIN 23 NOV");
-      expect(content).toContain("09.00 · Rina Kusuma");
-      expect(content).toContain("Sesi lanjutan · Chat");
+      expect(content).toContain("appointments = []");
       expect(content).toContain("Masuk");
-      expect(content).toContain("SELASA 24 NOV");
-      expect(content).toContain("13.00 · Budi Santoso");
-      expect(content).toContain("Menunggu pembayaran");
       expect(content).toContain("Lihat");
       expect(content).toContain("Slot kosong");
       expect(content).toContain(

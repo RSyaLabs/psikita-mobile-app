@@ -13,7 +13,7 @@ export interface ChatHeaderBarProps {
 }
 
 export function ChatHeaderBar({
-  practitionerName = "Dr. Sarah Jenkins, Sp.KJ",
+  practitionerName = "Psikolog Sesi",
   timeRemaining = "32:10",
   onBack,
   onOpenOvertime,

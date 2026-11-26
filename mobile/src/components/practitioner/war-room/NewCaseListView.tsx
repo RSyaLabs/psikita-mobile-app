@@ -19,34 +19,8 @@ interface NewCaseListViewProps {
   onSelectOffer?: (offer: MatchingOfferItem) => void;
 }
 
-const DEFAULT_OFFERS: MatchingOfferItem[] = [
-  {
-    id: "off-1",
-    urgency: "Mendesak",
-    remainingTime: "02:10",
-    chiefComplaint: "Kecemasan · Gangguan tidur",
-    functionalImpact: "Sulit tidur hampir setiap minggu, mulai mengganggu pekerjaan.",
-    waitingMinutes: 6,
-  },
-  {
-    id: "off-2",
-    urgency: "Sedang",
-    remainingTime: "08:40",
-    chiefComplaint: "Tekanan Kerja & Kelelahan",
-    functionalImpact: "Sulit konsentrasi dan merasa kewalahan dengan beban kerja.",
-    waitingMinutes: 2,
-  },
-  {
-    id: "off-3",
-    urgency: "Terjadwal",
-    remainingTime: "14:00",
-    chiefComplaint: "Konsultasi Hubungan Keluarga",
-    functionalImpact: "Butuh pendampingan resolusi konflik dan komunikasi sehat.",
-  },
-];
-
 export function NewCaseListView({
-  offers = DEFAULT_OFFERS,
+  offers = [],
   onBack,
   onSelectOffer,
 }: NewCaseListViewProps) {

@@ -16,9 +16,7 @@ export default function OvertimeModalScreen() {
   const isGuest = guest === "true";
   const consultation = useActiveConsultation(consultationId);
   const practitioner = usePractitioner(consultation.context?.practitionerId);
-  const practitionerName =
-    practitioner.data?.fullName ||
-    (isGuest ? "Dr. Sarah Jenkins, Sp.KJ" : "Psikolog Sesi");
+  const practitionerName = practitioner.data?.fullName || "Psikolog Sesi";
 
   const [isOpen, setIsOpen] = useState(true);
 

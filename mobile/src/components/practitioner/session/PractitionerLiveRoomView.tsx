@@ -29,7 +29,7 @@ export interface PractitionerLiveRoomViewProps {
 }
 
 export function PractitionerLiveRoomView({
-  patientName = "Siti Rahma",
+  patientName = "Pasien Sesi",
   remainingTime = "32:10",
   onBack,
   onOpenContext,

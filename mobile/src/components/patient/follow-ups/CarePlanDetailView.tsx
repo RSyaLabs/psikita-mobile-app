@@ -33,7 +33,7 @@ export interface CarePlanDetailViewProps {
 }
 
 export function CarePlanDetailView({
-  practitionerName = "Dr. Sarah Jenkins, Sp.KJ",
+  practitionerName = "Psikolog Pendamping",
   validUntil = "29 November 2026",
   tasks: initialTasks,
   reminderActive: initialReminder = true,

@@ -69,9 +69,7 @@ export default function FollowUpsScreen() {
   const practitioner = usePractitioner(
     context?.practitionerId || activeFollowUp?.practitionerId,
   );
-  const practitionerName =
-    practitioner.data?.fullName ||
-    (isGuest ? "Dr. Sarah Jenkins, Sp.KJ" : "Psikolog Pendamping");
+  const practitionerName = practitioner.data?.fullName || "Psikolog Pendamping";
 
   // Map care plan interventions from API into UI tasks
   const carePlanTasks =
@@ -94,8 +92,8 @@ export default function FollowUpsScreen() {
   }, [routeView, initialStep]);
 
   const [confirmedSchedule, setConfirmedSchedule] = useState({
-    date: routeDate || (isGuest ? "Rabu, 18 November 2026" : "Menunggu Jadwal"),
-    time: routeTime || (isGuest ? "10.00 WIB" : "-"),
+    date: routeDate || "Menunggu Jadwal",
+    time: routeTime || "-",
   });
 
   const [showCrisisHelp, setShowCrisisHelp] = useState(false);

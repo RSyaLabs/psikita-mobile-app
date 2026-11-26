@@ -72,7 +72,6 @@ describe("Tahap 10: Komunitas Feed & Diskusi Interaktif (Screens 57–63)", () =
 
     it("should render post cards with author, timestamp, category badge, and 'Lihat balasan ›'", () => {
       expect(feedContent).toContain("PENGALAMAN");
-      expect(feedContent).toContain("EDUKASI");
       expect(feedContent).toContain("Lihat balasan ›");
     });
   });

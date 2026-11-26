@@ -24,13 +24,9 @@ describe("19. Notifications & Patient Help Center Flow (Wireframe Screens 67-69)
 
       expect(content).toContain("Notifikasi");
       expect(content).toContain("BARU");
-      expect(content).toContain("Psikolog ditemukan");
-      expect(content).toContain("Lanjut ke pembayaran · 2 mnt lalu");
-      expect(content).toContain("Hasil konsultasi tersedia");
-      expect(content).toContain("Baca saran dan rencana perawatan");
       expect(content).toContain("SEBELUMNYA");
-      expect(content).toContain("Pembayaran berhasil");
-      expect(content).toContain("Verifikasi identitas disetujui");
+      expect(content).toContain("Belum ada notifikasi");
+      expect(content).toContain("items = []");
       expect(content).toContain(
         "Isi notifikasi tidak menampilkan detail medis di layar kunci."
       );

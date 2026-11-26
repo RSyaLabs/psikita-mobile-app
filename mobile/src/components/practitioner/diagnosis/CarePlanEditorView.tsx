@@ -27,22 +27,9 @@ export interface CarePlanEditorViewProps {
   onCancel: () => void;
 }
 
-const DEFAULT_TASKS: CarePlanTask[] = [
-  {
-    id: "task-1",
-    title: "Latihan pernapasan 4-7-8",
-    frequency: "2x sehari, pagi dan sebelum tidur",
-  },
-  {
-    id: "task-2",
-    title: "Jurnal kecemasan harian",
-    frequency: "1x sehari saat merasa cemas",
-  },
-];
-
 export function CarePlanEditorView({
-  initialTasks = DEFAULT_TASKS,
-  initialValidUntil = "30 hari ke depan",
+  initialTasks = [],
+  initialValidUntil = "",
   onSavePlan,
   onCancel,
 }: CarePlanEditorViewProps) {

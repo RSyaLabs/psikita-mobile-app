@@ -19,20 +19,13 @@ interface NotificationListViewProps {
   items?: NotificationItem[];
 }
 
-const DEFAULT_NOTIFICATIONS: NotificationItem[] = [
-  { id: "nt-1", title: "Psikolog ditemukan", subtitle: "Lanjut ke pembayaran · 2 mnt lalu", category: "BARU", route: "/patient/payment-regular" },
-  { id: "nt-2", title: "Hasil konsultasi tersedia", subtitle: "Baca saran dan rencana perawatan", category: "BARU", route: "/patient/assessment-result" },
-  { id: "nt-3", title: "Pembayaran berhasil", subtitle: "18 Nov 2026, 14:30", category: "SEBELUMNYA", route: "/patient/history" },
-  { id: "nt-4", title: "Verifikasi identitas disetujui", subtitle: "15 Nov 2026, 09:15", category: "SEBELUMNYA", route: "/patient/profile" },
-];
-
 const SECTIONS = ["BARU", "SEBELUMNYA"] as const;
 
 export function NotificationListView({
   onBack,
   onOpenSettings,
   onSelectNotification,
-  items = DEFAULT_NOTIFICATIONS,
+  items = [],
 }: NotificationListViewProps) {
   return (
     <ScrollView
@@ -54,33 +47,42 @@ export function NotificationListView({
         <Text className="text-[17px] font-bold text-[#222222]">Notifikasi</Text>
       </View>
 
-      {SECTIONS.map((sec) => {
-        const group = items.filter((i) => i.category === sec);
-        if (group.length === 0) return null;
-        return (
-          <View key={sec} className="gap-2.5">
-            <Text className="text-sm font-bold tracking-wider text-[#555555]">{sec}</Text>
-            <View className="border-[1.5px] border-[#333333] rounded-xl bg-white overflow-hidden">
-              {group.map((item, idx) => (
-                <Pressable
-                  key={item.id}
-                  testID={`notification-item-${item.id}`}
-                  accessibilityRole="button"
-                  accessibilityLabel={`${item.title}, ${item.subtitle}`}
-                  onPress={() => { haptics.selection(); onSelectNotification?.(item); }}
-                  className={`flex-row items-center justify-between min-h-[68px] px-4 py-2.5 active:bg-stone-50 ${idx > 0 ? "border-t border-dashed border-[#999999]" : ""}`}
-                >
-                  <View className="flex-1 mr-2.5">
-                    <Text className="text-[15px] font-bold text-[#222222]">{item.title}</Text>
-                    <Text className="text-sm text-[#555555] mt-0.5">{item.subtitle}</Text>
-                  </View>
-                  <AppIcon icon={ChevronRight} size={18} tone="muted" />
-                </Pressable>
-              ))}
+      {items.length === 0 ? (
+        <View className="border-[1.5px] border-[#CCCCCC] rounded-xl bg-white p-5 items-center">
+          <Text className="text-[15px] font-bold text-[#222222]">Belum ada notifikasi</Text>
+          <Text className="text-sm text-[#555555] text-center mt-1">
+            Pembaruan status konsultasi, pembayaran, dan pengingat jadwal akan muncul di sini.
+          </Text>
+        </View>
+      ) : (
+        SECTIONS.map((sec) => {
+          const group = items.filter((i) => i.category === sec);
+          if (group.length === 0) return null;
+          return (
+            <View key={sec} className="gap-2.5">
+              <Text className="text-sm font-bold tracking-wider text-[#555555]">{sec}</Text>
+              <View className="border-[1.5px] border-[#333333] rounded-xl bg-white overflow-hidden">
+                {group.map((item, idx) => (
+                  <Pressable
+                    key={item.id}
+                    testID={`notification-item-${item.id}`}
+                    accessibilityRole="button"
+                    accessibilityLabel={`${item.title}, ${item.subtitle}`}
+                    onPress={() => { haptics.selection(); onSelectNotification?.(item); }}
+                    className={`flex-row items-center justify-between min-h-[68px] px-4 py-2.5 active:bg-stone-50 ${idx > 0 ? "border-t border-dashed border-[#999999]" : ""}`}
+                  >
+                    <View className="flex-1 mr-2.5">
+                      <Text className="text-[15px] font-bold text-[#222222]">{item.title}</Text>
+                      <Text className="text-sm text-[#555555] mt-0.5">{item.subtitle}</Text>
+                    </View>
+                    <AppIcon icon={ChevronRight} size={18} tone="muted" />
+                  </Pressable>
+                ))}
+              </View>
             </View>
-          </View>
-        );
-      })}
+          );
+        })
+      )}
 
       <View className="border-[1.5px] border-dashed border-[#777777] rounded-xl p-3.5 bg-stone-50/60">
         <Text className="text-sm leading-relaxed text-[#555555]">

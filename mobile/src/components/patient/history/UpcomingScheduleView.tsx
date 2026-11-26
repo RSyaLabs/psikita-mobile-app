@@ -76,10 +76,10 @@ export function UpcomingScheduleView({
 
         <VStack space="xs">
           <Text size="md" bold className="text-foreground text-[17px] font-bold">
-            Rabu, 25 Nov 2026 · 14:00 WIB
+            Belum ada jadwal terkonfirmasi
           </Text>
           <Text size="sm" className="text-muted-foreground text-sm">
-            Sesi lanjutan · dr. Alivia Zahra, Sp.KJ · Chat Interaktif
+            Jadwal sesi lanjutan yang sudah dibayar akan tampil di sini.
           </Text>
         </VStack>
 

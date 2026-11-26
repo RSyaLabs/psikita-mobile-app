@@ -25,8 +25,7 @@ export default function PractitionerDashboardScreen() {
 
   const isOnline = profile?.availabilityStatus === "AVAILABLE";
   const doctorName =
-    profile?.fullName ||
-    (isGuest ? "dr. Sarah Sp.KJ" : user?.email?.split("@")[0] || "Mitra Praktisi");
+    profile?.fullName || user?.email?.split("@")[0] || "Mitra Praktisi";
 
   const handleToggleOnline = (val: boolean) => {
     if (isGuest) {
