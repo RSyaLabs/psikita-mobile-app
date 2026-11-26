@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Alert } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
@@ -52,6 +53,7 @@ export default function VideoCallScreen() {
 
   const [isMicOn, setIsMicOn] = useState(true);
   const [isVideoOn, setIsVideoOn] = useState(true);
+  const [isFrontCamera, setIsFrontCamera] = useState(true);
   const [showEndModal, setShowEndModal] = useState(false);
 
   const handleBack = () => {
@@ -231,8 +233,18 @@ export default function VideoCallScreen() {
           {/* Flip Camera */}
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="Balik Kamera"
-            onPress={() => haptics.light()}
+            accessibilityLabel={
+              isFrontCamera ? "Balik ke Kamera Belakang" : "Balik ke Kamera Depan"
+            }
+            onPress={() => {
+              const nextIsFront = !isFrontCamera;
+              setIsFrontCamera(nextIsFront);
+              haptics.light();
+              Alert.alert(
+                "Kamera Native Belum Aktif",
+                `Preferensi kamera dialihkan ke ${nextIsFront ? "depan" : "belakang"}. Streaming kamera langsung menunggu integrasi WebRTC SDK.`,
+              );
+            }}
             className="w-12 h-12 rounded-2xl bg-primary/80 border border-primary-foreground/20 items-center justify-center"
           >
             <SwitchCamera size={20} className="text-primary-foreground" />

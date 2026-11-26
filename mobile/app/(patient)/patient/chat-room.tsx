@@ -222,7 +222,13 @@ export default function ChatRoomScreen() {
         <ChatInputBar
           placeholder="Tulis pesan..."
           onSendMessage={handleSendMessage}
-          onAttach={() => haptics.light()}
+          onAttach={() => {
+            haptics.light();
+            Alert.alert(
+              "Lampiran Berkas Belum Tersedia",
+              "Pengiriman gambar dan dokumen di ruang konsultasi sedang menunggu integrasi layanan pesan server.",
+            );
+          }}
         />
 
         {/* Screen 44: In-Session Clinical Assessment Modal */}

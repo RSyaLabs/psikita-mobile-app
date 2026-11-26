@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Alert } from "react-native";
+import { Alert, Share } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
@@ -189,7 +189,26 @@ export default function FollowUpsScreen() {
             consultationFormat="Konsultasi Chat"
             totalPaid="-"
             rescheduleDeadline="2 jam"
-            onAddToCalendar={() => haptics.success()}
+            onAddToCalendar={() => {
+              haptics.success();
+              const scheduleLabel = `${confirmedSchedule.date} · ${confirmedSchedule.time}`;
+              Alert.alert(
+                "Pengingat Jadwal",
+                `Jadwal konsultasi lanjutan dengan ${practitionerName} (${scheduleLabel}) siap dicatat ke kalender perangkat Anda.`,
+                [
+                  {
+                    text: "Bagikan / Simpan",
+                    onPress: () => {
+                      void Share.share({
+                        title: "Jadwal Konsultasi Seraphany",
+                        message: `Konsultasi Lanjutan Seraphany\nPraktisi: ${practitionerName}\nJadwal: ${scheduleLabel}`,
+                      }).catch(() => {});
+                    },
+                  },
+                  { text: "Tutup", style: "cancel" },
+                ],
+              );
+            }}
             onViewMySchedule={() => {
               haptics.selection();
               router.push(ROUTES.PATIENT.HISTORY as any);
