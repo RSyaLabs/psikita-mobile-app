@@ -31,7 +31,7 @@ export interface PaymentInvoiceViewProps {
 
 export function PaymentInvoiceView({
   invoiceNumber = "-",
-  dateText = "22 Nov 2026 · 12:00 WIB",
+  dateText = "-",
   doctorName = "Psikolog Klinis",
   paymentMethodName = "BCA Virtual Account",
   status = "PENDING",

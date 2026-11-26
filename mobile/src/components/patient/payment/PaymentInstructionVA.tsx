@@ -28,7 +28,7 @@ export function PaymentInstructionVA({
   bankName = "BANK BCA",
   vaNumber = "8277 0812 3456 7890",
   amount = 154000,
-  deadlineText = "22 Nov, 12:00",
+  deadlineText = "-",
   onPaid,
   onChangeMethod,
   onBack,

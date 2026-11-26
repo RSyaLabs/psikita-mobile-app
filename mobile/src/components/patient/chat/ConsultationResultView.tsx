@@ -27,15 +27,11 @@ export interface ConsultationResultViewProps {
 }
 
 export function ConsultationResultView({
-  dateLabel = "22 November 2026",
+  dateLabel = "-",
   practitionerName = "Psikolog Sesi",
-  doctorNotes = "Pertahankan teknik relaksasi pernapasan 4-7-8 setiap sebelum tidur. Jadwalkan waktu istirahat teratur dan kurangi stimulasi layar 1 jam sebelum beristirahat.",
-  carePlanItems = [
-    "Latihan pernapasan diafragma 10 menit setiap pagi dan malam",
-    "Jurnal harian pemicu rasa cemas dan catatan pola tidur",
-    "Jalan kaki santai 20 menit saat sore hari tanpa gawai",
-  ],
-  followUpDeadline = "29 November 2026",
+  doctorNotes = "Belum ada catatan klinis dari psikolog.",
+  carePlanItems = [],
+  followUpDeadline = "-",
   onBack,
   onViewFullCarePlan,
   onViewFollowUpDetail,

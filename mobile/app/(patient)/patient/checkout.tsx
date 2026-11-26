@@ -276,7 +276,7 @@ export default function CheckoutScreen() {
     router.push({
       pathname: ROUTES.PATIENT.PAYMENT_REGULAR,
       params: {
-        consultationId: targetConsultationId || (isGuest ? "demo-consultation-id" : ""),
+        consultationId: targetConsultationId || "",
         doctorName,
         method: selectedMethod,
         mode: targetMode,

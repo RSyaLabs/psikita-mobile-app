@@ -115,7 +115,7 @@ export default function PatientRefundsScreen() {
           requestedAmount={
             refundDetail?.quote?.netRefund
               ? `Rp ${refundDetail.quote.netRefund.toLocaleString("id-ID")}`
-              : "Rp 150.000"
+              : "-"
           }
           onBack={handleReturnToSessions}
           onContactSupport={() => {

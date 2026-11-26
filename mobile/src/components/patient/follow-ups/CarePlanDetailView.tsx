@@ -34,7 +34,7 @@ export interface CarePlanDetailViewProps {
 
 export function CarePlanDetailView({
   practitionerName = "Psikolog Pendamping",
-  validUntil = "29 November 2026",
+  validUntil = "-",
   tasks: initialTasks,
   reminderActive: initialReminder = true,
   reminderSchedule = "Setiap hari · 08.00 & 20.00 WIB",

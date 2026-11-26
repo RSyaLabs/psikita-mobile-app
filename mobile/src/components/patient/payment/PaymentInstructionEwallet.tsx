@@ -28,7 +28,7 @@ export interface PaymentInstructionEwalletProps {
 export function PaymentInstructionEwallet({
   walletName = "ShopeePay",
   amount = 151500,
-  deadlineText = "22 Nov, 12:00",
+  deadlineText = "-",
   onOpenApp,
   onChangeWallet,
   onPaid,

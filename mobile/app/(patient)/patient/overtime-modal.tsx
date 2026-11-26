@@ -30,7 +30,7 @@ export default function OvertimeModalScreen() {
     router.push({
       pathname: ROUTES.PATIENT.CHECKOUT,
       params: {
-        consultationId: consultationId || (isGuest ? "demo-consultation" : ""),
+        consultationId: consultationId || "",
         overtime: String(minutes),
         ...(isGuest ? { guest: "true" } : {}),
       },
@@ -42,7 +42,7 @@ export default function OvertimeModalScreen() {
     router.push({
       pathname: ROUTES.PATIENT.SESSION_SUMMARY,
       params: {
-        consultationId: consultationId || (isGuest ? "demo-consultation" : ""),
+        consultationId: consultationId || "",
         ...(isGuest ? { guest: "true" } : {}),
       },
     } as any);

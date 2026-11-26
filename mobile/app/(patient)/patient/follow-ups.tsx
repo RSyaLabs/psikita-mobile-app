@@ -57,7 +57,7 @@ export default function FollowUpsScreen() {
   const isGuest = guest === "true";
   const consultationId = Array.isArray(routeConsultationId)
     ? routeConsultationId[0]
-    : routeConsultationId || (isGuest ? "demo-session" : "");
+    : routeConsultationId || "";
 
   const consultation = useActiveConsultation(consultationId || undefined);
   const context = consultation.context;
@@ -162,7 +162,7 @@ export default function FollowUpsScreen() {
         {currentStep === "care-plan" && (
           <CarePlanDetailView
             practitionerName={practitionerName}
-            validUntil="29 November 2026"
+            validUntil="-"
             tasks={carePlanTasks}
             reminderSchedule="Setiap hari · 08.00 & 20.00 WIB"
             onSelectSchedule={() => setCurrentStep("picker")}
@@ -187,7 +187,7 @@ export default function FollowUpsScreen() {
             practitionerName={practitionerName}
             scheduledTime={`${confirmedSchedule.date} · ${confirmedSchedule.time}`}
             consultationFormat="Konsultasi Chat"
-            totalPaid="Rp 150.000"
+            totalPaid="-"
             rescheduleDeadline="2 jam"
             onAddToCalendar={() => haptics.success()}
             onViewMySchedule={() => {
@@ -205,12 +205,12 @@ export default function FollowUpsScreen() {
         {currentStep === "recommendation" && (
           <FollowUpRecommendationView
             practitionerName={practitionerName}
-            sessionDate="22 November 2026"
-            clinicalReason="Memerlukan evaluasi penerapan teknik relaksasi diafragma 4-7-8 secara konsisten dan pemantauan penurunan gejala kecemasan mingguan."
+            sessionDate="-"
+            clinicalReason="Direkomendasikan untuk evaluasi perkembangan sesi."
             durationLabel="50 menit"
             formatLabel="Chat / Video"
-            validUntil="29 November 2026"
-            estimatedFee="Rp 150.000"
+            validUntil="-"
+            estimatedFee="Dihitung saat checkout"
             onProceedToSchedule={() => setCurrentStep("picker")}
             onDismiss={handleBackToResults}
           />

@@ -9,7 +9,7 @@ export interface PaymentCountdownTimerProps {
 }
 
 export function PaymentCountdownTimer({
-  deadlineText = "22 Nov, 12:00",
+  deadlineText = "-",
   initialSeconds = 900,
   onExpire,
 }: PaymentCountdownTimerProps) {

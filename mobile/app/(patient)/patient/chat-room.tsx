@@ -97,7 +97,7 @@ export default function ChatRoomScreen() {
       setShowFinishDialog(false);
       router.push({
         pathname: ROUTES.PATIENT.SESSION_SUMMARY,
-        params: { consultationId: consultationId || "demo-session" },
+        params: { consultationId: consultationId || "" },
       } as any);
       return;
     }
@@ -250,7 +250,7 @@ export default function ChatRoomScreen() {
             router.push({
               pathname: ROUTES.PATIENT.CHECKOUT,
               params: {
-                consultationId: consultationId || "demo-consultation",
+                consultationId: consultationId || "",
                 overtime: String(minutes),
                 guest: guest || "true",
               },

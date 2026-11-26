@@ -158,7 +158,7 @@ export function SessionDetailView({
             Total dibayar
           </Text>
           <Text size="md" bold className="text-foreground font-semibold text-[15px]">
-            Rp 150.000
+            -
           </Text>
         </HStack>
       </Card>

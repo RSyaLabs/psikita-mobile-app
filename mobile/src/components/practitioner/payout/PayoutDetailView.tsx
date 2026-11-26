@@ -31,7 +31,7 @@ export function PayoutDetailView({
   period = "16 - 31 Okt 2026",
   referenceNumber = "-",
   includedSessionsCount = 12,
-  deductionsAmount = "Rp 150.000",
+  deductionsAmount = "Rp 0",
   bankAccountMasked = "BCA ••••8821",
   onContactSupport,
   onBack,

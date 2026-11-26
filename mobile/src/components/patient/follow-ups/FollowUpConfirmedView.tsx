@@ -27,9 +27,9 @@ export interface FollowUpConfirmedViewProps {
 
 export function FollowUpConfirmedView({
   practitionerName = "Psikolog Pendamping",
-  scheduledTime = "Rabu, 18 November 2026 · 10.00 WIB",
+  scheduledTime = "Menunggu konfirmasi jadwal",
   consultationFormat = "Konsultasi Chat",
-  totalPaid = "Rp 150.000",
+  totalPaid = "-",
   rescheduleDeadline = "2 jam",
   onAddToCalendar,
   onViewMySchedule,

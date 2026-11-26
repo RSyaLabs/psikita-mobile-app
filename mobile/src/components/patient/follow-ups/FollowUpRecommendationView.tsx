@@ -27,12 +27,12 @@ export interface FollowUpRecommendationViewProps {
 
 export function FollowUpRecommendationView({
   practitionerName = "Psikolog Pendamping",
-  sessionDate = "22 November 2026",
-  clinicalReason = "Memerlukan evaluasi penerapan teknik relaksasi diafragma 4-7-8 secara konsisten dan pemantauan penurunan gejala kecemasan mingguan.",
+  sessionDate = "-",
+  clinicalReason = "Direkomendasikan untuk evaluasi lanjutan sesuai perkembangan sesi.",
   durationLabel = "50 menit",
   formatLabel = "Chat / Video",
-  validUntil = "29 November 2026",
-  estimatedFee = "Rp 150.000",
+  validUntil = "-",
+  estimatedFee = "Dihitung saat checkout",
   onProceedToSchedule,
   onDismiss,
 }: FollowUpRecommendationViewProps) {

@@ -34,7 +34,7 @@ export function ScreeningResultView({
   categoryLabel,
   totalScore,
   maxScore,
-  dateStr = "22 Nov 2026",
+  dateStr = "-",
   explanation,
   onBack,
   onViewFeedTopic,

@@ -25,7 +25,7 @@ export default function CommunityDetailScreen() {
   const { user } = useAuth();
   const params = useLocalSearchParams<{ id?: string; step?: string; guest?: string }>();
   const isGuest = params.guest === "true";
-  const postId = params.id || (isGuest ? "post-1" : "");
+  const postId = params.id || "";
 
   const [currentMode, setCurrentMode] = useState<"detail" | "edit">(
     params.step === "edit" ? "edit" : "detail",
@@ -128,7 +128,7 @@ export default function CommunityDetailScreen() {
         <CommunityDetailView
           post={post}
           replies={replies}
-          currentUserId={user?.id || (isGuest ? "usr-1" : "")}
+          currentUserId={user?.id || ""}
           isSendingReply={createReplyMutation.isPending}
           onBack={() => safeNavigateBack(router, ROUTES.PATIENT.COMMUNITY)}
           onSendReply={handleSendReply}

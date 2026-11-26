@@ -27,7 +27,7 @@ export interface PaymentInstructionQRISProps {
 export function PaymentInstructionQRIS({
   amount = 151050,
   qrCodeUrl,
-  deadlineText = "22 Nov, 12:00",
+  deadlineText = "-",
   onPaid,
   onChangeMethod,
   onBack,

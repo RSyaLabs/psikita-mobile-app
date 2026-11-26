@@ -244,7 +244,7 @@ export default function PaymentRegularScreen() {
     router.push({
       pathname: ROUTES.PATIENT.CHAT_ROOM,
       params: {
-        consultationId: consultationId || (isGuest ? "demo-consultation-id" : ""),
+        consultationId: consultationId || "",
         ...(isGuest ? { guest: "true" } : {}),
       },
     });
@@ -264,9 +264,7 @@ export default function PaymentRegularScreen() {
         hour: "2-digit",
         minute: "2-digit",
       })
-    : isGuest
-      ? "22 Nov, 12:00"
-      : "24 jam dari pemesanan";
+    : "24 jam dari pemesanan";
 
   return (
     <SafeAreaView className="flex-1 bg-background">
@@ -369,9 +367,7 @@ export default function PaymentRegularScreen() {
           dateText={
             paymentResult?.createdAt
               ? new Date(paymentResult.createdAt).toLocaleString("id-ID")
-              : isGuest
-                ? "22 Nov 2026 · 12:00 WIB"
-                : "Hari ini"
+              : "Hari ini"
           }
           doctorName={doctorName}
           paymentMethodName={

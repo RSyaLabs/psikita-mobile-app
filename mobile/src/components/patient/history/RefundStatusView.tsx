@@ -31,7 +31,7 @@ export function RefundStatusView({
   onReturnToSessions,
   referenceNumber = "-",
   submissionDate = "Hari ini · 14:15 WIB",
-  requestedAmount = "Rp 150.000",
+  requestedAmount = "-",
 }: RefundStatusViewProps) {
   return (
     <ScrollView

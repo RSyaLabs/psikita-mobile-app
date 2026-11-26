@@ -33,13 +33,21 @@ export function FollowUpSchedulePickerView({
   onProceedToCheckout,
   onDismiss,
 }: FollowUpSchedulePickerViewProps) {
-  const dateOptions: DateOption[] = [
-    { id: "d-1", dayName: "Rab", dayNumber: "18", fullDate: "18 November 2026" },
-    { id: "d-2", dayName: "Kam", dayNumber: "19", fullDate: "19 November 2026" },
-    { id: "d-3", dayName: "Jum", dayNumber: "20", fullDate: "20 November 2026" },
-    { id: "d-4", dayName: "Sab", dayNumber: "21", fullDate: "21 November 2026" },
-    { id: "d-5", dayName: "Min", dayNumber: "22", fullDate: "22 November 2026" },
-  ];
+  const dateOptions: DateOption[] = Array.from({ length: 5 }, (_, idx) => {
+    const d = new Date();
+    d.setDate(d.getDate() + idx + 1);
+    const dayNames = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
+    return {
+      id: `d-${idx + 1}`,
+      dayName: dayNames[d.getDay()],
+      dayNumber: String(d.getDate()),
+      fullDate: d.toLocaleDateString("id-ID", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      }),
+    };
+  });
 
   const timeSlots = ["09.00", "10.00", "11.00", "14.00", "15.00", "19.00"];
 
