@@ -94,10 +94,44 @@ export const psychometricsService = {
   },
 
   getInstrumentForm: async (code: string, signal?: AbortSignal): Promise<PsychometricFormDto> => {
-    return apiRequest<PsychometricFormDto>(`/psychometrics/types/${code}/form`, {
-      signal,
-      adapter: (v) => v as PsychometricFormDto,
+    const raw = await apiRequest<Record<string, unknown>>(
+      `/psychometrics/types/${code}/form`,
+      {
+        signal,
+        adapter: (v) => (isRecord(v) ? v : {}),
+      },
+    );
+    const sharedOptions = Array.isArray(raw.responseOptions)
+      ? raw.responseOptions
+          .filter(isRecord)
+          .map((opt) => ({
+            value: Number(opt.value ?? 0),
+            label: String(opt.label ?? ""),
+          }))
+      : [];
+    const rawQuestions = Array.isArray(raw.questions) ? raw.questions : [];
+    const questions: PsychometricQuestionDto[] = rawQuestions
+      .filter(isRecord)
+      .map((q, idx) => ({
+        id: String(q.id || q.code || `q-${idx + 1}`),
+        questionText: String(q.questionText || q.text || ""),
+        orderIndex: Number(q.orderIndex ?? q.order ?? idx + 1),
+        options: Array.isArray(q.options)
+          ? q.options.filter(isRecord).map((opt) => ({
+              value: Number(opt.value ?? 0),
+              label: String(opt.label ?? ""),
+            }))
+          : sharedOptions,
+      }));
+    const base = normalizeInstrument({
+      ...raw,
+      code: raw.code ?? raw.typeCode ?? code,
+      totalQuestions: raw.totalQuestions ?? questions.length,
     });
+    return {
+      ...base,
+      questions,
+    };
   },
 
   dryRunScore: async (
