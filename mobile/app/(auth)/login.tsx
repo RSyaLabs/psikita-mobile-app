@@ -31,7 +31,7 @@ import {
 import { haptics } from "@/utils/haptics";
 import { useAuth, getHomeRouteForResponse } from "@/hooks/useAuth";
 import { useLogin } from "@/hooks/useApiQueries";
-import { ApiError } from "@/api/client";
+import { ApiError, WEB_BASE_URL } from "@/api/client";
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -346,18 +346,14 @@ export default function LoginScreen() {
             <Text className="text-sm text-muted-foreground text-center leading-relaxed">
               Dengan masuk, Anda menyetujui{" "}
               <Text
-                onPress={() =>
-                  openUrl("https://staging.seraphany.id/syarat-layanan")
-                }
+                onPress={() => openUrl(`${WEB_BASE_URL}/syarat-layanan`)}
                 className="text-sm text-primary font-bold underline"
               >
                 Syarat Layanan
               </Text>{" "}
               dan{" "}
               <Text
-                onPress={() =>
-                  openUrl("https://staging.seraphany.id/kebijakan-privasi")
-                }
+                onPress={() => openUrl(`${WEB_BASE_URL}/kebijakan-privasi`)}
                 className="text-sm text-primary font-bold underline"
               >
                 Kebijakan Privasi
@@ -366,18 +362,14 @@ export default function LoginScreen() {
             </Text>
             <HStack space="xs" className="items-center mt-1">
               <Text
-                onPress={() =>
-                  openUrl("https://staging.seraphany.id/en/terms-of-service")
-                }
+                onPress={() => openUrl(`${WEB_BASE_URL}/en/terms-of-service`)}
                 className="text-sm text-muted-foreground underline"
               >
                 Terms of Service (EN)
               </Text>
               <Text className="text-sm text-muted-foreground">•</Text>
               <Text
-                onPress={() =>
-                  openUrl("https://staging.seraphany.id/en/privacy-policy")
-                }
+                onPress={() => openUrl(`${WEB_BASE_URL}/en/privacy-policy`)}
                 className="text-sm text-muted-foreground underline"
               >
                 Privacy Policy (EN)

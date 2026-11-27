@@ -258,7 +258,7 @@ export default function ChatRoomScreen() {
               params: {
                 consultationId: consultationId || "",
                 overtime: String(minutes),
-                guest: guest || "true",
+                ...(isGuest ? { guest: "true" } : {}),
               },
             } as any);
           }}

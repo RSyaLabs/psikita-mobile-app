@@ -31,7 +31,7 @@ import {
 } from "@/components/ui";
 import { haptics } from "@/utils/haptics";
 import { useRegisterPatient } from "@/hooks/useApiQueries";
-import { ApiError } from "@/api/client";
+import { ApiError, WEB_BASE_URL } from "@/api/client";
 
 export default function RegisterScreen() {
   const router = useRouter();
@@ -344,18 +344,14 @@ export default function RegisterScreen() {
                   <Text className="text-sm text-muted-foreground flex-1 leading-relaxed">
                     Saya menyetujui{" "}
                     <Text
-                      onPress={() =>
-                        openUrl("https://staging.seraphany.id/syarat-layanan")
-                      }
+                      onPress={() => openUrl(`${WEB_BASE_URL}/syarat-layanan`)}
                       className="text-sm font-bold text-primary underline"
                     >
                       Syarat Layanan
                     </Text>{" "}
                     dan{" "}
                     <Text
-                      onPress={() =>
-                        openUrl("https://staging.seraphany.id/kebijakan-privasi")
-                      }
+                      onPress={() => openUrl(`${WEB_BASE_URL}/kebijakan-privasi`)}
                       className="text-sm font-bold text-primary underline"
                     >
                       Kebijakan Privasi
@@ -405,18 +401,14 @@ export default function RegisterScreen() {
           >
             <HStack space="xs" className="items-center">
               <Text
-                onPress={() =>
-                  openUrl("https://staging.seraphany.id/en/terms-of-service")
-                }
+                onPress={() => openUrl(`${WEB_BASE_URL}/en/terms-of-service`)}
                 className="text-sm text-muted-foreground underline"
               >
                 Terms of Service (EN)
               </Text>
               <Text className="text-sm text-muted-foreground">•</Text>
               <Text
-                onPress={() =>
-                  openUrl("https://staging.seraphany.id/en/privacy-policy")
-                }
+                onPress={() => openUrl(`${WEB_BASE_URL}/en/privacy-policy`)}
                 className="text-sm text-muted-foreground underline"
               >
                 Privacy Policy (EN)

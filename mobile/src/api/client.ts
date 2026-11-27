@@ -19,6 +19,10 @@ export const API_BASE_URL =
   process.env.EXPO_PUBLIC_API_BASE_URL ||
   "https://api.staging.seraphany.id/core";
 
+export const WEB_BASE_URL = API_BASE_URL.includes("api.staging.seraphany.id")
+  ? "https://staging.seraphany.id"
+  : "https://seraphany.id";
+
 const TOKEN_KEY = "seraphany_access_token";
 const REFRESH_TOKEN_KEY = "seraphany_refresh_token";
 let currentAccessToken: string | null = null;

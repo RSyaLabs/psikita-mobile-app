@@ -1,5 +1,5 @@
 import React from "react";
-import { Linking } from "react-native";
+import { Alert, Linking, Platform } from "react-native";
 import { AlertTriangle, PhoneCall, HeartHandshake } from "lucide-react-native";
 import {
   Modal,
@@ -82,7 +82,12 @@ export function CrisisHelpModal({
                   size="sm"
                   onPress={() => {
                     haptics.medium();
-                    Linking.openURL("tel:119");
+                    Linking.openURL("tel:119").catch(() => {
+                      Alert.alert(
+                        "Buka Aplikasi Telepon",
+                        "Silakan hubungi hotline krisis Kemenkes RI di 119 ext 8 melalui aplikasi Telepon di perangkat Anda.",
+                      );
+                    });
                   }}
                   className="w-full bg-destructive rounded-xl h-11 flex-row items-center justify-center shadow-xs"
                 >
@@ -111,7 +116,16 @@ export function CrisisHelpModal({
                   size="sm"
                   onPress={() => {
                     haptics.light();
-                    Linking.openURL("tel:");
+                    const contactsUrl =
+                      Platform.OS === "android"
+                        ? "content://contacts/people/"
+                        : "tel:";
+                    Linking.openURL(contactsUrl).catch(() => {
+                      Alert.alert(
+                        "Buka Kontak Telepon",
+                        "Silakan buka aplikasi Telepon atau Kontak di perangkat Anda untuk menghubungi keluarga atau orang tepercaya.",
+                      );
+                    });
                   }}
                   className="w-full border-border/80 rounded-xl h-11"
                 >

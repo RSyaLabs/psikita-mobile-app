@@ -69,6 +69,7 @@ function setAndroidManifestNetworkSecurity(androidManifest) {
   if (application) {
     application.$["android:networkSecurityConfig"] =
       "@xml/network_security_config";
+    application.$["android:allowBackup"] = "false";
   }
   return androidManifest;
 }
