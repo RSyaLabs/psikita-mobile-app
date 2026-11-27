@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { Share } from "react-native";
 import { ArrowLeft, Copy, Check, ChevronDown, ChevronUp } from "lucide-react-native";
 import {
   Box,
@@ -37,17 +38,26 @@ export function PaymentInstructionVA({
   const [copiedAmount, setCopiedAmount] = useState(false);
   const [atmOpen, setAtmOpen] = useState(true);
   const [mBankingOpen, setMBankingOpen] = useState(false);
+  const timersRef = useRef<Array<ReturnType<typeof setTimeout>>>([]);
+
+  useEffect(() => {
+    return () => {
+      timersRef.current.forEach(clearTimeout);
+    };
+  }, []);
 
   const handleCopyVa = () => {
     haptics.success();
+    void Share.share({ message: vaNumber }).catch(() => {});
     setCopiedVa(true);
-    setTimeout(() => setCopiedVa(false), 2500);
+    timersRef.current.push(setTimeout(() => setCopiedVa(false), 2500));
   };
 
   const handleCopyAmount = () => {
     haptics.success();
+    void Share.share({ message: String(amount) }).catch(() => {});
     setCopiedAmount(true);
-    setTimeout(() => setCopiedAmount(false), 2500);
+    timersRef.current.push(setTimeout(() => setCopiedAmount(false), 2500));
   };
 
   return (

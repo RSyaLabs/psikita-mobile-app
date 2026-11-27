@@ -7,6 +7,7 @@ import { AppIcon } from "@/components/common/AppIcon";
 interface PersonalDataViewProps {
   initialData?: { fullName?: string; email?: string; phone?: string; birthDate?: string };
   isKycVerified?: boolean;
+  isSaving?: boolean;
   onBack?: () => void;
   onSave?: (data: { fullName: string; email: string; phone: string; birthDate: string }) => void;
   onCancel?: () => void;
@@ -16,6 +17,7 @@ interface PersonalDataViewProps {
 export function PersonalDataView({
   initialData,
   isKycVerified = false,
+  isSaving = false,
   onBack,
   onSave,
   onCancel,
@@ -140,10 +142,15 @@ export function PersonalDataView({
           accessibilityRole="button"
           accessibilityLabel="Simpan"
           testID="btn-personal-data-save"
+          disabled={isSaving}
           onPress={() => { haptics.medium(); onSave?.({ fullName, email, phone, birthDate }); }}
-          className="h-[52px] border-[1.5px] border-[#222222] rounded-[10px] bg-[#222222] items-center justify-center active:opacity-90"
+          className={`h-[52px] border-[1.5px] border-[#222222] rounded-[10px] items-center justify-center active:opacity-90 ${
+            isSaving ? "bg-[#555555] opacity-70" : "bg-[#222222]"
+          }`}
         >
-          <Text className="text-[16px] font-semibold text-white">Simpan</Text>
+          <Text className="text-[16px] font-semibold text-white">
+            {isSaving ? "Menyimpan..." : "Simpan"}
+          </Text>
         </Pressable>
         <Pressable
           accessibilityRole="button"

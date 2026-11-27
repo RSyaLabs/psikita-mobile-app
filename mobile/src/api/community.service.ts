@@ -1,5 +1,5 @@
 import { apiRequest } from "./client";
-import { isRecord, noContentAdapter, withQueryParams } from "./response";
+import { isRecord, noContentAdapter } from "./response";
 
 export interface PostReplyDto {
   id: string;
@@ -41,18 +41,16 @@ export interface CreateReplyPayload {
 
 export const communityService = {
   getPosts: async (category?: string, signal?: AbortSignal): Promise<PostDto[]> => {
-    const path =
-      category && category !== "Semua"
-        ? withQueryParams("/posts", { category })
-        : "/posts";
-    const response = await apiRequest<unknown>(path, { signal, adapter: (v) => v });
-    if (Array.isArray(response)) {
-      return response as PostDto[];
+    const response = await apiRequest<unknown>("/posts", { signal, adapter: (v) => v });
+    const rawList = Array.isArray(response)
+      ? (response as PostDto[])
+      : isRecord(response) && Array.isArray((response as any).data)
+        ? ((response as any).data as PostDto[])
+        : [];
+    if (category && category !== "Semua") {
+      return rawList.filter((item) => !item.category || item.category === category);
     }
-    if (isRecord(response) && Array.isArray((response as any).data)) {
-      return (response as any).data as PostDto[];
-    }
-    return [];
+    return rawList;
   },
 
   getPostById: async (id: string, signal?: AbortSignal): Promise<PostDto> => {

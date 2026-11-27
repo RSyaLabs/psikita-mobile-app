@@ -301,11 +301,17 @@ export default function PaymentRegularScreen() {
           total={totalAmount}
           initialWallet="shopeepay"
           onProceed={(wallet: string) => {
+            createInitiatedRef.current = false;
+            setPaymentResult(null);
             if (wallet === "shopeepay") setActiveMode("shopeepay");
             else if (wallet === "dana") setActiveMode("dana");
           }}
           onBack={handleBackToCheckout}
-          onSelectQRIS={() => setActiveMode("qris")}
+          onSelectQRIS={() => {
+            createInitiatedRef.current = false;
+            setPaymentResult(null);
+            setActiveMode("qris");
+          }}
         />
       )}
 
@@ -322,7 +328,11 @@ export default function PaymentRegularScreen() {
             }
             setActiveMode("checking");
           }}
-          onChangeWallet={() => setActiveMode("ewallet-select")}
+          onChangeWallet={() => {
+            createInitiatedRef.current = false;
+            setPaymentResult(null);
+            setActiveMode("ewallet-select");
+          }}
           onPaid={() => setActiveMode("checking")}
           onBack={handleBackToCheckout}
         />
@@ -341,7 +351,11 @@ export default function PaymentRegularScreen() {
             }
             setActiveMode("checking");
           }}
-          onChangeWallet={() => setActiveMode("ewallet-select")}
+          onChangeWallet={() => {
+            createInitiatedRef.current = false;
+            setPaymentResult(null);
+            setActiveMode("ewallet-select");
+          }}
           onPaid={() => setActiveMode("checking")}
           onBack={handleBackToCheckout}
         />
@@ -387,9 +401,14 @@ export default function PaymentRegularScreen() {
               : "BCA Virtual Account"
           }
           status={paymentResult?.transactionStatus || "SETTLEMENT"}
-          serviceFee={150000}
-          discount={0}
-          adminFee={totalAmount > 150000 ? totalAmount - 150000 : 0}
+          serviceFee={paymentContextQuery?.billingOrder?.grossAmount ?? totalAmount}
+          discount={paymentContextQuery?.billingOrder?.discountAmount ?? 0}
+          adminFee={(() => {
+            const base = paymentContextQuery?.billingOrder?.grossAmount ?? totalAmount;
+            const disc = paymentContextQuery?.billingOrder?.discountAmount ?? 0;
+            const gross = paymentResult?.grossAmount ?? totalAmount;
+            return Math.max(0, gross - (base - disc));
+          })()}
           total={paymentResult?.grossAmount ?? totalAmount}
           onBack={() => setActiveMode("checking")}
           onProceedToChat={handleProceedToChatRoom}

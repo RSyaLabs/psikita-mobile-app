@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { Share } from "react-native";
 import { ArrowLeft, Copy, Check } from "lucide-react-native";
 import {
   Box,
@@ -43,11 +44,20 @@ export function PaymentInvoiceView({
   onProceedToChat,
 }: PaymentInvoiceViewProps) {
   const [copied, setCopied] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, []);
 
   const handleCopy = () => {
     haptics.success();
+    void Share.share({ message: invoiceNumber }).catch(() => {});
     setCopied(true);
-    setTimeout(() => setCopied(false), 2500);
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => setCopied(false), 2500);
   };
 
   const isLunas = status === "SETTLEMENT" || status === "SUCCESS";

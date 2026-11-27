@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { Share } from "react-native";
 import { ArrowLeft, Download, Maximize2, Check, QrCode } from "lucide-react-native";
 import {
   Box,
@@ -34,11 +35,22 @@ export function PaymentInstructionQRIS({
 }: PaymentInstructionQRISProps) {
   const [saved, setSaved] = useState(false);
   const [zoomed, setZoomed] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, []);
 
   const handleSaveQR = () => {
     haptics.success();
+    if (qrCodeUrl) {
+      void Share.share({ message: qrCodeUrl, url: qrCodeUrl }).catch(() => {});
+    }
     setSaved(true);
-    setTimeout(() => setSaved(false), 2500);
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => setSaved(false), 2500);
   };
 
   const handleZoom = () => {

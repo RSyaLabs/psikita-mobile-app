@@ -8,12 +8,14 @@ interface DeleteAccountViewProps {
   onBack?: () => void;
   onConfirmDelete?: (password: string) => void;
   onCancel?: () => void;
+  isLoading?: boolean;
 }
 
 export function DeleteAccountView({
   onBack,
   onConfirmDelete,
   onCancel,
+  isLoading = false,
 }: DeleteAccountViewProps) {
   const [password, setPassword] = useState("");
   const [isAgreed, setIsAgreed] = useState(false);
@@ -120,10 +122,15 @@ export function DeleteAccountView({
           accessibilityRole="button"
           accessibilityLabel="Hapus Akun Saya"
           testID="btn-confirm-delete-account"
+          disabled={isLoading}
           onPress={handleDelete}
-          className="h-[52px] border-[1.5px] border-dashed border-[#222222] rounded-[10px] items-center justify-center bg-white active:bg-red-50"
+          className={`h-[52px] border-[1.5px] border-dashed border-[#222222] rounded-[10px] items-center justify-center bg-white active:bg-red-50 ${
+            isLoading ? "opacity-60" : ""
+          }`}
         >
-          <Text className="text-[16px] font-semibold text-[#222222]">Hapus Akun Saya</Text>
+          <Text className="text-[16px] font-semibold text-[#222222]">
+            {isLoading ? "Memproses..." : "Hapus Akun Saya"}
+          </Text>
         </Pressable>
         <Pressable
           accessibilityRole="button"

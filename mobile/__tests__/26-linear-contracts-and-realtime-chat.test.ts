@@ -8,6 +8,10 @@ import { matchingService } from "../src/api/matching.service";
 import { paymentService, mintServerPaymentContext } from "../src/api/payment.service";
 import { refundService } from "../src/api/refund.service";
 import { avatarService } from "../src/api/avatar.service";
+import { carePlanService } from "../src/api/careplan.service";
+import { cdssService } from "../src/api/cdss.service";
+import { followUpService } from "../src/api/followup.service";
+import { prescriptionService } from "../src/api/prescription.service";
 import { formatRupiah } from "../src/utils/format";
 import { chatSocketClient } from "../src/services/chat-socket";
 import * as clientModule from "../src/api/client";
@@ -420,6 +424,94 @@ describe("RLN Linear Backlog Fixes: Closeout Boundary, Realtime Chat, Care Plan 
 
       expect(formatRupiah(undefined)).toBe("Rp 0");
       expect(formatRupiah(NaN)).toBe("Rp 0");
+    });
+
+    it("should align care-plan, cdss, follow-up, referral letter, and identity adapters with OpenAPI shapes", async () => {
+      const mockJson = (payload: unknown) =>
+        ({
+          ok: true,
+          status: 200,
+          headers: new Headers({ "content-type": "application/json" }),
+          json: async () => payload,
+        }) as unknown as Response;
+
+      const fetchSpy = jest
+        .spyOn(global, "fetch")
+        .mockResolvedValueOnce(
+          mockJson({
+            id: "cp-1",
+            consultationId: "cons-1",
+            homework: [{ description: "Latihan napas (1x/hari)" }],
+            exercises: [{ name: "Latihan napas", instructions: "Tarik napas 4 detik" }],
+            goals: [{ description: "Tidur nyenyak", dueDate: "2026-12-28T00:00:00.000Z" }],
+          }),
+        )
+        .mockResolvedValueOnce(mockJson({ evaluationRunId: "run-1", alerts: [] }))
+        .mockResolvedValueOnce(
+          mockJson([
+            {
+              id: "fu-1",
+              originConsultationId: "cons-1",
+              patientId: "pat-1",
+              practitionerId: "prac-1",
+              status: "ISSUED",
+              scheduledAt: "2026-12-01T10:00:00Z",
+              validFrom: "2026-11-28T00:00:00Z",
+            },
+          ]),
+        )
+        .mockResolvedValueOnce(
+          mockJson({
+            referralId: "ref-1",
+            letterUrl: "https://cdn.seraphany.id/letters/ref-1.pdf",
+          }),
+        )
+        .mockResolvedValueOnce(
+          mockJson([
+            {
+              provider: "GOOGLE",
+              email: "pasien@seraphany.id",
+              createdAt: "2026-11-01T00:00:00Z",
+            },
+          ]),
+        );
+
+      const cp = await carePlanService.createCarePlan("cons-1", {
+        goals: ["Tidur nyenyak"],
+        interventions: [{ title: "Latihan napas", description: "1x/hari" }],
+      });
+      const cpCall = fetchSpy.mock.calls.find(([url]) =>
+        String(url).includes("/care-plan"),
+      );
+      const cpBody = JSON.parse(String(cpCall?.[1]?.body));
+      expect(cpBody.homework[0].description).toContain("Latihan napas");
+      expect(cpBody.exercises[0].name).toBe("Latihan napas");
+      expect(cpBody.goals[0].description).toBe("Tidur nyenyak");
+      expect(cp.goals).toEqual(["Tidur nyenyak"]);
+      expect(cp.interventions.length).toBeGreaterThanOrEqual(1);
+
+      await cdssService.evaluatePatientContext({
+        patientId: "pat-1",
+        consultationId: "cons-1",
+        phqScore: 14,
+        gadScore: 10,
+      });
+      const cdssCall = fetchSpy.mock.calls.find(([url]) =>
+        String(url).includes("/cdss/evaluate"),
+      );
+      const cdssBody = JSON.parse(String(cdssCall?.[1]?.body));
+      expect(cdssBody.metrics).toEqual({ phq9_score: 14, gad7_score: 10 });
+      expect(cdssBody.subjectRef).toBe("pat-1");
+
+      const fus = await followUpService.getMyFollowUps();
+      expect(fus[0].status).toBe("PENDING");
+      expect(fus[0].consultationId).toBe("cons-1");
+
+      const letter = await prescriptionService.getReferralLetter("ref-1");
+      expect(letter.pdfUrl).toBe("https://cdn.seraphany.id/letters/ref-1.pdf");
+
+      const idRes = await authService.getIdentities();
+      expect(idRes.identities[0].identifier).toBe("pasien@seraphany.id");
     });
   });
 });

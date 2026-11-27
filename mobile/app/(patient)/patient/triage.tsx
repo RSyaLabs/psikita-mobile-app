@@ -241,17 +241,17 @@ export default function TriageScreen() {
           }
         },
         onError: (err) => {
-          if (err instanceof ApiError && err.statusCode === 403) {
-            haptics.error();
-            setKycModalOpen(true);
-            return;
-          }
           if (isGuest) {
             haptics.medium();
             router.push({
               pathname: ROUTES.PATIENT.ASSESSMENT_RESULT,
               params: { guest: "true", mode: "assessment" },
             } as never);
+            return;
+          }
+          if (err instanceof ApiError && err.statusCode === 403) {
+            haptics.error();
+            setKycModalOpen(true);
             return;
           }
           haptics.error();

@@ -185,6 +185,20 @@ export default function SecurityScreen() {
         <SecuritySettingsView
           onBack={handleBack}
           onChangePassword={() => setStep("change-password")}
+          onOtpLogin={() =>
+            router.push({
+              pathname: ROUTES.AUTH.FORGOT_PASSWORD,
+              params: { mode: "otp", email: user?.email },
+            } as any)
+          }
+          onGoogleAccountInfo={() =>
+            Alert.alert(
+              "Akun Google",
+              user?.email
+                ? `Masuk cepat tersedia melalui email ${user.email} di halaman login.`
+                : "Masuk dengan Google tersedia di halaman login aplikasi.",
+            )
+          }
           onLogoutOtherDevice={handleLogoutAllDevices}
           onLogoutAllDevices={handleLogoutAllDevices}
           onDeleteAccount={() => setStep("delete-account")}
@@ -200,6 +214,7 @@ export default function SecurityScreen() {
           }}
           onForgotPassword={() => router.push(ROUTES.AUTH.FORGOT_PASSWORD as any)}
           onCancel={() => setStep("main")}
+          isLoading={isBusy}
         />
       )}
       {step === "delete-account" && (
@@ -207,6 +222,7 @@ export default function SecurityScreen() {
           onBack={handleBack}
           onConfirmDelete={handleConfirmDelete}
           onCancel={() => setStep("main")}
+          isLoading={isBusy}
         />
       )}
     </SafeAreaView>

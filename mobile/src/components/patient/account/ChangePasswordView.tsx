@@ -9,6 +9,7 @@ interface ChangePasswordViewProps {
   onSubmit?: (data: { currentPass: string; newPass: string; logoutOtherDevices: boolean }) => void;
   onForgotPassword?: () => void;
   onCancel?: () => void;
+  isLoading?: boolean;
 }
 
 export function ChangePasswordView({
@@ -16,6 +17,7 @@ export function ChangePasswordView({
   onSubmit,
   onForgotPassword,
   onCancel,
+  isLoading = false,
 }: ChangePasswordViewProps) {
   const [currentPass, setCurrentPass] = useState("");
   const [newPass, setNewPass] = useState("");
@@ -153,10 +155,15 @@ export function ChangePasswordView({
           accessibilityRole="button"
           accessibilityLabel="Simpan Kata Sandi"
           testID="btn-submit-change-password"
+          disabled={isLoading}
           onPress={handleSubmit}
-          className="h-[52px] border-[1.5px] border-[#222222] rounded-[10px] bg-[#222222] items-center justify-center active:opacity-90"
+          className={`h-[52px] border-[1.5px] border-[#222222] rounded-[10px] items-center justify-center active:opacity-90 ${
+            isLoading ? "bg-[#555555] opacity-70" : "bg-[#222222]"
+          }`}
         >
-          <Text className="text-[16px] font-semibold text-white">Simpan Kata Sandi</Text>
+          <Text className="text-[16px] font-semibold text-white">
+            {isLoading ? "Menyimpan..." : "Simpan Kata Sandi"}
+          </Text>
         </Pressable>
         <Pressable
           accessibilityRole="button"

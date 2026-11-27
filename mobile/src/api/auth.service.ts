@@ -230,7 +230,32 @@ export const authService = {
         linkedAt?: string;
       }>;
     }>("/user/identities", {
-      adapter: (v) => v as any,
+      adapter: (v) => {
+        const rawList = Array.isArray(v)
+          ? v
+          : v && typeof v === "object" && Array.isArray((v as any).identities)
+            ? (v as any).identities
+            : [];
+        return {
+          identities: rawList
+            .filter((item: unknown): item is Record<string, unknown> => typeof item === "object" && item !== null)
+            .map((item: Record<string, unknown>) => ({
+              provider: String(item.provider ?? ""),
+              identifier:
+                typeof item.identifier === "string"
+                  ? item.identifier
+                  : typeof item.email === "string"
+                    ? item.email
+                    : undefined,
+              linkedAt:
+                typeof item.linkedAt === "string"
+                  ? item.linkedAt
+                  : typeof item.createdAt === "string"
+                    ? item.createdAt
+                    : undefined,
+            })),
+        };
+      },
     });
   },
 

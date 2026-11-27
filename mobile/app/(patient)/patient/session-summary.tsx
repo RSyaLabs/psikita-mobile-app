@@ -64,10 +64,14 @@ export default function SessionSummaryScreen() {
     note?.soapData?.plan ||
     "Catatan klinis sedang disiapkan oleh praktisi Anda.";
 
+  const mappedCarePlan =
+    carePlan?.interventions?.map((i) => i.title || i.description).filter(Boolean) ?? [];
   const carePlanList: string[] =
-    carePlan?.interventions?.map((i) => i.title || i.description) ||
-    carePlan?.goals ||
-    ["Belum ada tugas perawatan lanjutan yang ditetapkan."];
+    mappedCarePlan.length > 0
+      ? mappedCarePlan
+      : carePlan?.goals && carePlan.goals.length > 0
+        ? carePlan.goals
+        : ["Belum ada tugas perawatan lanjutan yang ditetapkan."];
 
   const handleBackToHome = () => {
     haptics.light();
@@ -100,21 +104,18 @@ export default function SessionSummaryScreen() {
       ) : (
         /* Screen 47: Hasil Konsultasi */
         <ConsultationResultView
-          dateLabel={
-            resultDetail?.sessionDate
-              ? new Date(resultDetail.sessionDate).toLocaleDateString("id-ID", {
+          dateLabel={(() => {
+            const rawDate = resultDetail?.sessionDate || note?.createdAt;
+            if (!rawDate) return "Sesi Terbaru";
+            const d = new Date(rawDate);
+            return Number.isNaN(d.getTime())
+              ? "Sesi Terbaru"
+              : d.toLocaleDateString("id-ID", {
                   day: "numeric",
                   month: "long",
                   year: "numeric",
-                })
-              : note?.createdAt
-                ? new Date(note.createdAt).toLocaleDateString("id-ID", {
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric",
-                  })
-                : "Sesi Terbaru"
-          }
+                });
+          })()}
           practitionerName={practitionerName}
           doctorNotes={doctorAdvice}
           carePlanItems={carePlanList}

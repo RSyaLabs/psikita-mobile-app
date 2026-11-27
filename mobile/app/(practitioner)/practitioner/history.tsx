@@ -53,6 +53,7 @@ export default function PractitionerHistoryScreen() {
   const [npwp, setNpwp] = useState("");
   const [taxStatus, setTaxStatus] = useState("TK/0 - Tidak Kawin");
   const [taxAgreed, setTaxAgreed] = useState(true);
+  const [isTaxSaving, setIsTaxSaving] = useState(false);
 
   const bankStatusLabel =
     bankData?.status === "VERIFIED"
@@ -116,6 +117,7 @@ export default function PractitionerHistoryScreen() {
       return;
     }
 
+    setIsTaxSaving(true);
     try {
       await payoutService.submitTaxProfile({ npwp: data.npwp });
       await payoutService.acceptPayoutAgreement();
@@ -135,6 +137,8 @@ export default function PractitionerHistoryScreen() {
             ? err.message
             : "Terjadi kendala saat menyimpan profil pajak.",
       );
+    } finally {
+      setIsTaxSaving(false);
     }
   };
 
@@ -180,6 +184,7 @@ export default function PractitionerHistoryScreen() {
             initialNpwp={npwp}
             initialTaxStatus={taxStatus}
             initialAgreed={taxAgreed}
+            isSaving={isTaxSaving}
             onSave={(data) => {
               void handleSaveTax(data);
             }}
@@ -194,6 +199,7 @@ export default function PractitionerHistoryScreen() {
             initialAccountNumber={bankData?.accountNumber || ""}
             initialAccountName={bankData?.accountName || ""}
             isVerified={bankData?.status === "VERIFIED"}
+            isSaving={saveBankMutation.isPending}
             onSave={(data) => {
               void handleSaveBank(data);
             }}

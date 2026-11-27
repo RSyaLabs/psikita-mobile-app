@@ -99,9 +99,14 @@ export default function FollowUpsScreen() {
   });
 
   const [showCrisisHelp, setShowCrisisHelp] = useState(false);
+  const [isBooking, setIsBooking] = useState(false);
 
   const handleBackToResults = () => {
     haptics.light();
+    if (router.canGoBack()) {
+      router.back();
+      return;
+    }
     router.push({
       pathname: ROUTES.PATIENT.SESSION_SUMMARY,
       params: {
@@ -117,6 +122,7 @@ export default function FollowUpsScreen() {
     selectedTime: string,
     isoDate?: string,
   ) => {
+    if (isBooking) return;
     haptics.selection();
     if (isGuest) {
       setConfirmedSchedule({
@@ -135,8 +141,12 @@ export default function FollowUpsScreen() {
       return;
     }
 
+    setIsBooking(true);
     try {
-      const normalizedTime = selectedTime.replace(".", ":");
+      const normalizedTime = selectedTime
+        .replace(/WIB|WITA|WIT/gi, "")
+        .trim()
+        .replace(".", ":");
       const baseDate =
         isoDate && /^\d{4}-\d{2}-\d{2}$/.test(isoDate)
           ? isoDate
@@ -162,6 +172,8 @@ export default function FollowUpsScreen() {
           ? err.message
           : "Tidak dapat mengunci jadwal sesi lanjutan saat ini.",
       );
+    } finally {
+      setIsBooking(false);
     }
   };
 

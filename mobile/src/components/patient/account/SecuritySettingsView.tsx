@@ -7,6 +7,8 @@ import { AppIcon } from "@/components/common/AppIcon";
 interface SecuritySettingsViewProps {
   onBack?: () => void;
   onChangePassword?: () => void;
+  onOtpLogin?: () => void;
+  onGoogleAccountInfo?: () => void;
   onLogoutOtherDevice?: (deviceId: string) => void;
   onLogoutAllDevices?: () => void;
   onDeleteAccount?: () => void;
@@ -17,6 +19,8 @@ interface SecuritySettingsViewProps {
 export function SecuritySettingsView({
   onBack,
   onChangePassword,
+  onOtpLogin,
+  onGoogleAccountInfo,
   onLogoutOtherDevice,
   onLogoutAllDevices,
   onDeleteAccount,
@@ -25,8 +29,8 @@ export function SecuritySettingsView({
 }: SecuritySettingsViewProps) {
   const loginMethods = [
     { id: "pwd", title: "Ubah kata sandi", subtitle: "Kelola kata sandi akun Anda", action: onChangePassword, testID: "btn-goto-change-password" },
-    { id: "otp", title: "Masuk dengan kode OTP", subtitle: "Aktif melalui email terdaftar" },
-    { id: "google", title: "Akun Google", subtitle: "Tersedia saat masuk aplikasi" },
+    { id: "otp", title: "Masuk dengan kode OTP", subtitle: "Aktif melalui email terdaftar", action: onOtpLogin, testID: "btn-goto-otp-login" },
+    { id: "google", title: "Akun Google", subtitle: "Tersedia saat masuk aplikasi", action: onGoogleAccountInfo, testID: "btn-google-account-info" },
   ];
 
   return (

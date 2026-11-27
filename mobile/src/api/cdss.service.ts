@@ -57,23 +57,39 @@ export const cdssService = {
   },
 
   evaluatePatientContext: async (payload: CdssEvaluatePayload): Promise<CdssInsightDto> => {
+    const metrics: Record<string, number> = {};
+    if (typeof payload.phqScore === "number") metrics.phq9_score = payload.phqScore;
+    if (typeof payload.gadScore === "number") metrics.gad7_score = payload.gadScore;
     return apiRequest<CdssInsightDto>("/cdss/evaluate", {
       method: "POST",
-      body: JSON.stringify(payload),
+      body: JSON.stringify({
+        metrics,
+        subjectRef: payload.patientId,
+        ...(payload.consultationId ? { contextRef: payload.consultationId } : {}),
+        ...(payload.observedSymptoms ? { frameworkPayloads: { symptoms: payload.observedSymptoms } } : {}),
+      }),
       adapter: (v) => v as CdssInsightDto,
     });
   },
 
-  acknowledgeAlert: async (alertId: string): Promise<{ success: boolean }> => {
+  acknowledgeAlert: async (
+    alertId: string,
+    resolutionNote = "Dikonfirmasi oleh praktisi melalui aplikasi mobile.",
+  ): Promise<{ success: boolean }> => {
     return apiRequest<{ success: boolean }>(`/cdss/alerts/${alertId}/acknowledge`, {
       method: "POST",
+      body: JSON.stringify({ resolutionNote }),
       adapter: (v) => (isRecord(v) ? (v as any) : { success: true }),
     });
   },
 
-  resolveAlert: async (alertId: string): Promise<{ success: boolean }> => {
+  resolveAlert: async (
+    alertId: string,
+    resolutionNote = "Diselesaikan oleh praktisi melalui aplikasi mobile.",
+  ): Promise<{ success: boolean }> => {
     return apiRequest<{ success: boolean }>(`/cdss/alerts/${alertId}/resolve`, {
       method: "POST",
+      body: JSON.stringify({ resolutionNote }),
       adapter: (v) => (isRecord(v) ? (v as any) : { success: true }),
     });
   },

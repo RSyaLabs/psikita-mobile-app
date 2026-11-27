@@ -19,6 +19,7 @@ export interface TaxProfileAgreementViewProps {
   initialNpwp?: string;
   initialTaxStatus?: string;
   initialAgreed?: boolean;
+  isSaving?: boolean;
   onSave: (data: {
     npwp: string;
     taxStatus: string;
@@ -32,6 +33,7 @@ export function TaxProfileAgreementView({
   initialNpwp = "",
   initialTaxStatus = "TK/0 - Tidak Kawin",
   initialAgreed = true,
+  isSaving = false,
   onSave,
   onOpenTerms,
   onBack,
@@ -142,11 +144,12 @@ export function TaxProfileAgreementView({
       {/* Footer Buttons */}
       <VStack className="p-4 border-t border-border bg-card gap-2">
         <Button
+          isDisabled={isSaving}
           className="h-[52px] bg-foreground rounded-xl"
           onPress={() => onSave({ npwp, taxStatus, agreed })}
         >
           <ButtonText className="text-background font-semibold">
-            Simpan
+            {isSaving ? "Menyimpan..." : "Simpan"}
           </ButtonText>
         </Button>
         <Button

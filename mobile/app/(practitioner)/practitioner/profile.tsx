@@ -302,6 +302,18 @@ export default function PractitionerProfileScreen() {
       <ChangePhotoModal
         isOpen={showPhotoModal}
         onClose={() => setShowPhotoModal(false)}
+        onSelectCamera={() => {
+          Alert.alert(
+            "Foto Profil",
+            "Gunakan portal web praktisi atau pembaruan kamera perangkat untuk mengganti foto profil.",
+          );
+        }}
+        onSelectGallery={() => {
+          Alert.alert(
+            "Foto Profil",
+            "Pemilihan foto galeri memerlukan izin penyimpanan tambahan.",
+          );
+        }}
       />
 
       {activeView === "pengaturan" && (

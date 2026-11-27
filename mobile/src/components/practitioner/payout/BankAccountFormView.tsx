@@ -20,6 +20,7 @@ export interface BankAccountFormViewProps {
   initialAccountNumber?: string;
   initialAccountName?: string;
   isVerified?: boolean;
+  isSaving?: boolean;
   onSave: (data: {
     bankCode: string;
     accountNumber: string;
@@ -40,6 +41,7 @@ export function BankAccountFormView({
   initialAccountNumber = "",
   initialAccountName = "",
   isVerified = false,
+  isSaving = false,
   onSave,
   onCancel,
 }: BankAccountFormViewProps) {
@@ -161,11 +163,12 @@ export function BankAccountFormView({
       {/* Footer Buttons */}
       <VStack className="p-4 border-t border-border bg-card gap-2">
         <Button
+          isDisabled={isSaving}
           className="h-[52px] bg-foreground rounded-xl"
           onPress={() => onSave({ bankCode, accountNumber, accountName })}
         >
           <ButtonText className="text-background font-semibold">
-            Simpan Rekening
+            {isSaving ? "Menyimpan..." : "Simpan Rekening"}
           </ButtonText>
         </Button>
         <Button

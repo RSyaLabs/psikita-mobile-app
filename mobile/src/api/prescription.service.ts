@@ -203,7 +203,19 @@ export const prescriptionService = {
     const id = requireServerId(referralId, "referralId");
     return apiRequest<ReferralLetterResponseDto>(
       `/consultation/referral/${encodeURIComponent(id)}/letter`,
-      { signal, adapter: (v) => v as ReferralLetterResponseDto },
+      {
+        signal,
+        adapter: (v) => {
+          const rec = (v && typeof v === "object" ? v : {}) as Record<string, unknown>;
+          const letterUrl = typeof rec.letterUrl === "string" ? rec.letterUrl : undefined;
+          return {
+            ...(rec as unknown as ReferralLetterResponseDto),
+            referralId: typeof rec.referralId === "string" ? rec.referralId : id,
+            pdfUrl: typeof rec.pdfUrl === "string" ? rec.pdfUrl : letterUrl,
+            downloadUrl: typeof rec.downloadUrl === "string" ? rec.downloadUrl : letterUrl,
+          };
+        },
+      },
     );
   },
 
@@ -216,7 +228,19 @@ export const prescriptionService = {
     const id = requireServerId(referralId, "referralId");
     return apiRequest<ReferralLetterResponseDto>(
       `/consultation/referral/${encodeURIComponent(id)}/letter`,
-      { method: "POST", adapter: (v) => v as ReferralLetterResponseDto },
+      {
+        method: "POST",
+        adapter: (v) => {
+          const rec = (v && typeof v === "object" ? v : {}) as Record<string, unknown>;
+          const letterUrl = typeof rec.letterUrl === "string" ? rec.letterUrl : undefined;
+          return {
+            ...(rec as unknown as ReferralLetterResponseDto),
+            referralId: typeof rec.referralId === "string" ? rec.referralId : id,
+            pdfUrl: typeof rec.pdfUrl === "string" ? rec.pdfUrl : letterUrl,
+            downloadUrl: typeof rec.downloadUrl === "string" ? rec.downloadUrl : letterUrl,
+          };
+        },
+      },
     );
   },
 
@@ -230,7 +254,51 @@ export const prescriptionService = {
     const path = withQueryParams("/medications/suggestions", params);
     return apiRequest<MedicationSuggestionsDto>(path, {
       signal,
-      adapter: (v) => v as MedicationSuggestionsDto,
+      adapter: (v) => {
+        const rec = (v && typeof v === "object" ? v : {}) as Record<string, unknown>;
+        const rawSuggestions = Array.isArray(rec.suggestions) ? rec.suggestions : [];
+        const normalized = rawSuggestions.map((item: unknown) => {
+          const s = (item && typeof item === "object" ? item : {}) as Record<string, unknown>;
+          const med =
+            s.medication && typeof s.medication === "object"
+              ? (s.medication as Record<string, unknown>)
+              : undefined;
+          return {
+            id: typeof s.id === "string" ? s.id : typeof med?.id === "string" ? med.id : undefined,
+            name: String(s.name ?? med?.name ?? med?.genericName ?? "Obat"),
+            genericName:
+              typeof s.genericName === "string"
+                ? s.genericName
+                : typeof med?.genericName === "string"
+                  ? med.genericName
+                  : undefined,
+            dosageForm:
+              typeof s.dosageForm === "string"
+                ? s.dosageForm
+                : typeof med?.dosageForm === "string"
+                  ? med.dosageForm
+                  : undefined,
+            strength:
+              typeof s.strength === "string"
+                ? s.strength
+                : typeof med?.strength === "string"
+                  ? med.strength
+                  : undefined,
+            rationale:
+              typeof s.rationale === "string"
+                ? s.rationale
+                : typeof s.therapyLine === "string"
+                  ? s.therapyLine
+                  : undefined,
+          };
+        });
+        return {
+          ...(rec as unknown as MedicationSuggestionsDto),
+          diagnosisCode:
+            typeof rec.diagnosisCode === "string" ? rec.diagnosisCode : params.diagnosisCode,
+          suggestions: normalized,
+        };
+      },
     });
   },
 };

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Alert } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { PersonalDataView } from "@/components/patient/account";
@@ -128,6 +129,7 @@ export default function EditProfileScreen() {
           birthDate: formatBirthDateForDisplay(profile?.birthDate),
         }}
         isKycVerified={isKycVerified}
+        isSaving={updateProfileMutation.isPending}
         onBack={() => safeNavigateBack(router, ROUTES.PATIENT.PROFILE)}
         onCancel={() => safeNavigateBack(router, ROUTES.PATIENT.PROFILE)}
         onChangePhoto={() => setShowPhotoModal(true)}
@@ -136,6 +138,18 @@ export default function EditProfileScreen() {
       <ChangePhotoModal
         isOpen={showPhotoModal}
         onClose={() => setShowPhotoModal(false)}
+        onSelectCamera={() => {
+          Alert.alert(
+            "Foto Profil",
+            "Gunakan verifikasi e-KTP atau pembaruan perangkat untuk mengganti foto profil.",
+          );
+        }}
+        onSelectGallery={() => {
+          Alert.alert(
+            "Foto Profil",
+            "Pemilihan foto galeri memerlukan izin penyimpanan tambahan.",
+          );
+        }}
       />
     </SafeAreaView>
   );

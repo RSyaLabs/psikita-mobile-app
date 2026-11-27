@@ -82,6 +82,11 @@ export default function CommunityFeedScreen() {
 
   const handleCreatePost = (data: { type: "EXPERIENCE" | "EDUCATION"; content: string }) => {
     setSubmissionError(null);
+    if (isGuest) {
+      haptics.success();
+      setCurrentStep("feed");
+      return;
+    }
     createPostMutation.mutate(
       {
         content: data.content,
@@ -101,6 +106,10 @@ export default function CommunityFeedScreen() {
   };
 
   const handleDeletePost = (postId: string) => {
+    if (isGuest) {
+      haptics.success();
+      return;
+    }
     deletePostMutation.mutate(postId, {
       onSuccess: () => {
         haptics.success();
