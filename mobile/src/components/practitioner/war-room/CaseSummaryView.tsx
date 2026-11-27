@@ -7,12 +7,14 @@ import { MatchingOfferItem } from "./NewCaseListView";
 
 interface CaseSummaryViewProps {
   caseData?: MatchingOfferItem;
+  isClaiming?: boolean;
   onBack?: () => void;
   onAcceptCase?: () => void;
 }
 
 export function CaseSummaryView({
   caseData,
+  isClaiming = false,
   onBack,
   onAcceptCase,
 }: CaseSummaryViewProps) {
@@ -98,10 +100,15 @@ export function CaseSummaryView({
           accessibilityRole="button"
           accessibilityLabel="Terima Kasus"
           testID="btn-accept-case"
+          disabled={isClaiming}
           onPress={() => { haptics.success(); onAcceptCase?.(); }}
-          className="h-[52px] border-[1.5px] border-[#222222] rounded-[10px] bg-[#222222] items-center justify-center active:opacity-90"
+          className={`h-[52px] border-[1.5px] border-[#222222] rounded-[10px] items-center justify-center active:opacity-90 ${
+            isClaiming ? "bg-[#555555] opacity-70" : "bg-[#222222]"
+          }`}
         >
-          <Text className="text-[16px] font-semibold text-white">Terima Kasus</Text>
+          <Text className="text-[16px] font-semibold text-white">
+            {isClaiming ? "Memproses..." : "Terima Kasus"}
+          </Text>
         </Pressable>
         <Pressable
           accessibilityRole="button"

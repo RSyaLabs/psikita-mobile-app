@@ -21,6 +21,7 @@ export interface CompleteSessionResultViewProps {
   initialAdvice?: string;
   initialNeedFollowUp?: boolean;
   hasCarePlan?: boolean;
+  isSubmitting?: boolean;
   onOpenClinicalDecision: () => void;
   onOpenCarePlan: () => void;
   onViewNotes?: () => void;
@@ -38,6 +39,7 @@ export function CompleteSessionResultView({
   initialAdvice = "Latih teknik relaksasi pernapasan saat menjelang tidur. Batasi paparan layar gawai 1 jam sebelum istirahat malam.",
   initialNeedFollowUp = true,
   hasCarePlan = true,
+  isSubmitting = false,
   onOpenClinicalDecision,
   onOpenCarePlan,
   onViewNotes,
@@ -293,18 +295,18 @@ export function CompleteSessionResultView({
       {/* Footer Actions */}
       <VStack className="p-4 border-t border-border bg-card gap-2">
         <Button
-          isDisabled={!isComplete}
+          isDisabled={!isComplete || isSubmitting}
           className={`h-[52px] rounded-xl ${
-            isComplete ? "bg-foreground" : "bg-muted opacity-60 border border-border"
+            isComplete && !isSubmitting ? "bg-foreground" : "bg-muted opacity-60 border border-border"
           }`}
           onPress={() => onSubmitResult({ advice, needFollowUp })}
         >
           <ButtonText
             className={`font-semibold ${
-              isComplete ? "text-background" : "text-muted-foreground"
+              isComplete && !isSubmitting ? "text-background" : "text-muted-foreground"
             }`}
           >
-            Kirim Hasil
+            {isSubmitting ? "Mengirim..." : "Kirim Hasil"}
           </ButtonText>
         </Button>
 

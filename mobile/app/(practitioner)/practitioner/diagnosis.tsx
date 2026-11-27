@@ -61,6 +61,8 @@ export default function DiagnosisScreen() {
 
   // State for clinical decisions
   const [diagnosis, setDiagnosis] = useState("");
+  const [advice, setAdvice] = useState("");
+  const [needFollowUp, setNeedFollowUp] = useState(true);
   const [prescriptionOption, setPrescriptionOption] =
     useState<PrescriptionOption>("none");
   const [carePlanTasks, setCarePlanTasks] = useState<CarePlanTask[]>([]);
@@ -70,6 +72,8 @@ export default function DiagnosisScreen() {
     advice: string;
     needFollowUp: boolean;
   }) => {
+    setAdvice(data.advice);
+    setNeedFollowUp(data.needFollowUp);
     if (isGuest) {
       haptics.success();
       router.push({
@@ -159,7 +163,10 @@ export default function DiagnosisScreen() {
           <CompleteSessionResultView
             patientName="Pasien Sesi"
             initialDiagnosis={diagnosis}
+            initialAdvice={advice}
+            initialNeedFollowUp={needFollowUp}
             hasCarePlan={carePlanTasks.length > 0}
+            isSubmitting={soapMutation.isPending || finishMutation.isPending}
             onOpenClinicalDecision={() => setActiveView("clinical-decision")}
             onOpenCarePlan={() => setActiveView("care-plan")}
             onViewNotes={() => {

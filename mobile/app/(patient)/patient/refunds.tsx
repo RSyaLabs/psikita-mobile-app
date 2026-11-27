@@ -7,6 +7,7 @@ import {
   RefundStatusView,
 } from "@/components/patient/history";
 import { useRequestRefundMutation, useRefundCaseQuery } from "@/hooks/useApiQueries";
+import { paymentService } from "@/api/payment.service";
 import { ApiError } from "@/api/client";
 import { ROUTES } from "@/constants/routes";
 import { haptics } from "@/utils/haptics";
@@ -54,7 +55,18 @@ export default function PatientRefundsScreen() {
       return;
     }
 
-    const paymentId = params.paymentId;
+    let paymentId = params.paymentId;
+    if ((!paymentId || paymentId.length !== 26) && params.consultationId) {
+      try {
+        const order = await paymentService.getCurrentBillingOrder(params.consultationId);
+        if (typeof order?.paymentId === "string" && order.paymentId.trim()) {
+          paymentId = order.paymentId.trim();
+        }
+      } catch {
+        // Ignore lookup error and trigger clear validation message below
+      }
+    }
+
     if (!paymentId || paymentId.length !== 26) {
       haptics.error();
       Alert.alert(

@@ -225,30 +225,39 @@ export default function PractitionerProfileScreen() {
         />
       )}
 
-      {activeView === "ubah-jam" && (
-        <EditScheduleHoursView
-          dayName={selectedDay}
-          onBack={() => setActiveView("ketersediaan")}
-          onCancel={() => setActiveView("ketersediaan")}
-          onSaveHours={async ({ dayName, startTime, endTime, isActive, applyToAll }) => {
-            const normStart = startTime.replace(".", ":");
-            const normEnd = endTime.replace(".", ":");
-            const nextSchedules = weeklySchedules.map((item) =>
-              applyToAll || item.day === dayName
-                ? { ...item, hours: `${normStart} - ${normEnd}`, isActive }
-                : item,
-            );
-            const ok = await persistWeeklySchedules(nextSchedules);
-            if (ok) {
-              Alert.alert(
-                "Jam Diperbarui",
-                `Jam praktik hari ${dayName} (${normStart} - ${normEnd}) berhasil disimpan.`,
+      {activeView === "ubah-jam" && (() => {
+        const currentDaySchedule = weeklySchedules.find((s) => s.day === selectedDay);
+        const [startRaw = "09.00", endRaw = "17.00"] = (currentDaySchedule?.hours || "09.00 - 17.00")
+          .split("-")
+          .map((part) => part.trim().replace(":", "."));
+        return (
+          <EditScheduleHoursView
+            dayName={selectedDay}
+            initialActive={currentDaySchedule?.isActive ?? true}
+            initialStart={startRaw}
+            initialEnd={endRaw}
+            onBack={() => setActiveView("ketersediaan")}
+            onCancel={() => setActiveView("ketersediaan")}
+            onSaveHours={async ({ dayName, startTime, endTime, isActive, applyToAll }) => {
+              const normStart = startTime.replace(".", ":");
+              const normEnd = endTime.replace(".", ":");
+              const nextSchedules = weeklySchedules.map((item) =>
+                applyToAll || item.day === dayName
+                  ? { ...item, hours: `${normStart} - ${normEnd}`, isActive }
+                  : item,
               );
-              setActiveView("ketersediaan");
-            }
-          }}
-        />
-      )}
+              const ok = await persistWeeklySchedules(nextSchedules);
+              if (ok) {
+                Alert.alert(
+                  "Jam Diperbarui",
+                  `Jam praktik hari ${dayName} (${normStart} - ${normEnd}) berhasil disimpan.`,
+                );
+                setActiveView("ketersediaan");
+              }
+            }}
+          />
+        );
+      })()}
 
       {activeView === "profil-profesional" && (
         <ProfessionalProfileView
@@ -319,6 +328,7 @@ export default function PractitionerProfileScreen() {
             fullName={fullName}
             title={title}
             avatarUrl={avatarUrl}
+            isReady={profile?.availabilityStatus === "AVAILABLE"}
             onOpenProfessionalProfile={() =>
               setActiveView("profil-profesional")
             }

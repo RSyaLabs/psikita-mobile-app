@@ -199,6 +199,13 @@ export default function PractitionerChatScreen() {
             onOpenNotes={() => setActiveView("notes")}
             onViewAssessmentAnswers={() => setActiveView("assessment-answers")}
             onEndSession={() => setActiveView("end-session")}
+            onStartVideoCall={() => {
+              haptics.light();
+              Alert.alert(
+                "Panggilan Video",
+                "Sesi konsultasi berlangsung melalui ruang chat real-time. Fitur panggilan video akan otomatis aktif bila kanal video tersedia.",
+              );
+            }}
           />
         )}
 

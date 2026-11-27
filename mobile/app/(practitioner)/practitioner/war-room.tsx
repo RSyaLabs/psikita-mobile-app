@@ -52,9 +52,13 @@ export default function WarRoomScreen() {
           return {
             id: item.matchingRequestId || `srv-${idx}`,
             urgency: (isUrgent ? "Mendesak" : isModerate ? "Sedang" : "Terjadwal") as "Mendesak" | "Sedang" | "Terjadwal",
-            remainingTime: item.deadlineAt
-              ? new Date(item.deadlineAt).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })
-              : "02:10",
+            remainingTime: (() => {
+              if (!item.deadlineAt) return "02:10";
+              const d = new Date(item.deadlineAt);
+              return Number.isNaN(d.getTime())
+                ? "02:10"
+                : d.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
+            })(),
             chiefComplaint: item.brief?.chiefComplaint || "Konsultasi Klinis",
             functionalImpact: item.brief?.summaryText || "Membutuhkan asesmen dan pendampingan psikologis.",
             waitingMinutes: 5,
@@ -76,7 +80,11 @@ export default function WarRoomScreen() {
       return;
     }
 
-    if (!selectedOffer?.id || selectedOffer.id.startsWith("off-")) {
+    if (
+      !selectedOffer?.id ||
+      selectedOffer.id.startsWith("off-") ||
+      selectedOffer.id.startsWith("srv-")
+    ) {
       haptics.error();
       Alert.alert("Kasus Tidak Valid", "Pilih penawaran kasus aktif dari antrean server.");
       setView("offers");
@@ -113,6 +121,7 @@ export default function WarRoomScreen() {
       {view === "summary" && (
         <CaseSummaryView
           caseData={selectedOffer || undefined}
+          isClaiming={claimMutation.isPending}
           onBack={() => setView("offers")}
           onAcceptCase={handleAcceptCase}
         />
