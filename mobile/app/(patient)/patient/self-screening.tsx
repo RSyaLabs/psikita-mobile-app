@@ -146,6 +146,17 @@ export default function SelfScreeningScreen() {
           setCurrentStep("result");
         },
         onError: (err: unknown) => {
+          if (err instanceof ApiError && err.statusCode === 403) {
+            setTestResult({
+              score: totalScore,
+              maxScore,
+              category: fallbackCategory,
+              explanation: `Berdasarkan jawaban Anda pada tes ${currentInstrument.title}, terdeteksi ${fallbackCategory.toLowerCase()} (skor dihitung di perangkat karena simulasi skor server khusus praktisi). Hasil ini bukan diagnosis klinis resmi.`,
+            });
+            haptics.success();
+            setCurrentStep("result");
+            return;
+          }
           haptics.error();
           Alert.alert(
             "Gagal Memproses Hasil",
