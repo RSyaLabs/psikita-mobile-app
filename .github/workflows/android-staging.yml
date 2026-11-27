@@ -88,7 +88,8 @@ jobs:
       - name: Build Android staging APK (local runner)
         run: |
           mkdir -p "$RUNNER_TEMP/android-build"
-          npx --no-install eas build \
+          npm install --global eas-cli
+          eas build \
             --platform android \
             --profile staging \
             --local \
