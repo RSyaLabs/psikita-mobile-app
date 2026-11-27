@@ -1,6 +1,9 @@
 import fs from "fs";
 import path from "path";
 import { consultationService } from "../src/api/consultation.service";
+import { authService } from "../src/api/auth.service";
+import { payoutService } from "../src/api/payout.service";
+import { practitionerService } from "../src/api/practitioner.service";
 import { chatSocketClient } from "../src/services/chat-socket";
 import * as clientModule from "../src/api/client";
 
@@ -126,6 +129,124 @@ describe("RLN Linear Backlog Fixes: Closeout Boundary, Realtime Chat, Care Plan 
       expect(notifView).toContain("secureStorage");
       expect(notifView).toContain(".getItem(");
       expect(notifView).toContain("secureStorage.setItem");
+    });
+  });
+
+  describe("API response adapters & contract completeness", () => {
+    it("should provide explicit response adapters for every apiRequest call across src/api/", () => {
+      const apiDir = path.resolve(__dirname, "../src/api");
+      const files = fs
+        .readdirSync(apiDir)
+        .filter((f) => f.endsWith(".service.ts"));
+
+      for (const file of files) {
+        const content = fs.readFileSync(path.join(apiDir, file), "utf8");
+        const matches = [...content.matchAll(/\bapiRequest(?:<[^>]*>)?\(/g)];
+        for (const m of matches) {
+          const start = m.index ?? 0;
+          let depth = 0;
+          let end = start + m[0].length - 1;
+          while (end < content.length) {
+            if (content[end] === "(") depth += 1;
+            else if (content[end] === ")") {
+              depth -= 1;
+              if (depth === 0) break;
+            }
+            end += 1;
+          }
+          const callBody = content.slice(start, end + 1);
+          expect(callBody).toContain("adapter");
+        }
+      }
+    });
+
+    it("should parse auth, payout tax/agreement, and practitioner schedule responses without MISSING_RESPONSE_ADAPTER", async () => {
+      jest.spyOn(clientModule, "getAuthToken").mockResolvedValue("token-123");
+
+      const mockJson = (payload: unknown) =>
+        ({
+          ok: true,
+          status: 200,
+          headers: new Headers({ "content-type": "application/json" }),
+          json: async () => payload,
+        }) as unknown as Response;
+
+      const fetchSpy = jest
+        .spyOn(global, "fetch")
+        .mockResolvedValueOnce(
+          mockJson({ userId: "u-1", sessions: ["s-1"], count: 1 }),
+        )
+        .mockResolvedValueOnce(
+          mockJson({
+            message: "Account deletion has been scheduled in 30 days",
+            scheduledDeletionAt: "2026-12-28T00:00:00.000Z",
+          }),
+        )
+        .mockResolvedValueOnce(mockJson({ status: "SUBMITTED" }))
+        .mockResolvedValueOnce(mockJson({ accepted: true }))
+        .mockResolvedValueOnce(
+          mockJson({
+            schedules: [
+              {
+                id: "sch-1",
+                dayOfWeek: 1,
+                startTime: "09:00",
+                endTime: "17:00",
+                timezone: "Asia/Jakarta",
+                isActive: true,
+                type: "WAR_ROOM_DUTY",
+              },
+            ],
+            exceptions: [],
+          }),
+        )
+        .mockResolvedValueOnce(
+          mockJson([
+            {
+              id: "sch-1",
+              dayOfWeek: 1,
+              startTime: "09:00",
+              endTime: "17:00",
+              timezone: "Asia/Jakarta",
+              isActive: true,
+              type: "WAR_ROOM_DUTY",
+            },
+          ]),
+        );
+
+      const sessions = await authService.getMySessions();
+      expect(sessions).toEqual({ userId: "u-1", sessions: ["s-1"], count: 1 });
+
+      const del = await authService.deleteMyAccount();
+      expect(del.message).toContain("30 days");
+
+      await payoutService.submitTaxProfile({ npwp: "092542943407000" });
+      const taxCall = fetchSpy.mock.calls.find(([url]) =>
+        String(url).includes("/payout/tax-profile/me"),
+      );
+      expect(taxCall?.[1]?.body).toBe(
+        JSON.stringify({ npwp: "0092542943407000" }),
+      );
+
+      await payoutService.acceptPayoutAgreement();
+
+      const sch = await practitionerService.getMySchedules();
+      expect(sch.schedules).toHaveLength(1);
+
+      await practitionerService.replaceMyWeeklySchedules([
+        {
+          type: "WAR_ROOM_DUTY",
+          dayOfWeek: 1,
+          startTime: "09:00",
+          endTime: "17:00",
+          timezone: "Asia/Jakarta",
+          isActive: true,
+        },
+      ]);
+
+      await expect(
+        payoutService.submitTaxProfile({ npwp: "12345" }),
+      ).rejects.toThrow("15 atau 16 digit");
     });
   });
 });

@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { apiRequest } from "./client";
-import { zodAdapter } from "./response";
+import { zodAdapter, noContentAdapter } from "./response";
 import {
   PayoutBankAccountStatusDto,
   SavePayoutBankAccountDto,
@@ -65,12 +65,15 @@ export const payoutService = {
    */
   async submitTaxProfile(dto: { npwp: string }): Promise<void> {
     const cleanedNpwp = dto.npwp.replace(/[^\d]/g, "");
-    if (cleanedNpwp.length < 15) {
-      throw new Error("Nomor NPWP minimal 15 digit.");
+    if (cleanedNpwp.length !== 15 && cleanedNpwp.length !== 16) {
+      throw new Error("Nomor NPWP harus terdiri dari 15 atau 16 digit.");
     }
+    const normalizedNpwp =
+      cleanedNpwp.length === 15 ? `0${cleanedNpwp}` : cleanedNpwp;
     await apiRequest<void>("/payout/tax-profile/me", {
       method: "PUT",
-      body: JSON.stringify({ npwp: cleanedNpwp }),
+      body: JSON.stringify({ npwp: normalizedNpwp }),
+      adapter: noContentAdapter,
     });
   },
 
@@ -80,6 +83,7 @@ export const payoutService = {
   async acceptPayoutAgreement(): Promise<void> {
     await apiRequest<void>("/payout/agreements/accept", {
       method: "POST",
+      adapter: noContentAdapter,
     });
   },
 };

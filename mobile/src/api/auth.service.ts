@@ -97,6 +97,18 @@ const tokenResponseAdapter = zodAdapter(tokenResponseSchema);
 const registerResponseAdapter = zodAdapter(registerResponseSchema);
 const otpResponseAdapter = zodAdapter(otpResponseSchema);
 
+const deleteAccountResponseSchema = z.object({
+  message: z.string(),
+  scheduledDeletionAt: z.string().optional(),
+});
+const userSessionsResponseSchema = z.object({
+  userId: z.string(),
+  sessions: z.array(z.string()),
+  count: z.number(),
+});
+const deleteAccountResponseAdapter = zodAdapter(deleteAccountResponseSchema);
+const userSessionsResponseAdapter = zodAdapter(userSessionsResponseSchema);
+
 export const authService = {
   /**
    * Login dengan Username/Email dan Password
@@ -252,6 +264,7 @@ export const authService = {
   async deleteMyAccount(): Promise<{ message: string; scheduledDeletionAt?: string }> {
     return apiRequest<{ message: string; scheduledDeletionAt?: string }>("/user/me", {
       method: "DELETE",
+      adapter: deleteAccountResponseAdapter,
     });
   },
 
@@ -261,6 +274,7 @@ export const authService = {
   async getMySessions(): Promise<{ userId: string; sessions: string[]; count: number }> {
     return apiRequest<{ userId: string; sessions: string[]; count: number }>("/auth/sessions", {
       method: "GET",
+      adapter: userSessionsResponseAdapter,
     });
   },
 

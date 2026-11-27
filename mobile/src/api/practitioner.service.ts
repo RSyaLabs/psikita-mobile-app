@@ -6,6 +6,7 @@ import {
   paginatedAdapter,
   requireServerId,
   withQueryParams,
+  zodAdapter,
   type PaginatedResult,
 } from "./response";
 import {
@@ -141,6 +142,38 @@ const practitionerAdapter = (value: unknown): PractitionerResponseDto => {
 
 const practitionerListAdapter = paginatedAdapter(practitionerAdapter);
 
+const scheduleItemResponseSchema = z
+  .object({
+    id: z.string(),
+    dayOfWeek: z.number(),
+    startTime: z.string(),
+    endTime: z.string(),
+    timezone: z.string(),
+    isActive: z.boolean().optional().default(true),
+    type: z.string(),
+  })
+  .passthrough();
+
+const schedulesOverviewAdapter = zodAdapter(
+  z
+    .object({
+      schedules: z.array(scheduleItemResponseSchema),
+      exceptions: z.array(z.record(z.string(), z.unknown())).optional().default([]),
+    })
+    .passthrough(),
+);
+
+const replaceSchedulesAdapter = zodAdapter(
+  z.union([
+    z.array(scheduleItemResponseSchema),
+    z
+      .object({
+        schedules: z.array(scheduleItemResponseSchema),
+      })
+      .passthrough(),
+  ]),
+);
+
 export const practitionerService = {
   /**
    * Profil Praktisi saat ini (me)
@@ -211,6 +244,7 @@ export const practitionerService = {
     return apiRequest("/practitioner/me/schedules", {
       method: "GET",
       signal,
+      adapter: schedulesOverviewAdapter,
     });
   },
 
@@ -230,6 +264,7 @@ export const practitionerService = {
     return apiRequest("/practitioner/me/schedules", {
       method: "PUT",
       body: JSON.stringify({ schedules }),
+      adapter: replaceSchedulesAdapter,
     });
   },
 
