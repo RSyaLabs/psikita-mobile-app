@@ -105,6 +105,7 @@ export default function DoctorsDirectoryScreen() {
       if (filterBpjsOnly && !doc.supportsBpjs) return false;
       if (filterOnlineOnly && !doc.isOnline) return false;
 
+      if (filterPriceRange !== "Semua" && doc.fee === null) return false;
       if (filterPriceRange === "< 150rb" && doc.fee >= 150000) return false;
       if (
         filterPriceRange === "150rb - 250rb" &&

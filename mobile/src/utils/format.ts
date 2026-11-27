@@ -2,8 +2,10 @@
  * Format angka atau string ke mata uang Rupiah standar Indonesia
  * Contoh: formatRupiah(150000) => "Rp 150.000"
  */
-export function formatRupiah(amount: number | string): string {
-  const num = typeof amount === "string" ? parseFloat(amount) || 0 : amount;
+export function formatRupiah(amount?: number | string | null): string {
+  if (amount === undefined || amount === null) return "Rp 0";
+  const parsed = typeof amount === "string" ? parseFloat(amount) : amount;
+  const num = typeof parsed === "number" && Number.isFinite(parsed) ? parsed : 0;
   // Kept the sign. Math.abs here made a negative ledger balance render as a
   // positive one, which is the worst possible direction for money to be wrong.
   return `Rp ${num.toLocaleString("id-ID")}`;
@@ -12,15 +14,16 @@ export function formatRupiah(amount: number | string): string {
 /**
  * Format angka singkat (Miliar / Juta / Ribu)
  */
-export function formatCompactCurrency(val: number): string {
-  const abs = Math.abs(val);
+export function formatCompactCurrency(val?: number | null): string {
+  const safe = typeof val === "number" && Number.isFinite(val) ? val : 0;
+  const abs = Math.abs(safe);
   if (abs >= 1_000_000_000) {
-    return `Rp ${(val / 1_000_000_000).toFixed(1).replace(".", ",")}M`;
+    return `Rp ${(safe / 1_000_000_000).toFixed(1).replace(".", ",")}M`;
   }
   if (abs >= 1_000_000) {
-    return `Rp ${(val / 1_000_000).toFixed(1).replace(".", ",")}Jt`;
+    return `Rp ${(safe / 1_000_000).toFixed(1).replace(".", ",")}Jt`;
   }
-  return formatRupiah(val);
+  return formatRupiah(safe);
 }
 
 /**

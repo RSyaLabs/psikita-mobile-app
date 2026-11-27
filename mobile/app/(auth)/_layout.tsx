@@ -1,17 +1,18 @@
 import React, { useEffect } from "react";
-import { Stack, useRouter } from "expo-router";
+import { Stack, useRouter, useGlobalSearchParams } from "expo-router";
 import { colors } from "@/theme/colors";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function AuthLayout() {
   const router = useRouter();
   const { status, homeRoute } = useAuth();
+  const params = useGlobalSearchParams<{ triageId?: string; redirect?: string }>();
 
   useEffect(() => {
-    if (status === "authenticated" && homeRoute) {
+    if (status === "authenticated" && homeRoute && !params.triageId && !params.redirect) {
       router.replace(homeRoute as any);
     }
-  }, [status, homeRoute, router]);
+  }, [status, homeRoute, params.triageId, params.redirect, router]);
 
   return (
     <Stack

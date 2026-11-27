@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Alert } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -43,22 +43,34 @@ export default function HistoryScreen() {
   const sessionData = consultations.data ?? [];
 
   // Map API consultations to SessionItem if available
-  const mappedSessions: SessionItem[] = sessionData.map((s) => ({
-    id: s.id,
-    practitionerName: s.practitionerName || "Praktisi SeraPhany",
-    practitionerSpecialization: s.practitionerSpecialization || "Psikolog / Psikiater",
-    date: s.createdAt ? new Date(s.createdAt).toLocaleDateString("id-ID") : "-",
-    status: (s.status as any) || "FINISHED",
-    format: "Chat",
-    resultAvailable: s.status === "FINISHED",
-    followUpAvailable: true,
-  }));
+  const mappedSessions: SessionItem[] = useMemo(
+    () =>
+      sessionData.map((s) => {
+        const parsedDate = s.createdAt ? new Date(s.createdAt) : null;
+        const formattedDate =
+          parsedDate && !Number.isNaN(parsedDate.getTime())
+            ? parsedDate.toLocaleDateString("id-ID")
+            : "-";
+        return {
+          id: s.id,
+          practitionerName: s.practitionerName || "Praktisi SeraPhany",
+          practitionerSpecialization:
+            s.practitionerSpecialization || "Psikolog / Psikiater",
+          date: formattedDate,
+          status: (s.status as any) || "FINISHED",
+          format: "Chat",
+          resultAvailable: s.status === "FINISHED",
+          followUpAvailable: true,
+        };
+      }),
+    [sessionData],
+  );
 
   useEffect(() => {
     if (requestedId && mappedSessions.length > 0) {
       const found = mappedSessions.find((s) => s.id === requestedId);
       if (found) {
-        setSelectedSession(found);
+        setSelectedSession((prev) => (prev?.id === found.id ? prev : found));
       }
     }
   }, [requestedId, mappedSessions]);

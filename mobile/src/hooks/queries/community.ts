@@ -53,6 +53,7 @@ export function useCreateReply() {
     onSuccess: (_data, { postId }) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.community.replies(postId) });
       queryClient.invalidateQueries({ queryKey: queryKeys.community.detail(postId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.community.all });
     },
   });
 }

@@ -54,6 +54,7 @@ export function useNearestFacilities(params?: {
       "nearest-facilities",
       params?.latitude,
       params?.longitude,
+      params?.limit,
     ] as const,
     queryFn: ({ signal }) =>
       prescriptionService.getNearestFacilities(params, signal),

@@ -227,12 +227,13 @@ export const queryKeys = {
   },
   diagnosisCodes: {
     all: ["diagnosisCodes"] as const,
-    list: (params?: { system?: string; search?: string }) =>
+    list: (params?: { system?: string; search?: string; limit?: number }) =>
       [
         ...queryKeys.diagnosisCodes.all,
         "list",
         params?.system ?? "ALL",
         params?.search ?? "",
+        params?.limit ?? 0,
       ] as const,
   },
   identityVerification: {

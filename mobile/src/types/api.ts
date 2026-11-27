@@ -185,7 +185,7 @@ export interface MatchingResponseDto {
   id: string;
   patientId: string;
   practitionerId?: string;
-  status: Record<string, unknown>;
+  status: string | Record<string, unknown>;
   matchScore?: number;
   createdAt: string;
   triageId: string;
@@ -449,7 +449,7 @@ export interface PaymentMethodItemDto {
   available: boolean;
   providerVerified: boolean;
   fee: PaymentMethodMoneyDto;
-  feeBearer: "PATIENT" | "MERCHANT";
+  feeBearer: "PATIENT" | "MERCHANT" | "INCLUDED";
   totalPayable: PaymentMethodMoneyDto;
   disabledReason?: string | null;
 }
@@ -502,9 +502,9 @@ export interface RefundCaseViewDto {
   earningHold: boolean;
   transferAvailable: boolean;
   disabledReason?: "REFUND_DISABLED" | "REFUND_TRANSFER_UNVERIFIED" | string | null;
-  deliveryStatus?: string;
-  actualTransferFee?: number;
-  deliveryConfirmedAt?: string;
+  deliveryStatus?: string | null;
+  actualTransferFee?: number | null;
+  deliveryConfirmedAt?: string | null;
   quote: RefundQuoteDto;
   createdAt: string;
   updatedAt: string;

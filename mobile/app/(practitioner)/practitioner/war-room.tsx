@@ -39,7 +39,7 @@ export default function WarRoomScreen() {
     }
   }, [params.view]);
 
-  const offersQuery = useMatchingOffers();
+  const offersQuery = useMatchingOffers({ enabled: !isGuest });
   const claimMutation = useClaimMatching();
 
   // Map server offers to MatchingOfferItem if available

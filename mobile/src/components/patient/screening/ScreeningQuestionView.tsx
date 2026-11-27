@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Text,
@@ -102,12 +102,23 @@ export function ScreeningQuestionView({
     questions && questions.length > 0 ? questions : FALLBACK_QUESTIONS;
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, number>>(initialAnswers);
+  const questionIdsKey = activeQuestions.map((q) => q.id).join("|");
 
-  const currentQ = activeQuestions[currentIndex];
+  useEffect(() => {
+    setCurrentIndex((prev) =>
+      activeQuestions.length === 0 ? 0 : Math.min(prev, activeQuestions.length - 1),
+    );
+  }, [questionIdsKey, activeQuestions.length]);
+
   const total = activeQuestions.length;
+  const safeIndex = total > 0 ? Math.min(currentIndex, total - 1) : 0;
+  const currentQ = activeQuestions[safeIndex];
+  if (!currentQ) {
+    return null;
+  }
   const currentAnswer = answers[currentQ.id];
   const isAnswered = currentAnswer !== undefined;
-  const isLastQuestion = currentIndex === total - 1;
+  const isLastQuestion = safeIndex === total - 1;
 
   const handleSelectOption = (value: number) => {
     haptics.selection();
@@ -168,7 +179,7 @@ export function ScreeningQuestionView({
               <Box
                 key={q.id}
                 className={`flex-1 h-1.5 rounded-full ${
-                  idx <= currentIndex ? "bg-foreground" : "bg-[#CCCCCC]"
+                  idx <= safeIndex ? "bg-foreground" : "bg-[#CCCCCC]"
                 }`}
               />
             ))}
@@ -176,7 +187,7 @@ export function ScreeningQuestionView({
 
           {/* Question Index Badge */}
           <Text size="sm" bold className="text-sm font-bold text-muted-foreground tracking-wider uppercase">
-            PERTANYAAN {currentIndex + 1} DARI {total}
+            PERTANYAAN {safeIndex + 1} DARI {total}
           </Text>
 
           {/* Question Prompt */}

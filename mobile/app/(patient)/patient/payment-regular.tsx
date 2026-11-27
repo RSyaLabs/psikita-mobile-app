@@ -73,9 +73,9 @@ export default function PaymentRegularScreen() {
   const channelCode = Array.isArray(params.channelCode)
     ? params.channelCode[0]
     : params.channelCode || "VA_BCA";
-  const totalAmount = Number(
-    Array.isArray(params.total) ? params.total[0] : params.total
-  ) || 154000;
+  const rawTotal = Array.isArray(params.total) ? params.total[0] : params.total;
+  const parsedTotal = rawTotal !== undefined ? Number(rawTotal) : NaN;
+  const totalAmount = Number.isFinite(parsedTotal) && parsedTotal >= 0 ? parsedTotal : 0;
 
   const paymentContextQuery = useValidatedServerPaymentContext(consultationId);
   const serverContext = paymentContextQuery?.context;
@@ -257,14 +257,16 @@ export default function PaymentRegularScreen() {
       : serverReason
         ? "Instruksi VA tidak tersedia"
         : "Memuat nomor Virtual Account...");
-  const deadlineDisplay = paymentResult?.expiryTime
-    ? new Date(paymentResult.expiryTime).toLocaleString("id-ID", {
-        day: "numeric",
-        month: "short",
-        hour: "2-digit",
-        minute: "2-digit",
-      })
-    : "24 jam dari pemesanan";
+  const parsedExpiry = paymentResult?.expiryTime ? new Date(paymentResult.expiryTime) : null;
+  const deadlineDisplay =
+    parsedExpiry && !Number.isNaN(parsedExpiry.getTime())
+      ? parsedExpiry.toLocaleString("id-ID", {
+          day: "numeric",
+          month: "short",
+          hour: "2-digit",
+          minute: "2-digit",
+        })
+      : "24 jam dari pemesanan";
 
   return (
     <SafeAreaView className="flex-1 bg-background">
@@ -364,11 +366,14 @@ export default function PaymentRegularScreen() {
       {activeMode === "invoice" && (
         <PaymentInvoiceView
           invoiceNumber={paymentResult?.id || "-"}
-          dateText={
-            paymentResult?.createdAt
-              ? new Date(paymentResult.createdAt).toLocaleString("id-ID")
-              : "Hari ini"
-          }
+          dateText={(() => {
+            const parsed = paymentResult?.createdAt
+              ? new Date(paymentResult.createdAt)
+              : null;
+            return parsed && !Number.isNaN(parsed.getTime())
+              ? parsed.toLocaleString("id-ID")
+              : "Hari ini";
+          })()}
           doctorName={doctorName}
           paymentMethodName={
             method === "qris"

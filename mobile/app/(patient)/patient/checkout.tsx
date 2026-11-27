@@ -173,7 +173,7 @@ export default function CheckoutScreen() {
         durationMinutes,
         payerType: "SELF_PAY",
         discountCode: cleanCode,
-        gatewayChannel: selectedItem?.channelCode,
+        gatewayChannel: selectedItem?.key || selectedItem?.channelCode,
       });
       if (preview.discountEligible === false) {
         haptics.error();
@@ -236,7 +236,7 @@ export default function CheckoutScreen() {
             payerType: "SELF_PAY",
             practitionerType,
             discountCode: appliedPromo,
-            gatewayChannel: selectedItem?.channelCode,
+            gatewayChannel: selectedItem?.key || selectedItem?.channelCode,
             idempotencyKey,
           });
           targetConsultationId = created.consultationId;

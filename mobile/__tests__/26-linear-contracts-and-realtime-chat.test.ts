@@ -4,6 +4,11 @@ import { consultationService } from "../src/api/consultation.service";
 import { authService } from "../src/api/auth.service";
 import { payoutService } from "../src/api/payout.service";
 import { practitionerService } from "../src/api/practitioner.service";
+import { matchingService } from "../src/api/matching.service";
+import { paymentService, mintServerPaymentContext } from "../src/api/payment.service";
+import { refundService } from "../src/api/refund.service";
+import { avatarService } from "../src/api/avatar.service";
+import { formatRupiah } from "../src/utils/format";
 import { chatSocketClient } from "../src/services/chat-socket";
 import * as clientModule from "../src/api/client";
 
@@ -247,6 +252,174 @@ describe("RLN Linear Backlog Fixes: Closeout Boundary, Realtime Chat, Care Plan 
       await expect(
         payoutService.submitTaxProfile({ npwp: "12345" }),
       ).rejects.toThrow("15 atau 16 digit");
+    });
+
+    it("should parse OpenAPI matching strings, patient consultation items, payment DTOs, refund DTOs, avatar url, and safe formatRupiah", async () => {
+      const mockJson = (payload: unknown) =>
+        ({
+          ok: true,
+          status: 200,
+          headers: new Headers({ "content-type": "application/json" }),
+          json: async () => payload,
+        }) as unknown as Response;
+
+      const fetchSpy = jest
+        .spyOn(global, "fetch")
+        .mockResolvedValueOnce(
+          mockJson({
+            id: "mr-1",
+            patientId: "pat-1",
+            triageId: "trg-1",
+            requiredLevel: "level_1",
+            status: "CLAIMED",
+            candidatePractitionerIds: ["prac-1"],
+            assignedPractitionerId: "prac-1",
+            deadlineAt: null,
+            createdAt: "2026-11-28T00:00:00Z",
+            updatedAt: "2026-11-28T00:01:00Z",
+            consultationId: "cons-99",
+          }),
+        )
+        .mockResolvedValueOnce(
+          mockJson({
+            items: [
+              {
+                id: "cons-10",
+                practitionerId: "prac-1",
+                practitionerName: "dr. Siti",
+                practitionerType: "PSYCHIATRIST",
+                status: "ACTIVE",
+                durationMinutes: 60,
+                createdAt: "2026-11-28T00:00:00Z",
+                updatedAt: "2026-11-28T00:00:00Z",
+              },
+            ],
+            meta: { total: 1, page: 1, limit: 20 },
+          }),
+        )
+        .mockResolvedValueOnce(
+          mockJson({
+            schemaVersion: 1,
+            currency: "IDR",
+            baseAmount: { amount: 150000, currency: "IDR" },
+            generatedAt: "2026-11-28T00:00:00Z",
+            estimate: true,
+            groups: [
+              {
+                methodType: "VIRTUAL_ACCOUNT",
+                label: "Virtual Account",
+                methods: [
+                  {
+                    key: "VA_BCA",
+                    label: "BCA Virtual Account",
+                    iconUrl: null,
+                    available: true,
+                    providerVerified: true,
+                    fee: { amount: 4000, currency: "IDR" },
+                    feeLabel: "Biaya layanan",
+                    feeBearer: "INCLUDED",
+                    totalPayable: { amount: 150000, currency: "IDR" },
+                    disabledReason: null,
+                  },
+                ],
+              },
+            ],
+          }),
+        )
+        .mockResolvedValueOnce(
+          mockJson({
+            id: "pay-1",
+            patientId: "pat-1",
+            status: "PENDING",
+            amount: 150000,
+            methodType: "VIRTUAL_ACCOUNT",
+            createdAt: "2026-11-28T00:00:00Z",
+            updatedAt: "2026-11-28T00:00:00Z",
+            instruction: {
+              methodType: "VIRTUAL_ACCOUNT",
+              bankCode: "BCA",
+              accountNumber: "8277001122",
+            },
+          }),
+        )
+        .mockResolvedValueOnce(
+          mockJson({
+            schemaVersion: 1,
+            items: [
+              {
+                key: "BCA",
+                kind: "BANK",
+                label: "Bank Central Asia",
+                maximum: { amount: 5000000, currency: "IDR" },
+              },
+            ],
+          }),
+        )
+        .mockResolvedValueOnce(
+          mockJson({
+            schemaVersion: 1,
+            id: "ref-1",
+            paymentId: "01J7XYZPAYMENT000000000001",
+            status: "REQUESTED",
+            beneficiaryVerified: false,
+            earningHold: false,
+            transferAvailable: false,
+            disabledReason: null,
+            quote: null,
+            createdAt: "2026-11-28T00:00:00Z",
+            updatedAt: "2026-11-28T00:00:00Z",
+          }),
+        )
+        .mockResolvedValueOnce(
+          mockJson({ url: "https://cdn.seraphany.id/avatar/u1.jpg" }),
+        );
+
+      const claimed = await matchingService.claimMatchingRequest("mr-1");
+      expect(claimed.status).toBe("CLAIMED");
+      expect(claimed.consultationId).toBe("cons-99");
+
+      const patientCons = await consultationService.getPatientConsultations();
+      expect(patientCons).toHaveLength(1);
+      expect(patientCons[0].practitionerName).toBe("dr. Siti");
+
+      const methods = await paymentService.getPaymentMethods(150000);
+      expect(methods.groups[0].groupName).toBe("Virtual Account");
+      expect(methods.groups[0].methods[0].name).toBe("BCA Virtual Account");
+      expect(methods.groups[0].methods[0].channelCode).toBe("VA_BCA");
+
+      const ctx = mintServerPaymentContext({
+        consultationId: "cons-10",
+        billingOrderId: "order-10",
+      });
+      const payment = await paymentService.createPayment({
+        context: ctx,
+        methodType: "VIRTUAL_ACCOUNT",
+        channelCode: "VA_BCA",
+      });
+      expect(payment.vaNumber).toBe("8277001122");
+      const paymentCall = fetchSpy.mock.calls.find(([u]) =>
+        String(u).endsWith("/payments"),
+      );
+      expect(JSON.parse(String(paymentCall?.[1]?.body)).channelCode).toBe("BCA");
+
+      const dests = await refundService.getDestinations();
+      expect(dests.items[0]).toEqual({
+        type: "BANK",
+        code: "BCA",
+        name: "Bank Central Asia",
+      });
+
+      const refundCase = await refundService.requestRefund({
+        paymentId: "01J7XYZPAYMENT000000000001",
+        idempotencyKey: "refund-key-1",
+      });
+      expect(refundCase.quote.netRefund).toBe(0);
+
+      const avatar = await avatarService.getMyAvatar();
+      expect(avatar.avatarUrl).toBe("https://cdn.seraphany.id/avatar/u1.jpg");
+
+      expect(formatRupiah(undefined)).toBe("Rp 0");
+      expect(formatRupiah(NaN)).toBe("Rp 0");
     });
   });
 });

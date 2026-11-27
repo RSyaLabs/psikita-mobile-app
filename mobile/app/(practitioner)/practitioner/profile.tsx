@@ -201,6 +201,7 @@ export default function PractitionerProfileScreen() {
               Alert.alert("Sukses", "Jadwal ketersediaan berhasil disimpan.");
               setActiveView("account-hub");
             }
+            return ok;
           }}
         />
       )}

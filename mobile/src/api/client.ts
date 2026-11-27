@@ -407,8 +407,10 @@ export async function apiRequest<T>(
   const url = resolveApiUrl(endpoint);
   assertApiUrl(url);
 
+  const isFormDataBody =
+    typeof FormData !== "undefined" && restOptions.body instanceof FormData;
   const requestHeaders: Record<string, string> = {
-    "Content-Type": "application/json",
+    ...(isFormDataBody ? {} : { "Content-Type": "application/json" }),
     Accept: "application/json",
     ...(headers as Record<string, string>),
   };

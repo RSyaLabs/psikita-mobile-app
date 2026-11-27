@@ -39,7 +39,9 @@ export function CommunityDetailView({
   onConsultDoctor,
 }: CommunityDetailViewProps) {
   const [replyInput, setReplyInput] = useState("");
-  const isAuthor = !currentUserId || currentUserId === post.authorId || post.authorId === "current-user";
+  const isAuthor =
+    Boolean(currentUserId) &&
+    (currentUserId === post.authorId || post.authorId === "current-user");
   const displayReplies = replies ?? [];
   const categoryLabel = (post.category || "PENGALAMAN").toUpperCase();
 

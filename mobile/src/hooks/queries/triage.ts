@@ -21,15 +21,25 @@ import {
 /**
  * Hook to query patient waiting room status with Smart Jittered Polling
  */
-export function useWaitingRoomStatus() {
+export function useWaitingRoomStatus(options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: queryKeys.matching.waitingRoom(),
     queryFn: ({ signal }) =>
       callWithSignal(matchingService.getMyWaitingRoomStatus, signal),
+    enabled: options?.enabled ?? true,
+    retry: false,
     refetchInterval: (query) => {
+      if (query.state.status === "error") return false;
       const status = (query.state.data as any)?.status;
-      if (isTerminalConsultationStatus(status) || status === "MATCHED")
+      if (
+        isTerminalConsultationStatus(status) ||
+        status === "MATCHED" ||
+        status === "CLAIMED" ||
+        status === "AUTO_ALLOCATED" ||
+        status === "CANCELLED"
+      ) {
         return false;
+      }
       return getJitteredInterval(12000); // 10-14s dengan jitter
     },
     refetchIntervalInBackground: false,
@@ -64,12 +74,14 @@ export function useSubmitTriage() {
 /**
  * Hook to query live matching offers for practitioners with Smart Jittered Polling
  */
-export function useMatchingOffers() {
+export function useMatchingOffers(options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: queryKeys.matching.offers(),
     queryFn: ({ signal }) =>
       callWithSignal(matchingService.getMyOffers, signal),
-    refetchInterval: () => getJitteredInterval(10000), // 8-12s polling for fast real-time incoming cases
+    enabled: options?.enabled ?? true,
+    refetchInterval: (query) =>
+      query.state.status === "error" ? false : getJitteredInterval(10000),
     refetchIntervalInBackground: false,
   });
 }

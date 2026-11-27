@@ -97,7 +97,7 @@ export function useFinishConsultation() {
     onSuccess: (_result, context) => {
       const detailKey = queryKeys.consultations.detail(context.consultationId);
       queryClient.removeQueries({ queryKey: detailKey, exact: true });
-      queryClient.invalidateQueries({ queryKey: queryKeys.patient.me() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.patient.all });
       queryClient.invalidateQueries({
         queryKey: queryKeys.prescriptions.list(),
       });
@@ -137,11 +137,12 @@ export function usePatientConsultations<T = ConsultationResponseDto[]>(options?:
  * Hook to retrieve a single consultation by ID
  */
 export function useConsultation(id: string) {
+  const normalizedId = id?.trim() || "";
   return useQuery({
-    queryKey: queryKeys.consultations.detail(id),
+    queryKey: queryKeys.consultations.detail(normalizedId),
     queryFn: ({ signal }) =>
-      callWithSignal(consultationService.getById, signal, id),
-    enabled: !!id,
+      callWithSignal(consultationService.getById, signal, normalizedId),
+    enabled: Boolean(normalizedId),
     staleTime: 10 * 60 * 1000,
   });
 }
@@ -171,15 +172,16 @@ export function useConsultationNotes(
   consultationId: string,
   options?: { enabled?: boolean },
 ) {
+  const normalizedId = consultationId?.trim() || "";
   return useQuery({
-    queryKey: queryKeys.consultations.notes(consultationId),
+    queryKey: queryKeys.consultations.notes(normalizedId),
     queryFn: ({ signal }) =>
       callWithSignal(
         notesService.getNotesByConsultation,
         signal,
-        consultationId,
+        normalizedId,
       ),
-    enabled: !!consultationId && (options?.enabled ?? true),
+    enabled: Boolean(normalizedId) && (options?.enabled ?? true),
     staleTime: 10 * 60 * 1000,
   });
 }

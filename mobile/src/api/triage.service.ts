@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { ApiError, apiRequest } from "./client";
-import { arrayAdapter, requireServerId } from "./response";
+import { collectionAdapter, requireServerId } from "./response";
 import {
   validateAssessmentResult,
 } from "@/clinical/assessment";
@@ -53,9 +53,13 @@ export const triageService = {
   /** Submit a complete, explicitly supplied assessment to the server. */
   async submitTriage(dto: SubmitTriageDto): Promise<TriageResponseDto> {
     const payload = parseRequest(dto);
+    const idempotencyKey = `triage-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
 
     return apiRequest<TriageResponseDto>("/triage", {
       method: "POST",
+      headers: {
+        "Idempotency-Key": idempotencyKey,
+      },
       body: JSON.stringify(payload),
       adapter: triageAdapter(),
     });
@@ -76,7 +80,7 @@ export const triageService = {
   /** List the server-confirmed triage queue. */
   async getTriageQueue(signal?: AbortSignal): Promise<TriageResponseDto[]> {
     return apiRequest<TriageResponseDto[]>("/triage/queue", {
-      adapter: arrayAdapter(triageAdapter()),
+      adapter: collectionAdapter(triageAdapter()),
       signal,
     });
   },

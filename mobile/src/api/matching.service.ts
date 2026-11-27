@@ -48,7 +48,7 @@ const matchingResponseSchema = z.object({
   patientId: z.string().trim().min(1),
   triageId: z.string().trim().min(1),
   requiredLevel: z.enum(["level_1", "level_2", "level_3", "level_4"]),
-  status: z.record(z.string(), z.unknown()),
+  status: z.union([z.string().trim().min(1), z.record(z.string(), z.unknown())]),
   candidatePractitionerIds: z.array(z.string().trim().min(1)),
   assignedPractitionerId: nullableReferenceSchema,
   deadlineAt: nullableReferenceSchema,
@@ -220,6 +220,9 @@ const matchingResponseAdapter =
         (matching.assignedPractitionerId === null ? null : undefined),
       deadlineAt: deadline,
       updatedAt: matching.updatedAt,
+      consultationId:
+        matching.consultationId ??
+        (context ? context.consultationId : undefined),
     };
 
     if (context) {

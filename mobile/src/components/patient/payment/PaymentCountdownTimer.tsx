@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Clock } from "lucide-react-native";
 import { Box, Text, HStack, Badge, BadgeText } from "@/components/ui";
 
@@ -13,27 +13,35 @@ export function PaymentCountdownTimer({
   initialSeconds = 900,
   onExpire,
 }: PaymentCountdownTimerProps) {
-  const [secondsRemaining, setSecondsRemaining] = useState<number>(initialSeconds);
+  const safeInitial =
+    typeof initialSeconds === "number" && Number.isFinite(initialSeconds)
+      ? Math.max(0, Math.floor(initialSeconds))
+      : 0;
+  const [secondsRemaining, setSecondsRemaining] = useState<number>(safeInitial);
+  const expiredCalledRef = useRef(false);
+  const onExpireRef = useRef(onExpire);
+  onExpireRef.current = onExpire;
+
+  useEffect(() => {
+    setSecondsRemaining(safeInitial);
+    expiredCalledRef.current = false;
+  }, [safeInitial]);
 
   useEffect(() => {
     if (secondsRemaining <= 0) {
-      onExpire?.();
+      if (!expiredCalledRef.current) {
+        expiredCalledRef.current = true;
+        onExpireRef.current?.();
+      }
       return;
     }
 
     const interval = setInterval(() => {
-      setSecondsRemaining((prev) => {
-        if (prev <= 1) {
-          clearInterval(interval);
-          onExpire?.();
-          return 0;
-        }
-        return prev - 1;
-      });
+      setSecondsRemaining((prev) => (prev <= 1 ? 0 : prev - 1));
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [secondsRemaining, onExpire]);
+  }, [secondsRemaining > 0]);
 
   const hours = Math.floor(secondsRemaining / 3600);
   const minutes = Math.floor((secondsRemaining % 3600) / 60);

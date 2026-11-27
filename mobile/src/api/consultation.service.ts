@@ -211,6 +211,50 @@ function parseCreateRequest(dto: CreateConsultationDto) {
   }
 }
 
+const patientConsultationItemSchema = z
+  .object({
+    id: z.string().trim().min(1),
+    practitionerId: z.string().trim().min(1),
+    practitionerName: z.string().optional(),
+    practitionerType: z.string().optional(),
+    status: z.enum(CONSULTATION_STATUSES),
+    durationMinutes: z.number().int().min(15).max(180).optional().default(60),
+    startedAt: z.unknown().nullable().optional(),
+    finishedAt: z.unknown().nullable().optional(),
+    cancelledAt: z.unknown().nullable().optional(),
+    createdAt: z.string().min(1),
+    updatedAt: z.string().min(1),
+    patientFacingAdvice: z.unknown().nullable().optional(),
+  })
+  .passthrough();
+
+const patientConsultationItemAdapter = (value: unknown): ConsultationResponseDto => {
+  const item = patientConsultationItemSchema.parse(value);
+  const normalizeIso = (v: unknown): string | undefined =>
+    typeof v === "string" && v.trim() ? v : undefined;
+  return {
+    id: item.id,
+    patientId: "",
+    practitionerId: item.practitionerId,
+    durationMinutes: item.durationMinutes,
+    status: item.status,
+    participants: [],
+    startedAt: normalizeIso(item.startedAt),
+    finishedAt: normalizeIso(item.finishedAt),
+    cancelledAt: normalizeIso(item.cancelledAt),
+    createdAt: item.createdAt,
+    updatedAt: item.updatedAt,
+    practitionerName: item.practitionerName,
+    practitionerSpecialization:
+      item.practitionerType === "PSYCHIATRIST"
+        ? "Psikiater (Sp.KJ)"
+        : item.practitionerType === "PSYCHOLOGIST"
+          ? "Psikolog Klinis"
+          : undefined,
+    note: typeof item.patientFacingAdvice === "string" ? item.patientFacingAdvice : undefined,
+  };
+};
+
 export const consultationService = {
   /** Create a consultation and accept only a validated server response. */
   async create(dto: CreateConsultationDto): Promise<ConsultationResponseDto> {
@@ -301,13 +345,19 @@ export const consultationService = {
   ): Promise<ConsultationResponseDto[]> {
     const query = params ? withQueryParams("/patient/me/consultations", params) : "/patient/me/consultations";
     const response = await apiRequest<unknown>(query, { signal, adapter: (v) => v });
-    if (Array.isArray(response)) {
-      return response.map((item) => consultationAdapter(undefined, undefined, false)(item));
-    }
-    if (isRecord(response) && Array.isArray((response as any).data)) {
-      return (response as any).data.map((item: unknown) => consultationAdapter(undefined, undefined, false)(item));
-    }
-    return [];
+    const rawList = Array.isArray(response)
+      ? response
+      : isRecord(response) && Array.isArray((response as any).items)
+        ? (response as any).items
+        : isRecord(response) && Array.isArray((response as any).data)
+          ? (response as any).data
+          : [];
+    return rawList.map((item: unknown) => {
+      if (isRecord(item) && Array.isArray(item.participants)) {
+        return consultationAdapter(undefined, undefined, false)(item);
+      }
+      return patientConsultationItemAdapter(item);
+    });
   },
 
   async getById(

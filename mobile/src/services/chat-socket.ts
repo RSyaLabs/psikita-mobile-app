@@ -62,8 +62,11 @@ class ChatSocketClient {
       return this.socket;
     }
 
-    if (this.socket && this.activeToken !== token) {
-      this.disconnect();
+    if (this.socket && (this.activeToken !== token || !this.socket.connected)) {
+      this.socket.removeAllListeners();
+      this.socket.disconnect();
+      this.socket = null;
+      this.joinedRooms.clear();
     }
 
     const { namespaceUrl, path } = resolveMessagingSocketTarget();

@@ -8,12 +8,33 @@ import {
   RequestRefundCaseDto,
 } from "@/types/api";
 
-const refundQuoteSchema = z.object({
-  amount: z.number().int().nonnegative(),
-  currency: z.literal("IDR"),
-  deductions: z.number().int().nonnegative().optional(),
-  netRefund: z.number().int().nonnegative(),
-});
+const refundQuoteSchema = z
+  .union([
+    z.object({
+      amount: z.number().int().nonnegative(),
+      currency: z.literal("IDR"),
+      deductions: z.number().int().nonnegative().optional(),
+      netRefund: z.number().int().nonnegative(),
+    }),
+    z
+      .object({
+        schemaVersion: z.number(),
+        currency: z.string(),
+        grossUserPayment: z.number(),
+        userReceives: z.number(),
+        transferFee: z.number().optional(),
+      })
+      .passthrough()
+      .transform((q) => ({
+        amount: q.grossUserPayment,
+        currency: q.currency,
+        deductions: q.transferFee,
+        netRefund: q.userReceives,
+      })),
+  ])
+  .nullable()
+  .optional()
+  .transform((q) => q ?? { amount: 0, currency: "IDR", netRefund: 0 });
 
 const refundCaseStatusSchema = z.enum([
   "REQUESTED",
@@ -29,26 +50,33 @@ const refundCaseStatusSchema = z.enum([
   "CANCELLED",
 ]);
 
-export const refundCaseViewSchema = z.object({
-  schemaVersion: z.literal(1),
-  id: z.string().min(1),
-  paymentId: z.string().min(1),
-  status: refundCaseStatusSchema.or(z.string()),
-  beneficiaryVerified: z.boolean(),
-  earningHold: z.boolean(),
-  transferAvailable: z.boolean(),
-  disabledReason: z
-    .enum(["REFUND_DISABLED", "REFUND_TRANSFER_UNVERIFIED"])
-    .nullable()
-    .optional(),
-  deliveryStatus: z.string().optional(),
-  actualTransferFee: z.number().int().optional(),
-  deliveryConfirmedAt: z.string().optional(),
-  quote: refundQuoteSchema,
-  createdAt: z.string(),
-  updatedAt: z.string(),
-  audit: z.array(z.unknown()).optional(),
-});
+export const refundCaseViewSchema = z
+  .object({
+    schemaVersion: z.literal(1),
+    id: z.string().min(1),
+    paymentId: z.string().min(1),
+    status: refundCaseStatusSchema.or(z.string()),
+    beneficiaryVerified: z.boolean(),
+    earningHold: z.boolean(),
+    transferAvailable: z.boolean(),
+    disabledReason: z
+      .enum([
+        "REFUND_DISABLED",
+        "REFUND_TRANSFER_UNVERIFIED",
+        "BENEFICIARY_UNVERIFIED",
+      ])
+      .or(z.string())
+      .nullable()
+      .optional(),
+    deliveryStatus: z.string().nullable().optional(),
+    actualTransferFee: z.number().int().nullable().optional(),
+    deliveryConfirmedAt: z.string().nullable().optional(),
+    quote: refundQuoteSchema,
+    createdAt: z.string(),
+    updatedAt: z.string(),
+    audit: z.array(z.unknown()).optional(),
+  })
+  .passthrough();
 
 export const refundCaseListSchema = z.object({
   schemaVersion: z.literal(1),
@@ -56,11 +84,30 @@ export const refundCaseListSchema = z.object({
   limit: z.number().int().positive(),
 });
 
-const refundDestinationItemSchema = z.object({
-  type: z.enum(["BANK", "E_WALLET"]),
-  code: z.string().min(1),
-  name: z.string().min(1),
-});
+const refundDestinationItemSchema = z.union([
+  z.object({
+    type: z.enum(["BANK", "E_WALLET"]),
+    code: z.string().min(1),
+    name: z.string().min(1),
+  }),
+  z
+    .object({
+      key: z.string().min(1),
+      kind: z.enum(["BANK", "E_WALLET"]),
+      label: z.string().min(1),
+      maximum: z
+        .object({
+          amount: z.number(),
+          currency: z.string(),
+        })
+        .optional(),
+    })
+    .transform((d) => ({
+      type: d.kind,
+      code: d.key,
+      name: d.label,
+    })),
+]);
 
 export const refundDestinationsSchema = z.object({
   schemaVersion: z.literal(1),

@@ -71,14 +71,21 @@ export default function VideoCallScreen() {
   const handleEndCall = () => {
     setShowEndModal(false);
     haptics.heavy();
-    router.replace(
-      (context?.consultationId
-        ? {
-            pathname: ROUTES.PATIENT.RATING,
-            params: { consultationId: context.consultationId },
-          }
-        : ROUTES.PATIENT.RATING) as never,
-    );
+    if (context?.status === "FINISHED") {
+      router.replace({
+        pathname: ROUTES.PATIENT.RATING,
+        params: { consultationId: context.consultationId },
+      } as never);
+      return;
+    }
+    if (context?.consultationId || consultationId) {
+      router.replace({
+        pathname: ROUTES.PATIENT.CHAT_ROOM,
+        params: { consultationId: context?.consultationId || consultationId || "" },
+      } as never);
+      return;
+    }
+    safeNavigateBack(router, ROUTES.PATIENT.DASHBOARD);
   };
 
   return (

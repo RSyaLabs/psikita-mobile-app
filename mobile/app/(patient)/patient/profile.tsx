@@ -57,6 +57,7 @@ import { useAuth } from "@/hooks/useAuth";
 export default function ProfileScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ kyc?: string; guest?: string }>();
+  const isGuest = params.guest === "true";
   const kycView = params.kyc;
 
   const { data: patient } = usePatientProfile();
@@ -194,10 +195,14 @@ export default function ProfileScreen() {
                 className="w-full bg-[#4A3B6B] rounded-xl py-3.5 shadow-sm"
                 onPress={() => {
                   haptics.medium();
-                  router.push({
-                    pathname: ROUTES.PATIENT.PROFILE,
-                    params: { kyc: "scan" },
-                  } as any);
+                  if (isGuest) {
+                    router.push({
+                      pathname: ROUTES.PATIENT.PROFILE,
+                      params: { kyc: "scan", guest: "true" },
+                    } as any);
+                    return;
+                  }
+                  void handleStartRealKyc();
                 }}
               >
                 <ButtonText className="text-white font-semibold text-center text-base">

@@ -17,7 +17,7 @@ export interface DailyAvailabilityViewProps {
     chatEnabled: boolean;
     videoEnabled: boolean;
     schedules: DaySchedule[];
-  }) => void;
+  }) => boolean | void | Promise<boolean | void>;
   initialReady?: boolean;
   initialSchedules?: DaySchedule[];
 }
@@ -53,10 +53,14 @@ export const DailyAvailabilityView = React.memo(function DailyAvailabilityView({
       ? initialSchedules
       : DEFAULT_SCHEDULES;
 
-  const handleSave = () => {
+  const handleSave = async () => {
     haptics.success();
-    if (onSave) onSave({ isReady, chatEnabled, videoEnabled, schedules });
-    onBack();
+    const result = onSave
+      ? await onSave({ isReady, chatEnabled, videoEnabled, schedules })
+      : true;
+    if (result !== false) {
+      onBack();
+    }
   };
 
   return (

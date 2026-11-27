@@ -22,24 +22,48 @@ const paymentMethodMoneySchema = z.object({
   currency: z.literal("IDR"),
 });
 
-const paymentMethodItemSchema = z.object({
-  key: z.string().min(1),
-  name: z.string().min(1),
-  methodType: z.string().min(1),
-  channelCode: z.string().min(1),
-  available: z.boolean(),
-  providerVerified: z.boolean(),
-  fee: paymentMethodMoneySchema,
-  feeBearer: z.enum(["PATIENT", "MERCHANT"]),
-  totalPayable: paymentMethodMoneySchema,
-  disabledReason: z.string().nullable().optional(),
-});
+function toPaymentInstructionChannelCode(raw: string): string {
+  const normalized = raw.trim().toUpperCase().replace(/-/g, "_");
+  if (normalized === "QRIS") return "QRIS_NOBU";
+  if (normalized.startsWith("VA_")) return normalized.slice(3);
+  if (normalized.startsWith("EWALLET_")) return normalized.slice(8);
+  return normalized;
+}
 
-const paymentMethodGroupSchema = z.object({
-  groupName: z.string().min(1),
-  methodType: z.string().min(1),
-  methods: z.array(paymentMethodItemSchema),
-});
+const paymentMethodItemSchema = z
+  .object({
+    key: z.string().min(1),
+    name: z.string().min(1).optional(),
+    label: z.string().min(1).optional(),
+    methodType: z.string().min(1).optional(),
+    channelCode: z.string().min(1).optional(),
+    available: z.boolean(),
+    providerVerified: z.boolean(),
+    fee: paymentMethodMoneySchema,
+    feeBearer: z.enum(["PATIENT", "MERCHANT", "INCLUDED"]),
+    totalPayable: paymentMethodMoneySchema,
+    disabledReason: z.string().nullable().optional(),
+  })
+  .passthrough();
+
+const paymentMethodGroupSchema = z
+  .object({
+    groupName: z.string().min(1).optional(),
+    label: z.string().min(1).optional(),
+    methodType: z.string().min(1),
+    methods: z.array(paymentMethodItemSchema),
+  })
+  .passthrough()
+  .transform((group) => ({
+    groupName: group.groupName || group.label || group.methodType,
+    methodType: group.methodType,
+    methods: group.methods.map((item) => ({
+      ...item,
+      name: item.name || item.label || item.key,
+      methodType: item.methodType || group.methodType,
+      channelCode: item.channelCode || item.key,
+    })),
+  }));
 
 export const paymentMethodsSchema = z.object({
   schemaVersion: z.literal(1),
@@ -50,25 +74,27 @@ export const paymentMethodsSchema = z.object({
   groups: z.array(paymentMethodGroupSchema),
 });
 
-export const billingOrderResponseSchema = z.object({
-  id: z.string().min(1),
-  consultationId: z.string().min(1),
-  patientId: z.string().min(1),
-  payerType: z.string(),
-  orderType: z.string(),
-  durationMinutes: z.number(),
-  grossAmount: z.number(),
-  discountAmount: z.number(),
-  totalAmount: z.number(),
-  currency: z.literal("IDR"),
-  paymentStatus: z.string(),
-  claimStatus: z.string().optional(),
-  gatewayChannel: z.unknown().nullable().optional(),
-  paymentId: z.string().nullable().optional(),
-  expiresAt: z.string().nullable().optional(),
-  createdAt: z.string(),
-  updatedAt: z.string(),
-});
+export const billingOrderResponseSchema = z
+  .object({
+    id: z.string().min(1),
+    consultationId: z.string().min(1),
+    patientId: z.string().min(1),
+    payerType: z.string(),
+    orderType: z.string(),
+    durationMinutes: z.number(),
+    grossAmount: z.number(),
+    discountAmount: z.number(),
+    totalAmount: z.number(),
+    currency: z.literal("IDR"),
+    paymentStatus: z.string(),
+    claimStatus: z.string().optional(),
+    gatewayChannel: z.unknown().nullable().optional(),
+    paymentId: z.string().nullable().optional(),
+    expiresAt: z.string().nullable().optional(),
+    createdAt: z.string(),
+    updatedAt: z.string(),
+  })
+  .passthrough();
 
 export interface BrandedBillingOrderDto extends BillingOrderResponseDto {
   serverPaymentContext: ServerPaymentContext;
@@ -143,20 +169,27 @@ function serverPaymentContextFromApiResponse(
 }
 
 const paymentInstructionSchema = z.discriminatedUnion("methodType", [
-  z.object({
-    methodType: z.literal("E_WALLET"),
-    provider: z.union([z.string(), z.record(z.string(), z.unknown())]),
-    checkoutUrl: z.string().optional(),
-  }),
-  z.object({
-    methodType: z.literal("VIRTUAL_ACCOUNT"),
-    bankCode: z.string(),
-    accountNumber: z.string().optional(),
-  }),
-  z.object({
-    methodType: z.literal("QRIS"),
-    qrUrl: z.string().optional(),
-  }),
+  z
+    .object({
+      methodType: z.literal("E_WALLET"),
+      provider: z.union([z.string(), z.record(z.string(), z.unknown())]).optional(),
+      checkoutUrl: z.string().nullable().optional(),
+    })
+    .passthrough(),
+  z
+    .object({
+      methodType: z.literal("VIRTUAL_ACCOUNT"),
+      bankCode: z.string().optional(),
+      accountNumber: z.string().nullable().optional(),
+    })
+    .passthrough(),
+  z
+    .object({
+      methodType: z.literal("QRIS"),
+      qrUrl: z.string().nullable().optional(),
+      qrString: z.string().nullable().optional(),
+    })
+    .passthrough(),
 ]);
 
 const paymentStatusSchema = z.enum([
@@ -173,11 +206,11 @@ const paymentSchema = z
     id: z.string().trim().min(1),
     status: paymentStatusSchema,
     amount: z.number().finite(),
-    contextType: z.literal("BILLING_ORDER"),
-    contextId: z.string().trim().min(1),
+    contextType: z.literal("BILLING_ORDER").optional(),
+    contextId: z.string().trim().min(1).optional(),
     instruction: paymentInstructionSchema.nullable().optional(),
   })
-  .strict();
+  .passthrough();
 
 const billingOrderSchema = z
   .object({
@@ -326,25 +359,33 @@ const paymentAdapter = (
   }
 
   const instruction = payment.instruction;
+  const resolvedContextId = payment.contextId ?? expectedContext.contextId;
   return {
     id: payment.id,
     status: payment.status,
-    billingOrderId: payment.contextId,
+    billingOrderId: resolvedContextId,
     transactionStatus: paymentStatusMap[payment.status],
-    paymentType: instruction?.methodType ?? payment.contextType,
+    paymentType: instruction?.methodType ?? payment.contextType ?? expectedContext.contextType,
     grossAmount: payment.amount,
     vaNumber:
       instruction &&
       instruction.methodType === "VIRTUAL_ACCOUNT" &&
-      "accountNumber" in instruction
+      "accountNumber" in instruction &&
+      typeof instruction.accountNumber === "string"
         ? instruction.accountNumber
         : undefined,
     paymentUrl:
-      instruction && "checkoutUrl" in instruction
+      instruction &&
+      "checkoutUrl" in instruction &&
+      typeof instruction.checkoutUrl === "string"
         ? instruction.checkoutUrl
         : undefined,
     qrCodeUrl:
-      instruction && "qrUrl" in instruction ? instruction.qrUrl : undefined,
+      instruction &&
+      "qrUrl" in instruction &&
+      typeof instruction.qrUrl === "string"
+        ? instruction.qrUrl
+        : undefined,
   };
 };
 
@@ -554,7 +595,7 @@ export const paymentService = {
     const context = requireServerPaymentContext(inputPayload.context);
     const payload: CreatePaymentDto = {
       methodType: inputPayload.methodType,
-      channelCode: inputPayload.channelCode,
+      channelCode: toPaymentInstructionChannelCode(inputPayload.channelCode),
       contextType: "BILLING_ORDER",
       contextId: context.billingOrderId,
       ...(inputPayload.metadata === undefined

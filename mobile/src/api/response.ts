@@ -90,17 +90,6 @@ export function healthAdapter(value: unknown): { status: string } {
   throw new Error("Expected valid health probe status");
 }
 
-export function arrayAdapter<T>(
-  adapter: ResponseAdapter<T>,
-): ResponseAdapter<T[]> {
-  return (value) => {
-    if (!Array.isArray(value)) {
-      throw new Error("Expected an array response");
-    }
-    return value.map((item) => adapter(item));
-  };
-}
-
 export function collectionAdapter<T>(
   adapter: ResponseAdapter<T>,
 ): ResponseAdapter<T[]> {
