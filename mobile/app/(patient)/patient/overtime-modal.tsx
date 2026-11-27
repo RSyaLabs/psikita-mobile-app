@@ -54,8 +54,6 @@ export default function OvertimeModalScreen() {
         isOpen={isOpen}
         timeRemaining="05:00"
         practitionerName={practitionerName}
-        rate15Label="Rp 25.000"
-        rate30Label="Rp 45.000"
         onClose={handleClose}
         onProceedToPayment={handleProceedToPayment}
         onEndSessionOnTime={handleEndSessionOnTime}

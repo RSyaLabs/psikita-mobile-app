@@ -136,10 +136,10 @@ export function UpcomingScheduleView({
           >
             <VStack space="xs" className="flex-1 pr-3">
               <Text size="md" bold className="text-foreground text-[15px] font-bold">
-                Kamis, 03 Des 2026 · 10:00 WIB
+                Belum ada pembayaran tertunda
               </Text>
               <Text size="sm" className="text-muted-foreground text-sm">
-                Menunggu pembayaran · tahan sampai 14:30 WIB
+                Menunggu pembayaran · ketuk untuk melihat atau melanjutkan
               </Text>
             </VStack>
             <HStack space="xs" className="items-center">

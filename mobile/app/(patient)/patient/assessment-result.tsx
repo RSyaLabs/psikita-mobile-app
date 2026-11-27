@@ -276,7 +276,7 @@ export default function AssessmentResultScreen() {
                   </Text>
                 </Box>
                 <Text size="sm" className="text-primary-foreground/80 font-medium">
-                  22 Sep 2026
+                  Mode Pratinjau
                 </Text>
               </HStack>
 

@@ -20,10 +20,10 @@ export interface ProfessionalProfileViewProps {
 
 export const ProfessionalProfileView = React.memo(function ProfessionalProfileView({
   initialName = "",
-  initialBio = "Psikiater klinis berlisensi dengan minat khusus pada gangguan kecemasan, depresi, dan manajemen stres berbasis bukti klinis.",
+  initialBio = "",
   initialSpecialties = ["Kecemasan", "Tidur"],
-  strExpiryDate = "15 Agu 2027",
-  sipExpiryDate = "20 Okt 2026",
+  strExpiryDate = "-",
+  sipExpiryDate = "-",
   avatarUrl,
   onBack,
   onCancel,

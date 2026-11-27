@@ -25,7 +25,7 @@ export const PractitionerAccountHubView = React.memo(function PractitionerAccoun
   fullName = "Mitra Praktisi",
   title = "Psikiater Klinis",
   avatarUrl,
-  strExpiryDate = "31 Des 2027",
+  strExpiryDate = "-",
   isReady = true,
   bankStatus = "Menunggu verifikasi",
   onOpenProfessionalProfile,

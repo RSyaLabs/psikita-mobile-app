@@ -21,18 +21,22 @@ export interface PayoutDetailViewProps {
   includedSessionsCount?: number;
   deductionsAmount?: string;
   bankAccountMasked?: string;
+  calculatedAt?: string;
+  estimatedAt?: string;
   onContactSupport?: () => void;
   onBack: () => void;
 }
 
 export function PayoutDetailView({
-  amount = "Rp 2.300.000",
-  statusLabel = "Diproses",
-  period = "16 - 31 Okt 2026",
+  amount = "Rp 0",
+  statusLabel = "Menunggu",
+  period = "-",
   referenceNumber = "-",
-  includedSessionsCount = 12,
+  includedSessionsCount = 0,
   deductionsAmount = "Rp 0",
-  bankAccountMasked = "BCA ••••8821",
+  bankAccountMasked = "-",
+  calculatedAt = "-",
+  estimatedAt = "-",
   onContactSupport,
   onBack,
 }: PayoutDetailViewProps) {
@@ -115,7 +119,7 @@ export function PayoutDetailView({
                 Dihitung
               </Text>
               <Text size="sm" className="text-muted-foreground">
-                1 Nov 2026
+                {calculatedAt}
               </Text>
             </VStack>
           </HStack>
@@ -145,7 +149,7 @@ export function PayoutDetailView({
                 Diterima
               </Text>
               <Text size="sm" className="text-muted-foreground">
-                Estimasi 3 Nov 2026
+                {estimatedAt}
               </Text>
             </VStack>
           </HStack>

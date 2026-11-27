@@ -250,8 +250,6 @@ export default function ChatRoomScreen() {
           isOpen={isOvertimeOpen}
           timeRemaining="05:00"
           practitionerName={practitionerName}
-          rate15Label="Rp 25.000"
-          rate30Label="Rp 45.000"
           onClose={() => setIsOvertimeOpen(false)}
           onProceedToPayment={(minutes) => {
             setIsOvertimeOpen(false);
