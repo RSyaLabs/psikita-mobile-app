@@ -19,6 +19,9 @@ import {
   useActiveConsultation,
   useConsultationNotes,
   useCreateSoapNote,
+  useRoomMessages,
+  useRoomRealtimeSync,
+  useSendRoomMessage,
 } from "@/hooks/useApiQueries";
 import { ApiError } from "@/api/client";
 import { ROUTES } from "@/constants/routes";
@@ -70,8 +73,15 @@ export default function PractitionerChatScreen() {
   const activeConsultationId =
     consultationId || consultationsQuery.data?.[0]?.id || "";
   const activeConsultation = useActiveConsultation(activeConsultationId || undefined);
+  const activeContext = activeConsultation.context;
+  const messagesQuery = useRoomMessages(activeContext?.roomId, activeContext?.status);
+  useRoomRealtimeSync(activeContext?.roomId, activeContext?.status);
+  const sendMessageMutation = useSendRoomMessage();
   const notesQuery = useConsultationNotes(activeConsultationId);
   const soapMutation = useCreateSoapNote();
+  const [guestMessages, setGuestMessages] = useState<
+    Array<{ id: string; sender: "practitioner" | "patient"; text: string }>
+  >([]);
 
   const currentPatientName =
     consultationsQuery.data?.find((c) => c.id === activeConsultationId)?.patientName ||
@@ -142,6 +152,47 @@ export default function PractitionerChatScreen() {
         {activeView === "room" && (
           <PractitionerLiveRoomView
             patientName={currentPatientName}
+            messages={
+              isGuest
+                ? guestMessages
+                : (messagesQuery.data ?? []).map((m) => ({
+                    id: m.id,
+                    sender: m.senderRole === "PATIENT" ? "patient" : "practitioner",
+                    text: m.content,
+                  }))
+            }
+            onSendMessage={async (text) => {
+              if (isGuest) {
+                setGuestMessages((prev) => [
+                  ...prev,
+                  { id: `msg-${Date.now()}`, sender: "practitioner", text },
+                ]);
+                return;
+              }
+              if (!activeContext?.roomId) {
+                haptics.error();
+                Alert.alert(
+                  "Ruang Sesi Belum Aktif",
+                  "Masuk melalui jadwal atau konsultasi aktif untuk mengirim pesan ke pasien.",
+                );
+                return;
+              }
+              try {
+                await sendMessageMutation.mutateAsync({
+                  roomId: activeContext.roomId,
+                  dto: { content: text, senderRole: "PRACTITIONER" },
+                });
+                haptics.light();
+              } catch (err: unknown) {
+                haptics.error();
+                Alert.alert(
+                  "Gagal Mengirim Pesan",
+                  err instanceof ApiError
+                    ? err.message
+                    : "Pesan belum dapat dikirim ke server.",
+                );
+              }
+            }}
             onBack={() => setActiveView("lobby")}
             onOpenContext={() => setActiveView("context")}
             onOpenRequestAssessment={() => setActiveView("request-assessment")}

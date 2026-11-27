@@ -11,15 +11,47 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build:
-    name: Build Android Staging
+  quality:
+    name: Code Quality & Contract Gate
     runs-on: ubuntu-latest
-    timeout-minutes: 90
-
+    timeout-minutes: 25
     defaults:
       run:
         working-directory: mobile
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+
+      - name: Install locked dependencies
+        run: npm ci --include=dev
+
+      - name: Validate Expo configuration
+        run: npx --no-install expo config --json > /dev/null
+
+      - name: Typecheck
+        run: npx --no-install tsc --noEmit
+
+      - name: Run unit tests
+        run: npm run test:ci
+
+      - name: Audit API contracts and routes
+        run: npm run audit
+
+  build:
+    name: Build Android Staging APK
+    needs: quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    defaults:
+      run:
+        working-directory: mobile
     env:
       CI: "1"
       EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
@@ -35,22 +67,35 @@ jobs:
           cache: npm
           cache-dependency-path: mobile/package-lock.json
 
-      - name: Install dependencies
+      - name: Install locked dependencies
         run: npm ci --include=dev
 
-      - name: Validate Expo configuration
-        run: npx --no-install expo config --json > /dev/null
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
 
-      - name: Validate EAS project
-        run: npx --no-install eas project:info
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
 
-      - name: Run unit tests
-        run: npm run test:ci
-
-      - name: Build Android staging APK with EAS
+      - name: Build Android staging APK (local runner)
         run: |
+          mkdir -p "$RUNNER_TEMP/android-build"
           npx --no-install eas build \
             --platform android \
             --profile staging \
-            --non-interactive
+            --local \
+            --non-interactive \
+            --output "$RUNNER_TEMP/android-build/seraphany-staging-${{ github.sha }}.apk"
+          sha256sum "$RUNNER_TEMP/android-build/seraphany-staging-${{ github.sha }}.apk" > "$RUNNER_TEMP/android-build/SHA256SUMS.txt"
 
+      - name: Upload staging APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: seraphany-android-staging-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/android-build/*.apk
+            ${{ runner.temp }}/android-build/SHA256SUMS.txt
+          retention-days: 14
+          if-no-files-found: error

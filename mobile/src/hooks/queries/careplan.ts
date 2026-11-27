@@ -7,14 +7,17 @@ import {
 import { queryKeys } from "../useQueryKeys";
 import { callWithSignal } from "./shared";
 
-export function useCarePlan(consultationId?: string) {
+export function useCarePlan(
+  consultationId?: string,
+  options?: { enabled?: boolean },
+) {
   return useQuery<CarePlanDto | null>({
     queryKey: queryKeys.carePlan.byConsultation(consultationId ?? ""),
     queryFn: ({ signal }) =>
       consultationId
         ? callWithSignal(carePlanService.getCarePlanByConsultation, signal, consultationId)
         : Promise.resolve(null),
-    enabled: !!consultationId,
+    enabled: !!consultationId && (options?.enabled ?? true),
     staleTime: 5 * 60 * 1000,
   });
 }

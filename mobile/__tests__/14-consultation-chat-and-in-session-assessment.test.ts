@@ -83,7 +83,7 @@ describe("Tahap 7: Ruang Konsultasi Chat & Asesmen dalam Sesi (Screens 43-47)", 
       expect(content).toContain("TextInput");
     });
 
-    it("should verify chat-room.tsx connects the components, default dialogue, and finish dialog", () => {
+    it("should verify chat-room.tsx connects the components, safe leave dialog, and enforces practitioner-only finish", () => {
       const content = fs.readFileSync(chatRoomScreenFile, "utf-8");
       expect(content).toContain("Belum ada riwayat pesan pada sesi konsultasi ini.");
       expect(content).toContain("ChatHeaderBar");
@@ -92,7 +92,9 @@ describe("Tahap 7: Ruang Konsultasi Chat & Asesmen dalam Sesi (Screens 43-47)", 
       expect(content).toContain("ChatInputBar");
       expect(content).toContain("InSessionAssessmentModal");
       expect(content).toContain("SessionOvertimeSheet");
-      expect(content).toContain("Akhiri sesi?");
+      expect(content).toContain("Keluar dari Ruang Chat?");
+      expect(content).toContain("Sesi hanya dapat diakhiri oleh praktisi yang ditugaskan");
+      expect(content).not.toContain("useFinishConsultation");
     });
   });
 

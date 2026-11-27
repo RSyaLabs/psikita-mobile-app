@@ -2,12 +2,12 @@ import { z } from "zod";
 import { CONSULTATION_STATUSES } from "@/constants/enums";
 import { ApiError, apiRequest } from "./client";
 import {
-  noContentAdapter,
   paginatedAdapter,
   requireServerId,
   withQueryParams,
   type PaginatedResult,
 } from "./response";
+import { chatSocketClient } from "@/services/chat-socket";
 import {
   ActiveConsultationContext,
   CreateConsultationDto,
@@ -228,14 +228,20 @@ export const consultationService = {
     return this.create(dto);
   },
 
-  /** Finish is confirmed only by the documented no-content success response. */
-  async finish(consultationId: string): Promise<void> {
+  /** Core API responds 200 with the updated consultation, not 204. */
+  async finish(consultationId: string): Promise<ConsultationResponseDto> {
     const normalizedId = requireServerId(consultationId, "consultationId");
-    return apiRequest<void>(
+    return apiRequest<ConsultationResponseDto>(
       `/consultations/${encodeURIComponent(normalizedId)}/finish`,
       {
         method: "POST",
-        adapter: noContentAdapter,
+        adapter: (value) => {
+          const response = consultationAdapter(normalizedId)(value);
+          if (response.status !== "FINISHED") {
+            throw new Error("Consultation finish was not confirmed by the server");
+          }
+          return response;
+        },
       },
     );
   },
@@ -340,22 +346,39 @@ export const consultationService = {
   },
 
   /**
-   * The checked-in contract has no message POST. Keep the method as a typed
-   * failing boundary for old callers instead of inventing an endpoint.
+   * Send a consultation message via the authorized Socket.IO `/messaging` gateway.
    */
   async sendMessage(
-    _roomId: string,
-    _dto: {
+    roomId: string,
+    dto: {
       content: string;
       contentType?: "TEXT" | "IMAGE" | "DOCUMENT" | "AUDIO";
       senderRole?: "PATIENT" | "PRACTITIONER";
+      clientMessageId?: string;
     },
   ): Promise<MessageResponseDto> {
-    throw new ApiError(
-      "Pengiriman pesan belum tersedia",
-      501,
-      "CHAT_WRITE_UNAVAILABLE",
-    );
+    const normalizedRoomId = requireServerId(roomId, "roomId");
+    const trimmedContent = dto.content.trim();
+    if (!trimmedContent) {
+      throw new ApiError("Isi pesan tidak boleh kosong.", 400, "INVALID_MESSAGE");
+    }
+
+    const clientMessageId =
+      dto.clientMessageId?.trim() ||
+      `mob_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+
+    const raw = await chatSocketClient.sendMessage({
+      roomId: normalizedRoomId,
+      clientMessageId,
+      ciphertext: trimmedContent,
+      metadata: {
+        contentType: dto.contentType ?? "TEXT",
+        senderRole: dto.senderRole ?? "PATIENT",
+        clientGeneratedAt: new Date().toISOString(),
+      },
+    });
+
+    return messageAdapter(normalizedRoomId)(raw);
   },
 };
 

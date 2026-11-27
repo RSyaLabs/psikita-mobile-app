@@ -16,9 +16,17 @@ import {
 } from "@/components/ui";
 import { ArrowLeft, Send, Video } from "lucide-react-native";
 
+interface PractitionerLiveRoomMessage {
+  id: string;
+  sender: "practitioner" | "patient";
+  text: string;
+}
+
 export interface PractitionerLiveRoomViewProps {
   patientName?: string;
   remainingTime?: string;
+  messages?: PractitionerLiveRoomMessage[];
+  onSendMessage?: (text: string) => void | Promise<void>;
   onBack: () => void;
   onOpenContext: () => void;
   onOpenRequestAssessment: () => void;
@@ -31,6 +39,8 @@ export interface PractitionerLiveRoomViewProps {
 export function PractitionerLiveRoomView({
   patientName = "Pasien Sesi",
   remainingTime = "32:10",
+  messages: propMessages,
+  onSendMessage,
   onBack,
   onOpenContext,
   onOpenRequestAssessment,
@@ -40,27 +50,20 @@ export function PractitionerLiveRoomView({
   onStartVideoCall,
 }: PractitionerLiveRoomViewProps) {
   const [inputText, setInputText] = useState("");
-  const [messages, setMessages] = useState<
-    Array<{ id: string; sender: "practitioner" | "patient"; text: string }>
-  >([
-    {
-      id: "m1",
-      sender: "practitioner",
-      text: "Halo, terima kasih sudah datang. Boleh ceritakan apa yang paling mengganggumu belakangan ini?",
-    },
-    {
-      id: "m2",
-      sender: "patient",
-      text: "Akhir-akhir ini saya susah tidur karena cemas.",
-    },
-  ]);
+  const [localMessages, setLocalMessages] = useState<PractitionerLiveRoomMessage[]>([]);
+  const messages = propMessages ?? localMessages;
 
   const handleSendMessage = () => {
-    if (!inputText.trim()) return;
-    setMessages((prev) => [
-      ...prev,
-      { id: Date.now().toString(), sender: "practitioner", text: inputText.trim() },
-    ]);
+    const trimmed = inputText.trim();
+    if (!trimmed) return;
+    if (onSendMessage) {
+      void onSendMessage(trimmed);
+    } else {
+      setLocalMessages((prev) => [
+        ...prev,
+        { id: Date.now().toString(), sender: "practitioner", text: trimmed },
+      ]);
+    }
     setInputText("");
   };
 

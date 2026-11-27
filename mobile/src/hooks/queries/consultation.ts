@@ -167,7 +167,10 @@ export function useActiveConsultation(consultationId?: string) {
 /**
  * Hook to retrieve clinical notes (SOAP) for a consultation
  */
-export function useConsultationNotes(consultationId: string) {
+export function useConsultationNotes(
+  consultationId: string,
+  options?: { enabled?: boolean },
+) {
   return useQuery({
     queryKey: queryKeys.consultations.notes(consultationId),
     queryFn: ({ signal }) =>
@@ -176,7 +179,7 @@ export function useConsultationNotes(consultationId: string) {
         signal,
         consultationId,
       ),
-    enabled: !!consultationId,
+    enabled: !!consultationId && (options?.enabled ?? true),
     staleTime: 10 * 60 * 1000,
   });
 }

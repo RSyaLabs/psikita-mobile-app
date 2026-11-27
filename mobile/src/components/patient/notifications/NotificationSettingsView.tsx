@@ -1,8 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, Pressable, ScrollView, Switch } from "react-native";
 import { ChevronLeft } from "lucide-react-native";
 import { haptics } from "@/utils/haptics";
+import { secureStorage } from "@/utils/storage";
 import { AppIcon } from "@/components/common/AppIcon";
+
+const STORAGE_KEY = "seraphany_notification_prefs";
 
 export interface NotificationSettingsState {
   paymentAndSession: boolean;
@@ -56,11 +59,46 @@ export function NotificationSettingsView({
 }: NotificationSettingsViewProps) {
   const [settings, setSettings] = useState<NotificationSettingsState>(initialSettings);
 
+  useEffect(() => {
+    let active = true;
+    secureStorage
+      .getItem(STORAGE_KEY)
+      .then((raw) => {
+        if (!active || !raw) return;
+        const parsed = JSON.parse(raw) as Partial<NotificationSettingsState>;
+        setSettings((prev) => ({
+          ...prev,
+          consultationResult:
+            typeof parsed.consultationResult === "boolean"
+              ? parsed.consultationResult
+              : prev.consultationResult,
+          sessionReminder:
+            typeof parsed.sessionReminder === "boolean"
+              ? parsed.sessionReminder
+              : prev.sessionReminder,
+          carePlanReminder:
+            typeof parsed.carePlanReminder === "boolean"
+              ? parsed.carePlanReminder
+              : prev.carePlanReminder,
+          educationAndTips:
+            typeof parsed.educationAndTips === "boolean"
+              ? parsed.educationAndTips
+              : prev.educationAndTips,
+          paymentAndSession: true,
+        }));
+      })
+      .catch(() => undefined);
+    return () => {
+      active = false;
+    };
+  }, []);
+
   const updateSetting = (key: keyof NotificationSettingsState, value: boolean) => {
     if (key === "paymentAndSession") return;
     haptics.selection();
     const updated = { ...settings, [key]: value };
     setSettings(updated);
+    void secureStorage.setItem(STORAGE_KEY, JSON.stringify(updated)).catch(() => undefined);
     onSettingsChange?.(updated);
   };
 
@@ -118,9 +156,12 @@ export function NotificationSettingsView({
         </Text>
       </View>
 
-      <View className="border-[1.5px] border-dashed border-[#777777] rounded-xl p-3.5 bg-stone-50/60">
+      <View className="border-[1.5px] border-dashed border-[#777777] rounded-xl p-3.5 bg-stone-50/60 gap-1">
         <Text className="text-sm leading-relaxed text-[#555555]">
           Kategori wajib vs opsional ditentukan produk.
+        </Text>
+        <Text className="text-sm leading-relaxed text-[#555555]">
+          Preferensi tersimpan di perangkat ini (sinkronisasi server & izin push OS mengikuti pengaturan sistem).
         </Text>
       </View>
     </ScrollView>

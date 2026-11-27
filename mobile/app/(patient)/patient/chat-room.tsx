@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Alert, KeyboardAvoidingView, Platform } from "react-native";
@@ -10,7 +10,6 @@ import {
   Card,
   Button,
   ButtonText,
-  ButtonSpinner,
   ScrollView,
 } from "@/components/ui";
 import {
@@ -25,10 +24,12 @@ import {
 import { ROUTES } from "@/constants/routes";
 import {
   useActiveConsultation,
-  useFinishConsultation,
   useRoomMessages,
+  useRoomRealtimeSync,
+  useSendRoomMessage,
   usePractitioner,
 } from "@/hooks/useApiQueries";
+import { ApiError } from "@/api/client";
 import { haptics, safeNavigateBack, formatMessageTime } from "@/utils";
 
 export default function ChatRoomScreen() {
@@ -50,18 +51,17 @@ export default function ChatRoomScreen() {
   const consultation = useActiveConsultation(consultationId);
   const context = consultation.context;
   const messagesQuery = useRoomMessages(context?.roomId, context?.status);
-  const finishMutation = useFinishConsultation();
+  useRoomRealtimeSync(context?.roomId, context?.status);
+  const sendMessageMutation = useSendRoomMessage();
 
-  const [showFinishDialog, setShowFinishDialog] = useState(false);
-  const finishInFlightRef = useRef(false);
-  const [isFinishing, setIsFinishing] = useState(false);
+  const [showLeaveDialog, setShowLeaveDialog] = useState(false);
 
   // In-session sub-screens state
   const [isAssessmentOpen, setIsAssessmentOpen] = useState(mode === "assessment");
   const [isAssessmentCompleted, setIsAssessmentCompleted] = useState(false);
   const [isOvertimeOpen, setIsOvertimeOpen] = useState(mode === "overtime");
 
-  // Local message state for immediate user interactivity
+  // Local message state for guest preview / immediate optimistic feedback
   const [localMessages, setLocalMessages] = useState<ChatMessageItem[]>([]);
   const isGuest = guest === "true";
 
@@ -73,53 +73,55 @@ export default function ChatRoomScreen() {
     safeNavigateBack(router, ROUTES.PATIENT.DASHBOARD);
   };
 
-  const handleSendMessage = (text: string) => {
-    if (!isGuest) {
+  const handleSendMessage = async (text: string) => {
+    const trimmed = text.trim();
+    if (!trimmed) return;
+
+    if (isGuest) {
+      const newMessage: ChatMessageItem = {
+        id: "msg-" + Date.now(),
+        senderRole: "PATIENT",
+        content: trimmed,
+        statusLabel: "Terkirim",
+        timestamp: formatMessageTime(new Date().toISOString()),
+      };
+      setLocalMessages((prev) => [...prev, newMessage]);
+      return;
+    }
+
+    if (!context?.roomId) {
       haptics.error();
       Alert.alert(
-        "Layanan Chat Real-Time Belum Tersambung",
-        "Koneksi pesan langsung sedang disiapkan. Gunakan sesi video atau segarkan percakapan secara berkala.",
+        "Ruang Konsultasi Belum Aktif",
+        "Masuk melalui jadwal atau sesi konsultasi yang sedang aktif untuk mengirim pesan.",
       );
       return;
     }
-    const newMessage: ChatMessageItem = {
-      id: "msg-" + Date.now(),
-      senderRole: "PATIENT",
-      content: text,
-      statusLabel: "Terkirim",
-      timestamp: formatMessageTime(new Date().toISOString()),
-    };
-    setLocalMessages((prev) => [...prev, newMessage]);
+
+    try {
+      await sendMessageMutation.mutateAsync({
+        roomId: context.roomId,
+        dto: {
+          content: trimmed,
+          senderRole: "PATIENT",
+        },
+      });
+      haptics.light();
+    } catch (err: unknown) {
+      haptics.error();
+      Alert.alert(
+        "Gagal Mengirim Pesan",
+        err instanceof ApiError
+          ? err.message
+          : "Pesan tidak dapat dikirim ke ruang konsultasi saat ini.",
+      );
+    }
   };
 
-  const handleFinish = () => {
-    if (!context) {
-      setShowFinishDialog(false);
-      router.push({
-        pathname: ROUTES.PATIENT.SESSION_SUMMARY,
-        params: { consultationId: consultationId || "" },
-      } as any);
-      return;
-    }
-
-    if (finishInFlightRef.current) return;
-    finishInFlightRef.current = true;
-    setIsFinishing(true);
-
-    finishMutation.mutate(context, {
-      onSuccess: () => {
-        setShowFinishDialog(false);
-        router.push({
-          pathname: ROUTES.PATIENT.SESSION_SUMMARY,
-          params: { consultationId: context.consultationId },
-        } as any);
-      },
-      onSettled: () => {
-        finishInFlightRef.current = false;
-        setIsFinishing(false);
-      },
-      onError: () => haptics.error(),
-    });
+  const handleLeaveRoom = () => {
+    setShowLeaveDialog(false);
+    haptics.light();
+    safeNavigateBack(router, ROUTES.PATIENT.HISTORY);
   };
 
   const serverMessages: ChatMessageItem[] =
@@ -203,16 +205,16 @@ export default function ChatRoomScreen() {
             onOpenAssessment={() => setIsAssessmentOpen(true)}
           />
 
-          {/* Quick End-Session Action */}
+          {/* Safe Navigation Action: Leave room without closing clinical episode */}
           <Box className="self-center mt-3 mb-2">
             <Button
               variant="outline"
               size="sm"
-              onPress={() => setShowFinishDialog(true)}
+              onPress={() => setShowLeaveDialog(true)}
               className="border-border rounded-xl px-4 active:bg-muted"
             >
               <ButtonText className="text-sm font-semibold text-muted-foreground">
-                Akhiri sesi konsultasi
+                Keluar dari ruang chat
               </ButtonText>
             </Button>
           </Box>
@@ -264,24 +266,24 @@ export default function ChatRoomScreen() {
           }}
           onEndSessionOnTime={() => {
             setIsOvertimeOpen(false);
-            setShowFinishDialog(true);
+            setShowLeaveDialog(true);
           }}
         />
 
-        {/* Confirmation Dialog: Akhiri Sesi? */}
-        {showFinishDialog && (
+        {/* Safe Navigation Dialog: Keluar Ruang Chat (tidak menyelesaikan sesi klinis) */}
+        {showLeaveDialog && (
           <Box className="absolute inset-0 bg-black/40 items-center justify-center p-5 z-50">
             <Card className="bg-card rounded-3xl p-5 border border-border w-full max-w-[420px]">
               <Heading size="md" bold className="text-foreground text-lg">
-                Akhiri sesi?
+                Keluar dari Ruang Chat?
               </Heading>
               <Text className="text-sm text-muted-foreground mt-2 leading-relaxed">
-                Sesi hanya ditandai selesai setelah server mengonfirmasi respons.
+                Sesi hanya dapat diakhiri oleh praktisi yang ditugaskan. Keluar dari ruang chat tidak menyelesaikan sesi klinis.
               </Text>
               <HStack space="sm" className="mt-5">
                 <Button
                   variant="outline"
-                  onPress={() => setShowFinishDialog(false)}
+                  onPress={() => setShowLeaveDialog(false)}
                   className="flex-1 rounded-xl h-11"
                 >
                   <ButtonText className="text-sm font-semibold text-foreground">
@@ -289,17 +291,12 @@ export default function ChatRoomScreen() {
                   </ButtonText>
                 </Button>
                 <Button
-                  onPress={handleFinish}
-                  isDisabled={isFinishing}
+                  onPress={handleLeaveRoom}
                   className="flex-1 rounded-xl h-11 bg-primary"
                 >
-                  {isFinishing ? (
-                    <ButtonSpinner />
-                  ) : (
-                    <ButtonText className="text-sm font-semibold text-primary-foreground">
-                      Konfirmasi
-                    </ButtonText>
-                  )}
+                  <ButtonText className="text-sm font-semibold text-primary-foreground">
+                    Keluar Chat
+                  </ButtonText>
                 </Button>
               </HStack>
             </Card>

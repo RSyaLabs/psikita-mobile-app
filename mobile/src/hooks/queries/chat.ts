@@ -1,10 +1,14 @@
+import { useEffect } from "react";
 import {
+  useMutation,
   useQuery,
+  useQueryClient,
 } from "@tanstack/react-query";
 import type { PaginatedResult } from "@/api/response";
 import {
   consultationService,
 } from "@/api";
+import { chatSocketClient } from "@/services/chat-socket";
 import {
   MessageResponseDto,
 } from "@/types/api";
@@ -67,4 +71,71 @@ export function useRoomMessages(
     data: query.data?.data,
     meta: query.data?.meta,
   };
+}
+
+/**
+ * Subscribe to Socket.IO room updates and keep React Query messages synchronized.
+ */
+export function useRoomRealtimeSync(
+  roomId?: string,
+  consultationStatus?: string,
+) {
+  const queryClient = useQueryClient();
+  const normalizedRoomId = roomId?.trim() || "";
+  const isActive = shouldPollRoom(normalizedRoomId, consultationStatus);
+
+  useEffect(() => {
+    if (!isActive || !normalizedRoomId) return;
+
+    let cancelled = false;
+    chatSocketClient.joinRoom(normalizedRoomId).catch(() => {
+      // Fallback adaptive polling in useRoomMessages continues safely if socket fails.
+    });
+
+    const unsubscribe = chatSocketClient.subscribeMessages((payload) => {
+      if (cancelled) return;
+      if (
+        payload &&
+        typeof payload === "object" &&
+        "roomId" in payload &&
+        (payload as { roomId?: unknown }).roomId === normalizedRoomId
+      ) {
+        void queryClient.invalidateQueries({
+          queryKey: queryKeys.consultations.roomMessages(normalizedRoomId),
+        });
+      }
+    });
+
+    return () => {
+      cancelled = true;
+      unsubscribe();
+      void chatSocketClient.leaveRoom(normalizedRoomId);
+    };
+  }, [isActive, normalizedRoomId, queryClient]);
+}
+
+/**
+ * Mutation hook to send a consultation message through the Socket.IO gateway.
+ */
+export function useSendRoomMessage() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      roomId,
+      dto,
+    }: {
+      roomId: string;
+      dto: {
+        content: string;
+        contentType?: "TEXT" | "IMAGE" | "DOCUMENT" | "AUDIO";
+        senderRole?: "PATIENT" | "PRACTITIONER";
+        clientMessageId?: string;
+      };
+    }) => consultationService.sendMessage(roomId, dto),
+    onSuccess: (_data, { roomId }) => {
+      void queryClient.invalidateQueries({
+        queryKey: queryKeys.consultations.roomMessages(roomId.trim()),
+      });
+    },
+  });
 }

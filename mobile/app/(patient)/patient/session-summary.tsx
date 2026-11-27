@@ -37,8 +37,8 @@ export default function SessionSummaryScreen() {
   const context = consultation.context;
   const targetConsultationId = context?.consultationId || consultationId || "";
 
-  const notesQuery = useConsultationNotes(targetConsultationId);
-  const { data: carePlan } = useCarePlan(targetConsultationId);
+  const notesQuery = useConsultationNotes(targetConsultationId, { enabled: false });
+  const { data: carePlan } = useCarePlan(targetConsultationId, { enabled: false });
   const { data: resultDetail } = usePatientResultDetail(targetConsultationId);
 
   // Toggle between Screen 46 ("completed") and Screen 47 ("result")
@@ -101,13 +101,19 @@ export default function SessionSummaryScreen() {
         /* Screen 47: Hasil Konsultasi */
         <ConsultationResultView
           dateLabel={
-            note?.createdAt
-              ? new Date(note.createdAt).toLocaleDateString("id-ID", {
+            resultDetail?.sessionDate
+              ? new Date(resultDetail.sessionDate).toLocaleDateString("id-ID", {
                   day: "numeric",
                   month: "long",
                   year: "numeric",
                 })
-              : "Sesi Terbaru"
+              : note?.createdAt
+                ? new Date(note.createdAt).toLocaleDateString("id-ID", {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                  })
+                : "Sesi Terbaru"
           }
           practitionerName={practitionerName}
           doctorNotes={doctorAdvice}

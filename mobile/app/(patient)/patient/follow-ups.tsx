@@ -65,7 +65,9 @@ export default function FollowUpsScreen() {
 
   const { data: myFollowUps, refetch: refetchFollowUps } = useMyFollowUps();
   const activeFollowUp = myFollowUps?.[0];
-  const { data: carePlan } = useCarePlan(targetConsultationId || undefined);
+  const { data: carePlan } = useCarePlan(targetConsultationId || undefined, {
+    enabled: false,
+  });
   const practitioner = usePractitioner(
     context?.practitionerId || activeFollowUp?.practitionerId,
   );

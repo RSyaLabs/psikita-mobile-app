@@ -18,7 +18,9 @@
   "ignoreDependencies": [
     "expo-updates",
     "expo-system-ui",
-    "babel-preset-expo"
+    "babel-preset-expo",
+    "query-string",
+    "@react-native/js-polyfills"
   ],
   "ignoreBinaries": [
     "knip"
