@@ -33,10 +33,23 @@ function resolveMessagingSocketTarget(): { namespaceUrl: string; path: string } 
   }
 }
 
+function extractWsExceptionMessage(payload: unknown, fallback: string): string {
+  if (typeof payload === "string" && payload.trim()) return payload;
+  if (payload && typeof payload === "object") {
+    const msg = (payload as { message?: unknown }).message;
+    if (typeof msg === "string" && msg.trim()) return msg;
+    if (Array.isArray(msg) && msg.length > 0 && typeof msg[0] === "string") {
+      return msg[0];
+    }
+  }
+  return fallback;
+}
+
 class ChatSocketClient {
   private socket: Socket | null = null;
   private activeToken: string | null = null;
   private joinedRooms = new Set<string>();
+  private desiredRooms = new Set<string>();
   private messageListeners = new Set<(message: unknown) => void>();
 
   private async ensureConnected(): Promise<Socket> {
@@ -65,6 +78,22 @@ class ChatSocketClient {
 
     socket.on("message_received", (payload: unknown) => {
       this.messageListeners.forEach((listener) => listener(payload));
+    });
+
+    socket.on("disconnect", () => {
+      this.joinedRooms.clear();
+    });
+
+    socket.on("connect", () => {
+      this.desiredRooms.forEach((roomId) => {
+        if (!this.joinedRooms.has(roomId)) {
+          socket.emit("join_room", { roomId }, (ack?: { status?: string }) => {
+            if (ack?.status === "JOINED") {
+              this.joinedRooms.add(roomId);
+            }
+          });
+        }
+      });
     });
 
     this.socket = socket;
@@ -117,15 +146,40 @@ class ChatSocketClient {
 
   async joinRoom(roomId: string): Promise<void> {
     const normalizedRoomId = requireServerId(roomId, "roomId");
+    this.desiredRooms.add(normalizedRoomId);
     const socket = await this.ensureConnected();
 
     await new Promise<void>((resolve, reject) => {
+      let settled = false;
+      const cleanup = () => {
+        clearTimeout(timer);
+        socket.off("exception", onException);
+      };
       const timer = setTimeout(() => {
+        if (settled) return;
+        settled = true;
+        cleanup();
         reject(new ApiError("Gagal bergabung ke ruang konsultasi.", 504, "JOIN_ROOM_TIMEOUT"));
       }, 8000);
 
+      const onException = (errPayload: unknown) => {
+        if (settled) return;
+        settled = true;
+        cleanup();
+        reject(
+          new ApiError(
+            extractWsExceptionMessage(errPayload, "Akses ruang konsultasi ditolak server."),
+            403,
+            "JOIN_ROOM_FAILED",
+          ),
+        );
+      };
+
+      socket.once("exception", onException);
       socket.emit("join_room", { roomId: normalizedRoomId }, (ack?: { status?: string; message?: string }) => {
-        clearTimeout(timer);
+        if (settled) return;
+        settled = true;
+        cleanup();
         if (ack?.status === "JOINED") {
           this.joinedRooms.add(normalizedRoomId);
           resolve();
@@ -144,6 +198,7 @@ class ChatSocketClient {
 
   async leaveRoom(roomId: string): Promise<void> {
     const normalizedRoomId = roomId.trim();
+    this.desiredRooms.delete(normalizedRoomId);
     if (!normalizedRoomId || !this.socket?.connected) {
       this.joinedRooms.delete(normalizedRoomId);
       return;
@@ -168,7 +223,16 @@ class ChatSocketClient {
     }
 
     return await new Promise<unknown>((resolve, reject) => {
+      let settled = false;
+      const cleanup = () => {
+        clearTimeout(timer);
+        socket.off("exception", onException);
+      };
+
       const timer = setTimeout(() => {
+        if (settled) return;
+        settled = true;
+        cleanup();
         reject(
           new ApiError(
             "Pengiriman pesan melebihi batas waktu. Coba kirim ulang.",
@@ -178,6 +242,20 @@ class ChatSocketClient {
         );
       }, 10000);
 
+      const onException = (errPayload: unknown) => {
+        if (settled) return;
+        settled = true;
+        cleanup();
+        reject(
+          new ApiError(
+            extractWsExceptionMessage(errPayload, "Pesan ditolak oleh server."),
+            403,
+            "CHAT_SEND_FAILED",
+          ),
+        );
+      };
+
+      socket.once("exception", onException);
       socket.emit(
         "send_message",
         {
@@ -187,7 +265,9 @@ class ChatSocketClient {
           metadata: input.metadata ?? {},
         },
         (ack: unknown) => {
-          clearTimeout(timer);
+          if (settled) return;
+          settled = true;
+          cleanup();
           if (ack && typeof ack === "object" && "id" in ack) {
             resolve(ack);
             return;
@@ -211,6 +291,7 @@ class ChatSocketClient {
 
   disconnect(): void {
     this.joinedRooms.clear();
+    this.desiredRooms.clear();
     if (this.socket) {
       this.socket.removeAllListeners();
       this.socket.disconnect();

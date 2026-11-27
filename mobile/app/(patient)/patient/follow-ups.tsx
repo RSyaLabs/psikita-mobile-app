@@ -112,7 +112,11 @@ export default function FollowUpsScreen() {
     } as any);
   };
 
-  const handleProceedToCheckout = async (selectedDate: string, selectedTime: string) => {
+  const handleProceedToCheckout = async (
+    selectedDate: string,
+    selectedTime: string,
+    isoDate?: string,
+  ) => {
     haptics.selection();
     if (isGuest) {
       setConfirmedSchedule({
@@ -132,9 +136,16 @@ export default function FollowUpsScreen() {
     }
 
     try {
+      const normalizedTime = selectedTime.replace(".", ":");
+      const baseDate =
+        isoDate && /^\d{4}-\d{2}-\d{2}$/.test(isoDate)
+          ? isoDate
+          : /^\d{4}-\d{2}-\d{2}/.test(selectedDate)
+            ? selectedDate.slice(0, 10)
+            : new Date(Date.now() + 86400000).toISOString().slice(0, 10);
       const slotIso = selectedDate.includes("T")
         ? selectedDate
-        : `${selectedDate}T${selectedTime.replace(".", ":")}:00+07:00`;
+        : `${baseDate}T${normalizedTime}:00+07:00`;
       await followUpService.bookFollowUpSlot(activeFollowUp.id, slotIso);
       await refetchFollowUps();
       haptics.success();

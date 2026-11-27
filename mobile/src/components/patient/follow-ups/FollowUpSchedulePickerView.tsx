@@ -18,12 +18,13 @@ interface DateOption {
   dayName: string;
   dayNumber: string;
   fullDate: string;
+  isoDate: string;
 }
 
 export interface FollowUpSchedulePickerViewProps {
   practitionerName?: string;
   sessionDuration?: string;
-  onProceedToCheckout: (selectedDate: string, selectedTime: string) => void;
+  onProceedToCheckout: (selectedDate: string, selectedTime: string, isoDate?: string) => void;
   onDismiss: () => void;
 }
 
@@ -37,6 +38,9 @@ export function FollowUpSchedulePickerView({
     const d = new Date();
     d.setDate(d.getDate() + idx + 1);
     const dayNames = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const dd = String(d.getDate()).padStart(2, "0");
     return {
       id: `d-${idx + 1}`,
       dayName: dayNames[d.getDay()],
@@ -46,6 +50,7 @@ export function FollowUpSchedulePickerView({
         month: "long",
         year: "numeric",
       }),
+      isoDate: `${yyyy}-${mm}-${dd}`,
     };
   });
 
@@ -214,7 +219,11 @@ export function FollowUpSchedulePickerView({
           <Button
             onPress={() => {
               haptics.selection();
-              onProceedToCheckout(selectedDateObj.fullDate, selectedTime);
+              onProceedToCheckout(
+                selectedDateObj.fullDate,
+                selectedTime,
+                selectedDateObj.isoDate,
+              );
             }}
             accessibilityRole="button"
             accessibilityLabel="Pesan dan Lanjut Bayar"
